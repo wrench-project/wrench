@@ -41,13 +41,12 @@ namespace wrench {
      * @param grid_post_overhead: grid job post-overhead
      * @param non_grid_pre_overhead: non-grid job pre-overhead
      * @param non_grid_post_overhead: non-grid job post-overhead
-     * @param fast_bmcs_resource_availability: whether to obtain direct availabily information from bare-metal services
+     * @param fast_bmcs_resource_availability: whether to obtain direct availability information from bare-metal services
      * @param fcfs: whether to enforce FCFS scheduling of jobs
      * @param compute_services: a set of 'child' compute resources available to and via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @throw std::runtime_error
      */
     HTCondorCentralManagerService::HTCondorCentralManagerService(
             const std::string &hostname,
@@ -60,7 +59,7 @@ namespace wrench {
             bool fcfs,
             std::set<shared_ptr<ComputeService>> compute_services,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list)
         : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
 
@@ -83,8 +82,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    HTCondorCentralManagerService::~HTCondorCentralManagerService() {
-    }
+    HTCondorCentralManagerService::~HTCondorCentralManagerService() = default;
 
     /**
      * @brief Add a new 'child' compute service
@@ -104,8 +102,6 @@ namespace wrench {
      * @param job: a compound job
      * @param service_specific_args: service specific arguments
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::submitCompoundJob(
             std::shared_ptr<CompoundJob> job,
@@ -155,7 +151,7 @@ namespace wrench {
                             this->fcfs,
                             this->compute_services,
                             this->running_jobs, this->pending_jobs, this->commport);
-                    negotiator->setSimulation(this->simulation);
+                    negotiator->setSimulation(this->simulation_);
                     negotiator->start(negotiator, true, false);// Daemonized, no auto-restart
                 }
             }
@@ -180,7 +176,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool HTCondorCentralManagerService::processNextMessage() {
         // Wait for a message
@@ -254,7 +249,6 @@ namespace wrench {
      * @param job: the job
      * @param service_specific_args: service specific arguments
      *
-     * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitCompoundJob(
             S4U_CommPort *answer_commport, std::shared_ptr<CompoundJob> job,
@@ -276,7 +270,6 @@ namespace wrench {
     //     * @param job: the job
     //     * @param service_specific_args: service specific arguments
     //     *
-    //     * @throw std::runtime_error
     //     */
     //    void HTCondorCentralManagerService::processSubmitPilotJob(
     //            const std::string &answer_commport, std::shared_ptr <PilotJob> job,
@@ -297,7 +290,6 @@ namespace wrench {
     //     *
     //     * @param job: the pilot job
     //     *
-    //     * @throw std::runtime_error
     //     */
     //    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr <PilotJob> job) {
     //        // Forward the notification
@@ -314,7 +306,6 @@ namespace wrench {
     //     *
     //     * @param job: the pilot job
     //     *
-    //     * @throw std::runtime_error
     //     */
     //    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr <PilotJob> job) {
     //        // Forward the notification
@@ -331,7 +322,6 @@ namespace wrench {
      *
      * @param job: the job
      *
-     * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
@@ -351,7 +341,6 @@ namespace wrench {
      *
      * @param job: the job
      *
-     * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processCompoundJobFailure(const std::shared_ptr<CompoundJob> &job) {
         WRENCH_INFO("A compound job has failed: %s", job->getName().c_str());

@@ -17,7 +17,7 @@
 #include "CommunicatingActionsController.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MB (1000.0 * 1000.0)
+#define MB (1000000ULL)
 
 #define COMMUNICATOR_SIZE 16UL
 
@@ -44,7 +44,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int CommunicatingActionsController::main() {
         /* Set the logging output to GREEN */
@@ -104,7 +103,7 @@ namespace wrench {
 
                     // Participate in an all to all communication
                     unsigned long num_comm_bytes = 1 * MB;
-                    std::map<unsigned long, double> sends;
+                    std::map<unsigned long, sg_size_t> sends;
                     for (unsigned long i = 0; i < num_ranks; i++) {
                         if (i != my_rank) {
                             sends[i] = num_comm_bytes;

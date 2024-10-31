@@ -32,7 +32,7 @@ namespace wrench {
     class SimpleStorageServiceBufferized : public SimpleStorageService {
 
     private:
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -53,9 +53,9 @@ namespace wrench {
 
         // Public Constructor
         SimpleStorageServiceBufferized(const std::string &hostname,
-                                       std::set<std::string> mount_points,
+                                       const std::set<std::string>& mount_points,
                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                                       WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
 
     public:
@@ -65,7 +65,7 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
         void cleanup(bool has_returned_from_main, int return_value) override;
-        double countRunningFileTransferThreads();
+        unsigned long countRunningFileTransferThreads();
 
         /***********************/
         /** \endcond          **/
@@ -79,12 +79,12 @@ namespace wrench {
         bool processNextMessage();
 
         bool processFileWriteRequest(std::shared_ptr<FileLocation> &location,
-                                     double num_bytes_to_write,
+                                     sg_size_t num_bytes_to_write,
                                      S4U_CommPort *answer_commport);
 
         bool
         processFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                               double num_bytes_to_read, S4U_CommPort *answer_commport);
+                               sg_size_t num_bytes_to_read, S4U_CommPort *answer_commport);
 
         bool processFileCopyRequest(
                 std::shared_ptr<FileLocation> &src,
@@ -98,7 +98,7 @@ namespace wrench {
                 S4U_CommPort *dst_commportx,
                 const std::shared_ptr<FileLocation> &dst_location,
                 bool success,
-                std::shared_ptr<FailureCause> failure_cause,
+                const std::shared_ptr<FailureCause>& failure_cause,
                 S4U_CommPort *answer_commport_if_read,
                 S4U_CommPort *answer_commport_if_write,
                 S4U_CommPort *answer_commport_if_copy);

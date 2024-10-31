@@ -34,7 +34,7 @@ namespace wrench {
         public:
             /** @brief The maximum time an unupdated entry can remain in the cache.*/
             double maxCacheTime = std::numeric_limits<double>::infinity();
-            bool isCached(std::shared_ptr<DataFile> file);
+            bool isCached(const std::shared_ptr<DataFile>& file);
             void add(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
             void add(const std::shared_ptr<DataFile> &file, const std::set<std::shared_ptr<FileLocation>> &locations);
             std::set<std::shared_ptr<FileLocation>> get(const std::shared_ptr<DataFile> &file);

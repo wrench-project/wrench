@@ -17,7 +17,7 @@
 #include "SuperCustomActionController.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MB (1000.0 * 1000.0)
+#define MB (1000000ULL)
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for SuperCustomActionController");
 
@@ -64,7 +64,6 @@ namespace wrench {
      *
      * @return 0 on completion
      *
-     * @throw std::runtime_error
      */
     int SuperCustomActionController::main() {
         /* Set the logging output to GREEN */
@@ -139,7 +138,7 @@ namespace wrench {
                             action->getName().c_str(),
                             action->getExecutionHistory().top().execution_host.c_str(),
                             action->getExecutionHistory().top().physical_execution_host.c_str());
-                WRENCH_INFO("     - it used %lu cores for computation, and %.2lf bytes of RAM",
+                WRENCH_INFO("     - it used %lu cores for computation, and %llu bytes of RAM",
                             action->getExecutionHistory().top().num_cores_allocated,
                             action->getExecutionHistory().top().ram_allocated);
                 WRENCH_INFO("     - it started at time %.2lf and finished at time %.2lf",

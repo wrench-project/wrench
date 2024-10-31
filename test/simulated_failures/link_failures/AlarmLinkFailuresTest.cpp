@@ -28,7 +28,7 @@ public:
     std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-    ~AlarmLinkFailuresTest() {
+    ~AlarmLinkFailuresTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -67,7 +67,7 @@ class AlarmLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmLinkFailuresTestWMS(AlarmLinkFailuresTest *test,
-                             std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                             const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -78,14 +78,14 @@ private:
 
         // Create an Alarm service that will go of in 10 seconds
         auto commport = this->commport;
-        wrench::Alarm::createAndStartAlarm(this->simulation, 10, "Host2", commport,
+        wrench::Alarm::createAndStartAlarm(this->getSimulation(), 10, "Host2", commport,
                                            new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 
         // Start the link killer that will turn off link1 in 20 seconds
         auto switcher = std::shared_ptr<wrench::ResourceSwitcher>(
                 new wrench::ResourceSwitcher("Host1", 20, "link1",
                                              wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::LINK));
-        switcher->setSimulation(this->simulation);
+        switcher->setSimulation(this->getSimulation());
         switcher->start(switcher, true, false);// Daemonized, no auto-restart
 
         // Wait for the message
@@ -112,10 +112,11 @@ void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
+    argv[2] = strdup("--wrench-default-control-message-size=10");
 
     simulation->init(&argc, argv);
 

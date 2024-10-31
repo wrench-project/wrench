@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f: workflow->getInputFiles()) {
-        simulation->stageFile(f, storage_service);
+        storage_service->createFile(f);
     }
 
     /* Launch the simulation. This call only returns when the simulation is complete. */

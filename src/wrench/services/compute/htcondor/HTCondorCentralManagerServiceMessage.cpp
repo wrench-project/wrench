@@ -9,6 +9,10 @@
 
 #include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
 
+#include <utility>
+
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -16,7 +20,7 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    HTCondorCentralManagerServiceMessage::HTCondorCentralManagerServiceMessage(double payload)
+    HTCondorCentralManagerServiceMessage::HTCondorCentralManagerServiceMessage(sg_size_t payload)
         : ServiceMessage(payload) {}
 
     /**
@@ -25,8 +29,8 @@ namespace wrench {
      * @param scheduled_jobs: list of pending jobs upon negotiator completion
      * @param payload: the message size in bytes
      */
-    NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, double payload)
-        : HTCondorCentralManagerServiceMessage(payload), scheduled_jobs(scheduled_jobs) {}
+    NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::set<std::shared_ptr<Job>> scheduled_jobs, sg_size_t payload)
+        : HTCondorCentralManagerServiceMessage(payload), scheduled_jobs(std::move(std::move(scheduled_jobs))) {}
 
 
     /**
@@ -34,7 +38,7 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    CentralManagerWakeUpMessage::CentralManagerWakeUpMessage(double payload)
+    CentralManagerWakeUpMessage::CentralManagerWakeUpMessage(sg_size_t payload)
         : HTCondorCentralManagerServiceMessage(payload) {}
 
 }// namespace wrench

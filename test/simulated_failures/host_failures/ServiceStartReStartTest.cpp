@@ -100,7 +100,7 @@ private:
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
-        sleeper->setSimulation(this->simulation);
+        sleeper->setSimulation(this->getSimulation());
         try {
             sleeper->start(sleeper, true, true);// Daemonized, auto-restart!!
         } catch (wrench::ExecutionException &e) {
@@ -170,19 +170,19 @@ private:
 
         // Starting a sleeper (that will reply with some message)
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
-        sleeper->setSimulation(this->simulation);
+        sleeper->setSimulation(this->getSimulation());
         sleeper->start(sleeper, true, true);// Daemonized, auto-restart!!
 
         // Starting a host-switcher-offer
         auto death = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 10, "FailedHost",
                                                                                             wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        death->setSimulation(this->simulation);
+        death->setSimulation(this->getSimulation());
         death->start(death, true, false);// Daemonized, no auto-restart
 
         // Starting a host-switcher-oner
         auto life = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 30, "FailedHost",
                                                                                            wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        life->setSimulation(this->simulation);
+        life->setSimulation(this->getSimulation());
         life->start(life, true, false);// Daemonized, no auto-restart
 
         // Waiting for a message

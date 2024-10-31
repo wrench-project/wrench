@@ -35,7 +35,7 @@ namespace wrench {
      */
     class HostHasTurnedOnMessage : public HostStateChangeDetectorMessage {
     public:
-        explicit HostHasTurnedOnMessage(std::string hostname);
+        explicit HostHasTurnedOnMessage(const std::string& hostname);
         /** @brief The name of the host that has tuned on */
         std::string hostname;
     };
@@ -45,7 +45,7 @@ namespace wrench {
      */
     class HostHasTurnedOffMessage : public HostStateChangeDetectorMessage {
     public:
-        explicit HostHasTurnedOffMessage(std::string hostname);
+        explicit HostHasTurnedOffMessage(const std::string& hostname);
         /** @brief The name of the host that has tuned off */
         std::string hostname;
     };
@@ -55,7 +55,7 @@ namespace wrench {
      */
     class HostHasChangedSpeedMessage : public HostStateChangeDetectorMessage {
     public:
-        explicit HostHasChangedSpeedMessage(std::string hostname, double speed);
+        explicit HostHasChangedSpeedMessage(const std::string& hostname, double speed);
         /** @brief The name of the host that has tuned off */
         std::string hostname;
         /** @brief The host's (new) speed */

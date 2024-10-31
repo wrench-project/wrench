@@ -23,6 +23,11 @@ cat $1"/conf/cmake/FindSimGrid.cmake"
 echo "\"\"\""
 echo ""
 
+echo "FILE_CONTENT_FINDFSMOD_CMAKE = r\"\"\""
+cat $1"/conf/cmake/FindFSMod.cmake"
+echo "\"\"\""
+echo ""
+
 echo "FILE_CONTENT_FINDWRENCH_CMAKE = r\"\"\""
 cat $1"/FindWRENCH.cmake"
 echo "\"\"\""

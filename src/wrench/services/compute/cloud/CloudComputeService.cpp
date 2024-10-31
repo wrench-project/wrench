@@ -37,30 +37,32 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @throw std::runtime_error
      */
     CloudComputeService::CloudComputeService(const std::string &hostname,
                                              const std::vector<std::string> &execution_hosts,
                                              const std::string &scratch_space_mount_point,
-                                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "cloud_service", scratch_space_mount_point) {
+                                             const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                             const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : ComputeService(hostname, "cloud_service", scratch_space_mount_point) {
         if (execution_hosts.empty()) {
             throw std::invalid_argument(
                     "CloudComputeService::CloudComputeService(): At least one execution host should be provided");
         }
 
         // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
+        this->setProperties(this->default_property_values, property_list);
 
         // Validate Properties
         validateProperties();
 
         // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         // Initialize internal data structures
         this->execution_hosts = execution_hosts;
         for (auto const &h: this->execution_hosts) {
+            if (not S4U_Simulation::hostExists(h)) {
+                throw std::invalid_argument("CloudComputeService::CloudComputeService(): unknown host " + h);
+            }
             this->used_ram_per_execution_host[h] = 0;
             this->used_cores_per_execution_host[h] = 0;
         }
@@ -69,8 +71,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    CloudComputeService::~CloudComputeService() {
-    }
+    CloudComputeService::~CloudComputeService() = default;
 
 
     /**
@@ -83,13 +84,11 @@ namespace wrench {
      *
      * @return A VM name
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::string CloudComputeService::createVM(unsigned long num_cores,
-                                              double ram_memory,
+                                              sg_size_t ram_memory,
                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+                                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
         if (num_cores == ComputeService::ALL_CORES) {
             throw std::invalid_argument(
                     "CloudComputeService::createVM(): the VM's number of cores cannot be ComputeService::ALL_CORES");
@@ -125,8 +124,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::shutdownVM(const std::string &vm_name) {
         this->shutdownVM(vm_name, false, ComputeService::TerminationCause::TERMINATION_NONE);
@@ -140,8 +137,6 @@ namespace wrench {
      * @param send_failure_notifications: whether to send the failure notifications
      * @param termination_cause: the termination cause (if failure notifications are sent)
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::shutdownVM(const std::string &vm_name, bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -172,8 +167,6 @@ namespace wrench {
      *
      * @return A BareMetalComputeService that runs on the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService> CloudComputeService::startVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -204,8 +197,6 @@ namespace wrench {
      *
      * @return A BareMetalComputeService that runs on the VM, or nullptr if none
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService> CloudComputeService::getVMComputeService(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -221,8 +212,6 @@ namespace wrench {
      *
      * @return physical host name
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     std::string CloudComputeService::getVMPhysicalHostname(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -236,8 +225,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::suspendVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -266,8 +253,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::resumeVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -296,8 +281,6 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
      */
     void CloudComputeService::destroyVM(const std::string &vm_name) {
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
@@ -325,7 +308,6 @@ namespace wrench {
      * @brief Method to check whether a VM is currently running
      * @param vm_name: the name of the VM
      * @return true or false
-     * @throw std::invalid_argument
      */
     bool CloudComputeService::isVMRunning(const std::string &vm_name) {
         auto vm_pair_it = this->vm_list.find(vm_name);
@@ -343,7 +325,6 @@ namespace wrench {
      * @brief Method to check whether a VM is currently down
      * @param vm_name: the name of the VM
      * @return true or false
-     * @throw std::invalid_argument
      */
     bool CloudComputeService::isVMDown(const std::string &vm_name) {
         auto vm_pair_it = this->vm_list.find(vm_name);
@@ -361,7 +342,6 @@ namespace wrench {
      * @brief Method to check whether a VM is currently running
      * @param vm_name: the name of the VM
      * @return true or false
-     * @throw std::invalid_argument
      */
     bool CloudComputeService::isVMSuspended(const std::string &vm_name) {
         auto vm_pair_it = this->vm_list.find(vm_name);
@@ -406,7 +386,6 @@ namespace wrench {
     //     * @param message: message to be sent
     //     * @return a simulation message
     //     *
-    //     * @throw std::runtime_error
     //     */
     //    template<class TMessageType>
     //    std::shared_ptr<TMessageType> CloudComputeService::sendRequestAndWaitForAnswer(S4U_CommPort *answer_commport,
@@ -424,7 +403,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool CloudComputeService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
@@ -536,10 +514,10 @@ namespace wrench {
      */
     void CloudComputeService::processCreateVM(S4U_CommPort *answer_commport,
                                               unsigned long requested_num_cores,
-                                              double requested_ram,
+                                              sg_size_t requested_ram,
                                               const std::string &physical_host,
                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
+                                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
                     (requested_num_cores == ComputeService::ALL_CORES ? "max" : std::to_string(requested_num_cores)).c_str(),
                     (requested_ram == ComputeService::ALL_RAM ? "max" : std::to_string(requested_ram)).c_str());
@@ -596,7 +574,7 @@ namespace wrench {
                                                        std::move(property_list),
                                                        std::move(messagepayload_list));
 
-        WRENCH_INFO("Created a VM called %s with %lu cores and %lf RAM",
+        WRENCH_INFO("Created a VM called %s with %lu cores and %llu RAM",
                     vm_name.c_str(), requested_num_cores, requested_ram);
 
         // Add the VM to the list of VMs, with (for now) a nullptr compute service
@@ -674,7 +652,7 @@ namespace wrench {
      * @return a hostname
      */
     std::string CloudComputeService::findHost(unsigned long desired_num_cores,
-                                              double desired_ram,
+                                              sg_size_t desired_ram,
                                               const std::string &desired_host) {
         // Find a physical host to start the VM
         std::vector<std::string> possible_hosts;
@@ -725,9 +703,9 @@ namespace wrench {
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
                           unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          sg_size_t a_ram = Simulation::getHostMemoryCapacity(a);
                           unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                          double b_ram = Simulation::getHostMemoryCapacity(b);
+                          sg_size_t b_ram = Simulation::getHostMemoryCapacity(b);
 
                           if (a_ram != b_ram) {
                               return a_ram < b_ram;
@@ -743,9 +721,9 @@ namespace wrench {
             std::sort(possible_hosts.begin(), possible_hosts.end(),
                       [](std::string const &a, std::string const &b) {
                           unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          sg_size_t a_ram = Simulation::getHostMemoryCapacity(a);
                           unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                          double b_ram = Simulation::getHostMemoryCapacity(b);
+                          sg_size_t b_ram = Simulation::getHostMemoryCapacity(b);
 
                           if (a_num_cores != b_num_cores) {
                               return a_num_cores < b_num_cores;
@@ -816,7 +794,7 @@ namespace wrench {
         // Create the Compute Service if needed
         if ((cs == nullptr) or (not cs->isUp())) {
             // Create the resource set for the BareMetalComputeService
-            std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
+            std::map<std::string, std::tuple<unsigned long, sg_size_t>> compute_resources = {
                     std::make_pair(vm_name, std::make_tuple(vm->getNumCores(), vm->getMemory()))};
 
             // Create the BareMetal service, whose main daemon is on this (stable) host
@@ -830,7 +808,7 @@ namespace wrench {
                                                 plist,
                                                 vm->getMessagePayloadList(),
                                                 this->getScratch()));
-            cs->simulation = this->simulation;
+            cs->simulation_ = this->simulation_;
             std::get<2>(this->vm_list[vm_name]) = cs;
         }
 
@@ -842,7 +820,7 @@ namespace wrench {
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
                 this->hostname, cs,
                 this->commport, false, true);
-        termination_detector->setSimulation(this->simulation);
+        termination_detector->setSimulation(this->simulation_);
         termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
 
         msg_to_send_back = new CloudComputeServiceStartVMAnswerMessage(
@@ -1013,15 +991,15 @@ namespace wrench {
 
         } else if (key == "ram_capacities") {
             for (auto &host: this->execution_hosts) {
-                double total_ram = Simulation::getHostMemoryCapacity(host);
-                dict.insert(std::make_pair(host, total_ram));
+                sg_size_t total_ram = Simulation::getHostMemoryCapacity(host);
+                dict.insert(std::make_pair(host, (double)total_ram));
             }
 
         } else if (key == "ram_availabilities") {
             for (auto &host: this->execution_hosts) {
-                double total_ram = Simulation::getHostMemoryCapacity(host);
+                sg_size_t total_ram = Simulation::getHostMemoryCapacity(host);
                 // Available RAM
-                double ram_allocated_to_vms = 0;
+                sg_size_t ram_allocated_to_vms = 0;
                 for (auto &vm_pair: this->vm_list) {
                     auto actual_vm = std::get<0>(vm_pair.second);
                     if ((actual_vm->getState() != S4U_VirtualMachine::DOWN) and
@@ -1029,7 +1007,7 @@ namespace wrench {
                         ram_allocated_to_vms += actual_vm->getMemory();
                     }
                 }
-                dict.insert(std::make_pair(host, total_ram - ram_allocated_to_vms));
+                dict.insert(std::make_pair(host, (double)total_ram - (double)ram_allocated_to_vms));
             }
 
         } else {
@@ -1095,7 +1073,7 @@ namespace wrench {
      * @param ram: the desired RAM
      */
     void CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(
-            S4U_CommPort *answer_commport, unsigned long num_cores, double ram) {
+            S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram) {
         bool answer = false;
         for (auto const &h: this->used_cores_per_execution_host) {
             auto available_num_cores = Simulation::getHostNumCores(h.first) - h.second;
@@ -1134,11 +1112,11 @@ namespace wrench {
             return;
         }
         auto vm = std::get<0>(this->vm_list[vm_name]);
-        unsigned long used_cores = vm->getNumCores();
-        double used_ram = vm->getMemory();
-        std::string pm_name = vm->getPhysicalHostname();
-        //        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf (exit_code = %d)",
-        //                    pm_name.c_str(), used_cores, used_ram, exit_code);
+//        unsigned long used_cores = vm->getNumCores();
+//        sg_size_t used_ram = vm->getMemory();
+//        std::string pm_name = vm->getPhysicalHostname();
+//        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf (exit_code = %d)",
+//                     pm_name.c_str(), used_cores, used_ram, exit_code);
 
         if (vm->getState() != S4U_VirtualMachine::State::DOWN) {
             vm->shutdown();
@@ -1148,7 +1126,6 @@ namespace wrench {
     /**
      * @brief Validate the service's properties
      *
-     * @throw std::invalid_argument
      */
     void CloudComputeService::validateProperties() {
         // VM Boot overhead

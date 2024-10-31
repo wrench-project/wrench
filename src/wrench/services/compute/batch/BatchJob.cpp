@@ -171,7 +171,7 @@ namespace wrench {
      * @brief Get the resources allocated to this BatchComputeService job
      * @return a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
-    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> BatchJob::getResourcesAllocated() {
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> BatchJob::getResourcesAllocated() {
         return this->resources_allocated;
     }
 
@@ -179,7 +179,7 @@ namespace wrench {
      * @brief Set the resources allocated to this BatchComputeService job
      * @param resources: a list of resource, each as a <host, number of cores, bytes of RAM> tuple
      */
-    void BatchJob::setAllocatedResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &resources) {
+    void BatchJob::setAllocatedResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &resources) {
         if (resources.empty()) {
             throw std::invalid_argument(
                     "BatchJob::setAllocatedResources(): Empty Resources allocated");

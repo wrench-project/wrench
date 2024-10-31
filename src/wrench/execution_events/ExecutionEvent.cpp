@@ -26,14 +26,12 @@ namespace wrench {
 
     /**
      * @brief Block the calling process until a ExecutionEvent is generated
-     *        based on messages received on a commport, or until a timeout ooccurs
+     *        based on messages received on a commport, or until a timeout occurs
      *
      * @param commport: the name of the receiving commport
      * @param timeout: a timeout value in seconds (-1 means: no timeout)
      * @return a workflow execution event (or nullptr in case of a timeout)
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     std::shared_ptr<ExecutionEvent>
     ExecutionEvent::waitForNextExecutionEvent(S4U_CommPort *commport, double timeout) {

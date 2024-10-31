@@ -37,7 +37,7 @@ namespace wrench {
                 {HTCondorComputeServiceProperty::FCFS, "false"},
                 {HTCondorComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}};
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {HTCondorComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
                 {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
@@ -56,8 +56,8 @@ namespace wrench {
     public:
         HTCondorComputeService(const std::string &hostname,
                                const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                               WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+                               const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                               const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
@@ -122,7 +122,7 @@ namespace wrench {
         //        void processSubmitPilotJob(const std::string &answer_commport, std::shared_ptr<PilotJob>job,
         //                                   const std::map<std::string, std::string> &service_specific_args);
 
-        void processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, double ram);
+        void processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram);
 
         void terminate();
 

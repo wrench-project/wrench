@@ -46,7 +46,7 @@ namespace wrench {
      */
     std::string InvalidDirectoryPath::toString() {
         return "Storage service " + this->location->getStorageService()->getName() + " doesn't have a " +
-               this->getLocation()->getPath() + " path";
+                this->getLocation()->getDirectoryPath() + " path";
     }
 
 }// namespace wrench

@@ -18,16 +18,15 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    ExecutionControllerMessage::ExecutionControllerMessage(double payload) : SimulationMessage(payload) {}
+    ExecutionControllerMessage::ExecutionControllerMessage(sg_size_t payload) : SimulationMessage(payload) {}
 
     /**
      * @brief Constructor
      * @param message: the (string) message to be sent
      * @param payload: message size in bytes
      *
-     * @throw std::invalid_argument
      */
-    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) : ExecutionControllerMessage(payload), message(std::move(message)) {}
+    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, sg_size_t payload) : ExecutionControllerMessage(payload), message(std::move(message)) {}
 
 
 }// namespace wrench

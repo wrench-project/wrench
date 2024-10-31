@@ -42,7 +42,7 @@ namespace wrench {
 
         unsigned long getMinNumCores() const override;
         unsigned long getMaxNumCores() const override;
-        double getMinRAMFootprint() const override;
+        sg_size_t getMinRAMFootprint() const override;
 
         void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
         void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;

@@ -15,6 +15,7 @@
 #include <vector>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 WRENCH_LOG_CATEGORY(wfcommons_workflow_parser, "Log category for WfCommonsWorkflowParser");
 
@@ -199,6 +200,10 @@ namespace wrench {
             } catch (nlohmann::json::out_of_range &e) {
                 // do nothing
             }
+            if (num_cores <= 0) {
+                if (show_warnings) std::cerr << "[WARNING]: Task " << task->getID() << " specifies an invalid number of cores (" + std::to_string(num_cores) + "): Assuming 1 core instead.\n";
+                num_cores = 1;
+            }
 
             double runtimeInSeconds = task_exec.at("runtimeInSeconds");
             // Scale runtime based on avgCPU unless disabled
@@ -339,6 +344,110 @@ namespace wrench {
         workflow->updateAllTopBottomLevels();
 
         return workflow;
+    }
+
+    /**
+     * @brief Helper method to build the workflow's JSON specification
+     * @param workflow
+     * @return
+     */
+    nlohmann::json build_workflow_specification_json(std::shared_ptr<Workflow> workflow) {
+        nlohmann::json json_specification;
+
+        // Tasks
+        json_specification["tasks"] = nlohmann::json::array();
+        for (const auto &task : workflow->getTasks()) {
+            nlohmann::json json_task;
+            json_task["name"] = task->getID();
+            json_task["id"] = task->getID();
+            nlohmann::json parent_tasks = nlohmann::json::array();
+            for (const auto &parent : task->getParents()) {
+                parent_tasks.push_back(parent->getID());
+            }
+            nlohmann::json child_tasks = nlohmann::json::array();
+            for (const auto &child : task->getChildren()) {
+                child_tasks.push_back(child->getID());
+            }
+            nlohmann::json input_files = nlohmann::json::array();
+            for (const auto &file : task->getInputFiles()) {
+                input_files.push_back(file->getID());
+            }
+            nlohmann::json output_files = nlohmann::json::array();
+            for (const auto &file : task->getOutputFiles()) {
+                output_files.push_back(file->getID());
+            }
+            json_task["parents"] = parent_tasks;
+            json_task["children"] = child_tasks;
+            json_task["inputFiles"] = input_files;
+            json_task["outputFiles"] = output_files;
+
+            json_specification["tasks"].push_back(json_task);
+        }
+
+        // Files
+        json_specification["files"] = nlohmann::json::array();
+        for (const auto &item : workflow->getFileMap()) {
+            auto file = item.second;
+            nlohmann::json json_file;
+            json_file["id"] = file->getID();
+            json_file["sizeInBytes"] = (long long)(file->getSize());
+            json_specification["files"].push_back(json_file);
+        }
+
+        return json_specification;
+    }
+
+    /**
+     * @brief Helper method to build the workflow's JSON execution
+     * @param workflow
+     * @return
+     */
+    nlohmann::json build_workflow_execution_json(std::shared_ptr<Workflow> workflow) {
+        nlohmann::json json_execution;
+
+        json_execution["makespanInSeconds"] = workflow->getCompletionDate() - workflow->getStartDate();
+        boost::posix_time::ptime t = boost::posix_time::microsec_clock::universal_time();
+        json_execution["executedAt"] = to_iso_extended_string(t);
+
+        std::set<std::string> used_machines;
+
+        // Tasks
+        json_execution["tasks"] = nlohmann::json::array();
+        for (const auto &task : workflow->getTasks()) {
+            nlohmann::json json_task;
+            json_task["id"] = task->getID();
+            json_task["runtimeInSeconds"] = task->getEndDate() - task->getStartDate();
+            json_task["coreCount"] = task->getNumCoresAllocated();
+            nlohmann::json json_machines;
+            auto execution_host = task->getPhysicalExecutionHost();
+            json_execution["tasks"].push_back(json_task);
+        }
+
+        return json_execution;
+    }
+
+
+    /**
+   * Documentation in .h file
+   */
+    std::string WfCommonsWorkflowParser::createJSONStringFromWorkflow(std::shared_ptr<Workflow> workflow) {
+        nlohmann::json json_doc;
+        json_doc["name"] = workflow->getName();
+        json_doc["description"] = "Generated from a WRENCH simulator";
+        boost::posix_time::ptime t = boost::posix_time::microsec_clock::universal_time();
+        json_doc["createAt"] = to_iso_extended_string(t);
+        json_doc["schemaVersion"] = "1.5";
+
+        nlohmann::json json_workflow;
+
+        json_workflow["specification"] = build_workflow_specification_json(workflow);
+
+        if (workflow->isDone()) {
+            json_workflow["execution"] = build_workflow_execution_json(workflow);
+        }
+
+        json_doc["workflow"] = json_workflow;
+        return json_doc.dump();
     }
 
 

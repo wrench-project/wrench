@@ -10,11 +10,9 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/network_proximity/NetworkProximityReceiverDaemon.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <random>
 #include "wrench/services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/exceptions/ExecutionException.h"
 
@@ -32,10 +30,10 @@ namespace wrench {
 
     NetworkProximityReceiverDaemon::NetworkProximityReceiverDaemon(
             Simulation *simulation,
-            std::string hostname, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(std::move(hostname), "network_proximity_receiver_daemon") {
+            const std::string& hostname, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : Service(hostname, "network_proximity_receiver_daemon") {
 
         setMessagePayloads(messagepayload_list, {});
-        this->simulation = simulation;
+        this->simulation_ = simulation;
     }
 
     /**

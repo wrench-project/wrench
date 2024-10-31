@@ -68,7 +68,6 @@ namespace wrench {
      * @brief Helper static method to parse resource specifications to the <cores,ram> format
      * @param spec: specification string
      * @return a <host, core> tuple
-     * @throw std::invalid_argument
      */
     static std::tuple<simgrid::s4u::Host *, unsigned long> parseResourceSpec(const std::string &spec) {
         std::vector<std::string> tokens;
@@ -185,10 +184,10 @@ namespace wrench {
      */
     ActionExecutionService::ActionExecutionService(
             const std::string &hostname,
-            const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &compute_resources,
+            const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &compute_resources,
             std::shared_ptr<Service> parent_service,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname,
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : Service(hostname,
                                                                                  "action_execution_service") {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -227,8 +226,8 @@ namespace wrench {
                         std::to_string(requested_cores) + " are requested");
             }
 
-            double requested_ram = std::get<1>(host.second);
-            double available_ram = S4U_Simulation::getHostMemoryCapacity(host.first);
+            sg_size_t requested_ram = std::get<1>(host.second);
+            sg_size_t available_ram = S4U_Simulation::getHostMemoryCapacity(host.first);
             if (requested_ram < 0) {
                 throw std::invalid_argument(
                         "ActionExecutionService::ActionExecutionService(): requested RAM should be non-negative");
@@ -296,7 +295,7 @@ namespace wrench {
             this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
                     new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, true,
                                                 this->getSharedPtr<Service>(), this->commport));
-            this->host_state_change_monitor->setSimulation(this->simulation);
+            this->host_state_change_monitor->setSimulation(this->simulation_);
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
                                                    false);// Daemonized, no auto-restart
         }
@@ -335,7 +334,7 @@ namespace wrench {
         // Compute possible hosts
         std::set<simgrid::s4u::Host *> possible_hosts;
         simgrid::s4u::Host *new_host_to_avoid = nullptr;
-        double new_host_to_avoid_ram_capacity = 0;
+        sg_size_t new_host_to_avoid_ram_capacity = 0;
         for (auto const &r: this->compute_resources) {
 
             // If there is a required host, then don't even look at others
@@ -443,7 +442,7 @@ namespace wrench {
             std::string picked_host;
             simgrid::s4u::Host *target_host = nullptr;
             unsigned long target_num_cores;
-            double required_ram;
+            sg_size_t required_ram;
 
             std::tuple<simgrid::s4u::Host *, unsigned long> allocation =
                     pickAllocation(action,
@@ -473,7 +472,7 @@ namespace wrench {
                                        action,
                                        this->getSharedPtr<ActionExecutionService>()));
 
-            action_executor->setSimulation(this->simulation);
+            action_executor->setSimulation(this->simulation_);
             try {
                 action_executor->start(action_executor, true, false);// Daemonized, no auto-restart
             } catch (ExecutionException &e) {
@@ -486,7 +485,7 @@ namespace wrench {
             // action executor has died)
             auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(
                     new ServiceTerminationDetector(this->hostname, action_executor, this->commport, true, false));
-            failure_detector->setSimulation(this->simulation);
+            failure_detector->setSimulation(this->simulation_);
             failure_detector->start(failure_detector, true, false);// Daemonized, no auto-restart
 
             // Keep track of this action executor
@@ -521,7 +520,6 @@ namespace wrench {
      *
      * @return false if the daemon should terminate, true otherwise
      *
-     * @throw std::runtime_error
      */
     bool ActionExecutionService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
@@ -720,8 +718,6 @@ namespace wrench {
      * @param action: an action
      * @param termination_cause: termination cause
      *
-     * @throw ExecutionException
-     * @throw std::runtime_error
      */
     void ActionExecutionService::terminateAction(std::shared_ptr<Action> action,
                                                  ComputeService::TerminationCause termination_cause) {
@@ -848,7 +844,7 @@ namespace wrench {
      * @param ram: ram capacity
      * @return true is a host was found
      */
-    bool ActionExecutionService::isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram) {
+    bool ActionExecutionService::isThereAtLeastOneHostWithResources(unsigned long num_cores, sg_size_t ram) {
         for (auto const &r: this->compute_resources) {
             if ((std::get<0>(r.second) >= num_cores) and (std::get<1>(r.second) >= ram)) {
                 return true;
@@ -898,7 +894,7 @@ namespace wrench {
             minimum_required_num_cores = desired_num_cores;
         }
         unsigned long num_cores_on_desired_host = std::get<0>(this->compute_resources[desired_host]);
-        double ram_on_desired_host = std::get<1>(this->compute_resources[desired_host]);
+        sg_size_t ram_on_desired_host = std::get<1>(this->compute_resources[desired_host]);
 
         if ((num_cores_on_desired_host < minimum_required_num_cores) or
             (ram_on_desired_host < action->getMinRAMFootprint())) {
@@ -962,7 +958,7 @@ namespace wrench {
      * @return true or false
      */
     bool ActionExecutionService::IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores,
-                                                                             double ram) {
+                                                                             sg_size_t ram) {
         bool enough_ram = false;
         bool enough_cores = false;
 
@@ -1059,7 +1055,6 @@ namespace wrench {
     /**
      * @brief Method to make sure that property specs are valid
      *
-     * @throw std::invalid_argument
      */
     void ActionExecutionService::validateProperties() {
         bool success = true;
@@ -1136,7 +1131,7 @@ namespace wrench {
      * @brief Get a (reference to) the compute resources of this service
      * @return the compute resources
      */
-    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, double>> &ActionExecutionService::getComputeResources() {
+    std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &ActionExecutionService::getComputeResources() {
         return this->compute_resources;
     }
 

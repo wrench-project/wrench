@@ -18,7 +18,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    FileRegistryMessage::FileRegistryMessage(double payload) : ServiceMessage(payload) {
+    FileRegistryMessage::FileRegistryMessage(sg_size_t payload) : ServiceMessage(payload) {
     }
 
     /**
@@ -28,7 +28,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(S4U_CommPort *answer_commport,
-                                                                               const std::shared_ptr<DataFile> &file, double payload) : FileRegistryMessage(payload), answer_commport(answer_commport), file(file) {
+                                                                               const std::shared_ptr<DataFile> &file, sg_size_t payload) : FileRegistryMessage(payload), answer_commport(answer_commport), file(file) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || file == nullptr) {
             throw std::invalid_argument(
@@ -43,7 +43,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(std::set<std::shared_ptr<FileLocation>> locations,
-                                                                             double payload) : FileRegistryMessage(payload) {
+                                                                             sg_size_t payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
 //        if (locations.empty()) {
 //            throw std::invalid_argument(
@@ -62,8 +62,8 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
-            S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, std::string reference_host,
-            std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) : FileRegistryMessage(payload) {
+            S4U_CommPort *answer_commport, std::shared_ptr<DataFile> file, const std::string& reference_host,
+            std::shared_ptr<NetworkProximityService> network_proximity_service, sg_size_t payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (answer_commport == nullptr) || (reference_host == "") ||
             (network_proximity_service == nullptr)) {
@@ -85,9 +85,9 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityAnswerMessage::FileRegistryFileLookupByProximityAnswerMessage(
-            std::shared_ptr<DataFile> file, std::string reference_host,
+            std::shared_ptr<DataFile> file, const std::string& reference_host,
             std::map<double, std::shared_ptr<FileLocation>> locations,
-            double payload) : FileRegistryMessage(payload) {
+            sg_size_t payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (reference_host.empty())) {
             throw std::invalid_argument(
@@ -107,7 +107,7 @@ namespace wrench {
      */
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(S4U_CommPort *answer_commport,
                                                                                  std::shared_ptr<FileLocation> location,
-                                                                                 double payload) : FileRegistryMessage(payload) {
+                                                                                 sg_size_t payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
@@ -125,7 +125,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryRemoveEntryAnswerMessage::FileRegistryRemoveEntryAnswerMessage(bool success,
-                                                                               double payload) : FileRegistryMessage(payload) {
+                                                                               sg_size_t payload) : FileRegistryMessage(payload) {
         this->success = success;
     }
 
@@ -137,7 +137,7 @@ namespace wrench {
      */
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(S4U_CommPort *answer_commport,
                                                                            std::shared_ptr<FileLocation> location,
-                                                                           double payload) : FileRegistryMessage(payload) {
+                                                                           sg_size_t payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_commport == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
@@ -152,7 +152,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    FileRegistryAddEntryAnswerMessage::FileRegistryAddEntryAnswerMessage(double payload) : FileRegistryMessage(payload) {
+    FileRegistryAddEntryAnswerMessage::FileRegistryAddEntryAnswerMessage(sg_size_t payload) : FileRegistryMessage(payload) {
     }
 
 }// namespace wrench

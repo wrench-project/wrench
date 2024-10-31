@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
     std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f: workflow->getInputFiles()) {
-        simulation->stageFile(f, storage_service);
+        storage_service->createFile(f);
     }
 
     simulation->getOutput().enableWorkflowTaskTimestamps(true);

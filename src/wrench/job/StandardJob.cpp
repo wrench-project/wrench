@@ -32,7 +32,6 @@ namespace wrench {
      * @param cleanup_file_deletions: a vector of tuples that specify which file copies should be removed from which
      *                         locations. This will happen regardless of whether the job succeeds or fails
      *
-     * @throw std::invalid_argument
      */
     StandardJob::StandardJob(std::shared_ptr<JobManager> job_manager,
                              std::vector<std::shared_ptr<WorkflowTask>> tasks,
@@ -452,8 +451,6 @@ namespace wrench {
         *earliest_failure_date = -1.0;
 
         for (const auto &action: actions) {
-            //            std::cerr << "   ANALYSING ACTION " << action->getName() << "    END DATE " << action->getEndDate() << "\n";
-
             // Set the dates
             if ((*earliest_start_date == -1.0) or ((action->getStartDate() < *earliest_start_date) and (action->getStartDate() != -1.0))) {
                 *earliest_start_date = action->getStartDate();

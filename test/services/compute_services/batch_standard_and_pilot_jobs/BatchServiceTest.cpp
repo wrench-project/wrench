@@ -73,6 +73,8 @@ public:
 
     void do_ShutdownWithPendingRunningJobsTest_test();
 
+    void do_ResourceInformationTest_test();
+
 protected:
     ~BatchServiceTest() override {
         workflow->clear();
@@ -473,11 +475,11 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
                                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -596,11 +598,11 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
                                     this, hostname)));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -744,11 +746,11 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
                                     this, hostname)));
 
     // Create two files
-    auto input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    auto output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    auto input_file = wrench::Simulation::addFile("input_file", 10000);
+    auto output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -876,11 +878,11 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
                                     this, hostname)));
 
     // Create two files
-    auto input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    auto output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    auto input_file = wrench::Simulation::addFile("input_file", 10000);
+    auto output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1037,11 +1039,11 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
                             new TwoStandardJobSubmissionTestWMS(this, hostname)));
 
     // Create two files
-    auto input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    auto output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    auto input_file = wrench::Simulation::addFile("input_file", 10000);
+    auto output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1198,11 +1200,11 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1365,11 +1367,11 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1497,11 +1499,11 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1610,11 +1612,11 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1753,11 +1755,11 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1877,11 +1879,11 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -2078,17 +2080,17 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
-    std::shared_ptr<wrench::DataFile> input_file_1 = wrench::Simulation::addFile("input_file_1", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file_1 = wrench::Simulation::addFile("output_file_1", 20000.0);
-    std::shared_ptr<wrench::DataFile> input_file_2 = wrench::Simulation::addFile("input_file_2", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file_2 = wrench::Simulation::addFile("output_file_2", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
+    std::shared_ptr<wrench::DataFile> input_file_1 = wrench::Simulation::addFile("input_file_1", 10000);
+    std::shared_ptr<wrench::DataFile> output_file_1 = wrench::Simulation::addFile("output_file_1", 20000);
+    std::shared_ptr<wrench::DataFile> input_file_2 = wrench::Simulation::addFile("input_file_2", 10000);
+    std::shared_ptr<wrench::DataFile> output_file_2 = wrench::Simulation::addFile("output_file_2", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_1, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_2, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file_1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file_2));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -2228,17 +2230,17 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
-    std::shared_ptr<wrench::DataFile> input_file_1 = wrench::Simulation::addFile("input_file_1", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file_1 = wrench::Simulation::addFile("output_file_1", 20000.0);
-    std::shared_ptr<wrench::DataFile> input_file_2 = wrench::Simulation::addFile("input_file_2", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file_2 = wrench::Simulation::addFile("output_file_2", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
+    std::shared_ptr<wrench::DataFile> input_file_1 = wrench::Simulation::addFile("input_file_1", 10000);
+    std::shared_ptr<wrench::DataFile> output_file_1 = wrench::Simulation::addFile("output_file_1", 20000);
+    std::shared_ptr<wrench::DataFile> input_file_2 = wrench::Simulation::addFile("input_file_2", 10000);
+    std::shared_ptr<wrench::DataFile> output_file_2 = wrench::Simulation::addFile("output_file_2", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_1, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_2, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file_1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file_2));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -2488,17 +2490,17 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
-    std::shared_ptr<wrench::DataFile> input_file_1 = wrench::Simulation::addFile("input_file_1", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file_1 = wrench::Simulation::addFile("output_file_1", 20000.0);
-    std::shared_ptr<wrench::DataFile> input_file_2 = wrench::Simulation::addFile("input_file_2", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file_2 = wrench::Simulation::addFile("output_file_2", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
+    std::shared_ptr<wrench::DataFile> input_file_1 = wrench::Simulation::addFile("input_file_1", 10000);
+    std::shared_ptr<wrench::DataFile> output_file_1 = wrench::Simulation::addFile("output_file_1", 20000);
+    std::shared_ptr<wrench::DataFile> input_file_2 = wrench::Simulation::addFile("input_file_2", 10000);
+    std::shared_ptr<wrench::DataFile> output_file_2 = wrench::Simulation::addFile("output_file_2", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_1, storage_service1));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_2, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file_1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file_2));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -2663,11 +2665,11 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -2815,11 +2817,11 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -2956,11 +2958,11 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -3083,11 +3085,11 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -3215,11 +3217,11 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two files
-    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000.0);
-    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = wrench::Simulation::addFile("input_file", 10000);
+    std::shared_ptr<wrench::DataFile> output_file = wrench::Simulation::addFile("output_file", 20000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

@@ -691,7 +691,7 @@ namespace wrench {
      * @brief Append to the log
      */
     void MemoryManager::log() {
-        this->time_log.push_back(this->simulation->getCurrentSimulatedDate());
+        this->time_log.push_back(this->simulation_->getCurrentSimulatedDate());
         this->dirty_log.push_back(this->dirty);
         this->cached_log.push_back(this->cached);
         this->free_log.push_back(this->free);

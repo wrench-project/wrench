@@ -60,15 +60,23 @@ namespace wrench {
         json addFileWriteAction(json data);
         json addFileReadAction(json data);
         json addSleepAction(json data);
+        json addActionDependency(json data);
         json addParentJob(json data);
+        json getActionState(json data);
+        json getActionStartDate(json data);
+        json getActionEndDate(json data);
+        json getActionFailureCause(json data);
 
         json createTask(json data);
+        json getTaskState(json data);
         json getTaskFlops(json data);
         json getTaskMinNumCores(json data);
         json getTaskMaxNumCores(json data);
         json getTaskMemory(json data);
         json getTaskStartDate(json data);
         json getTaskEndDate(json data);
+        json getTaskNumberOfChildren(json data);
+        json getTaskBottomLevel(json data);
 
         json waitForNextSimulationEvent(const json &data);
 
@@ -92,14 +100,11 @@ namespace wrench {
         json getFileSize(json data);
 
         json getTaskInputFiles(json data);
-
         json getTaskOutputFiles(json data);
 
         json getInputFiles(json data);
         json getReadyTasks(json data);
-        json stageInputFiles(json data);
         json workflowIsDone(json data);
-
 
         json supportsCompoundJobs(json data);
         json supportsPilotJobs(json data);
@@ -134,6 +139,7 @@ namespace wrench {
         json createWorkflow(const json &data);
 
         json createWorkflowFromJSON(json data);
+
 
     private:
         template<class T>

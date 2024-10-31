@@ -52,7 +52,7 @@ namespace wrench {
          * @param failure_cause: a failure cause
          */
         FileReadFailedEvent(std::shared_ptr<FileLocation> location,
-                            double num_bytes,
+                            sg_size_t num_bytes,
                             std::shared_ptr<FailureCause> failure_cause)
             : location(std::move(location)), num_bytes(num_bytes),
               failure_cause(std::move(failure_cause)) {}
@@ -61,7 +61,7 @@ namespace wrench {
         /** @brief The location */
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes that should have been read */
-        double num_bytes;
+        sg_size_t num_bytes;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
 

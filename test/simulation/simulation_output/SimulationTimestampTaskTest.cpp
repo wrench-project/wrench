@@ -204,8 +204,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
     small_input_file = wrench::Simulation::addFile("small_input_file", 10);
     large_input_file = wrench::Simulation::addFile("large_input_file", 1000000);
 
-    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(large_input_file));
+    ASSERT_NO_THROW(storage_service->createFile(small_input_file));
 
     simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
@@ -371,7 +371,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1024");
-    //    argv[2] = strdup("--wrench-full-log");
+//        argv[2] = strdup("--wrench-full-log");
 
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -392,7 +392,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     ASSERT_NO_THROW(backup_storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(wms_host, {"/backup"})));
 
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms;
 
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskMultipleTestWMS(
                             this, wms_host)));
@@ -402,9 +402,9 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     small_input_file = wrench::Simulation::addFile("small_input_file", 10);
     large_input_file = wrench::Simulation::addFile("large_input_file", 1000000);
 
-    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, backup_storage_service));
+    ASSERT_NO_THROW(storage_service->createFile(large_input_file));
+    ASSERT_NO_THROW(storage_service->createFile(small_input_file));
+    ASSERT_NO_THROW(backup_storage_service->createFile(small_input_file));
 
     simulation->getOutput().enableWorkflowTaskTimestamps(true);
 

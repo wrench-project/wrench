@@ -9,6 +9,8 @@
 
 
 #include <cmath>
+#include <utility>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -20,9 +22,9 @@
 WRENCH_LOG_CATEGORY(simple_storage_service_performance_test, "Log category for SimpleStorageServicePerformanceTest");
 
 
-#define FILE_SIZE (10 * 1000 * 1000 * 1000.00)// 10 GB
-#define MBPS_BANDWIDTH 100                    // 100 MB
-#define STORAGE_SIZE (100.0 * FILE_SIZE)
+#define FILE_SIZE (10ULL * 1000ULL * 1000ULL * 1000ULL)// 10 GB
+#define MBPS_BANDWIDTH 100.0                   // 100 MB
+#define STORAGE_SIZE (100ULL * FILE_SIZE)
 
 class SimpleStorageServicePerformanceTest : public ::testing::Test {
 
@@ -30,45 +32,45 @@ public:
     std::shared_ptr<wrench::DataFile> file_1;
     std::shared_ptr<wrench::DataFile> file_2;
     std::shared_ptr<wrench::DataFile> file_3;
-    std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_1 = nullptr;
+    std::shared_ptr<wrench::SimpleStorageService> storage_service_2 = nullptr;
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
-    void do_FileRead_test(double buffer_size);
-    void do_ConcurrentFileCopies_test(double buffer_size);
+    void do_FileRead_test(sg_size_t buffer_size);
+    void do_ConcurrentFileCopies_test(sg_size_t buffer_size);
 
-    static double computeExpectedTwoStagePipelineTime(double bw_stage1, double bw_stage2, double total_size,
-                                                      double buffer_size) {
+    static double computeExpectedTwoStagePipelineTime(double bw_stage1, double bw_stage2, sg_size_t total_size,
+                                                      sg_size_t buffer_size) {
         double expected_elapsed = 0;
         if (buffer_size >= total_size) {
-            return (total_size / bw_stage1) + (total_size / bw_stage2);
+            return ((double)total_size / bw_stage1) + ((double)total_size / bw_stage2);
         } else {
             double bottleneck_bandwidth = std::min<double>(bw_stage1, bw_stage2);
             double num_full_buffers = std::floor(total_size / buffer_size);
-            return buffer_size / bw_stage1 +
+            return (double)buffer_size / bw_stage1 +
                    (num_full_buffers - 1) * (buffer_size / bottleneck_bandwidth) +
                    buffer_size / bw_stage2 +
-                   (total_size - num_full_buffers * buffer_size) / bw_stage2;
+                   ((double)total_size - num_full_buffers * buffer_size) / bw_stage2;
         }
     }
 
     static double computeExpectedThreeStagePipelineTime(double bw_stage1, double bw_stage2, double bw_stage3,
-                                                        double total_size, double buffer_size) {
+                                                        sg_size_t total_size, sg_size_t buffer_size) {
         double expected_elapsed = 0;
         if (buffer_size >= total_size) {
-            return (total_size / bw_stage1) + (total_size / bw_stage2) + (total_size / bw_stage3);
+            return ((double)total_size / bw_stage1) + ((double)total_size / bw_stage2) + ((double)total_size / bw_stage3);
         } else {
             double bottleneck_bandwidth = std::min<double>(std::min<double>(bw_stage1, bw_stage2), bw_stage3);
             double num_full_buffers = std::floor(total_size / buffer_size);
-            double last_nonfull_buffer_size = total_size - num_full_buffers * buffer_size;
+            double last_nonfull_buffer_size = total_size - num_full_buffers * (double)buffer_size;
 
-            return buffer_size / bw_stage1 +
-                   buffer_size / std::min<double>(bw_stage1, bw_stage2) +
-                   (num_full_buffers - 2) * (buffer_size / bottleneck_bandwidth) +
+            return (double)buffer_size / bw_stage1 +
+                    (double)buffer_size / std::min<double>(bw_stage1, bw_stage2) +
+                   (num_full_buffers - 2) * ((double)buffer_size / bottleneck_bandwidth) +
                    std::max<double>(last_nonfull_buffer_size / bw_stage1,
-                                    buffer_size / std::min<double>(bw_stage2, bw_stage3)) +
-                   std::max<double>(last_nonfull_buffer_size / bw_stage2, buffer_size / bw_stage3) +
+                                    (double)buffer_size / std::min<double>(bw_stage2, bw_stage3)) +
+                   std::max<double>(last_nonfull_buffer_size / bw_stage2, (double)buffer_size / bw_stage3) +
                    last_nonfull_buffer_size / bw_stage3;
         }
     }
@@ -151,14 +153,14 @@ class SimpleStorageServiceConcurrentFileCopiesTestWMS : public wrench::Execution
 
 public:
     SimpleStorageServiceConcurrentFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
-                                                    std::string hostname,
-                                                    double buffer_size) : wrench::ExecutionController(hostname, "test"), test(test), buffer_size(buffer_size) {
+                                                    const std::string& hostname,
+                                                    sg_size_t buffer_size) : wrench::ExecutionController(hostname, "test"), test(test), buffer_size(buffer_size) {
     }
 
 private:
     SimpleStorageServicePerformanceTest *test;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
-    double buffer_size;
+    sg_size_t buffer_size;
 
     int main() override {
 
@@ -242,7 +244,7 @@ private:
 };
 
 TEST_F(SimpleStorageServicePerformanceTest, ConcurrentFileCopies) {
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, DBL_MAX)
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, LONG_LONG_MAX)
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 2);
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 10);
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 10 + FILE_SIZE / 3);
@@ -251,7 +253,7 @@ TEST_F(SimpleStorageServicePerformanceTest, ConcurrentFileCopies) {
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 100);
 }
 
-void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double buffer_size) {
+void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -278,7 +280,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
                                                                                      {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms;
     ASSERT_NO_THROW(wms = simulation->add(
                             new SimpleStorageServiceConcurrentFileCopiesTestWMS(
                                     this, "WMSHost", buffer_size)));
@@ -287,9 +289,9 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging all files on the Src storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_2));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_3));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -310,13 +312,13 @@ class SimpleStorageServiceFileReadTestWMS : public wrench::ExecutionController {
 public:
     SimpleStorageServiceFileReadTestWMS(SimpleStorageServicePerformanceTest *test,
                                         std::shared_ptr<wrench::FileRegistryService> file_registry_service,
-                                        std::string hostname, double buffer_size) : wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service), buffer_size(buffer_size) {
+                                        const std::string& hostname, sg_size_t buffer_size) : wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(std::move(std::move(file_registry_service))), buffer_size(buffer_size) {
     }
 
 private:
     SimpleStorageServicePerformanceTest *test;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
-    double buffer_size;
+    sg_size_t buffer_size;
 
     int main() override {
 
@@ -343,7 +345,7 @@ private:
             throw std::runtime_error("Incorrect file read time " + std::to_string(elapsed) +
                                      " (expected: " + std::to_string(expected_elapsed) +
                                      "; buffer size = " +
-                                     (buffer_size == DBL_MAX ? "infty" : std::to_string(buffer_size)) + ")");
+                                     (buffer_size == LONG_LONG_MAX ? "infty" : std::to_string(buffer_size)) + ")");
         }
 
         return 0;
@@ -351,7 +353,7 @@ private:
 };
 
 TEST_F(SimpleStorageServicePerformanceTest, FileRead) {
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, DBL_MAX);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, LONG_LONG_MAX);
     DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 2);
     DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 10);
     DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 10 + FILE_SIZE / 3);
@@ -362,7 +364,7 @@ TEST_F(SimpleStorageServicePerformanceTest, FileRead) {
 }
 
 
-void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
+void SimpleStorageServicePerformanceTest::do_FileRead_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -391,9 +393,9 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     // Create a file registry
 
     // Staging all files on the  storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
-    ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_1));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_2));
+    ASSERT_NO_THROW(storage_service_1->createFile(file_3));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

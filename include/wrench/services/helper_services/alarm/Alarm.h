@@ -39,8 +39,8 @@ namespace wrench {
         void kill();
 
     private:
-        Alarm(double date, std::string hostname, S4U_CommPort *reply_commport,
-              SimulationMessage *msg, std::string suffix);
+        Alarm(double date, const std::string& hostname, S4U_CommPort *reply_commport,
+              SimulationMessage *msg, const std::string& suffix);
 
         double date;
         //        std::string reply_commport_name;

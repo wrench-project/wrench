@@ -34,6 +34,24 @@ if (DEFINED SimGrid_PATH)
 endif()
 find_package(SimGrid REQUIRED)
 
+# Find SimGrid's FS module
+if (DEFINED FSMOD_PATH)
+    if (NOT EXISTS "${FSMOD_PATH}")
+        message(FATAL_ERROR "The specified FSMOD_PATH doesn't exit")
+    else()
+        file(GLOB LIBFSMOD_FILES
+                "${FSMOD_PATH}/liblibfsmod.so"
+                "${FSMOD_PATH}/lib/libfsmod.dylib"
+                )
+        if (NOT LIBFSMOD_FILES)
+            message(FATAL_ERROR "The specified FSMOD_PATH doesn't seem to contain a valid FSMod installation")
+        else()
+            set(CMAKE_PREFIX_PATH ${FSMOD_PATH} ${CMAKE_PREFIX_PATH})
+        endif()
+    endif()
+endif()
+find_package(FSMod REQUIRED)
+
 # Find WRENCH
 if (DEFINED WRENCH_PATH)
     if (NOT EXISTS "${WRENCH_PATH}")
@@ -53,7 +71,7 @@ find_package(WRENCH REQUIRED)
 
 
 # include directories
-include_directories(include/ /usr/local/include/ /opt/local/include/ ${WRENCH_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+include_directories(include/ /usr/local/include/ /opt/local/include/ ${WRENCH_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 # source files
 set(SOURCE_FILES
@@ -70,6 +88,7 @@ if (ENABLE_BATSCHED)
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
             ${SimGrid_LIBRARY}
+            ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
             -lzmq)
@@ -77,6 +96,7 @@ else()
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
             ${SimGrid_LIBRARY}
+            ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
             )

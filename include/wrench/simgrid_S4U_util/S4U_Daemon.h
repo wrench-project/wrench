@@ -15,6 +15,8 @@
 #include <simgrid/s4u.hpp>
 #include <iostream>
 
+//#include <wrench/simulation/Simulation.h>
+
 //#define ACTOR_TRACKING_OUTPUT yes
 
 
@@ -24,8 +26,8 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-    class Simulation;
     class S4U_CommPort;
+    class Simulation;
 
     /**
      * @brief A generic "running daemon" abstraction that serves as a basis for all simulated processes
@@ -72,7 +74,7 @@ namespace wrench {
 
         virtual ~S4U_Daemon();
 
-        void startDaemon(bool _daemonized, bool _auto_restart);
+        void startDaemon(bool daemonized, bool auto_restart);
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
         void deleteLifeSaver();
@@ -131,7 +133,7 @@ namespace wrench {
 
     protected:
         /** @brief a pointer to the simulation object */
-        Simulation *simulation;
+        Simulation *simulation_;
 
         /** @brief The service's state */
         State state;
@@ -167,10 +169,10 @@ namespace wrench {
         simgrid::s4u::MutexPtr daemon_lock;
 
 
-        bool has_returned_from_main = false;// Set to true after main returns
-        int return_value = 0;               // Set to the value returned by main
-        bool daemonized{};                  // Set to true if daemon is daemonized
-        bool auto_restart{};                // Set to true if daemon is supposed to auto-restart
+        bool has_returned_from_main_ = false;// Set to true after main returns
+        int return_value_ = 0;               // Set to the value returned by main
+        bool daemonized_=true;               // Whether the daemon is daemonized (will be overwritten by start())
+        bool auto_restart_=false;            // Whether the daemon is supposed to auto-restart (will be overwritten by start())
 
         static int num_non_daemonized_actors_running;
 

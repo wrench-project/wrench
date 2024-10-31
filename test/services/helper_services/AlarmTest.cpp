@@ -95,7 +95,7 @@ private:
         // Start an alarm
         auto commport = wrench::S4U_CommPort::getTemporaryCommPort();
         try {
-            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", commport,
+            wrench::Alarm::createAndStartAlarm(this->getSimulation(), 10.0, "Host2", commport,
                                                new wrench::SimulationMessage(1), "bogus");
             throw std::runtime_error("Should not be able to create an alarm on a down host");
         } catch (wrench::ExecutionException &e) {

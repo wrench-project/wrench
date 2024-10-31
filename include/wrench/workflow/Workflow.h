@@ -48,7 +48,7 @@ namespace wrench {
         std::shared_ptr<WorkflowTask> addTask(const std::string &, double flops,
                                               unsigned long min_num_cores,
                                               unsigned long max_num_cores,
-                                              double memory_requirement);
+                                              sg_size_t memory_requirement);
 
         void removeTask(const std::shared_ptr<WorkflowTask> &task);
 
@@ -68,6 +68,7 @@ namespace wrench {
 
         unsigned long getNumLevels();
 
+        double getStartDate();
         double getCompletionDate();
 
         std::vector<std::shared_ptr<DataFile>> getInputFiles() const;

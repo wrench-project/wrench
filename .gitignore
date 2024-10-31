@@ -33,6 +33,7 @@ cmake-build-debug
 cmake-build-release
 build
 .idea
+.clang-format
 
 # VSCode
 .vscode
@@ -57,8 +58,9 @@ examples/workflow_api/condor-grid-example/wrench-example-condor-grid-universe
 *wrench-example*
 examples/workflow_api/basic-examples/io-pagecache/wrench-example*
 
-# Generated REST API routes
+# Generated REST API routes and data structures
 tools/wrench/wrench-daemon/include/routes.h
+tools/wrench/wrench-daemon/include/callback-map.h
 
 #JSON
 host_utilization_layout.json

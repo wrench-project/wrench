@@ -37,10 +37,10 @@ namespace wrench {
     //    NetworkProximitySenderDaemon::NetworkProximitySenderDaemon(Simulation *simulation,
     //                                                   std::string hostname,
     //                                                   S4U_CommPort *network_proximity_service_commport,
-    //                                                   double message_size, double measurement_period,
+    //                                                   sg_size_t message_size, double measurement_period,
     //                                                   double noise,
     //                                                   int noise_seed,
-    //                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : NetworkProximitySenderDaemon(simulation, std::move(hostname), network_proximity_service_commport,
+    //                                                   WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : NetworkProximitySenderDaemon(simulation, std::move(hostname), network_proximity_service_commport,
     //                                                                                                                                       message_size, measurement_period, noise, noise_seed, messagepayload_list, "") {
     //    }
 
@@ -60,16 +60,16 @@ namespace wrench {
 
     NetworkProximitySenderDaemon::NetworkProximitySenderDaemon(
             Simulation *simulation,
-            std::string hostname,
+            const std::string& hostname,
             S4U_CommPort *network_proximity_service_commport,
-            double message_size, double measurement_period,
+            sg_size_t message_size, double measurement_period,
             double noise,
             int noise_seed,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(std::move(hostname), "network_proximity_sender_daemon") {
+            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : Service(hostname, "network_proximity_sender_daemon") {
         // Set the message payloads
         setMessagePayloads(messagepayload_list, {});
 
-        this->simulation = simulation;
+        this->simulation_ = simulation;
         this->message_size = message_size;
         this->measurement_period = measurement_period;
         this->max_noise = noise;

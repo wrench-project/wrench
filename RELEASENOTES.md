@@ -3,7 +3,16 @@ WRENCH Release Notes
 
 ### current master branch
 
-Nothing new yet
+Nothing here yet
+
+### wrench 2.4
+
+- Removal of all file system simulation code, which was replaced by calls to
+  the [SimGrid File System Module (FSMod)](https://github.com/simgrid/file-system-module), which is now a new
+  software dependency for WRENCH
+- API change: all numbers of bytes (file and memory sizes) are now of type `sg_size_t` instead of `double` (due to the use of FSMod above)
+- Added REST API functionality and updated all documentation
+- Minor code/documentation cleanups
 
 ### wrench 2.3
 
