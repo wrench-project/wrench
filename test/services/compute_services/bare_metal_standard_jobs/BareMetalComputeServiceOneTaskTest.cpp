@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -62,7 +61,7 @@ public:
 
 
 protected:
-    ~BareMetalComputeServiceOneTaskTest() {
+    ~BareMetalComputeServiceOneTaskTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -654,14 +653,14 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
 
 class HostMemoryTestWMS : public wrench::ExecutionController {
 public:
-    HostMemoryTestWMS(BareMetalComputeServiceOneTaskTest *test, std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    HostMemoryTestWMS(BareMetalComputeServiceOneTaskTest *test, const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
     BareMetalComputeServiceOneTaskTest *test;
 
     int main() override {
-        double ram_capacity;
+        sg_size_t ram_capacity;
 
         ram_capacity = wrench::Simulation::getHostMemoryCapacity("TwoCoreHost");
         if (ram_capacity != wrench::S4U_Simulation::DEFAULT_RAM) {
@@ -677,7 +676,7 @@ private:
         if (ram_capacity == wrench::S4U_Simulation::DEFAULT_RAM) {
             throw std::runtime_error("RAM Capacity of RAMHost should not be the default");
         }
-        if (std::abs(ram_capacity - 1024) > 0.01) {
+        if (ram_capacity != 1024) {
             throw std::runtime_error("RAM Capacity of RAMHost should  be 1024");
         }
 

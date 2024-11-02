@@ -21,7 +21,7 @@ public:
     void do_basic_Test();
 
 protected:
-    ~S4U_VirtualMachineTest() {
+    ~S4U_VirtualMachineTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -73,7 +73,7 @@ protected:
 class Sleep100Daemon : public wrench::S4U_Daemon {
 
 public:
-    Sleep100Daemon(std::string hostname) : S4U_Daemon(hostname, "sleep100daemon") {}
+    Sleep100Daemon(const std::string& hostname) : S4U_Daemon(hostname, "sleep100daemon") {}
 
     int main() override {
         simgrid::s4u::this_actor::execute(100);
@@ -89,14 +89,10 @@ public:
 class S4U_VirtualMachineTestWMS : public wrench::ExecutionController {
 
 public:
-    S4U_VirtualMachineTestWMS(S4U_VirtualMachineTest *test,
-                              std::string hostname) : wrench::ExecutionController(hostname, "test") {
-        this->test = test;
+    S4U_VirtualMachineTestWMS(const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
     }
 
 private:
-    S4U_VirtualMachineTest *test;
-
     int main() override {
 
         auto vm = new wrench::S4U_VirtualMachine("vm", 1, 1, {}, {});
@@ -176,12 +172,7 @@ void S4U_VirtualMachineTest::do_basic_Test() {
 
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-
-    ASSERT_NO_THROW(wms = simulation->add(
-                            new S4U_VirtualMachineTestWMS(
-                                    this, hostname)));
-
+    ASSERT_NO_THROW(simulation->add(new S4U_VirtualMachineTestWMS(hostname)));
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 

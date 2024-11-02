@@ -32,7 +32,7 @@ public:
 
 
 protected:
-    ~SimpleStorageServiceWrongServiceTest() {
+    ~SimpleStorageServiceWrongServiceTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -83,7 +83,7 @@ class SimpleStorageServiceWrongServiceTestWMS : public wrench::ExecutionControll
 
 public:
     SimpleStorageServiceWrongServiceTestWMS(SimpleStorageServiceWrongServiceTest *test,
-                                                  std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                  const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -147,9 +147,7 @@ void SimpleStorageServiceWrongServiceTest::do_WrongService_test(double buffer_si
                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}}, {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleStorageServiceWrongServiceTestWMS(this, hostname)));
+    ASSERT_NO_THROW(simulation->add(new SimpleStorageServiceWrongServiceTestWMS(this, hostname)));
 
     // Staging all files on the 1000 storage service
     ASSERT_NO_THROW(storage_service_1->createFile(file_1));
