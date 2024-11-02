@@ -7,8 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
-
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -36,7 +34,7 @@ public:
     void do_UnsupportedPilotJobs_test();
 
 protected:
-    ~BareMetalComputeServiceTestPilotJobs() {
+    ~BareMetalComputeServiceTestPilotJobs() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -90,7 +88,7 @@ class BareMetalComputeServiceUnsupportedPilotJobsTestWMS : public wrench::Execut
 
 public:
     BareMetalComputeServiceUnsupportedPilotJobsTestWMS(BareMetalComputeServiceTestPilotJobs *test,
-                                                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                       const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
