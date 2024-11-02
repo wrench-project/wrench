@@ -266,8 +266,6 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
-        include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
-        include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/data_movement_manager/DataMovementManager.cpp
         src/wrench/managers/data_movement_manager/DataMovementManagerMessage.cpp
@@ -461,9 +459,9 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
-        test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceCachingTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
+        test/services/storage_services/SimpleStorageService/SimpleStorageServiceWrongServiceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/services/storage_services/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp

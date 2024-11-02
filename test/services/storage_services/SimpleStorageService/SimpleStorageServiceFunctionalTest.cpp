@@ -37,6 +37,8 @@ public:
 
     void do_BasicFunctionality_test(double buffer_size);
 
+    void do_WrongService_test(double buffer_size);
+
     void do_SynchronousFileCopy_test(double buffer_size);
 
     void do_AsynchronousFileCopy_test(double buffer_size);
@@ -723,7 +725,6 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
         free(argv[i]);
     free(argv);
 }
-
 
 /**********************************************************************/
 /**  SYNCHRONOUS FILE COPY TEST                                     **/
