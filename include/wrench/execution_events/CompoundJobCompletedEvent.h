@@ -22,22 +22,9 @@
 
 namespace wrench {
 
-    class WorkflowTask;
-
-    class DataFile;
-
     class CompoundJob;
 
-    class PilotJob;
-
     class ComputeService;
-
-    class StorageService;
-
-    class FileRegistryService;
-
-    class FileRegistryService;
-
 
     /**
      * @brief A "compound job has completed" ExecutionEvent
