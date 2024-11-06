@@ -15,6 +15,7 @@
 #include <iostream>
 #include <cfloat>
 #include <climits>
+#include <limits>
 
 #include "wrench/services/Service.h"
 #include "wrench/job/Job.h"
@@ -53,7 +54,7 @@ namespace wrench {
         /** @brief A convenient constant to mean "use all ram of a physical host" whenever a ram capacity
          *  is needed when instantiating compute services
          */
-        static constexpr sg_size_t ALL_RAM = LONG_LONG_MAX;
+        static constexpr sg_size_t ALL_RAM = LONG_MAX;
 
         /***********************/
         /** \cond DEVELOPER   **/

@@ -13,6 +13,7 @@
 
 #include <set>
 #include <climits>
+#include <limits>
 #include <simgrid/s4u.hpp>
 #include <simgrid/kernel/routing/ClusterZone.hpp>
 
@@ -29,7 +30,7 @@ namespace wrench {
     class S4U_Simulation {
     public:
         /** @brief The ram capacity of a physical host whenever not specified in the platform description file */
-        static constexpr sg_size_t DEFAULT_RAM = LONG_LONG_MAX;
+        static constexpr sg_size_t DEFAULT_RAM = LLONG_MAX;
 
     public:
         static void enableSMPI();
