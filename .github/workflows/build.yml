@@ -68,12 +68,19 @@ jobs:
             BRANCH_NAME=$(echo ${GITHUB_REF} | sed 's/refs\/heads\///g');
             docker exec -w /home/wrench/wrench wrench git checkout ${BRANCH_NAME};
           fi
+          # build wrench, including unit_tests and examples
           docker exec wrench mkdir wrench/build;
-          # build and test wrench
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
           docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples wrench-daemon;
+          # run unit_tests
           docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
-          docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
+          # run examples
+          #docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
+          docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh 
+          # run wrench-init
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init -a ACTION -d ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
 
       - name: Documentation Build and Deployment
         env:
