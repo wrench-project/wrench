@@ -1111,7 +1111,7 @@ namespace wrench {
                                                 " at host " + hostname + " has invalid size");
                 }
             } else {
-                capacity = LONG_LONG_MAX;// Default size if no size property specified
+                capacity = LLONG_MAX;// Default size if no size property specified
             }
 
             return capacity;
