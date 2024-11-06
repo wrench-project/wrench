@@ -112,7 +112,7 @@ namespace wrench {
         try {
             double value = parseValueWithUnit(string, units, "B"); // default: bytes
             if (value == DBL_MAX) {
-                return LONG_LONG_MAX;
+                return LLONG_MAX;
             } else {
                 return (sg_size_t) value;
             }
