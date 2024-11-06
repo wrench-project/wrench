@@ -72,6 +72,7 @@ jobs:
           docker exec wrench mkdir wrench/build;
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
           docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples wrench-daemon;
+          docker exec -w /home/wrench/wrench/build wrench sudo make install
           # run unit_tests
           docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
           # run examples
