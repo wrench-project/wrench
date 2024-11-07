@@ -8,10 +8,10 @@
  */
 
 #include <iostream>
-#include <wrench.h>
+#include "wrench.h"
 
 #include "SimpleWMS.h"
-#include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
+#include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
 #include <iostream>
 #include <fstream>
 
