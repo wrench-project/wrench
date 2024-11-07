@@ -51,16 +51,16 @@ namespace sg4 = simgrid::s4u;
 class PlatformCreator {
 
 public:
-    PlatformCreator(double link_bw) : link_bw(link_bw) {}
+    explicit PlatformCreator(double link_bw) : link_bw(link_bw) {}
 
     void operator()() const {
-        create_platform(this->link_bw);
+        create_platform();
     }
 
 private:
     double link_bw;
 
-    void create_platform(double link_bw) const {
+    void create_platform() const {
         // Create the top-level zone
         auto zone = sg4::create_full_zone("AS0");
         // Create the WMSHost host with its disk

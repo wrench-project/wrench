@@ -11,7 +11,8 @@ add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/basic-examples/cl
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks EXCLUDE_FROM_ALL)
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/basic-examples/batch-bag-of-tasks EXCLUDE_FROM_ALL)
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/basic-examples/batch-pilot-job EXCLUDE_FROM_ALL)
-add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/real-workflow-example EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/real-workflow-examples/vms-and-pilot-jobs EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/real-workflow-examples/single-cluster-programmatic-platform EXCLUDE_FROM_ALL)
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/condor-grid-example EXCLUDE_FROM_ALL)
 #add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/workflow_api/basic-examples/io-pagecache EXCLUDE_FROM_ALL)
 
