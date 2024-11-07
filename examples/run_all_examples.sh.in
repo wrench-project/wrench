@@ -133,11 +133,18 @@ echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job
 ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job/wrench-example-batch-pilot-job ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job/four_hosts_scratch.xml
 fi
 
-if [[ "${TO_EXCLUDE}" == *"wrench-example-real-workflow"* ]]; then
-        echo "${bold}SKIPPING: wrench-example-real-workflow${normal}"
+if [[ "${TO_EXCLUDE}" == *"wrench-example-real-workflow-single-cluster"* ]]; then
+        echo "${bold}SKIPPING: wrench-example-real-workflow-single-cluster${normal}"
 else
-echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow${normal}"
-${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow ${INSTALL_DIR}/workflow_api/real-workflow-example/cloud_batch_platform.xml ${INSTALL_DIR}/workflow_api/real-workflow-example/1000genome-chameleon-2ch-100k-001.json
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/real-workflow-examples/wrench-example-real-workflow-single-cluster${normal}"
+${INSTALL_DIR}/workflow_api/real-workflow-examples/single-cluster-programmatic-platform/wrench-example-real-workflow-single-cluster 10 ${INSTALL_DIR}/workflow_api/real-workflow-examples/single-cluster-programmatic-platform/1000genome-chameleon-2ch-100k-001.json
+fi
+
+if [[ "${TO_EXCLUDE}" == *"wrench-example-real-workflow-vms-and-pilots"* ]]; then
+        echo "${bold}SKIPPING: wrench-example-real-workflow-vms-and-pilots${normal}"
+else
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/real-workflow-examples/wrench-example-real-workflow-vms-and-pilots${normal}"
+${INSTALL_DIR}/workflow_api/real-workflow-examples/vms-and-pilot-jobs/wrench-example-real-workflow-vms-and-pilots ${INSTALL_DIR}/workflow_api/real-workflow-examples/vms-and-pilot-jobs/cloud_batch_platform.xml ${INSTALL_DIR}/workflow_api/real-workflow-examples/vms-and-pilot-jobs/1000genome-chameleon-2ch-100k-001.json
 fi
 
 if [[ "${TO_EXCLUDE}" == *"wrench-example-condor-grid-universe"* ]]; then

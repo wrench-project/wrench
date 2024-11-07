@@ -1,0 +1,2217 @@
+{
+    "name": "1000genome-20200401T035039Z-0",
+    "description": "Trace generated with wrench-pegasus-parser.py from http://wrench-project.org",
+    "createdAt": "2020-04-01T20:22:32.420180Z",
+    "schemaVersion": "1.5",
+    "author": {
+        "name": "rafsilva",
+        "email": "support@wrench-project.org"
+    },
+    "workflow": {
+        "specification": {
+            "tasks": [
+                {
+                    "name": "individuals_ID0000001",
+                    "id": "individuals_ID0000001",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-1-1001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000002",
+                    "id": "individuals_ID0000002",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-1001-2001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000003",
+                    "id": "individuals_ID0000003",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-2001-3001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000004",
+                    "id": "individuals_ID0000004",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-3001-4001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000005",
+                    "id": "individuals_ID0000005",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-4001-5001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000006",
+                    "id": "individuals_ID0000006",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-5001-6001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000007",
+                    "id": "individuals_ID0000007",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-6001-7001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000008",
+                    "id": "individuals_ID0000008",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-7001-8001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000009",
+                    "id": "individuals_ID0000009",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-8001-9001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000010",
+                    "id": "individuals_ID0000010",
+                    "children": [
+                        "individuals_merge_ID0000011"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.100000.vcf",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21n-9001-10001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_merge_ID0000011",
+                    "id": "individuals_merge_ID0000011",
+                    "children": [
+                        "mutation_overlap_ID0000025",
+                        "frequency_ID0000026",
+                        "mutation_overlap_ID0000027",
+                        "frequency_ID0000028",
+                        "mutation_overlap_ID0000029",
+                        "frequency_ID0000030",
+                        "mutation_overlap_ID0000031",
+                        "frequency_ID0000032",
+                        "mutation_overlap_ID0000033",
+                        "frequency_ID0000034",
+                        "mutation_overlap_ID0000035",
+                        "frequency_ID0000036",
+                        "mutation_overlap_ID0000037",
+                        "frequency_ID0000038"
+                    ],
+                    "inputFiles": [
+                        "chr21n-4001-5001.tar.gz",
+                        "chr21n-9001-10001.tar.gz",
+                        "chr21n-5001-6001.tar.gz",
+                        "chr21n-7001-8001.tar.gz",
+                        "chr21n-6001-7001.tar.gz",
+                        "chr21n-1001-2001.tar.gz",
+                        "chr21n-8001-9001.tar.gz",
+                        "chr21n-1-1001.tar.gz",
+                        "chr21n-3001-4001.tar.gz",
+                        "chr21n-2001-3001.tar.gz"
+                    ],
+                    "outputFiles": [
+                        "chr21n.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_ID0000004",
+                        "individuals_ID0000005",
+                        "individuals_ID0000006",
+                        "individuals_ID0000007",
+                        "individuals_ID0000001",
+                        "individuals_ID0000002",
+                        "individuals_ID0000003",
+                        "individuals_ID0000008",
+                        "individuals_ID0000009",
+                        "individuals_ID0000010"
+                    ]
+                },
+                {
+                    "name": "sifting_ID0000012",
+                    "id": "sifting_ID0000012",
+                    "children": [
+                        "mutation_overlap_ID0000025",
+                        "frequency_ID0000026",
+                        "mutation_overlap_ID0000027",
+                        "frequency_ID0000028",
+                        "mutation_overlap_ID0000029",
+                        "frequency_ID0000030",
+                        "mutation_overlap_ID0000031",
+                        "frequency_ID0000032",
+                        "mutation_overlap_ID0000033",
+                        "frequency_ID0000034",
+                        "mutation_overlap_ID0000035",
+                        "frequency_ID0000036",
+                        "mutation_overlap_ID0000037",
+                        "frequency_ID0000038"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr21.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf"
+                    ],
+                    "outputFiles": [
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000013",
+                    "id": "individuals_ID0000013",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-1-1001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000014",
+                    "id": "individuals_ID0000014",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-1001-2001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000015",
+                    "id": "individuals_ID0000015",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-2001-3001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000016",
+                    "id": "individuals_ID0000016",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-3001-4001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000017",
+                    "id": "individuals_ID0000017",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-4001-5001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000018",
+                    "id": "individuals_ID0000018",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-5001-6001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000019",
+                    "id": "individuals_ID0000019",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-6001-7001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000020",
+                    "id": "individuals_ID0000020",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-7001-8001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000021",
+                    "id": "individuals_ID0000021",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-8001-9001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_ID0000022",
+                    "id": "individuals_ID0000022",
+                    "children": [
+                        "individuals_merge_ID0000023"
+                    ],
+                    "inputFiles": [
+                        "columns.txt",
+                        "ALL.chr22.100000.vcf"
+                    ],
+                    "outputFiles": [
+                        "chr22n-9001-10001.tar.gz"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "individuals_merge_ID0000023",
+                    "id": "individuals_merge_ID0000023",
+                    "children": [
+                        "mutation_overlap_ID0000039",
+                        "frequency_ID0000040",
+                        "mutation_overlap_ID0000041",
+                        "frequency_ID0000042",
+                        "mutation_overlap_ID0000043",
+                        "frequency_ID0000044",
+                        "mutation_overlap_ID0000045",
+                        "frequency_ID0000046",
+                        "mutation_overlap_ID0000047",
+                        "frequency_ID0000048",
+                        "mutation_overlap_ID0000049",
+                        "frequency_ID0000050",
+                        "mutation_overlap_ID0000051",
+                        "frequency_ID0000052"
+                    ],
+                    "inputFiles": [
+                        "chr22n-4001-5001.tar.gz",
+                        "chr22n-3001-4001.tar.gz",
+                        "chr22n-1-1001.tar.gz",
+                        "chr22n-2001-3001.tar.gz",
+                        "chr22n-5001-6001.tar.gz",
+                        "chr22n-6001-7001.tar.gz",
+                        "chr22n-8001-9001.tar.gz",
+                        "chr22n-7001-8001.tar.gz",
+                        "chr22n-1001-2001.tar.gz",
+                        "chr22n-9001-10001.tar.gz"
+                    ],
+                    "outputFiles": [
+                        "chr22n.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_ID0000015",
+                        "individuals_ID0000016",
+                        "individuals_ID0000017",
+                        "individuals_ID0000018",
+                        "individuals_ID0000013",
+                        "individuals_ID0000014",
+                        "individuals_ID0000019",
+                        "individuals_ID0000022",
+                        "individuals_ID0000020",
+                        "individuals_ID0000021"
+                    ]
+                },
+                {
+                    "name": "sifting_ID0000024",
+                    "id": "sifting_ID0000024",
+                    "children": [
+                        "mutation_overlap_ID0000039",
+                        "frequency_ID0000040",
+                        "mutation_overlap_ID0000041",
+                        "frequency_ID0000042",
+                        "mutation_overlap_ID0000043",
+                        "frequency_ID0000044",
+                        "mutation_overlap_ID0000045",
+                        "frequency_ID0000046",
+                        "mutation_overlap_ID0000047",
+                        "frequency_ID0000048",
+                        "mutation_overlap_ID0000049",
+                        "frequency_ID0000050",
+                        "mutation_overlap_ID0000051",
+                        "frequency_ID0000052"
+                    ],
+                    "inputFiles": [
+                        "ALL.chr22.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf"
+                    ],
+                    "outputFiles": [
+                        "sifted.SIFT.chr22.txt"
+                    ],
+                    "parents": []
+                },
+                {
+                    "name": "mutation_overlap_ID0000025",
+                    "id": "mutation_overlap_ID0000025",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "AFR",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-AFR.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000026",
+                    "id": "frequency_ID0000026",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "AFR",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-AFR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000027",
+                    "id": "mutation_overlap_ID0000027",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "GBR",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-GBR.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000028",
+                    "id": "frequency_ID0000028",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "GBR",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-GBR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000029",
+                    "id": "mutation_overlap_ID0000029",
+                    "children": [],
+                    "inputFiles": [
+                        "ALL",
+                        "columns.txt",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-ALL.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000030",
+                    "id": "frequency_ID0000030",
+                    "children": [],
+                    "inputFiles": [
+                        "ALL",
+                        "columns.txt",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-ALL-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000031",
+                    "id": "mutation_overlap_ID0000031",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "SAS",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-SAS.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000032",
+                    "id": "frequency_ID0000032",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "SAS",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-SAS-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000033",
+                    "id": "mutation_overlap_ID0000033",
+                    "children": [],
+                    "inputFiles": [
+                        "EAS",
+                        "columns.txt",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-EAS.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000034",
+                    "id": "frequency_ID0000034",
+                    "children": [],
+                    "inputFiles": [
+                        "EAS",
+                        "columns.txt",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-EAS-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000035",
+                    "id": "mutation_overlap_ID0000035",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "AMR",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-AMR.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000036",
+                    "id": "frequency_ID0000036",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "AMR",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-AMR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000037",
+                    "id": "mutation_overlap_ID0000037",
+                    "children": [],
+                    "inputFiles": [
+                        "EUR",
+                        "columns.txt",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-EUR.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000038",
+                    "id": "frequency_ID0000038",
+                    "children": [],
+                    "inputFiles": [
+                        "EUR",
+                        "columns.txt",
+                        "chr21n.tar.gz",
+                        "sifted.SIFT.chr21.txt"
+                    ],
+                    "outputFiles": [
+                        "chr21-EUR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "sifting_ID0000012",
+                        "individuals_merge_ID0000011"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000039",
+                    "id": "mutation_overlap_ID0000039",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "AFR"
+                    ],
+                    "outputFiles": [
+                        "chr22-AFR.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000040",
+                    "id": "frequency_ID0000040",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "AFR"
+                    ],
+                    "outputFiles": [
+                        "chr22-AFR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000041",
+                    "id": "mutation_overlap_ID0000041",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "GBR"
+                    ],
+                    "outputFiles": [
+                        "chr22-GBR.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000042",
+                    "id": "frequency_ID0000042",
+                    "children": [],
+                    "inputFiles": [
+                        "columns.txt",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "GBR"
+                    ],
+                    "outputFiles": [
+                        "chr22-GBR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000043",
+                    "id": "mutation_overlap_ID0000043",
+                    "children": [],
+                    "inputFiles": [
+                        "ALL",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-ALL.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000044",
+                    "id": "frequency_ID0000044",
+                    "children": [],
+                    "inputFiles": [
+                        "ALL",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-ALL-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000045",
+                    "id": "mutation_overlap_ID0000045",
+                    "children": [],
+                    "inputFiles": [
+                        "SAS",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-SAS.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000046",
+                    "id": "frequency_ID0000046",
+                    "children": [],
+                    "inputFiles": [
+                        "SAS",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-SAS-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000047",
+                    "id": "mutation_overlap_ID0000047",
+                    "children": [],
+                    "inputFiles": [
+                        "EAS",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-EAS.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000048",
+                    "id": "frequency_ID0000048",
+                    "children": [],
+                    "inputFiles": [
+                        "EAS",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-EAS-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000049",
+                    "id": "mutation_overlap_ID0000049",
+                    "children": [],
+                    "inputFiles": [
+                        "AMR",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-AMR.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000050",
+                    "id": "frequency_ID0000050",
+                    "children": [],
+                    "inputFiles": [
+                        "AMR",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-AMR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "mutation_overlap_ID0000051",
+                    "id": "mutation_overlap_ID0000051",
+                    "children": [],
+                    "inputFiles": [
+                        "EUR",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-EUR.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                },
+                {
+                    "name": "frequency_ID0000052",
+                    "id": "frequency_ID0000052",
+                    "children": [],
+                    "inputFiles": [
+                        "EUR",
+                        "sifted.SIFT.chr22.txt",
+                        "chr22n.tar.gz",
+                        "columns.txt"
+                    ],
+                    "outputFiles": [
+                        "chr22-EUR-freq.tar.gz"
+                    ],
+                    "parents": [
+                        "individuals_merge_ID0000023",
+                        "sifting_ID0000024"
+                    ]
+                }
+            ],
+            "files": [
+                {
+                    "id": "ALL.chr21.100000.vcf",
+                    "sizeInBytes": 1014442803
+                },
+                {
+                    "id": "columns.txt",
+                    "sizeInBytes": 20078
+                },
+                {
+                    "id": "chr21n-1-1001.tar.gz",
+                    "sizeInBytes": 28281
+                },
+                {
+                    "id": "chr21n-1001-2001.tar.gz",
+                    "sizeInBytes": 28270
+                },
+                {
+                    "id": "chr21n-2001-3001.tar.gz",
+                    "sizeInBytes": 28266
+                },
+                {
+                    "id": "chr21n-3001-4001.tar.gz",
+                    "sizeInBytes": 28303
+                },
+                {
+                    "id": "chr21n-4001-5001.tar.gz",
+                    "sizeInBytes": 28232
+                },
+                {
+                    "id": "chr21n-5001-6001.tar.gz",
+                    "sizeInBytes": 28261
+                },
+                {
+                    "id": "chr21n-6001-7001.tar.gz",
+                    "sizeInBytes": 28307
+                },
+                {
+                    "id": "chr21n-7001-8001.tar.gz",
+                    "sizeInBytes": 28304
+                },
+                {
+                    "id": "chr21n-8001-9001.tar.gz",
+                    "sizeInBytes": 28348
+                },
+                {
+                    "id": "chr21n-9001-10001.tar.gz",
+                    "sizeInBytes": 28210
+                },
+                {
+                    "id": "chr21n.tar.gz",
+                    "sizeInBytes": 25037
+                },
+                {
+                    "id": "ALL.chr21.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf",
+                    "sizeInBytes": 267806263
+                },
+                {
+                    "id": "sifted.SIFT.chr21.txt",
+                    "sizeInBytes": 231958
+                },
+                {
+                    "id": "ALL.chr22.100000.vcf",
+                    "sizeInBytes": 1014493636
+                },
+                {
+                    "id": "chr22n-1-1001.tar.gz",
+                    "sizeInBytes": 28128
+                },
+                {
+                    "id": "chr22n-1001-2001.tar.gz",
+                    "sizeInBytes": 28281
+                },
+                {
+                    "id": "chr22n-2001-3001.tar.gz",
+                    "sizeInBytes": 28138
+                },
+                {
+                    "id": "chr22n-3001-4001.tar.gz",
+                    "sizeInBytes": 27624
+                },
+                {
+                    "id": "chr22n-4001-5001.tar.gz",
+                    "sizeInBytes": 27615
+                },
+                {
+                    "id": "chr22n-5001-6001.tar.gz",
+                    "sizeInBytes": 28138
+                },
+                {
+                    "id": "chr22n-6001-7001.tar.gz",
+                    "sizeInBytes": 28125
+                },
+                {
+                    "id": "chr22n-7001-8001.tar.gz",
+                    "sizeInBytes": 28244
+                },
+                {
+                    "id": "chr22n-8001-9001.tar.gz",
+                    "sizeInBytes": 28302
+                },
+                {
+                    "id": "chr22n-9001-10001.tar.gz",
+                    "sizeInBytes": 28272
+                },
+                {
+                    "id": "chr22n.tar.gz",
+                    "sizeInBytes": 25055
+                },
+                {
+                    "id": "ALL.chr22.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf",
+                    "sizeInBytes": 280949919
+                },
+                {
+                    "id": "sifted.SIFT.chr22.txt",
+                    "sizeInBytes": 480587
+                },
+                {
+                    "id": "AFR",
+                    "sizeInBytes": 8088
+                },
+                {
+                    "id": "chr21-AFR.tar.gz",
+                    "sizeInBytes": 144569
+                },
+                {
+                    "id": "chr21-AFR-freq.tar.gz",
+                    "sizeInBytes": 272990
+                },
+                {
+                    "id": "GBR",
+                    "sizeInBytes": 856
+                },
+                {
+                    "id": "chr21-GBR.tar.gz",
+                    "sizeInBytes": 136903
+                },
+                {
+                    "id": "chr21-GBR-freq.tar.gz",
+                    "sizeInBytes": 219928
+                },
+                {
+                    "id": "ALL",
+                    "sizeInBytes": 28000
+                },
+                {
+                    "id": "chr21-ALL.tar.gz",
+                    "sizeInBytes": 166614
+                },
+                {
+                    "id": "chr21-ALL-freq.tar.gz",
+                    "sizeInBytes": 289496
+                },
+                {
+                    "id": "SAS",
+                    "sizeInBytes": 5248
+                },
+                {
+                    "id": "chr21-SAS.tar.gz",
+                    "sizeInBytes": 143377
+                },
+                {
+                    "id": "chr21-SAS-freq.tar.gz",
+                    "sizeInBytes": 264723
+                },
+                {
+                    "id": "EAS",
+                    "sizeInBytes": 4896
+                },
+                {
+                    "id": "chr21-EAS.tar.gz",
+                    "sizeInBytes": 142592
+                },
+                {
+                    "id": "chr21-EAS-freq.tar.gz",
+                    "sizeInBytes": 265443
+                },
+                {
+                    "id": "AMR",
+                    "sizeInBytes": 4248
+                },
+                {
+                    "id": "chr21-AMR.tar.gz",
+                    "sizeInBytes": 142095
+                },
+                {
+                    "id": "chr21-AMR-freq.tar.gz",
+                    "sizeInBytes": 259983
+                },
+                {
+                    "id": "EUR",
+                    "sizeInBytes": 5312
+                },
+                {
+                    "id": "chr21-EUR.tar.gz",
+                    "sizeInBytes": 141848
+                },
+                {
+                    "id": "chr21-EUR-freq.tar.gz",
+                    "sizeInBytes": 266654
+                },
+                {
+                    "id": "chr22-AFR.tar.gz",
+                    "sizeInBytes": 146435
+                },
+                {
+                    "id": "chr22-AFR-freq.tar.gz",
+                    "sizeInBytes": 270800
+                },
+                {
+                    "id": "chr22-GBR.tar.gz",
+                    "sizeInBytes": 138728
+                },
+                {
+                    "id": "chr22-GBR-freq.tar.gz",
+                    "sizeInBytes": 221650
+                },
+                {
+                    "id": "chr22-ALL.tar.gz",
+                    "sizeInBytes": 169325
+                },
+                {
+                    "id": "chr22-ALL-freq.tar.gz",
+                    "sizeInBytes": 290690
+                },
+                {
+                    "id": "chr22-SAS.tar.gz",
+                    "sizeInBytes": 145894
+                },
+                {
+                    "id": "chr22-SAS-freq.tar.gz",
+                    "sizeInBytes": 265017
+                },
+                {
+                    "id": "chr22-EAS.tar.gz",
+                    "sizeInBytes": 145147
+                },
+                {
+                    "id": "chr22-EAS-freq.tar.gz",
+                    "sizeInBytes": 267302
+                },
+                {
+                    "id": "chr22-AMR.tar.gz",
+                    "sizeInBytes": 144357
+                },
+                {
+                    "id": "chr22-AMR-freq.tar.gz",
+                    "sizeInBytes": 258065
+                },
+                {
+                    "id": "chr22-EUR.tar.gz",
+                    "sizeInBytes": 143815
+                },
+                {
+                    "id": "chr22-EUR-freq.tar.gz",
+                    "sizeInBytes": 268471
+                }
+            ]
+        },
+        "execution": {
+            "makespanInSeconds": 776.0,
+            "executedAt": "20200401T035043+0000",
+            "tasks": [
+                {
+                    "id": "individuals_ID0000001",
+                    "runtimeInSeconds": 53.6,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "1",
+                            "1001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 160.8619,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000002",
+                    "runtimeInSeconds": 52.255,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "1001",
+                            "2001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 164.834,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000003",
+                    "runtimeInSeconds": 53.827,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "2001",
+                            "3001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 159.8919,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000004",
+                    "runtimeInSeconds": 52.111,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "3001",
+                            "4001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 165.3355,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000005",
+                    "runtimeInSeconds": 52.409,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "4001",
+                            "5001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 164.6378,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000006",
+                    "runtimeInSeconds": 51.066,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "5001",
+                            "6001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 168.7698,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000007",
+                    "runtimeInSeconds": 51.545,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "6001",
+                            "7001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 166.8445,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000008",
+                    "runtimeInSeconds": 52.759,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "7001",
+                            "8001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 163.5209,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000009",
+                    "runtimeInSeconds": 52.859,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "8001",
+                            "9001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 163.1662,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000010",
+                    "runtimeInSeconds": 51.251,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr21.100000.vcf",
+                            "21",
+                            "9001",
+                            "10001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 168.6679,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_merge_ID0000011",
+                    "runtimeInSeconds": 38.206,
+                    "command": {
+                        "program": "individuals_merge",
+                        "arguments": [
+                            "21",
+                            "chr21n-1-1001.tar.gz",
+                            "chr21n-1001-2001.tar.gz",
+                            "chr21n-2001-3001.tar.gz",
+                            "chr21n-3001-4001.tar.gz",
+                            "chr21n-4001-5001.tar.gz",
+                            "chr21n-5001-6001.tar.gz",
+                            "chr21n-6001-7001.tar.gz",
+                            "chr21n-7001-8001.tar.gz",
+                            "chr21n-8001-9001.tar.gz",
+                            "chr21n-9001-10001.tar.gz"
+                        ]
+                    },
+                    "avgCPU": 108.5484,
+                    "priority": 30,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "sifting_ID0000012",
+                    "runtimeInSeconds": 0.309,
+                    "command": {
+                        "program": "sifting",
+                        "arguments": [
+                            "ALL.chr21.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf",
+                            "21"
+                        ]
+                    },
+                    "avgCPU": 116.8285,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000013",
+                    "runtimeInSeconds": 51.199,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "1",
+                            "1001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 169.0424,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000014",
+                    "runtimeInSeconds": 53.755,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "1001",
+                            "2001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 160.8743,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000015",
+                    "runtimeInSeconds": 52.677,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "2001",
+                            "3001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 177.4645,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000016",
+                    "runtimeInSeconds": 52.968,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "3001",
+                            "4001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 175.9383,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000017",
+                    "runtimeInSeconds": 51.309,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "4001",
+                            "5001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 169.4771,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000018",
+                    "runtimeInSeconds": 51.475,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "5001",
+                            "6001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 169.0782,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000019",
+                    "runtimeInSeconds": 50.939,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "6001",
+                            "7001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 168.9059,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000020",
+                    "runtimeInSeconds": 52.127,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "7001",
+                            "8001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 165.3366,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000021",
+                    "runtimeInSeconds": 55.332,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "8001",
+                            "9001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 157.6899,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_ID0000022",
+                    "runtimeInSeconds": 53.637,
+                    "command": {
+                        "program": "individuals",
+                        "arguments": [
+                            "ALL.chr22.100000.vcf",
+                            "22",
+                            "9001",
+                            "10001",
+                            "10000"
+                        ]
+                    },
+                    "avgCPU": 160.8349,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "individuals_merge_ID0000023",
+                    "runtimeInSeconds": 37.667,
+                    "command": {
+                        "program": "individuals_merge",
+                        "arguments": [
+                            "22",
+                            "chr22n-1-1001.tar.gz",
+                            "chr22n-1001-2001.tar.gz",
+                            "chr22n-2001-3001.tar.gz",
+                            "chr22n-3001-4001.tar.gz",
+                            "chr22n-4001-5001.tar.gz",
+                            "chr22n-5001-6001.tar.gz",
+                            "chr22n-6001-7001.tar.gz",
+                            "chr22n-7001-8001.tar.gz",
+                            "chr22n-8001-9001.tar.gz",
+                            "chr22n-9001-10001.tar.gz"
+                        ]
+                    },
+                    "avgCPU": 108.6628,
+                    "priority": 30,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "sifting_ID0000024",
+                    "runtimeInSeconds": 0.344,
+                    "command": {
+                        "program": "sifting",
+                        "arguments": [
+                            "ALL.chr22.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf",
+                            "22"
+                        ]
+                    },
+                    "avgCPU": 123.5465,
+                    "priority": 20,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000025",
+                    "runtimeInSeconds": 4.975,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "AFR"
+                        ]
+                    },
+                    "avgCPU": 76.9246,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000026",
+                    "runtimeInSeconds": 111.475,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "AFR"
+                        ]
+                    },
+                    "avgCPU": 80.4754,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000027",
+                    "runtimeInSeconds": 3.957,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "GBR"
+                        ]
+                    },
+                    "avgCPU": 48.5469,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000028",
+                    "runtimeInSeconds": 106.522,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "GBR"
+                        ]
+                    },
+                    "avgCPU": 83.7874,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000029",
+                    "runtimeInSeconds": 29.216,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "ALL"
+                        ]
+                    },
+                    "avgCPU": 61.8326,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000030",
+                    "runtimeInSeconds": 110.171,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "ALL"
+                        ]
+                    },
+                    "avgCPU": 82.0152,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000031",
+                    "runtimeInSeconds": 4.882,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "SAS"
+                        ]
+                    },
+                    "avgCPU": 65.7927,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000032",
+                    "runtimeInSeconds": 112.042,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "SAS"
+                        ]
+                    },
+                    "avgCPU": 79.2551,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000033",
+                    "runtimeInSeconds": 7.824,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "EAS"
+                        ]
+                    },
+                    "avgCPU": 42.2163,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000034",
+                    "runtimeInSeconds": 109.436,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "EAS"
+                        ]
+                    },
+                    "avgCPU": 81.0245,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000035",
+                    "runtimeInSeconds": 5.158,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "AMR"
+                        ]
+                    },
+                    "avgCPU": 51.9581,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000036",
+                    "runtimeInSeconds": 108.564,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "AMR"
+                        ]
+                    },
+                    "avgCPU": 81.7269,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000037",
+                    "runtimeInSeconds": 10.799,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "EUR"
+                        ]
+                    },
+                    "avgCPU": 32.8827,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000038",
+                    "runtimeInSeconds": 112.012,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "21",
+                            "-pop",
+                            "EUR"
+                        ]
+                    },
+                    "avgCPU": 79.654,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000039",
+                    "runtimeInSeconds": 4.902,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "AFR"
+                        ]
+                    },
+                    "avgCPU": 79.845,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000040",
+                    "runtimeInSeconds": 101.256,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "AFR"
+                        ]
+                    },
+                    "avgCPU": 83.6691,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000041",
+                    "runtimeInSeconds": 2.579,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "GBR"
+                        ]
+                    },
+                    "avgCPU": 68.4762,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000042",
+                    "runtimeInSeconds": 108.778,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "GBR"
+                        ]
+                    },
+                    "avgCPU": 81.4264,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000043",
+                    "runtimeInSeconds": 33.96,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "ALL"
+                        ]
+                    },
+                    "avgCPU": 56.1366,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000044",
+                    "runtimeInSeconds": 111.687,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "ALL"
+                        ]
+                    },
+                    "avgCPU": 81.7615,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000045",
+                    "runtimeInSeconds": 4.311,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "SAS"
+                        ]
+                    },
+                    "avgCPU": 74.5999,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000046",
+                    "runtimeInSeconds": 109.125,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "SAS"
+                        ]
+                    },
+                    "avgCPU": 82.0481,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000047",
+                    "runtimeInSeconds": 5.282,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "EAS"
+                        ]
+                    },
+                    "avgCPU": 62.1734,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000048",
+                    "runtimeInSeconds": 109.772,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "EAS"
+                        ]
+                    },
+                    "avgCPU": 81.6492,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000049",
+                    "runtimeInSeconds": 3.777,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "AMR"
+                        ]
+                    },
+                    "avgCPU": 70.9558,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000050",
+                    "runtimeInSeconds": 99.194,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "AMR"
+                        ]
+                    },
+                    "avgCPU": 84.62,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "mutation_overlap_ID0000051",
+                    "runtimeInSeconds": 5.341,
+                    "command": {
+                        "program": "mutation_overlap",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "EUR"
+                        ]
+                    },
+                    "avgCPU": 61.2245,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                },
+                {
+                    "id": "frequency_ID0000052",
+                    "runtimeInSeconds": 108.672,
+                    "command": {
+                        "program": "frequency",
+                        "arguments": [
+                            "-c",
+                            "22",
+                            "-pop",
+                            "EUR"
+                        ]
+                    },
+                    "avgCPU": 81.6733,
+                    "priority": 40,
+                    "machines": [
+                        "pegasus-5"
+                    ]
+                }
+            ],
+            "machines": [
+                {
+                    "nodeName": "pegasus-5",
+                    "system": "linux",
+                    "architecture": "x86_64",
+                    "release": "4.15.0-88-generic",
+                    "cpu": {
+                        "vendor": "GenuineIntel",
+                        "coreCount": 48,
+                        "speedInMHz": 1200
+                    },
+                    "memoryInBytes": 131795984000
+                }
+            ]
+        }
+    },
+    "runtimeSystem": {
+        "url": "http://pegasus.isi.edu",
+        "version": "4.9.3",
+        "name": "Pegasus"
+    }
+}
