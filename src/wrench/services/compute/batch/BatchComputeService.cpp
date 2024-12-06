@@ -27,6 +27,7 @@
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/easy_bf/EasyBackfillingBatchScheduler.h"
 #include "wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h"
 #include <wrench/failure_causes/FunctionalityNotAvailable.h>
 #include <wrench/failure_causes/JobKilled.h>
@@ -201,6 +202,10 @@ namespace wrench {
             this->scheduler = std::unique_ptr<BatchScheduler>(new FCFSBatchScheduler(this));
         } else if (batch_scheduling_alg == "conservative_bf") {
             this->scheduler = std::unique_ptr<BatchScheduler>(new ConservativeBackfillingBatchScheduler(this));
+        } else if (batch_scheduling_alg == "easy_bf_depth0") {
+            this->scheduler = std::unique_ptr<BatchScheduler>(new EasyBackfillingBatchScheduler(this, 0));
+        } else if (batch_scheduling_alg == "easy_bf_depth1") {
+            this->scheduler = std::unique_ptr<BatchScheduler>(new EasyBackfillingBatchScheduler(this, 1));
         } else if (batch_scheduling_alg == "conservative_bf_core_level") {
             this->scheduler = std::unique_ptr<BatchScheduler>(new ConservativeBackfillingBatchSchedulerCoreLevel(this));
         }
