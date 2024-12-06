@@ -280,8 +280,8 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_RANDOM)
 TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_RANDOM)
 #endif
 {
-    int num_jobs = 100;
-    for (int seed = 0; seed < 10; seed++) {
+    int num_jobs = 10000;
+    for (int seed = 0; seed < 1; seed++) {
         std::vector<std::tuple<std::string, unsigned int, unsigned int, unsigned int, int>> spec;
 //        std::cerr << "SEED= " << seed << "\n";
         unsigned int random = seed;
@@ -294,7 +294,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_RANDOM)
             int expected_ct = -1;
             spec.emplace_back(job_name, num_nodes, duration, 0, expected_ct);
         }
-        DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, false);
+        DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, true);
     }
 }
 
