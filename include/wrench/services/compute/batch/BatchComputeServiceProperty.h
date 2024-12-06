@@ -29,11 +29,22 @@ namespace wrench {
         /**
          * @brief The batch scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
-         *      - "fcfs": First Come First Serve, which allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs) (default)
-         *      - "easy_bf_depth0": a home-grown implementation of EASY (FCFS with backfilling), which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs), and which may postpone the first (oldest) job in the queue via backfilling actions
-         *      - "easy_bf_depth1": a home-grown implementation of EASY (FCFS with backfilling), which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs), and which will never postpone the first (oldest) job in the queue via backfilling actions
-         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
-         *      - "conservative_bf_core_level": a home-grown implementation of FCFS with conservative backfilling, which allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs)
+         *      - "fcfs": First Come First Serve, which allocates resources at the core level (i.e., two jobs may run on the same node
+         *                if that node has enough cores to support both jobs) (default)
+         *
+         *      - "easy_bf_depth0": a home-grown implementation of EASY (FCFS with backfilling), which only allocates resources at the node level
+         *                          (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs),
+         *                          and which may postpone the first (oldest) job in the queue via backfilling actions
+         *
+         *      - "easy_bf_depth1": a home-grown implementation of EASY (FCFS with backfilling), which only allocates resources at the node level
+         *                          (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs),
+         *                          and which will never postpone the first (oldest) job in the queue via backfilling actions.
+         *                          This is typically considered the standard EASY algorithm.
+         *
+         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level
+         *                           (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
+         *      - "conservative_bf_core_level": a home-grown implementation of FCFS with conservative backfilling, which allocates resources at the core level
+         *                                      (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs)
          *
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched

@@ -50,7 +50,7 @@ namespace wrench {
 
         // Update the time origin
         double now = Simulation::getCurrentSimulatedDate();
-//        std::cerr << "* [" <<  now << "] IN PROCESSING QUEUE JOB (" << this->cs->batch_queue.size() << " JOBS IN THE QUEUE)" << std::endl;
+//        std::cerr << "** [" <<  now << "] IN PROCESSING QUEUE JOB (" << this->cs->batch_queue.size() << " JOBS IN THE QUEUE)" << std::endl;
         this->schedule->setTimeOrigin((u_int32_t) now);
 
         // While the first job can be scheduled now, schedule it
@@ -68,7 +68,7 @@ namespace wrench {
 //                std::cerr << "  CAN'T SCHEDULE IT NOW, OH WELL\n";
                 break;
             }
-//            std::cerr << "  SCHEDULING IT\n";
+//            std::cerr << "  SCHEDULING JOB FOR START: " << first_job->getCompoundJob()->getName() << "\n";
             // Insert the job into the schedule
             this->schedule->add(earliest_start_time, earliest_start_time + first_job->getRequestedTime(), first_job);
             first_job->easy_bf_start_date = earliest_start_time;
@@ -86,12 +86,13 @@ namespace wrench {
                     this->cs->batch_queue.at(first_job_not_started)->requested_time,
                     this->cs->batch_queue.at(first_job_not_started)->getRequestedNumNodes());
 
-//            std::cerr << "THE FIRST JOB'S GUARANTEED START TIME IS: " << first_job_start_time << "\n";
+//            std::cerr << "THE FIRST JOB'S (" << this->cs->batch_queue.at(first_job_not_started)->getCompoundJob()->getName() << ") GUARANTEED START TIME IS: " << first_job_start_time << "\n";
 
             // Go through all the other jobs, and start each one that can start
             // (without hurting the first job in the queue if the depth is 1)
             for (unsigned int i = first_job_not_started + 1; i < this->cs->batch_queue.size(); i++) {
                 auto candidate_job = this->cs->batch_queue.at(i);
+
                 if (not candidate_job->resources_allocated.empty()) {
                     continue;
                 }
@@ -105,19 +106,25 @@ namespace wrench {
                 }
 
                 // Tentatively add the job to the schedule
-                this->schedule->add(earliest_start_time, earliest_start_time + candidate_job->getRequestedTime(), candidate_job);
-
-                // If the reservation depth is 1, then make sure the first job in the queue isn't impacted
-                if (this->_depth == 1) {
+                if (this->_depth == 0) {
+                    this->schedule->add(earliest_start_time, earliest_start_time + candidate_job->getRequestedTime(),
+                                        candidate_job);
+//                        std::cerr << "BACKFILL_D0: SCHEDULING JOB FOR START: " << candidate_job->getCompoundJob()->getName() << "\n";
+                } else if (this->_depth == 1) {
+                    this->schedule->add(earliest_start_time, earliest_start_time + candidate_job->getRequestedTime(),
+                                        candidate_job);
                     // Check whether starting the job now would postpone the first job in the queue
                     auto new_first_job_start_time = this->schedule->findEarliestStartTime(
                             this->cs->batch_queue.at(first_job_not_started)->requested_time,
                             this->cs->batch_queue.at(first_job_not_started)->getRequestedNumNodes());
                     // If the first job would be harmed, remove the tentative job from the schedule
+//                    std::cerr << "BACKFILL? OLD=" << first_job_start_time << "  NEW=" << new_first_job_start_time << "\n";
                     if (new_first_job_start_time > first_job_start_time) {
                         this->schedule->remove(earliest_start_time,
                                                earliest_start_time + candidate_job->getRequestedTime(),
                                                candidate_job);
+                    } else {
+//                        std::cerr << "BACKFILL_D1: SCHEDULING JOB FOR START: " << candidate_job->getCompoundJob()->getName() << " AT TIME " << earliest_start_time << "\n";
                     }
                 }
             }
@@ -126,14 +133,16 @@ namespace wrench {
 //        std::cerr << "STARTING ALL THE JOBS THAT WERE SCHEDULED, GIVEN THIS SCHEDULE\n";
 //        this->schedule->print();
 
-        // Start  all non-started the jobs in the next slot!
+        // Start all non-started the jobs in the next slot!
+//        std::cerr << "GETTING THE JOBS IN THE NEXT SLOT\n";
         std::set<std::shared_ptr<BatchJob>> next_jobs = this->schedule->getJobsInFirstSlot();
-        if (next_jobs.empty()) {
-            this->compactSchedule();
-            next_jobs = this->schedule->getJobsInFirstSlot();
-        }
+//        if (next_jobs.empty()) {
+//            this->compactSchedule();
+//            next_jobs = this->schedule->getJobsInFirstSlot();
+//        }
 
         for (auto const &batch_job: next_jobs) {
+//            std::cerr << "   --> " << batch_job->getCompoundJob()->getName() << "\n";
             // If the job has already been allocated resources, it's already running anyway
             if (not batch_job->resources_allocated.empty()) {
                 continue;
