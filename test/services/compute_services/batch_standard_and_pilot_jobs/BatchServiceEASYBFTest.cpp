@@ -271,7 +271,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_3)
             {"job4", 1, 1080, 1, 660 + 1080},
     };
 
-    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, false);
+    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, true);
 }
 
 #ifdef ENABLE_BATSCHED
