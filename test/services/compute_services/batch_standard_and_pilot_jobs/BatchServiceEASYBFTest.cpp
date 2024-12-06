@@ -155,7 +155,7 @@ private:
             }
         }
         for (auto const &item: completion_times) {
-            if ((expected_completion_times[item.first] > 0) and (std::abs(std::get<3>(item.second) - expected_completion_times[item.first]) > 0.001)) {
+            if ((expected_completion_times[item.first] > 0) and (std::abs(std::get<4>(item.second) - expected_completion_times[item.first]) > 0.001)) {
                 throw std::runtime_error("Invalid job completion time for " + item.first + ": " +
                                          std::to_string(std::get<3>(item.second)) + " (expected: " +
                                          std::to_string(expected_completion_times[item.first]) + ")");
@@ -176,7 +176,7 @@ void BatchServiceEASY_BFTest::do_EASY_BF_test(int num_compute_nodes,
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-commport-pool-size=50000");
-//    argv[3] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
