@@ -228,9 +228,9 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_1)
     // job_name, num_nodes, duration, sleep_after, expected CT
     std::vector<std::tuple<std::string, unsigned int, unsigned int, unsigned int, int>> spec = {
             {"job1", 2, 60, 0, 60},
-            {"job2", 4, 30, 0, 110},
-//            {"job3", 2, 30, 0, 30},
-//            {"job4", 2, 50, 0, 80}
+            {"job2", 4, 30, 0, 90},
+            {"job3", 2, 30, 0, 30},
+            {"job4", 2, 50, 0, 140}
     };
 
     DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 4, spec, false);
@@ -267,8 +267,8 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_3)
     std::vector<std::tuple<std::string, unsigned int, unsigned int, unsigned int, int>> spec = {
             {"job1", 3, 660, 1, 660},
             {"job2", 1, 120, 1, 121},
-            {"job3", 3, 1740, 1, 660 + 1740},
-            {"job4", 1, 1080, 1, 1083},
+            {"job3", 3, 1740, 1, 121 + 1740},
+            {"job4", 1, 1080, 1, 660 + 1080},
     };
 
     DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, false);
