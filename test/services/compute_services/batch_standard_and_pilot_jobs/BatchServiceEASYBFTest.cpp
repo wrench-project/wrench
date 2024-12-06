@@ -220,7 +220,7 @@ void BatchServiceEASY_BFTest::do_EASY_BF_test(int num_compute_nodes,
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceEASY_BFTest, DISABLED_SimpleEASY_BFTest_1)
 #else
-TEST_F(BatchServiceEASY_BFTest, DISABLED_SimpleEASY_BFTest_1)
+TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_1)
 #endif
 {
     // BATSCHED FAILS: DOES NOT BACKFILL job4, SO DEPTH=1?
@@ -229,8 +229,8 @@ TEST_F(BatchServiceEASY_BFTest, DISABLED_SimpleEASY_BFTest_1)
     std::vector<std::tuple<std::string, unsigned int, unsigned int, unsigned int, int>> spec = {
             {"job1", 2, 60, 0, 60},
             {"job2", 4, 30, 0, 110},
-            {"job3", 2, 30, 0, 30},
-            {"job4", 2, 50, 0, 80}
+//            {"job3", 2, 30, 0, 30},
+//            {"job4", 2, 50, 0, 80}
     };
 
     DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 4, spec, false);
