@@ -29,14 +29,27 @@ namespace wrench {
         /**
          * @brief The batch scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
-         *      - "fcfs": First Come First Serve, which allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs) (default)
-         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
-         *      - "conservative_bf_core_level": a home-grown implementation of FCFS with conservative backfilling, which allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs)
+         *      - "fcfs": First Come First Serve, which allocates resources at the core level (i.e., two jobs may run on the same node
+         *                if that node has enough cores to support both jobs). (DEFAULT)
+         *
+         *      - "easy_bf_depth0": a home-grown implementation of EASY (FCFS with backfilling), which only allocates resources at the node level
+         *                          (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs),
+         *                          and which may postpone the first (oldest) job in the queue via backfilling actions
+         *
+         *      - "easy_bf_depth1": a home-grown implementation of EASY (FCFS with backfilling), which only allocates resources at the node level
+         *                          (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs),
+         *                          and which will never postpone the first (oldest) job in the queue via backfilling actions.
+         *                          THIS IS TYPICALLY CONSIDERED THE STANDARD "EASY" ALGORITHM.
+         *
+         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level
+         *                           (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
+         *
+         *      - "conservative_bf_core_level": a home-grown implementation of FCFS with conservative backfilling, which allocates resources at the core level
+         *                                      (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs)
          *
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
-         *        (by default: "conservative_bf", other options include
-         *        "easy_bf" and "easy_bf_fast")
+         *        (DEFAULT: "conservative_bf";  other options include "easy_bf" and "easy_bf_fast")
          *      - These only allocate resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
          *
          **/
@@ -111,7 +124,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE);
 
         /**
-         * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for b3atch schedule visualization purposes).
+         * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for batch schedule visualization purposes).
          *      - If ENABLE_BATSCHED is set to off or not set: ignored
          *      - If ENABLE_BATSCHED is set to on: The trace file is generated in CSV format as follows:
          *          allocated_processors,consumed_energy,execution_time,finish_time,job_id,metadata,
