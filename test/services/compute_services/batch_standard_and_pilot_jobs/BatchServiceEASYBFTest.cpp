@@ -280,8 +280,8 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_RANDOM)
 TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_RANDOM)
 #endif
 {
-    int num_jobs = 100;
-    for (int seed = 0; seed < 1; seed++) {
+    int num_jobs = 1000;
+    for (int seed = 0; seed < 10; seed++) {
         std::vector<std::tuple<std::string, unsigned int, unsigned int, unsigned int, int>> spec;
 //        std::cerr << "SEED= " << seed << "\n";
         unsigned int random = seed;
