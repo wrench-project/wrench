@@ -231,7 +231,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_1)
             {"job4", 2, 50, 0, 140}
     };
 
-    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 4, spec, true);
+    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 4, spec, false);
 }
 
 
@@ -250,7 +250,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_2)
             {"job5", 1, 6000, 0, 6000},
     };
 
-    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, true);
+    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, false);
 }
 
 #ifdef ENABLE_BATSCHED
@@ -267,7 +267,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_3)
             {"job4", 1, 1080, 1, 660 + 1080},
     };
 
-    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, true);
+    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, false);
 }
 
 #ifdef ENABLE_BATSCHED
@@ -290,7 +290,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_RANDOM)
             int expected_ct = -1;
             spec.emplace_back(job_name, num_nodes, duration, 0, expected_ct);
         }
-        DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, true);
+        DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, false);
     }
 }
 
