@@ -3,7 +3,7 @@ WRENCH Release Notes
 
 ### current master branch
 
-Nothing here yet
+- Implementation of the EASY batch scheduling algorithm
 
 ### wrench 2.4
 
