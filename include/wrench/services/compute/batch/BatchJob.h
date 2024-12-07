@@ -53,9 +53,12 @@ namespace wrench {
         }
 
     private:
+        friend class EasyBackfillingBatchScheduler;
         friend class ConservativeBackfillingBatchScheduler;
         friend class ConservativeBackfillingBatchSchedulerCoreLevel;
 
+        u_int32_t easy_bf_start_date;               // Field used by EASY_BF
+        u_int32_t easy_bf_expected_end_date;        // Field used by EASY_BF
         u_int32_t conservative_bf_start_date;       // Field used by CONSERVATIVE_BF
         u_int32_t conservative_bf_expected_end_date;// Field used by CONSERVATIVE_BF
 
