@@ -154,8 +154,6 @@ namespace wrench {
         if (num_available_nodes_at_that_time) {
             for (auto &availability_timeslot: this->availability_timeslots) {
                 if (availability_timeslot.first.lower() >= start_time) {
-
-//                    std::cerr << "SETTING NM AVAILABLE NODES: TIME = " << availability_timeslot.first.lower() << "  " << "NUM_NODES = " << this->max_num_nodes - availability_timeslot.second.num_nodes_utilized << "\n";
                     *num_available_nodes_at_that_time =  this->max_num_nodes - availability_timeslot.second.num_nodes_utilized;
                     break;
                 }
