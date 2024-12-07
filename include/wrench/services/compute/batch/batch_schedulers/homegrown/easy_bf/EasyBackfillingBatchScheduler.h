@@ -35,8 +35,6 @@ namespace wrench {
         void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
         void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
-        void compactSchedule();
-
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> scheduleOnHosts(unsigned long, unsigned long, sg_size_t) override;
 
         std::map<std::string, double>
