@@ -40,7 +40,7 @@ namespace wrench {
         this->schedule->setTimeOrigin((u_int32_t) Simulation::getCurrentSimulatedDate());
 
         // Find its earliest possible start time
-        auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
+        auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes(), nullptr);
         //        WRENCH_INFO("The Earliest start time is: %u", est);
 
         // Insert it in the schedule
@@ -138,7 +138,7 @@ namespace wrench {
 
             // Find the earliest start time
             //            WRENCH_INFO("FINDING THE EARLIEST START TIME");
-            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
+            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes(), nullptr);
             //            WRENCH_INFO("EARLIEST START TIME FOR IT: %u", est);
             // Insert it in the schedule
             this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
@@ -272,7 +272,7 @@ namespace wrench {
             }
             auto duration = (u_int32_t) (std::get<3>(j));
 
-            auto est = this->schedule->findEarliestStartTime(duration, num_nodes);
+            auto est = this->schedule->findEarliestStartTime(duration, num_nodes, nullptr);
             if (est < UINT32_MAX) {
                 to_return[id] = (double) est;
             } else {

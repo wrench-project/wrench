@@ -53,95 +53,108 @@ namespace wrench {
 //        std::cerr << "** [" <<  now << "] IN PROCESSING QUEUE JOB (" << this->cs->batch_queue.size() << " JOBS IN THE QUEUE)" << std::endl;
         this->schedule->setTimeOrigin((u_int32_t) now);
 
+//        this->schedule->print();
+
         // While the first job can be scheduled now, schedule it
         unsigned int i;
         for (i = 0; i < this->cs->batch_queue.size(); i++) {
             auto first_job = this->cs->batch_queue.at(i);
-            // If the job has already been allocated resources, it's already running anyway
+//            std::cerr << "SEEING IF JOB " << first_job->getCompoundJob()->getName() << " CAN BE STARTED\n";
+
+            // If the job has already been allocated resources, nevermind
             if (not first_job->resources_allocated.empty()) {
                 continue;
             }
+
             // If the job is already in the schedule, nevermind
             auto jobs_in_first_slot = this->schedule->getJobsInFirstSlot();
             if (jobs_in_first_slot.find(first_job) != jobs_in_first_slot.end()) {
                 continue;
             }
 
-            auto earliest_start_time = this->schedule->findEarliestStartTime(first_job->requested_time, first_job->getRequestedNumNodes());
-//            std::cerr << "  LOOKING AT JOB " << first_job->getCompoundJob()->getName() << ": IT HAS EARLIEST START TIME " << earliest_start_time << "\n";
-            // If the earliest start time is more than a second from now, never mind
-            if (std::abs(earliest_start_time - now) > 1) {
-//                std::cerr << "  CAN'T SCHEDULE IT NOW, OH WELL\n";
+            // If the job cannot start now, that's it
+            if (this->schedule->getNumAvailableNodesInFirstSlot() < first_job->getRequestedNumNodes()) {
+//                std::cerr << "CANNOT BE STARTED: " << this->schedule->getNumAvailableNodesInFirstSlot() << " " << first_job->getRequestedNumNodes() << " \n";
                 break;
             }
-//            std::cerr << "  SCHEDULING JOB FOR START: " << first_job->getCompoundJob()->getName() << "\n";
-            // Insert the job into the schedule
-            this->schedule->add(earliest_start_time, earliest_start_time + first_job->getRequestedTime(), first_job);
-            first_job->easy_bf_start_date = earliest_start_time;
-            first_job->easy_bf_expected_end_date = earliest_start_time + first_job->getRequestedTime();
+
+            // SCHEDULED IT!
+//            std::cerr << "SCHEDULING IT!!\n";
+            this->schedule->add(this->schedule->getTimeOrigin(), this->schedule->getTimeOrigin() + first_job->getRequestedTime(),
+                                first_job);
+            first_job->easy_bf_start_date = this->schedule->getTimeOrigin();
+            first_job->easy_bf_expected_end_date = this->schedule->getTimeOrigin() + first_job->getRequestedTime();
+
             WRENCH_INFO("Scheduled BatchComputeService job %lu on %lu nodes from time %u to %u",
                         first_job->getJobID(), first_job->getRequestedNumNodes(),
                         first_job->easy_bf_start_date, first_job->easy_bf_expected_end_date);
         }
+
         unsigned int first_job_not_started = i;
 
         if (first_job_not_started < this->cs->batch_queue.size()) {
 
+//            std::cerr << "DOING BACKFILLING\n";
+
             // At this point, the first job in the queue cannot start now, so determine when it could start
-            auto first_job_start_time = this->schedule->findEarliestStartTime(
+            unsigned long num_nodes_available_at_shadow_time;
+            auto shadow_time = this->schedule->findEarliestStartTime(
                     this->cs->batch_queue.at(first_job_not_started)->requested_time,
-                    this->cs->batch_queue.at(first_job_not_started)->getRequestedNumNodes());
+                    this->cs->batch_queue.at(first_job_not_started)->getRequestedNumNodes(),
+                    &num_nodes_available_at_shadow_time);
 
-//            std::cerr << "THE FIRST JOB'S (" << this->cs->batch_queue.at(first_job_not_started)->getCompoundJob()->getName() << ") GUARANTEED START TIME IS: " << first_job_start_time << "\n";
+            num_nodes_available_at_shadow_time -= this->cs->batch_queue.at(first_job_not_started)->getRequestedNumNodes();
 
-            // Go through all the other jobs, and start each one that can start
+//            std::cerr << "THE FIRST JOB'S (" << this->cs->batch_queue.at(first_job_not_started)->getCompoundJob()->getName() << ") GUARANTEED START TIME IS: " << shadow_time << "\n";
+//            std::cerr << "AND AT THAT TIME THE NUMNBER OF AVAILABLE NODES (COUNTING THE JOB) IS: " << num_nodes_available_at_shadow_time << "\n";
+
+            // BACKFILLING: Go through all the other jobs, and start each one that can start right now
             // (without hurting the first job in the queue if the depth is 1)
+            unsigned long num_nodes_available_now = this->schedule->getNumAvailableNodesInFirstSlot();
             for (unsigned int i = first_job_not_started + 1; i < this->cs->batch_queue.size(); i++) {
                 auto candidate_job = this->cs->batch_queue.at(i);
 
+                // If the job's already started, forget it
                 if (not candidate_job->resources_allocated.empty()) {
                     continue;
                 }
-                auto earliest_start_time = this->schedule->findEarliestStartTime(
-                        candidate_job->requested_time,
-                        candidate_job->getRequestedNumNodes());
 
-                // If the job cannot start now, nevermind
-                if (std::abs(earliest_start_time - now) > 1) {
+                // If the job couldn't start now anyway, forget it
+//                std::cerr << "  LOOKING AT JOB " << candidate_job->getCompoundJob()->getName() << "\n";
+                if (candidate_job->getRequestedNumNodes() > num_nodes_available_now) {
+//                    std::cerr << "NOT ENOUGH NODES NOW\n";
                     continue;
                 }
 
-                // Tentatively add the job to the schedule
-                if (this->_depth == 0) {
-                    this->schedule->add(earliest_start_time, earliest_start_time + candidate_job->getRequestedTime(),
-                                        candidate_job);
-//                        std::cerr << "BACKFILL_D0: SCHEDULING JOB FOR START: " << candidate_job->getCompoundJob()->getName() << "\n";
-                } else if (this->_depth == 1) {
-                    this->schedule->add(earliest_start_time, earliest_start_time + candidate_job->getRequestedTime(),
-                                        candidate_job);
-                    // Check whether starting the job now would postpone the first job in the queue
-                    auto new_first_job_start_time = this->schedule->findEarliestStartTime(
-                            this->cs->batch_queue.at(first_job_not_started)->requested_time,
-                            this->cs->batch_queue.at(first_job_not_started)->getRequestedNumNodes());
-                    // If the first job would be harmed, remove the tentative job from the schedule
-//                    std::cerr << "BACKFILL? OLD=" << first_job_start_time << "  NEW=" << new_first_job_start_time << "\n";
-                    if (new_first_job_start_time > first_job_start_time) {
-                        this->schedule->remove(earliest_start_time,
-                                               earliest_start_time + candidate_job->getRequestedTime(),
-                                               candidate_job);
-                    } else {
-//                        std::cerr << "BACKFILL_D1: SCHEDULING JOB FOR START: " << candidate_job->getCompoundJob()->getName() << " AT TIME " << earliest_start_time << "\n";
+                if (this->_depth == 1) {
+//                    std::cerr << "DOING DEPTH CHECK\n";
+//                    std::cerr << this->schedule->getTimeOrigin() + candidate_job->getRequestedTime()  << " " << shadow_time << "\n";
+//                    std::cerr << candidate_job->getRequestedNumNodes() << "  " << num_nodes_available_at_shadow_time << "\n";
+                    // If the job would push back the shadow job, forget it
+                    if ((this->schedule->getTimeOrigin() + candidate_job->getRequestedTime() > shadow_time) and
+                        (candidate_job->getRequestedNumNodes() > num_nodes_available_at_shadow_time)) {
+//                        std::cerr << "WOULD PUSH BACK SHADOW TIME\n";
+                        continue;
                     }
+                }
+
+                // Schedule the job
+//                std::cerr << "BACKFILLING IT!\n";
+                this->schedule->add(this->schedule->getTimeOrigin(), this->schedule->getTimeOrigin() + candidate_job->getRequestedTime(), candidate_job);
+
+                num_nodes_available_now -= candidate_job->getRequestedNumNodes();
+                if (this->schedule->getTimeOrigin() + candidate_job->getRequestedTime() > shadow_time) {
+                    num_nodes_available_at_shadow_time -= candidate_job->getRequestedNumNodes();
                 }
             }
         }
 
-//        std::cerr << "STARTING ALL THE JOBS THAT WERE SCHEDULED, GIVEN THIS SCHEDULE\n";
 //        this->schedule->print();
+//        std::cerr << "STARTING ALL THE JOBS THAT WERE SCHEDULED, GIVEN THE ABOVE SCHEDULE\n";
 
         // Start all non-started the jobs in the next slot!
-//        std::cerr << "GETTING THE JOBS IN THE NEXT SLOT\n";
         std::set<std::shared_ptr<BatchJob>> next_jobs = this->schedule->getJobsInFirstSlot();
+
         if (next_jobs.empty()) {
             this->compactSchedule();
             next_jobs = this->schedule->getJobsInFirstSlot();
@@ -150,6 +163,7 @@ namespace wrench {
         for (auto const &batch_job: next_jobs) {
             // If the job has already been allocated resources, it's already running anyway
             if (not batch_job->resources_allocated.empty()) {
+//                std::cerr << "--> NEVERMIND\n";
                 continue;
             }
 
@@ -161,10 +175,12 @@ namespace wrench {
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long requested_time = batch_job->getRequestedTime();
 
+//            std::cerr << "CALLING SCHEDULE ON HOSTS\n";
             auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
             if (resources.empty()) {
 //                std::cerr << "HMMM... DID NOT FIND RESOURCES\n";
                 // Hmmm... we don't have the resources right now... we should get an update soon....
+//                std::cerr << "HMMMM\n";
                 return;
                 //                throw std::runtime_error("Can't run BatchComputeService job " + std::to_string(batch_job->getJobID()) +  " right now, this shouldn't happen!");
             }
@@ -179,6 +195,7 @@ namespace wrench {
             this->cs->running_jobs[batch_job->getCompoundJob()] = batch_job;
 
             // Start it!
+//            std::cerr << "STARTING IT!: " << requested_time << "\n";
             this->cs->startJob(resources, compound_job, batch_job, num_nodes_asked_for, requested_time,
                                cores_per_node_asked_for);
         }
@@ -218,7 +235,7 @@ namespace wrench {
 
             // Find the earliest start time
             //            WRENCH_INFO("FINDING THE EARLIEST START TIME");
-            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
+            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes(), nullptr);
             //            WRENCH_INFO("EARLIEST START TIME FOR IT: %u", est);
             // Insert it in the schedule
             this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
@@ -245,18 +262,21 @@ namespace wrench {
     void EasyBackfillingBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         WRENCH_INFO("Notified of completion of BatchComputeService job, %lu", batch_job->getJobID());
 
+//        std::cerr << "PROCESSING JOB COMPLETION OF " << batch_job->getCompoundJob()->getName() << "\n";
         auto now = (u_int32_t) Simulation::getCurrentSimulatedDate();
         this->schedule->setTimeOrigin(now);
         this->schedule->remove(now, batch_job->easy_bf_expected_end_date + 100, batch_job);
+//        std::cerr << "PROCESSED\n";
+//        this->schedule->print();
 
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
 #endif
 
-        // TODO: REMOVE THIS, AS FOR EASY IT LIKELY DOESN'T DO ANYTHING
-        if (now < batch_job->easy_bf_expected_end_date) {
-            compactSchedule();
-        }
+//        // TODO: REMOVE THIS, AS FOR EASY IT LIKELY DOESN'T DO ANYTHING
+//        if (now < batch_job->easy_bf_expected_end_date) {
+//            compactSchedule();
+//        }
     }
 
     /**

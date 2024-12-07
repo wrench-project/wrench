@@ -223,8 +223,6 @@ TEST_F(BatchServiceEASY_BFTest, DISABLED_SimpleEASY_BFTest_1)
 TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_1)
 #endif
 {
-    // BATSCHED FAILS: DOES NOT BACKFILL job4, SO DEPTH=1?
-
     // job_name, num_nodes, duration, sleep_after, expected CT
     std::vector<std::tuple<std::string, unsigned int, unsigned int, unsigned int, int>> spec = {
             {"job1", 2, 60, 0, 60},
@@ -233,7 +231,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_1)
             {"job4", 2, 50, 0, 140}
     };
 
-    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 4, spec, false);
+    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 4, spec, true);
 }
 
 
@@ -252,7 +250,7 @@ TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_2)
             {"job5", 1, 6000, 0, 6000},
     };
 
-    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, false);
+    DO_TEST_WITH_FORK_THREE_ARGS(do_EASY_BF_test, 6, spec, true);
 }
 
 #ifdef ENABLE_BATSCHED
@@ -261,8 +259,6 @@ TEST_F(BatchServiceEASY_BFTest, DISABLED_SimpleEASY_BFTest_3)
 TEST_F(BatchServiceEASY_BFTest, SimpleEASY_BFTest_3)
 #endif
 {
-    // BATSCHED FAIL: DOES NOT BACKFILL JOB4, SO DEPTH=1?????
-
     // job_name, num_nodes, duration, sleep_after, expected CT
     std::vector<std::tuple<std::string, unsigned int, unsigned int, unsigned int, int>> spec = {
             {"job1", 3, 660, 1, 660},

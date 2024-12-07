@@ -71,6 +71,14 @@ namespace wrench {
     }
 
     /**
+    * @brief Method to get the node availability timeline's time origin
+    * @return a date
+    */
+    u_int32_t NodeAvailabilityTimeLine::getTimeOrigin() {
+        return this->availability_timeslots.begin()->first.lower();
+    }
+
+    /**
      * @brief Method to print the node availability timeline
      */
     void NodeAvailabilityTimeLine::print() {
@@ -109,9 +117,11 @@ namespace wrench {
      * @brief Method to find the earliest start time for a job spec
      * @param duration: the job's duration
      * @param num_nodes: the job's number of nodes
+     * @param num_available_nodes_at_that_time: the number of nodes available at that time (nullptr if you don't case)
      * @return a date
      */
-    u_int32_t NodeAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes) {
+    u_int32_t NodeAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes,
+                                                              unsigned long *num_available_nodes_at_that_time) {
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
@@ -139,6 +149,19 @@ namespace wrench {
                 start_time = availability_timeslot.first.lower();
             }
         }
+
+        // Set the num of available nodes at that time if need be (weirdly annoying to do it in the loop above)
+        if (num_available_nodes_at_that_time) {
+            for (auto &availability_timeslot: this->availability_timeslots) {
+                if (availability_timeslot.first.lower() >= start_time) {
+
+//                    std::cerr << "SETTING NM AVAILABLE NODES: TIME = " << availability_timeslot.first.lower() << "  " << "NUM_NODES = " << this->max_num_nodes - availability_timeslot.second.num_nodes_utilized << "\n";
+                    *num_available_nodes_at_that_time =  this->max_num_nodes - availability_timeslot.second.num_nodes_utilized;
+                    break;
+                }
+            }
+        }
+
         return start_time;
     }
 
@@ -153,5 +176,14 @@ namespace wrench {
         }
         return to_return;
     }
+
+    /**
+     * @brief Return the number of nodes available in first slot
+     * @return
+     */
+    unsigned long NodeAvailabilityTimeLine::getNumAvailableNodesInFirstSlot() {
+        return this->max_num_nodes - (*this->availability_timeslots.begin()).second.num_nodes_utilized;
+    }
+
 
 }// namespace wrench
