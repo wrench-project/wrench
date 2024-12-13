@@ -23,6 +23,7 @@ public:
     ~SimulationLauncher() = default;
 
     void createSimulation(bool full_log,
+                          unsigned long num_commports,
                           const std::string &platform_xml,
                           const std::string &controller_host,
                           int sleep_us);
