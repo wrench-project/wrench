@@ -43,6 +43,8 @@ int main(int argc, char **argv) {
              "Show full simulation log during execution")
             ("daemon-logging", po::bool_switch()->default_value(false),
              "Show full daemon log during execution")
+            ("num-commports", po::value<unsigned long>()->default_value(5000)->notifier(in(1, 100000, "port")),
+             "The number of commports that the simulation can use")
             ("port", po::value<int>()->default_value(8101)->notifier(in(1024, 49151, "port")),
              "A port number, between 1024 and 4951, on which this daemon will listen for 'start simulation' requests")
             ("allow-origin", po::value<std::string>()->default_value(""),
@@ -69,6 +71,11 @@ int main(int argc, char **argv) {
         cerr << "Error: " << e.what() << "\n";
         exit(1);
     }
+    
+    unsigned long num_commports = 5000;
+    if (vm.count("num-commports")) {
+        num_commports = vm["num-commports"].as<unsigned long>();
+    }
 
     int simulation_port = 0;
     if (vm.count("simulation-port")) {
@@ -78,6 +85,7 @@ int main(int argc, char **argv) {
     // Create and run the WRENCH daemon
     WRENCHDaemon daemon(vm["simulation-logging"].as<bool>(),
                         vm["daemon-logging"].as<bool>(),
+                        num_commports,
                         vm["port"].as<int>(),
                         simulation_port,
                         vm["allow-origin"].as<std::string>(),

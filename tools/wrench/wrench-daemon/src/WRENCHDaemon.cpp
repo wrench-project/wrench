@@ -36,6 +36,7 @@ std::vector<std::string> WRENCHDaemon::allowed_origins;
 * @brief Constructor
 * @param simulation_logging true if simulation logging should be printed
 * @param daemon_logging true if daemon logging should be printed
+* @param num_commports the number of commports to use
 * @param port_number port number on which to listen for 'start simulation' requests
 * @param simulation_port_number port number on which to listen for a new simulation (0 means: use a random port each time)
 * @param allowed_origin allowed origin for http connection
@@ -44,11 +45,13 @@ std::vector<std::string> WRENCHDaemon::allowed_origins;
 */
 WRENCHDaemon::WRENCHDaemon(bool simulation_logging,
                            bool daemon_logging,
+                           unsigned long num_commports,
                            int port_number,
                            int simulation_port_number,
                            const std::string &allowed_origin,
                            int sleep_us) : simulation_logging(simulation_logging),
                                            daemon_logging(daemon_logging),
+                                           num_commports(num_commports),
                                            port_number(port_number),
                                            fixed_simulation_port_number(simulation_port_number),
                                            sleep_us(sleep_us) {
@@ -240,6 +243,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
             auto simulation_thread = std::thread([simulation_launcher, this, body, &guard, &signal]() {
                 // Create simulation
                 simulation_launcher->createSimulation(this->simulation_logging,
+                                                      this->num_commports,
                                                       body["platform_xml"],
                                                       body["controller_hostname"],
                                                       this->sleep_us);
