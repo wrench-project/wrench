@@ -1,10 +1,11 @@
 WRENCH Release Notes
 ------
 
-### current master branch
+### wrench 2.5
 
-- Implementation of the EASY batch scheduling algorithm
-- Addition of a command-line to the wrench-daemon to specify the number of commports
+- Implementation of the EASY batch scheduling algorithm in BatchComputeService 
+
+- New command-line argument for the wrench-daemon to specify the number of commports
 
 ### wrench 2.4
 
