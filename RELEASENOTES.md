@@ -4,6 +4,7 @@ WRENCH Release Notes
 ### current master branch
 
 - Implementation of the EASY batch scheduling algorithm
+- Addition of a command-line to the wrench-daemon to specify the number of commports
 
 ### wrench 2.4
 
