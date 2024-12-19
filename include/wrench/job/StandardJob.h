@@ -65,7 +65,7 @@ namespace wrench {
 
         unsigned long getMinimumRequiredNumCores() const;
 
-        double getMinimumRequiredMemory() const;
+        sg_size_t getMinimumRequiredMemory() const;
 
         unsigned long getNumCompletedTasks() const;
 
