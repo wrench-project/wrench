@@ -48,61 +48,61 @@ namespace wrench {
             }
         }
 
-        if (auto m = std::dynamic_pointer_cast<JobManagerCompoundJobCompletedMessage>(message)) {
+        if (auto jmcjcm = std::dynamic_pointer_cast<JobManagerCompoundJobCompletedMessage>(message)) {
             return std::shared_ptr<CompoundJobCompletedEvent>(
-                    new CompoundJobCompletedEvent(m->job, m->compute_service));
+                    new CompoundJobCompletedEvent(jmcjcm->job, jmcjcm->compute_service));
 
-        } else if (auto m = std::dynamic_pointer_cast<JobManagerCompoundJobFailedMessage>(message)) {
+        } else if (auto jmcjfm = std::dynamic_pointer_cast<JobManagerCompoundJobFailedMessage>(message)) {
             return std::shared_ptr<CompoundJobFailedEvent>(
-                    new CompoundJobFailedEvent(m->job, m->compute_service, m->cause));
+                    new CompoundJobFailedEvent(jmcjfm->job, jmcjfm->compute_service, jmcjfm->cause));
 
-        } else if (auto m = std::dynamic_pointer_cast<JobManagerStandardJobCompletedMessage>(message)) {
+        } else if (auto jmsjcm = std::dynamic_pointer_cast<JobManagerStandardJobCompletedMessage>(message)) {
             std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
-            m->job->applyTaskUpdates(m->necessary_state_changes, failure_count_increments);
+            jmsjcm->job->applyTaskUpdates(jmsjcm->necessary_state_changes, failure_count_increments);
             return std::shared_ptr<StandardJobCompletedEvent>(
-                    new StandardJobCompletedEvent(m->job, m->compute_service));
+                    new StandardJobCompletedEvent(jmsjcm->job, jmsjcm->compute_service));
 
-        } else if (auto m = std::dynamic_pointer_cast<JobManagerStandardJobFailedMessage>(message)) {
-            m->job->applyTaskUpdates(m->necessary_state_changes, m->necessary_failure_count_increments);
+        } else if (auto jmsjfm = std::dynamic_pointer_cast<JobManagerStandardJobFailedMessage>(message)) {
+            jmsjfm->job->applyTaskUpdates(jmsjfm->necessary_state_changes, jmsjfm->necessary_failure_count_increments);
             return std::shared_ptr<StandardJobFailedEvent>(
-                    new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
+                    new StandardJobFailedEvent(jmsjfm->job, jmsjfm->compute_service, jmsjfm->cause));
 
-        } else if (auto m = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
-            return std::shared_ptr<PilotJobStartedEvent>(new PilotJobStartedEvent(m->job, m->compute_service));
+        } else if (auto cspjsm = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+            return std::shared_ptr<PilotJobStartedEvent>(new PilotJobStartedEvent(cspjsm->job, cspjsm->compute_service));
 
-        } else if (auto m = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
-            return std::shared_ptr<PilotJobExpiredEvent>(new PilotJobExpiredEvent(m->job, m->compute_service));
+        } else if (auto cspjem = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+            return std::shared_ptr<PilotJobExpiredEvent>(new PilotJobExpiredEvent(cspjem->job, cspjem->compute_service));
 
-        } else if (auto m = std::dynamic_pointer_cast<DataManagerFileCopyAnswerMessage>(message)) {
-            if (m->success) {
+        } else if (auto dmfcam = std::dynamic_pointer_cast<DataManagerFileCopyAnswerMessage>(message)) {
+            if (dmfcam->success) {
                 return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
-                        m->src_location, m->dst_location));
+                        dmfcam->src_location, dmfcam->dst_location));
 
             } else {
                 return std::shared_ptr<FileCopyFailedEvent>(
-                        new FileCopyFailedEvent(m->src_location, m->dst_location, m->failure_cause));
+                        new FileCopyFailedEvent(dmfcam->src_location, dmfcam->dst_location, dmfcam->failure_cause));
             }
-        } else if (auto m = std::dynamic_pointer_cast<DataManagerFileReadAnswerMessage>(message)) {
-            if (m->success) {
+        } else if (auto dmfram = std::dynamic_pointer_cast<DataManagerFileReadAnswerMessage>(message)) {
+            if (dmfram->success) {
                 return std::shared_ptr<FileReadCompletedEvent>(new FileReadCompletedEvent(
-                        m->location, m->num_bytes));
+                        dmfram->location, dmfram->num_bytes));
 
             } else {
                 return std::shared_ptr<FileReadFailedEvent>(
-                        new FileReadFailedEvent(m->location, m->num_bytes, m->failure_cause));
+                        new FileReadFailedEvent(dmfram->location, dmfram->num_bytes, dmfram->failure_cause));
             }
-        } else if (auto m = std::dynamic_pointer_cast<DataManagerFileWriteAnswerMessage>(message)) {
-            if (m->success) {
+        } else if (auto dmfwam = std::dynamic_pointer_cast<DataManagerFileWriteAnswerMessage>(message)) {
+            if (dmfwam->success) {
                 return std::shared_ptr<FileWriteCompletedEvent>(new FileWriteCompletedEvent(
-                        m->location));
+                        dmfwam->location));
 
             } else {
                 return std::shared_ptr<FileWriteFailedEvent>(
-                        new FileWriteFailedEvent(m->location, m->failure_cause));
+                        new FileWriteFailedEvent(dmfwam->location, dmfwam->failure_cause));
             }
 
-        } else if (auto m = std::dynamic_pointer_cast<ExecutionControllerAlarmTimerMessage>(message)) {
-            return std::shared_ptr<TimerEvent>(new TimerEvent(m->message));
+        } else if (auto ecatm = std::dynamic_pointer_cast<ExecutionControllerAlarmTimerMessage>(message)) {
+            return std::shared_ptr<TimerEvent>(new TimerEvent(ecatm->message));
         } else {
             throw std::runtime_error(
                     "ExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event (" +

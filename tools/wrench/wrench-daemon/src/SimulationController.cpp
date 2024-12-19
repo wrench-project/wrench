@@ -107,7 +107,6 @@ namespace wrench {
 
         // Main control loop
         while (keep_going) {
-
             // Starting compute and storage services that should be started, if any
             while (true) {
                 std::function<void()> thing_to_do;
@@ -375,7 +374,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createVM(json data) {
-
         std::string cs_name = data["service_name"];
         unsigned long num_cores = data["num_cores"];
         sg_size_t ram_memory = data["ram_memory"];
@@ -831,7 +829,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createStandardJob(json data) {
-
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
         std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
@@ -1377,7 +1374,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createTask(json data) {
-
         std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
@@ -1594,7 +1590,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::getTaskOutputFiles(json data) {
-
         std::string workflow_name = data["workflow_name"];
         std::shared_ptr<Workflow> workflow;
         if (not this->workflow_registry.lookup(workflow_name, workflow)) {
@@ -2011,7 +2006,6 @@ namespace wrench {
      * @return JSON output
      */
     json SimulationController::createWorkflow(const json &data) {
-
         auto wf = wrench::Workflow::createWorkflow();
         json answer;
         answer["workflow_name"] = wf->getName();

@@ -110,6 +110,10 @@ namespace wrench {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
 
+        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
+            throw std::invalid_argument("StorageService::writeFile(): Can only read from a location at that same storage service");
+        }
+
         this->assertServiceIsUp();
 
         this->commport->putMessage(
@@ -247,6 +251,10 @@ namespace wrench {
 
         if (!answer_commport or !location or (num_bytes < 0.0)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid nullptr/0 arguments");
+        }
+
+        if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
+            throw std::invalid_argument("StorageService::readFile(): Can only read from a location at that same storage service");
         }
 
         assertServiceIsUp(this->getSharedPtr<Service>());

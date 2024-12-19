@@ -22,11 +22,13 @@
  *        simple sets an error message variable and returns
  *
  * @param full_log: whether to show all simulation log
+ * @param num_commports: the number of comm ports to use
  * @param platform_xml: XML platform description (an XML string - not a file path)
  * @param controller_host: hostname of the host that will run the execution_controller
  * @param sleep_us: number of microseconds to sleep at each iteration of the main loop
  */
 void SimulationLauncher::createSimulation(bool full_log,
+                                          unsigned long num_commports,
                                           const std::string &platform_xml,
                                           const std::string &controller_host,
                                           int sleep_us) {
@@ -35,11 +37,12 @@ void SimulationLauncher::createSimulation(bool full_log,
 
     try {
         // Set up command-line arguments
-        int argc = (full_log ? 2 : 1);
+        int argc = (full_log ? 3 : 2);
         char **argv = (char **) calloc((size_t) argc, sizeof(char *));
         argv[0] = strdup("wrench-daemon-simulation");
-        if (argc > 1) {
-            argv[1] = strdup("--wrench-full-log");
+        argv[1] = strdup(("--wrench-commport-pool-size=" + std::to_string(num_commports)).c_str());
+        if (argc > 2) {
+            argv[2] = strdup("--wrench-full-log");
         }
 
         simulation = wrench::Simulation::createSimulation();

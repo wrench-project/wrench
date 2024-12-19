@@ -35,23 +35,23 @@ public:
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
-    void do_BasicFunctionality_test(double buffer_size);
+    void do_BasicFunctionality_test(sg_size_t buffer_size);
 
-    void do_SynchronousFileCopy_test(double buffer_size);
+    void do_SynchronousFileCopy_test(sg_size_t buffer_size);
 
-    void do_AsynchronousFileCopy_test(double buffer_size);
+    void do_AsynchronousFileCopy_test(sg_size_t buffer_size);
 
-    void do_SynchronousFileCopyFailures_test(double buffer_size);
+    void do_SynchronousFileCopyFailures_test(sg_size_t buffer_size);
 
-    void do_AsynchronousFileCopyFailures_test(double buffer_size);
+    void do_AsynchronousFileCopyFailures_test(sg_size_t buffer_size);
 
-    void do_Partitions_test(double buffer_size);
+    void do_Partitions_test(sg_size_t buffer_size);
 
-    void do_FileWrite_test(double buffer_size);
+    void do_FileWrite_test(sg_size_t buffer_size);
 
 
 protected:
-    ~SimpleStorageServiceFunctionalTest() {
+    ~SimpleStorageServiceFunctionalTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -113,7 +113,7 @@ class SimpleStorageServiceBasicFunctionalityTestWMS : public wrench::ExecutionCo
 
 public:
     SimpleStorageServiceBasicFunctionalityTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                  std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                  const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -237,14 +237,14 @@ private:
 
 
         // Send a free space request
-        double free_space;
+        sg_size_t free_space;
         try {
             free_space = this->test->storage_service_100->getTotalFreeSpace();
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
 
-        if (free_space != 90.0) {
+        if (free_space != 90) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
         }
@@ -255,7 +255,7 @@ private:
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space at a path");
         }
-        if (free_space != 90.0) {
+        if (free_space != 90) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
         }
@@ -266,7 +266,7 @@ private:
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space at a path");
         }
-        if (free_space != 90.0) {
+        if (free_space != 90) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
         }
@@ -277,7 +277,7 @@ private:
         } catch (wrench::ExecutionException &ignore) {
             throw std::runtime_error("Should be able to get a storage's service free space, even at a bogus path");
         }
-        if (free_space != 0.0) {
+        if (free_space != 0) {
             throw std::runtime_error(
                     "Free space on storage service at a bogus path should be 0.0 (" + std::to_string(free_space) + ")");
         }
@@ -402,7 +402,7 @@ private:
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
 
-        if (free_space != 100.0) {
+        if (free_space != 100) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 100.0");
         }
@@ -468,7 +468,7 @@ private:
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
-        if (free_space != 99.0) {
+        if (free_space != 99) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 99.0");
         }
@@ -644,7 +644,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, BasicFunctionality) {
     DO_TEST_WITH_FORK_ONE_ARG(do_BasicFunctionality_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffer_size) {
+void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -724,7 +724,6 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(double buffe
     free(argv);
 }
 
-
 /**********************************************************************/
 /**  SYNCHRONOUS FILE COPY TEST                                     **/
 /**********************************************************************/
@@ -784,13 +783,13 @@ private:
             throw std::runtime_error("Should not be able to do a file copy with a bogus path");
         } catch (wrench::ExecutionException &e) {
             auto cause = e.getCause();
-            if (auto real_cause = std::dynamic_pointer_cast<wrench::InvalidDirectoryPath>(e.getCause())) {
-                real_cause->toString();   // Coverage
-                real_cause->getLocation();// Coverage
-            } else if (auto real_cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause())) {
-                real_cause->toString();   // Coverage
-                real_cause->getFile();    // Coverage
-                real_cause->getLocation();// Coverage
+            if (auto real_cause_1 = std::dynamic_pointer_cast<wrench::InvalidDirectoryPath>(e.getCause())) {
+                real_cause_1->toString();   // Coverage
+                real_cause_1->getLocation();// Coverage
+            } else if (auto real_cause_2 = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause())) {
+                real_cause_2->toString();   // Coverage
+                real_cause_2->getFile();    // Coverage
+                real_cause_2->getLocation();// Coverage
             } else {
                 throw std::runtime_error("Got the expected exception, but the failure cause is not InvalidDirectoryPath or FileNotFound (it's " + cause->toString() + ")");
             }
@@ -832,7 +831,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopy) {
     DO_TEST_WITH_FORK_ONE_ARG(do_SynchronousFileCopy_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test(double buffer_size) {
+void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -898,7 +897,7 @@ class SimpleStorageServiceAsynchronousFileCopyTestWMS : public wrench::Execution
 
 public:
     SimpleStorageServiceAsynchronousFileCopyTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                    std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                    const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -978,7 +977,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopy) {
     DO_TEST_WITH_FORK_ONE_ARG(do_AsynchronousFileCopy_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test(double buffer_size) {
+void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -1043,7 +1042,7 @@ class SimpleStorageServiceSynchronousFileCopyFailuresTestWMS : public wrench::Ex
 
 public:
     SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                           std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                           const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1175,7 +1174,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopyFailures) {
     DO_TEST_WITH_FORK_ONE_ARG(do_SynchronousFileCopyFailures_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(double buffer_size) {
+void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -1246,7 +1245,7 @@ class SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS : public wrench::E
 
 public:
     SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                            std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                            const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1382,7 +1381,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopyFailures) {
     DO_TEST_WITH_FORK_ONE_ARG(do_AsynchronousFileCopyFailures_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test(double buffer_size) {
+void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -1449,7 +1448,7 @@ class PartitionsTestWMS : public wrench::ExecutionController {
 
 public:
     PartitionsTestWMS(SimpleStorageServiceFunctionalTest *test,
-                      std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                      const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1642,7 +1641,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, Partitions) {
     DO_TEST_WITH_FORK_ONE_ARG(do_Partitions_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_Partitions_test(double buffer_size) {
+void SimpleStorageServiceFunctionalTest::do_Partitions_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -1700,7 +1699,7 @@ class FileWriteTestWMS : public wrench::ExecutionController {
 
 public:
     FileWriteTestWMS(SimpleStorageServiceFunctionalTest *test,
-                     std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                     const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1747,7 +1746,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, FileWrite) {
     DO_TEST_WITH_FORK_ONE_ARG(do_FileWrite_test, 0);
 }
 
-void SimpleStorageServiceFunctionalTest::do_FileWrite_test(double buffer_size) {
+void SimpleStorageServiceFunctionalTest::do_FileWrite_test(sg_size_t buffer_size) {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();

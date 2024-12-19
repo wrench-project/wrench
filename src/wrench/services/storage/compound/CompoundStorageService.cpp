@@ -60,7 +60,6 @@ namespace wrench {
             StorageSelectionStrategyCallback &allocate,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "compound_storage_" + std::to_string(getNewUniqueNumber())), allocate(allocate) {
-
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
@@ -168,12 +167,10 @@ namespace wrench {
     }
 
     bool CompoundStorageService::processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg) {
-
         auto file = msg->file;
         WRENCH_INFO("CSS::processStorageSelectionMessage(): For file %s", file->getID().c_str());
 
         if (this->file_location_mapping.find(file) != this->file_location_mapping.end()) {
-
             WRENCH_INFO("CSS::processStorageSelectionMessage: File %s already known by CSS", file->getID().c_str());
 
             msg->answer_commport->dputMessage(
@@ -252,7 +249,6 @@ namespace wrench {
     }
 
     bool CompoundStorageService::processStorageLookupMessage(const CompoundStorageLookupRequestMessage *msg) {
-
         auto file = msg->file;
         WRENCH_INFO("CSS::processStorageLookupMessage(): For file %s", file->getID().c_str());
 
@@ -362,7 +358,6 @@ namespace wrench {
      *          or nullptr if it's not.
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<FileLocation>& location) {
-
         auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
         auto locations = this->lookupOrDesignateStorageService(location->getFile(), 0, temp_commport);
@@ -384,7 +379,6 @@ namespace wrench {
      *          or nullptr if it's not.
      */
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<FileLocation>& location, unsigned int stripe_count) {
-
         auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
         auto locations = this->lookupOrDesignateStorageService(location->getFile(), stripe_count, temp_commport);
@@ -422,7 +416,6 @@ namespace wrench {
 
         // Send a message to the storage service's daemon
         for (const auto &loc: designated_locations) {
-
             WRENCH_DEBUG("CSS:deleteFile Issuing delete message to SSS %s", loc->getStorageService()->getName().c_str());
 
             // assertServiceIsUp(loc->getStorageService());
@@ -433,7 +426,6 @@ namespace wrench {
                     this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
 
             if (wait_for_answer) {
-
                 std::unique_ptr<SimulationMessage> message = nullptr;
 
                 auto msg = answer_commport->getMessage<StorageServiceFileDeleteAnswerMessage>(this->network_timeout, "StorageService::deleteFile():");
@@ -487,7 +479,6 @@ namespace wrench {
 
         // Send a message to the storage service's daemon
         for (const auto &loc: file_parts) {
-
             assertServiceIsUp(loc->getStorageService());
 
             loc->getStorageService()->commport->putMessage(new StorageServiceFileLookupRequestMessage(
@@ -818,7 +809,6 @@ namespace wrench {
                                            const std::shared_ptr<FileLocation> &location,
                                            sg_size_t num_bytes_to_write,
                                            bool wait_for_answer) {
-
         WRENCH_INFO("CSS::writeFile(): Writing  %llu to file %s - starting at %f", num_bytes_to_write, location->getFile()->getID().c_str(), S4U_Simulation::getClock());
 
         if (location == nullptr) {
@@ -924,7 +914,6 @@ namespace wrench {
             auto buffer_size = msg->buffer_size;
 
             if (buffer_size >= 1) {
-
                 auto file = location->getFile();
                 for (auto const &dwmb: msg->data_write_commport_and_bytes) {
                     // Bufferized
@@ -1058,7 +1047,6 @@ namespace wrench {
         WRENCH_DEBUG("CSS::readFile(): %u FileReadRequests sent and validated", request_count);
 
         for (const auto &msg: messages) {
-
             if (msg->buffer_size < 1) {
                 // Non-Bufferized ; just wait for an ack for this message (note this may not be THE ack to this precise message, but it doesn't matter)
                 recv_commport->getMessage<StorageServiceAckMessage>("CSS::readFile(): ");
@@ -1256,7 +1244,6 @@ namespace wrench {
         trace.parts_count = size(locations);
 
         if (locations.empty()) {
-
             trace.file_name = "nofile";
 
             for (const auto &storage: this->storage_services) {
@@ -1270,13 +1257,11 @@ namespace wrench {
             }
 
         } else {
-
             trace.file_name = locations.begin()->get()->getFile()->getID();
 
             std::set<std::string> known_services;
 
             for (const auto &location: locations) {
-
                 auto storage_service = location->getStorageService();
                 if (known_services.find(storage_service->getName()) == known_services.end()) {
                     DiskUsage disk_usage;

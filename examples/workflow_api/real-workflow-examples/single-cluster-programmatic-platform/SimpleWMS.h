@@ -10,7 +10,7 @@
 #ifndef WRENCH_EXAMPLE_SIMPLEWMS_H
 #define WRENCH_EXAMPLE_SIMPLEWMS_H
 
-#include <wrench-dev.h>
+#include "wrench-dev.h"
 
 namespace wrench {
 
@@ -21,38 +21,26 @@ namespace wrench {
 
     public:
         SimpleWMS(const std::shared_ptr<Workflow> &workflow,
-                  const std::shared_ptr<BatchComputeService> &batch_compute_service,
-                  const std::shared_ptr<CloudComputeService> &cloud_compute_service,
+                  const std::set<std::shared_ptr<wrench::BareMetalComputeService>> &bare_metal_compute_services,
                   const std::shared_ptr<StorageService> &storage_service,
                   const std::string &hostname);
 
     protected:
         void processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) override;
         void processEventStandardJobFailure(const std::shared_ptr<StandardJobFailedEvent> &event) override;
-        void processEventPilotJobStart(const std::shared_ptr<PilotJobStartedEvent> &event) override;
-        void processEventPilotJobExpiration(const std::shared_ptr<PilotJobExpiredEvent> &event) override;
 
     private:
         int main() override;
 
-        /** @brief Whether the workflow execution should be aborted */
-        bool abort = false;
-
-        /** @brief A pilot job that is submitted to the batch compute service */
-        std::shared_ptr<PilotJob> pilot_job = nullptr;
-        /** @brief A boolean to indicate whether the pilot job is running */
-        bool pilot_job_is_running = false;
-
-        void scheduleReadyTasks(std::vector<std::shared_ptr<WorkflowTask>> ready_tasks,
-                                std::shared_ptr<JobManager> job_manager,
-                                std::set<std::shared_ptr<BareMetalComputeService>> compute_services);
+        void scheduleReadyTasks(std::vector<std::shared_ptr<WorkflowTask>> ready_tasks);
 
         std::shared_ptr<Workflow> workflow;
-        std::shared_ptr<BatchComputeService> batch_compute_service;
-        std::shared_ptr<CloudComputeService> cloud_compute_service;
+        std::set<std::shared_ptr<wrench::BareMetalComputeService>> bare_metal_compute_services;
         std::shared_ptr<StorageService> storage_service;
+        std::shared_ptr<JobManager> job_manager;
 
         std::map<std::shared_ptr<ComputeService>, unsigned long> core_utilization_map;
     };
 }// namespace wrench
+
 #endif//WRENCH_EXAMPLE_SIMPLEWMS_H
