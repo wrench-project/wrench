@@ -64,6 +64,7 @@ namespace wrench {
                 {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"},
 #else
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"},
+                {BatchComputeServiceProperty::BACKFILLING_DEPTH, "infinity"},
 #endif
                 {BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "5"},
                 {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, ""},
