@@ -20,19 +20,16 @@ namespace wrench {
      *        a scheduler implementation, and a list of compute services
      *
      * @param workflow: a workflow to execute
-     * @param batch_compute_service: a batch compute service available to run jobs
-     * @param cloud_compute_service: a cloud compute service available to run jobs
+     * @param bare_metal_compute_services: bare-metal compute services available to run jobs
      * @param storage_service: a storage service available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
     SimpleWMS::SimpleWMS(const std::shared_ptr<Workflow> &workflow,
-                         const std::shared_ptr<BatchComputeService> &batch_compute_service,
-                         const std::shared_ptr<CloudComputeService> &cloud_compute_service,
+                         const std::set<std::shared_ptr<wrench::BareMetalComputeService>> &bare_metal_compute_services,
                          const std::shared_ptr<StorageService> &storage_service,
                          const std::string &hostname) : ExecutionController(hostname, "simple"),
                                                         workflow(workflow),
-                                                        batch_compute_service(batch_compute_service),
-                                                        cloud_compute_service(cloud_compute_service),
+                                                        bare_metal_compute_services(bare_metal_compute_services),
                                                         storage_service(storage_service) {}
 
     /**
@@ -48,37 +45,16 @@ namespace wrench {
         WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         // Create a job manager
-        auto job_manager = this->createJobManager();
+        this->job_manager = this->createJobManager();
 
-        // Create a data movement manager
-        auto data_movement_manager = this->createDataMovementManager();
+        // Populate data structure to keep track of idle cores at each compute service
+        for (auto const &cs : this->bare_metal_compute_services) {
+            this->core_utilization_map[cs] = cs->getTotalNumCores(false);
+        }
 
-        // Create and start two VMs on the cloud service to use for the whole execution
-        auto vm1 = this->cloud_compute_service->createVM(2, 0.0);// 2 cores, 0 RAM (RAM isn't used in this simulation)
-        auto vm1_cs = this->cloud_compute_service->startVM(vm1);
-        this->core_utilization_map[vm1_cs] = 2;
-
-        auto vm2 = this->cloud_compute_service->createVM(4, 0.0);// 4 cores, 0 RAM (RAM isn't used in this simulation)
-        auto vm2_cs = this->cloud_compute_service->startVM(vm2);
-        this->core_utilization_map[vm2_cs] = 4;
 
         while (true) {
-            // If a pilot job is not running on the batch service, let's submit one that asks
-            // for 3 cores on 2 compute nodes for 1 hour
-            if (not pilot_job) {
-                WRENCH_INFO("Creating and submitting a pilot job");
-                pilot_job = job_manager->createPilotJob();
-                job_manager->submitJob(pilot_job, this->batch_compute_service,
-                                       {{"-N", "2"}, {"-c", "3"}, {"-t", "180000"}});
-            }
-
-            // Construct the list of currently available bare-metal services (on VMs and perhaps within pilot job as well)
-            std::set<std::shared_ptr<BareMetalComputeService>> available_compute_service = {vm1_cs, vm2_cs};
-            if (this->pilot_job_is_running) {
-                available_compute_service.insert(pilot_job->getComputeService());
-            }
-
-            scheduleReadyTasks(workflow->getReadyTasks(), job_manager, available_compute_service);
+            scheduleReadyTasks(workflow->getReadyTasks());
 
             // Wait for a workflow execution event, and process it
             try {
@@ -88,7 +64,7 @@ namespace wrench {
                             (e.getCause()->toString().c_str()));
                 continue;
             }
-            if (this->abort || this->workflow->isDone()) {
+            if (this->workflow->isDone()) {
                 break;
             }
         }
@@ -137,61 +113,39 @@ namespace wrench {
 
 
     /**
-    * @brief Process a PilotJobStartedEvent event
-    *
-    * @param event: a workflow execution event
-    */
-    void SimpleWMS::processEventPilotJobStart(const std::shared_ptr<PilotJobStartedEvent> &event) {
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-        WRENCH_INFO("The pilot job has started (it exposes bare-metal compute service %s)",
-                    event->pilot_job->getComputeService()->getName().c_str());
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
-        this->pilot_job_is_running = true;
-        this->core_utilization_map[this->pilot_job->getComputeService()] = event->pilot_job->getComputeService()->getTotalNumIdleCores();
-    }
-
-    /**
-    * @brief Process a processEventPilotJobExpiration even
-    *
-    * @param event: a workflow execution event
-    */
-    void SimpleWMS::processEventPilotJobExpiration(const std::shared_ptr<PilotJobExpiredEvent> &event) {
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
-        WRENCH_INFO("The pilot job has expired (it was exposing bare-metal compute service %s)",
-                    event->pilot_job->getComputeService()->getName().c_str());
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
-
-        this->pilot_job_is_running = false;
-        this->core_utilization_map.erase(this->pilot_job->getComputeService());
-        this->pilot_job = nullptr;
-    }
-
-    /**
-     * @brief Helper method to schedule a task one available compute services. This is a very, very
-     *        simple/naive scheduling approach, that greedily runs tasks on idle cores of whatever
-     *        compute services are available right now, using 1 core per task. Obviously, much more
-     *        sophisticated approaches/algorithms are possible. But this is sufficient for the sake
-     *        of an example.
+     * @brief Helper method to schedule a task one available compute services. The naive scheduling
+     *        strategy is to pick the task with the most computational work, and run it on
+     *        the compute services with the fastest cores. In this example, all compute services
+     *        are homogeneous, so we just pick the first available.
      *
      * @param ready_task: the ready tasks to schedule
-     * @param job_manager: a job manager
-     * @param compute_services: available compute services
      * @return
      */
-    void SimpleWMS::scheduleReadyTasks(std::vector<std::shared_ptr<WorkflowTask>> ready_tasks,
-                                       std::shared_ptr<JobManager> job_manager,
-                                       std::set<std::shared_ptr<BareMetalComputeService>> compute_services) {
+    void SimpleWMS::scheduleReadyTasks(std::vector<std::shared_ptr<WorkflowTask>> ready_tasks) {
 
         if (ready_tasks.empty()) {
             return;
         }
 
         WRENCH_INFO("Trying to schedule %zu ready tasks", ready_tasks.size());
+        // Sort the tasks
+        std::sort(ready_tasks.begin(), ready_tasks.end(),
+                  [](const std::shared_ptr<wrench::WorkflowTask> &x,
+                     const std::shared_ptr<wrench::WorkflowTask> &y) {
+                      if (x->getFlops() < y->getFlops()) {
+                          return true;
+                      } else if (x->getFlops() > y->getFlops()) {
+                          return false;
+                      } else {
+                          return (x.get() > y.get());
+                      }
+                  }
+        );
 
         unsigned long num_tasks_scheduled = 0;
         for (auto const &task: ready_tasks) {
             bool scheduled = false;
-            for (auto const &cs: compute_services) {
+            for (auto const &cs: this->bare_metal_compute_services) {
                 if (this->core_utilization_map[cs] > 0) {
                     // Specify that ALL files are read/written from the one storage service
                     std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;

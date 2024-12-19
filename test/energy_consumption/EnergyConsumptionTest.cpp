@@ -11,7 +11,6 @@
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <algorithm>
 #include <simgrid/plugins/energy.h>
@@ -780,7 +779,7 @@ private:
 
             double after_current_energy_consumed_by_host1 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
             double energy_consumed_while_running_with_higher_speed = after_current_energy_consumed_by_host1 - before_current_energy_consumed_by_host1;
-            double higher_speed_compuation_time = wrench::S4U_Simulation::getClock();
+            double higher_speed_computation_time = wrench::S4U_Simulation::getClock();
 
 
             if (energy_consumed_while_running_with_higher_speed <= 0) {
@@ -804,7 +803,7 @@ private:
 
             double after_current_energy_consumed_by_host2 = this->getSimulation()->getEnergyConsumed(simulation_hosts[1]);
             double energy_consumed_while_running_with_lower_speed = after_current_energy_consumed_by_host2 - before_current_energy_consumed_by_host2;
-            double lower_speed_computation_time = wrench::S4U_Simulation::getClock() - higher_speed_compuation_time;
+            double lower_speed_computation_time = wrench::S4U_Simulation::getClock() - higher_speed_computation_time;
 
             if (energy_consumed_while_running_with_lower_speed <= 0) {
                 throw std::runtime_error("Unexpectedly the energy consumed is less than 0 for a lower speed ??");
@@ -820,7 +819,7 @@ private:
             double exact_max_wattage_power_1 = wrench::Simulation::getMaxPowerConsumption(simulation_hosts[1]);
             double exact_max_wattage_power_2 = wrench::Simulation::getMaxPowerConsumption(simulation_hosts[1]);
             double EPSILON = 1.0;
-            double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed / higher_speed_compuation_time;
+            double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed / higher_speed_computation_time;
             double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed / lower_speed_computation_time;
 
             if (std::abs(exact_max_wattage_power_1 - computed_wattage_power_1) > EPSILON && std::abs(exact_max_wattage_power_2 - computed_wattage_power_2) > EPSILON) {

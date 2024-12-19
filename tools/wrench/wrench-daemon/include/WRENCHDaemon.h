@@ -34,6 +34,7 @@ class WRENCHDaemon {
 public:
     WRENCHDaemon(bool simulation_logging,
                  bool daemon_logging,
+                 unsigned long num_commports,
                  int port_number,
                  int fixed_simulation_port_number,
                  const std::string &allowed_origin,
@@ -64,6 +65,7 @@ private:
 
     bool simulation_logging;
     bool daemon_logging;
+    unsigned long num_commports;
     int port_number;
     int fixed_simulation_port_number;
     std::string allowed_origin;

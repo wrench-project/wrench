@@ -7,8 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
-
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -32,7 +30,7 @@ public:
     void do_ResourceInformation_test();
 
 protected:
-    ~BareMetalComputeServiceTestResourceInformation() {
+    ~BareMetalComputeServiceTestResourceInformation() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -81,7 +79,7 @@ class ResourceInformationTestWMS : public wrench::ExecutionController {
 
 public:
     ResourceInformationTestWMS(BareMetalComputeServiceTestResourceInformation *test,
-                               std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                               const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 

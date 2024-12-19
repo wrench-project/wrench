@@ -71,6 +71,14 @@ namespace wrench {
     }
 
     /**
+    * @brief Method to get the node availability timeline's time origin
+    * @return a date
+    */
+    u_int32_t NodeAvailabilityTimeLine::getTimeOrigin() {
+        return this->availability_timeslots.begin()->first.lower();
+    }
+
+    /**
      * @brief Method to print the node availability timeline
      */
     void NodeAvailabilityTimeLine::print() {
@@ -78,7 +86,7 @@ namespace wrench {
         for (auto &availability_timeslot: this->availability_timeslots) {
             std::cerr << availability_timeslot.first << "(" << availability_timeslot.second.num_nodes_utilized << ") | ";
             for (auto const &j: availability_timeslot.second.jobs) {
-                std::cerr << j->getJobID() << "(" << j->getRequestedNumNodes() << ") ";
+                std::cerr << j->getCompoundJob()->getName() << "(" << j->getRequestedNumNodes() << ") ";
             }
             std::cerr << "\n";
         }
@@ -90,7 +98,7 @@ namespace wrench {
      * @param add: true if we're adding, false otherwise
      * @param start: the start date
      * @param end: the end date
-     * @param job: the BatchComputeService job
+     * @param job: the batch job
      */
     void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         auto job_set = new BatchJobSet();
@@ -109,9 +117,11 @@ namespace wrench {
      * @brief Method to find the earliest start time for a job spec
      * @param duration: the job's duration
      * @param num_nodes: the job's number of nodes
+     * @param num_available_nodes_at_that_time: the number of nodes available at that time (nullptr if you don't case)
      * @return a date
      */
-    u_int32_t NodeAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes) {
+    u_int32_t NodeAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes,
+                                                              unsigned long *num_available_nodes_at_that_time) {
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
@@ -139,12 +149,23 @@ namespace wrench {
                 start_time = availability_timeslot.first.lower();
             }
         }
+
+        // Set the num of available nodes at that time if need be (weirdly annoying to do it in the loop above)
+        if (num_available_nodes_at_that_time) {
+            for (auto &availability_timeslot: this->availability_timeslots) {
+                if (availability_timeslot.first.lower() >= start_time) {
+                    *num_available_nodes_at_that_time =  this->max_num_nodes - availability_timeslot.second.num_nodes_utilized;
+                    break;
+                }
+            }
+        }
+
         return start_time;
     }
 
     /**
-     * @brief Get the BatchComputeService jobs in the first slot in the node availability timeline
-     * @return a set of BatchComputeService jobs
+     * @brief Get the batch jobs in the first slot in the node availability timeline
+     * @return a set of batch jobs
      */
     std::set<std::shared_ptr<BatchJob>> NodeAvailabilityTimeLine::getJobsInFirstSlot() {
         std::set<std::shared_ptr<BatchJob>> to_return;
@@ -153,5 +174,14 @@ namespace wrench {
         }
         return to_return;
     }
+
+    /**
+     * @brief Return the number of nodes available in first slot
+     * @return
+     */
+    unsigned long NodeAvailabilityTimeLine::getNumAvailableNodesInFirstSlot() {
+        return this->max_num_nodes - (*this->availability_timeslots.begin()).second.num_nodes_utilized;
+    }
+
 
 }// namespace wrench

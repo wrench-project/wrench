@@ -74,7 +74,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
-set(WRENCH_VERSION_MINOR "5")
+set(WRENCH_VERSION_MINOR "6")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -266,8 +266,6 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
-        include/wrench/services/storage/storage_helpers/LogicalFileSystemNoCaching.h
-        include/wrench/services/storage/storage_helpers/LogicalFileSystemLRUCaching.h
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/data_movement_manager/DataMovementManager.cpp
         src/wrench/managers/data_movement_manager/DataMovementManagerMessage.cpp
@@ -314,6 +312,8 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/BatchJobSet.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.cpp
         include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/easy_bf/EasyBackfillingBatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/easy_bf/EasyBackfillingBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.cpp
         include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
         include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h
@@ -461,9 +461,9 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
-        test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceCachingTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
+        test/services/storage_services/SimpleStorageService/SimpleStorageServiceWrongServiceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/services/storage_services/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
@@ -490,6 +490,7 @@ set(TEST_FILES
         test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceFCFSTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceEASYBFTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceCONSERVATIVEBFTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTraceFileTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceOutputCSVFileTest.cpp

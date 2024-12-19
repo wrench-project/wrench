@@ -20,22 +20,9 @@
 
 namespace wrench {
 
-    class WorkflowTask;
-
-    class DataFile;
-
-    class StandardJob;
-
     class PilotJob;
 
     class ComputeService;
-
-    class StorageService;
-
-    class FileRegistryService;
-
-    class FileRegistryService;
-
 
     /**
      * @brief A "pilot job has expired" ExecutionEvent

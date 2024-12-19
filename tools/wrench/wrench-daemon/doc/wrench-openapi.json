@@ -62,10 +62,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -98,10 +96,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -151,10 +147,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -207,10 +201,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -243,10 +235,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -279,10 +269,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -315,10 +303,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1368,10 +1354,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1441,10 +1425,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1493,10 +1475,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1578,10 +1558,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1662,11 +1640,9 @@
                 }
               }
             }
-          },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+          }, 
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1748,10 +1724,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1793,10 +1767,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1838,10 +1810,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1883,10 +1853,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -1944,10 +1912,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2005,10 +1971,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2064,10 +2028,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2116,10 +2078,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2172,10 +2132,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2287,10 +2245,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },
@@ -2478,10 +2434,8 @@
               }
             }
           },
-          "405": {
-            "description": "Invalid input",
-            "content": {}
-          }
+	  "404": { "$ref": "#/components/responses/NotFound" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" }
         }
       }
     },

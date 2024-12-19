@@ -151,7 +151,7 @@ namespace wrench {
         std::string string_value;
         string_value = this->getPropertyValueAsString(property);
         if (string_value == "infinity") {
-            return LONG_LONG_MAX;
+            return LLONG_MAX;
         }
         if (string_value == "zero") {
             return 0;

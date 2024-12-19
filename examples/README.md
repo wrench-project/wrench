@@ -96,10 +96,9 @@ to analyze action failures.
     
 #### Workflow-API Examples with real workflows and more sophisticated WMS implementations
 
-  - `workflow_api/real-workflow-example`: Two simulators, one in which the workflow is executed
-     using a batch compute service, and another in which the workflow is executed
-     using a cloud compute service. These simulators take as input workflow description
-     files from real-world workflow applications. They use the scheduler abstraction
-     provided by WRENCH to implement complex Workflow Management System. 
+  - `workflow_api/real-workflow-examples`: Two simulators, one in which the workflow is executed
+     using a batch compute service (with pilot jobs) and a cloud compute services (with VMs),
+     and another in which the workflow is executed on a single cluster. These simulators take as input workflow description
+     files from real-world workflow applications, as provided by the WfCommons project.  
      
 ---

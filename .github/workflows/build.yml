@@ -60,6 +60,7 @@ jobs:
           COMPILER: ${{ matrix.COMPILER }}
           batsched: ${{ matrix.batsched }}
         run: |
+          echo "Downloading wrench...";
           docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
           docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
           docker exec wrench git clone https://github.com/wrench-project/wrench;
@@ -68,12 +69,24 @@ jobs:
             BRANCH_NAME=$(echo ${GITHUB_REF} | sed 's/refs\/heads\///g');
             docker exec -w /home/wrench/wrench wrench git checkout ${BRANCH_NAME};
           fi
+          # build wrench, including unit_tests and examples
+          echo "Building wrench...";
           docker exec wrench mkdir wrench/build;
-          # build and test wrench
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
           docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples wrench-daemon;
+          docker exec -w /home/wrench/wrench/build wrench sudo make install
+          # run unit_tests
+          echo "Running tests...";
           docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
-          docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
+          # run examples
+          echo "Running examples...";
+          #docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
+          docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh 
+          # run wrench-init
+          echo "Testing wrench-init...";
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init -a ACTION -d ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
 
       - name: Documentation Build and Deployment
         env:
