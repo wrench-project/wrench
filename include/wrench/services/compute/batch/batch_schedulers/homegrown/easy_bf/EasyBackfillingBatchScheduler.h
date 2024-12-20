@@ -26,7 +26,7 @@ namespace wrench {
     class EasyBackfillingBatchScheduler : public HomegrownBatchScheduler {
 
     public:
-        explicit EasyBackfillingBatchScheduler(BatchComputeService *cs, int depth, unsigned long bacfkilling_depth);
+        explicit EasyBackfillingBatchScheduler(BatchComputeService *cs, int depth, unsigned long backfilling_depth);
 
         void processQueuedJobs() override;
 
