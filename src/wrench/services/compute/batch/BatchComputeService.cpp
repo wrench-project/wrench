@@ -198,8 +198,6 @@ namespace wrench {
                     batch_scheduling_alg);
         }
 
-        std::cerr << "DEPTH = " << this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH) << "\n";
-
         if (batch_scheduling_alg == "fcfs") {
             this->scheduler = std::unique_ptr<BatchScheduler>(new FCFSBatchScheduler(this));
         } else if (batch_scheduling_alg == "conservative_bf") {
