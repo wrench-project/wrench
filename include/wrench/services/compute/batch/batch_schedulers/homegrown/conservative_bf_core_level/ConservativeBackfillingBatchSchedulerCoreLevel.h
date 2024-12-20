@@ -26,7 +26,7 @@ namespace wrench {
     class ConservativeBackfillingBatchSchedulerCoreLevel : public HomegrownBatchScheduler {
 
     public:
-        explicit ConservativeBackfillingBatchSchedulerCoreLevel(BatchComputeService *cs);
+        explicit ConservativeBackfillingBatchSchedulerCoreLevel(BatchComputeService *cs, unsigned long backfilling_depth);
 
         void processQueuedJobs() override;
 
@@ -44,6 +44,7 @@ namespace wrench {
 
     private:
         std::unique_ptr<CoreAvailabilityTimeLine> schedule;
+        unsigned long _backfilling_depth;
     };
 
 

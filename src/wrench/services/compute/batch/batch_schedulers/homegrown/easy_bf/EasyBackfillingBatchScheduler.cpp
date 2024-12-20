@@ -23,10 +23,15 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param cs: The BatchComputeService for which this scheduler is working
+     * @param backfilling_depth: the backfilling depth
      */
-    EasyBackfillingBatchScheduler::EasyBackfillingBatchScheduler(BatchComputeService *cs, int depth) : HomegrownBatchScheduler(cs) {
+    EasyBackfillingBatchScheduler::EasyBackfillingBatchScheduler(
+            BatchComputeService *cs,
+            int depth,
+            unsigned long backfilling_depth) : HomegrownBatchScheduler(cs) {
         this->schedule = std::make_unique<NodeAvailabilityTimeLine>(cs->total_num_of_nodes);
         this->_depth = depth;
+        this->_backfilling_depth = backfilling_depth;
     }
 
     /**
@@ -106,7 +111,13 @@ namespace wrench {
             // BACKFILLING: Go through all the other jobs, and start each one that can start right now
             // (without hurting the first job in the queue if the depth is 1)
             unsigned long num_nodes_available_now = this->schedule->getNumAvailableNodesInFirstSlot();
-            for (unsigned int i = first_job_not_started + 1; i < this->cs->batch_queue.size(); i++) {
+            unsigned long loop_upper_bound;
+            if (this->_backfilling_depth > this->cs->batch_queue.size() - first_job_not_started + 1) {
+                loop_upper_bound = this->cs->batch_queue.size();
+            } else {
+                loop_upper_bound = std::min(first_job_not_started + 1 + this->_backfilling_depth, this->cs->batch_queue.size());
+            }
+            for (unsigned int i = first_job_not_started + 1; i < loop_upper_bound; i++) {
                 auto candidate_job = this->cs->batch_queue.at(i);
 
                 // If the job's already started, forget it
