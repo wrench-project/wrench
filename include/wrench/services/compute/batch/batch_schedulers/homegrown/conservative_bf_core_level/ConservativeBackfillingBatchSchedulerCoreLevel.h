@@ -44,7 +44,7 @@ namespace wrench {
 
     private:
         std::unique_ptr<CoreAvailabilityTimeLine> schedule;
-        unsigned long backfilling_depth;
+        unsigned long _backfilling_depth;
     };
 
 

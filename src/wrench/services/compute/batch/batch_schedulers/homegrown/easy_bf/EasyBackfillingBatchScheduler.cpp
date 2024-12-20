@@ -111,10 +111,13 @@ namespace wrench {
             // BACKFILLING: Go through all the other jobs, and start each one that can start right now
             // (without hurting the first job in the queue if the depth is 1)
             unsigned long num_nodes_available_now = this->schedule->getNumAvailableNodesInFirstSlot();
-            for (unsigned int i = first_job_not_started + 1;
-//                 i < this->cs->batch_queue.size();
-                 i < std::min<unsigned long>(first_job_not_started + 1 + this->_backfilling_depth, this->cs->batch_queue.size());
-                 i++) {
+            unsigned long loop_upper_bound;
+            if (this->_backfilling_depth > this->cs->batch_queue.size() - first_job_not_started + 1) {
+                loop_upper_bound = this->cs->batch_queue.size();
+            } else {
+                loop_upper_bound = std::min(first_job_not_started + 1 + this->_backfilling_depth, this->cs->batch_queue.size());
+            }
+            for (unsigned int i = first_job_not_started + 1; i < loop_upper_bound; i++) {
                 auto candidate_job = this->cs->batch_queue.at(i);
 
                 // If the job's already started, forget it

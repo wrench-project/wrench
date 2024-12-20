@@ -201,7 +201,8 @@ void BatchServiceEASY_BFTest::do_EASY_BF_test(int num_compute_nodes,
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, compute_hosts, "",
                                             {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, scheduling_algorithm},
-                                             {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}})));
+                                             {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"},
+                                             {wrench::BatchComputeServiceProperty::BACKFILLING_DEPTH, "infinity"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
