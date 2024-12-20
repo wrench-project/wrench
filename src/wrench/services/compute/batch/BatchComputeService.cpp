@@ -61,8 +61,8 @@ namespace wrench {
                                              std::string scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
-                                                                                                                              ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
-                                                                                                                              std::move(messagepayload_list), "") {}
+                                                                                                                               ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
+                                                                                                                               std::move(messagepayload_list), "") {}
 
     /**
      * @brief Constructor
@@ -201,13 +201,27 @@ namespace wrench {
         if (batch_scheduling_alg == "fcfs") {
             this->scheduler = std::unique_ptr<BatchScheduler>(new FCFSBatchScheduler(this));
         } else if (batch_scheduling_alg == "conservative_bf") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new ConservativeBackfillingBatchScheduler(this));
+            this->scheduler = std::unique_ptr<BatchScheduler>(
+                    new ConservativeBackfillingBatchScheduler(
+                            this,
+                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
         } else if (batch_scheduling_alg == "easy_bf_depth0") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new EasyBackfillingBatchScheduler(this, 0));
+            this->scheduler = std::unique_ptr<BatchScheduler>(
+                    new EasyBackfillingBatchScheduler(
+                            this,
+                            0,
+                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
         } else if (batch_scheduling_alg == "easy_bf_depth1") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new EasyBackfillingBatchScheduler(this, 1));
+            this->scheduler = std::unique_ptr<BatchScheduler>(
+                    new EasyBackfillingBatchScheduler(
+                            this,
+                            1,
+                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
         } else if (batch_scheduling_alg == "conservative_bf_core_level") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new ConservativeBackfillingBatchSchedulerCoreLevel(this));
+            this->scheduler = std::unique_ptr<BatchScheduler>(
+                    new ConservativeBackfillingBatchSchedulerCoreLevel(
+                            this,
+                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
         }
 #endif
 
@@ -772,7 +786,7 @@ namespace wrench {
             return true;
 
 #ifdef ENABLE_BATSCHED
-        } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
+            } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
 #endif
@@ -804,7 +818,7 @@ namespace wrench {
         unsigned long requested_hosts = job->getRequestedNumNodes();
         unsigned long requested_num_cores_per_host = job->getRequestedCoresPerNode();
 
-        double required_ram_per_host = job->getMemoryRequirement();
+        sg_size_t required_ram_per_host = job->getMemoryRequirement();
 
         if ((requested_hosts > this->available_nodes_to_cores.size()) or
             (requested_num_cores_per_host >
@@ -1066,7 +1080,7 @@ namespace wrench {
         } else if (key == "ram_availabilities") {
             // RAM availability per host  (0 if something is running, full otherwise)
             for (const auto &h: this->available_nodes_to_cores) {
-                if ((double) h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
+                if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
                     dict.insert(std::make_pair(h.first->get_name(), 0.0));
                 } else {
                     dict.insert(std::make_pair(h.first->get_name(), S4U_Simulation::getHostMemoryCapacity(h.first)));

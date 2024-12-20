@@ -56,6 +56,18 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
 
         /**
+         * @brief The backfilling depth used by backfilling algorithms, i.e., how far they go down
+         *        the batch queue to consider a waiting job for backfilling (e.g., "0" (no backfilling done), "10", "infinity").
+         *        Default: "infinity".
+         *
+         *    - If ENABLE_BATSCHED is set to off / not set:
+         *      - if the BATCH_SCHEDULING_ALGORITHM is "fcfs": ignored
+         *
+         *    - If ENABLE_BATSCHED is set to on: ignored
+         **/
+        DECLARE_PROPERTY_NAME(BACKFILLING_DEPTH);
+
+        /**
          * @brief The batch queue ordering algorithm. Can be:
          *     - If ENABLE_BATSCHED is set to off / not set: ignored
          *     - If ENABLE_BATSCHED is set to on:
