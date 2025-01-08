@@ -70,7 +70,7 @@ namespace wrench {
 
         virtual bool usesScratch() const;
 
-        void setPriority(double priority);
+        void setPriority(double p);
         double getPriority() const;
 
         static std::string getActionTypeAsString(const std::shared_ptr<Action> &action);

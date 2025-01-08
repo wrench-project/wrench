@@ -1280,7 +1280,7 @@ namespace wrench {
      * @return The index of the current pstate of the host (as specified in the platform xml description file)
      */
     int Simulation::getCurrentPstate(const std::string &hostname) {
-        return (int) S4U_Simulation::getCurrentPstate(hostname);
+        return static_cast<int>(S4U_Simulation::getCurrentPstate(hostname));
     }
 
     /**

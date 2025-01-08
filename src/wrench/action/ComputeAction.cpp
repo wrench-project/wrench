@@ -32,10 +32,10 @@ namespace wrench {
      * @param parallel_model: the parallel model (to determine speedup vs. number of cores)
      */
     ComputeAction::ComputeAction(const std::string &name,
-                                 double flops,
-                                 sg_size_t ram,
-                                 unsigned long min_num_cores,
-                                 unsigned long max_num_cores,
+                                 const double flops,
+                                 const sg_size_t ram,
+                                 const unsigned long min_num_cores,
+                                 const unsigned long max_num_cores,
                                  std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_") {
 
         if ((flops < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
