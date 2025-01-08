@@ -121,7 +121,8 @@ namespace wrench {
     /**
      * @brief Method to check that all link bandwidths are >0
      */
-    void S4U_Simulation::checkLinkBandwidths() {
+    void S4U_Simulation::checkLinkBandwidths() const
+    {
         auto links = this->engine->get_all_links();
         for (auto const &l: links) {
             if (l->get_bandwidth() <= 0) {
@@ -134,14 +135,14 @@ namespace wrench {
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
-     * @param filename the path to an XML platform description file
+     * @param filename the path to a .xml XML platform description file or a .so/.dylib shared object platform file
      *
      */
-    void S4U_Simulation::setupPlatform(const std::string &filename) {
+    void S4U_Simulation::setupPlatformFromFile(const std::string &filename) {
         try {
             this->engine->load_platform(filename);
         } catch (simgrid::ParseError &e) {
-            throw std::invalid_argument("XML Platform description file error: " + std::string(e.what()));
+            throw std::invalid_argument("Platform description file error: " + std::string(e.what()));
         } catch (std::invalid_argument &e) {
             throw;
         }
@@ -156,7 +157,7 @@ namespace wrench {
      * @param creation_function void() function to create the platform
      *
      */
-    void S4U_Simulation::setupPlatform(const std::function<void()> &creation_function) {
+    void S4U_Simulation::setupPlatformFromLambda(const std::function<void()> &creation_function) {
         creation_function();
         this->platform_setup = true;
     }
