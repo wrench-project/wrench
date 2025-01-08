@@ -41,8 +41,8 @@ namespace wrench {
         ComputeAction(const std::string &name,
                       double flops,
                       sg_size_t ram,
-                      unsigned long min_core,
-                      unsigned long max_core,
+                      unsigned long min_num_cores,
+                      unsigned long max_num_cores,
                       std::shared_ptr<ParallelModel> parallel_model);
 
         void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;

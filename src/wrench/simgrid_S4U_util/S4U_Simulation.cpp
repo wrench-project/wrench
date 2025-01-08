@@ -520,14 +520,14 @@ namespace wrench {
                                                 double sequential_work,
                                                 double parallel_per_thread_work) {
         // Overhead
-        S4U_Simulation::sleep((int) num_threads * thread_creation_overhead);
+        S4U_Simulation::sleep(static_cast<int>(num_threads) * thread_creation_overhead);
         if (num_threads == 1) {
             simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
         } else {
             // Launch compute-heavy thread
             auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
             // Launch all other threads
-            simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, (int) num_threads - 1);
+            simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, static_cast<int>(num_threads) - 1);
             // Wait for the compute-heavy thread
             bottleneck_thread->wait();
         }
@@ -872,7 +872,7 @@ namespace wrench {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
         try {
-            return (int) (host->get_pstate_count());
+            return static_cast<int>(host->get_pstate_count());
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
@@ -910,7 +910,7 @@ namespace wrench {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
         try {
-            return sg_host_get_wattmin_at(host, (int) (host->get_pstate()));
+            return sg_host_get_wattmin_at(host, static_cast<int>(host->get_pstate()));
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
@@ -930,7 +930,7 @@ namespace wrench {
         }
         try {
             return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
-                                          (int) ((simgrid::s4u::Host::by_name(hostname))->get_pstate()));
+                                          static_cast<int>((simgrid::s4u::Host::by_name(hostname))->get_pstate()));
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. "
