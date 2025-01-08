@@ -23,9 +23,13 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param cs: The BatchComputeService for which this scheduler is working
+     * @param backfilling_depth: the backfilling depth
      */
-    ConservativeBackfillingBatchScheduler::ConservativeBackfillingBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {
+    ConservativeBackfillingBatchScheduler::ConservativeBackfillingBatchScheduler(
+            BatchComputeService *cs,
+            unsigned long backfilling_depth) : HomegrownBatchScheduler(cs) {
         this->schedule = std::make_unique<NodeAvailabilityTimeLine>(cs->total_num_of_nodes);
+        this->_backfilling_depth = backfilling_depth;
     }
 
     /**
@@ -125,11 +129,13 @@ namespace wrench {
 
         // Reset the time origin
         auto now = (u_int32_t) Simulation::getCurrentSimulatedDate();
-        this->schedule->setTimeOrigin(now);
+        this->schedule->setTimeOrigin(now);;
 
         // Go through the BatchComputeService queue
-        for (auto const &batch_job: this->cs->batch_queue) {
+//        for (auto const &batch_job: this->cs->batch_queue) {
+        for (unsigned long i=0; i < std::min(this->_backfilling_depth, this->cs->batch_queue.size()); i++) {
             //            WRENCH_INFO("DEALING WITH JOB %lu", batch_job->getJobID());
+            auto batch_job  = this->cs->batch_queue.at(i);
 
             // Remove the job from the schedule
             //            WRENCH_INFO("REMOVING IT FROM SCHEDULE");

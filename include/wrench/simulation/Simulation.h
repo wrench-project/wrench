@@ -236,7 +236,7 @@ namespace wrench {
 
 //        static int unique_disk_sequence_number;
 
-        void platformSanityCheck();
+        void platformSanityCheck() const;
         void checkSimulationSetup();
 
         void startAllProcesses();

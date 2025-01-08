@@ -32,10 +32,10 @@ namespace wrench {
      * @param parallel_model: the parallel model (to determine speedup vs. number of cores)
      */
     ComputeAction::ComputeAction(const std::string &name,
-                                 double flops,
-                                 sg_size_t ram,
-                                 unsigned long min_num_cores,
-                                 unsigned long max_num_cores,
+                                 const double flops,
+                                 const sg_size_t ram,
+                                 const unsigned long min_num_cores,
+                                 const unsigned long max_num_cores,
                                  std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_") {
 
         if ((flops < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
@@ -95,7 +95,7 @@ namespace wrench {
     void ComputeAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         auto num_threads = action_executor->getNumCoresAllocated();
         if ((num_threads < this->min_num_cores) || (num_threads > this->max_num_cores) || (action_executor->getMemoryAllocated() < this->ram)) {
-            throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("Invalid resource specs for Action Executor")));
+            throw ExecutionException(std::make_shared<FatalFailure>("Invalid resource specs for Action Executor"));
         }
 
         double sequential_work = this->getParallelModel()->getPurelySequentialWork(this->getFlops(), num_threads);
@@ -132,7 +132,7 @@ namespace wrench {
   */
     void ComputeAction::simulateComputationAsSleep(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
-        S4U_Simulation::sleep((double) (num_threads) *action_executor->getThreadCreationOverhead());
+        S4U_Simulation::sleep(static_cast<double>(num_threads) *action_executor->getThreadCreationOverhead());
         // Then sleep for the computation duration
         double sleep_time = (sequential_work + parallel_per_thread_work) / Simulation::getFlopRate();
         Simulation::sleep(sleep_time);
@@ -152,8 +152,8 @@ namespace wrench {
                                                    sequential_work,
                                                    parallel_per_thread_work);
 
-        } catch (std::exception &e) {
-            throw ExecutionException(std::shared_ptr<FailureCause>(new ComputationHasDied()));
+        } catch (std::exception &) {
+            throw ExecutionException(std::make_shared<ComputationHasDied>());
         }
         WRENCH_INFO("All compute threads have completed successfully");
     }

@@ -16,6 +16,7 @@ namespace wrench {
     SET_PROPERTY_NAME(BatchComputeServiceProperty, TASK_SELECTION_ALGORITHM);
 
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_SCHEDULING_ALGORITHM);
+    SET_PROPERTY_NAME(BatchComputeServiceProperty, BACKFILLING_DEPTH);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_QUEUE_ORDERING_ALGORITHM);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_RJMS_PADDING_DELAY);
 

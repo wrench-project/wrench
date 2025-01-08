@@ -26,7 +26,7 @@ namespace wrench {
     class ConservativeBackfillingBatchScheduler : public HomegrownBatchScheduler {
 
     public:
-        explicit ConservativeBackfillingBatchScheduler(BatchComputeService *cs);
+        explicit ConservativeBackfillingBatchScheduler(BatchComputeService *cs, unsigned long backfilling_depth);
 
         void processQueuedJobs() override;
 
@@ -43,6 +43,7 @@ namespace wrench {
         getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) override;
 
     private:
+        unsigned long _backfilling_depth;
         std::unique_ptr<NodeAvailabilityTimeLine> schedule;
     };
 
