@@ -186,7 +186,7 @@ namespace wrench {
      * @param config: the SMPI config option
      */
     void Communicator::MPI_Bcast(int root_rank, sg_size_t bytes, std::string config) {
-        if ((bytes < 1) or (root_rank < 0) or (root_rank >= (int) this->size)) {
+        if ((bytes < 1) or (root_rank < 0) or (root_rank >= static_cast<int>(this->size))) {
             throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
         }
         this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], bytes, "smpi/bcast:" + std::move(config));

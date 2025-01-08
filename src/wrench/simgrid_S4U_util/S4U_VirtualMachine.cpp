@@ -83,7 +83,7 @@ namespace wrench {
         }
 
         this->vm = physical_host->create_vm(this->vm_name,
-                                            (int) this->num_cores,
+                                            static_cast<int>(this->num_cores),
                                             (size_t) this->ram_memory);
 
         //        this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,

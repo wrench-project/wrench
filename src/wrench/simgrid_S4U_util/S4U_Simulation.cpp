@@ -11,7 +11,6 @@
 #include <iostream>
 #include <set>
 #include <climits>
-#include <cfloat>
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
 #include <simgrid/plugins/file_system.h>
@@ -23,10 +22,8 @@
 
 #include <simgrid/version.h>
 
-#include <fstream>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include "smpi/smpi.h"
-#include <cstdio>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
@@ -124,7 +121,8 @@ namespace wrench {
     /**
      * @brief Method to check that all link bandwidths are >0
      */
-    void S4U_Simulation::checkLinkBandwidths() {
+    void S4U_Simulation::checkLinkBandwidths() const
+    {
         auto links = this->engine->get_all_links();
         for (auto const &l: links) {
             if (l->get_bandwidth() <= 0) {
@@ -137,14 +135,14 @@ namespace wrench {
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
-     * @param filename the path to an XML platform description file
+     * @param filename the path to a .xml XML platform description file or a .so/.dylib shared object platform file
      *
      */
-    void S4U_Simulation::setupPlatform(const std::string &filename) {
+    void S4U_Simulation::setupPlatformFromFile(const std::string &filename) {
         try {
             this->engine->load_platform(filename);
         } catch (simgrid::ParseError &e) {
-            throw std::invalid_argument("XML Platform description file error: " + std::string(e.what()));
+            throw std::invalid_argument("Platform description file error: " + std::string(e.what()));
         } catch (std::invalid_argument &e) {
             throw;
         }
@@ -159,7 +157,7 @@ namespace wrench {
      * @param creation_function void() function to create the platform
      *
      */
-    void S4U_Simulation::setupPlatform(const std::function<void()> &creation_function) {
+    void S4U_Simulation::setupPlatformFromLambda(const std::function<void()> &creation_function) {
         creation_function();
         this->platform_setup = true;
     }
@@ -522,14 +520,14 @@ namespace wrench {
                                                 double sequential_work,
                                                 double parallel_per_thread_work) {
         // Overhead
-        S4U_Simulation::sleep((int) num_threads * thread_creation_overhead);
+        S4U_Simulation::sleep(static_cast<int>(num_threads) * thread_creation_overhead);
         if (num_threads == 1) {
             simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
         } else {
             // Launch compute-heavy thread
             auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
             // Launch all other threads
-            simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, (int) num_threads - 1);
+            simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, static_cast<int>(num_threads) - 1);
             // Wait for the compute-heavy thread
             bottleneck_thread->wait();
         }
@@ -874,7 +872,7 @@ namespace wrench {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
         try {
-            return (int) (host->get_pstate_count());
+            return static_cast<int>(host->get_pstate_count());
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
@@ -912,7 +910,7 @@ namespace wrench {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
         try {
-            return sg_host_get_wattmin_at(host, (int) (host->get_pstate()));
+            return sg_host_get_wattmin_at(host, static_cast<int>(host->get_pstate()));
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
@@ -932,7 +930,7 @@ namespace wrench {
         }
         try {
             return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
-                                          (int) ((simgrid::s4u::Host::by_name(hostname))->get_pstate()));
+                                          static_cast<int>((simgrid::s4u::Host::by_name(hostname))->get_pstate()));
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. "

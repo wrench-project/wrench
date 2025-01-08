@@ -116,7 +116,6 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
-        bool commport_pool_size_set = false;
         bool default_control_message_size_set = false;
 
         // By  default, logs are disabled
@@ -129,7 +128,7 @@ namespace wrench {
             }
         }
 
-        std::vector<std::string> cleanedup_args;
+        std::vector<std::string> cleaned_up_args;
         for (i = 0; i < *argc; i++) {
             if (not strcmp(argv[i], "--help")) {
                 simulator_help_requested = true;
@@ -188,7 +187,7 @@ namespace wrench {
                 throw std::invalid_argument("The use of --wrench-pagecache-simulation has been deprecated for now");
                 Simulation::pagecache_enabled = true;
             } else {
-                cleanedup_args.emplace_back(argv[i]);
+                cleaned_up_args.emplace_back(argv[i]);
             }
         }
 
@@ -249,7 +248,7 @@ namespace wrench {
 
 
         *argc = 0;
-        for (const auto &a: cleanedup_args) {
+        for (const auto &a: cleaned_up_args) {
             //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.
             //This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
@@ -317,7 +316,7 @@ namespace wrench {
     /**
      * @brief Instantiate a simulated platform
      *
-     * @param filename: the path to a SimGrid XML platform description file
+     * @param filename: the path to a SimGrid XML platform description file (.xml) or shared object platform file (.so/.dylib)
      *
      */
     void Simulation::instantiatePlatform(const std::string &filename) {
@@ -328,7 +327,7 @@ namespace wrench {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
 
-        this->s4u_simulation->setupPlatform(filename);
+        this->s4u_simulation->setupPlatformFromFile(filename);
 
         this->platformSanityCheck();
 
@@ -342,12 +341,12 @@ namespace wrench {
      *
      */
     void Simulation::instantiatePlatformFromString(const std::string &platform) {
-        auto temp_dir = std::filesystem::temp_directory_path();
-        auto temp_path = temp_dir / ("tmp_wrench_platform_" + to_string(::getpid()) + "_" + to_string(std::time(nullptr)) + ".xml");
-        ofstream myfile;
-        myfile.open(temp_path);
-        myfile << platform << std::endl;
-        myfile.close();
+        auto const temp_dir = std::filesystem::temp_directory_path();
+        auto const temp_path = temp_dir / ("tmp_wrench_platform_" + to_string(::getpid()) + "_" + to_string(std::time(nullptr)) + ".xml");
+        ofstream file;
+        file.open(temp_path);
+        file << platform << std::endl;
+        file.close();
 
         instantiatePlatform(temp_path);
         remove(temp_path);
@@ -366,10 +365,8 @@ namespace wrench {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
 
-        this->s4u_simulation->setupPlatform(creation_function);
-
+        this->s4u_simulation->setupPlatformFromLambda(creation_function);
         this->platformSanityCheck();
-
         this->already_setup = true;
     }
 
@@ -435,13 +432,10 @@ namespace wrench {
             throw std::invalid_argument("Simulation::getLinkUsage() requires a valid link name");
         }
 
-        double time_now = getCurrentSimulatedDate();
-        double usage = S4U_Simulation::getLinkUsage(link_name);
-
+        const double usage = S4U_Simulation::getLinkUsage(link_name);
         if (record_as_time_stamp) {
             this->getOutput().addTimestampLinkUsage(Simulation::getCurrentSimulatedDate(), link_name, usage);
         }
-
         return usage;
     }
 
@@ -545,7 +539,7 @@ namespace wrench {
             wrench::FileLocation::file_location_map.clear();
             //            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
-        } catch (std::runtime_error &e) {
+        } catch (std::runtime_error &) {
             wrench::FileLocation::file_location_map.clear();
             //            Service::deleteLifeSaversOfAutorestartServices();
             this->is_running = false;
@@ -809,7 +803,7 @@ namespace wrench {
         int unique_disk_sequence_number_read = this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes);
         try {
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point, disk);
-        } catch (const std::invalid_argument &ia) {
+        } catch (const std::invalid_argument &) {
             this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                           unique_disk_sequence_number_read);
             throw;
@@ -839,7 +833,7 @@ namespace wrench {
         try {
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
                                                                    read_mount_point, write_mount_point, src_disk, dst_disk);
-        } catch (const std::invalid_argument &ia) {
+        } catch (const std::invalid_argument &) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                            unique_disk_sequence_number_write);
             this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
@@ -865,7 +859,7 @@ namespace wrench {
         int unique_disk_sequence_number_write = this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes);
         try {
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point, disk);
-        } catch (const std::invalid_argument &ia) {
+        } catch (const std::invalid_argument &) {
             this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                            unique_disk_sequence_number_write);
             throw;
@@ -1216,7 +1210,7 @@ namespace wrench {
      * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
      *        simulation output if can_record is set to true
      * @param hostname: the host name
-     * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object
+     * @param record_as_time_stamp: bool signaling whether to record a SimulationTimestampEnergyConsumption object
      * @return current energy consumption in joules
      */
     double Simulation::getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp) {
@@ -1224,9 +1218,7 @@ namespace wrench {
             throw std::invalid_argument("Simulation::getEnergyConsumed() requires a valid hostname");
         }
 
-        double time_now = getCurrentSimulatedDate();
-        double consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
-
+        double const consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
         if (record_as_time_stamp) {
             this->getOutput().addTimestampEnergyConsumption(Simulation::getCurrentSimulatedDate(), hostname, consumption);
         }
@@ -1288,7 +1280,7 @@ namespace wrench {
      * @return The index of the current pstate of the host (as specified in the platform xml description file)
      */
     int Simulation::getCurrentPstate(const std::string &hostname) {
-        return (int) S4U_Simulation::getCurrentPstate(hostname);
+        return static_cast<int>(S4U_Simulation::getCurrentPstate(hostname));
     }
 
     /**
@@ -1446,9 +1438,10 @@ namespace wrench {
 #endif
 
     /**
-     * @brief Checks that the platform is well defined
+     * @brief Checks that the platform is well-defined
      */
-    void Simulation::platformSanityCheck() {
+    void Simulation::platformSanityCheck() const
+    {
         auto hostnames = wrench::Simulation::getHostnameList();
 
         // Check link bandwidths (should be >0)
@@ -1524,7 +1517,7 @@ namespace wrench {
                 }
                 if (not has_memory_disk) {
                     throw std::invalid_argument("Simulation::platformSanityCheck(): Since --pagecache was passed, "
-                                                "each host must have a disk with mountpoint \"/memory\" (host " +
+                                                "each host must have a disk with mount point \"/memory\" (host " +
                                                 h +
                                                 " doesn't!)");
                 }
@@ -1607,7 +1600,6 @@ namespace wrench {
      *
      */
     std::shared_ptr<DataFile> Simulation::addFile(const std::string &id, const std::string &size) {
-        sg_size_t size_in_bytes = UnitParser::parse_size(size);
         return Simulation::addFile(id, UnitParser::parse_size(size));
     }
 

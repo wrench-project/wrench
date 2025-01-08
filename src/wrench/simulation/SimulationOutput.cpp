@@ -269,7 +269,7 @@ namespace wrench {
      * @param point: point on a 1D plane
      * @return bool
      */
-    bool isPointOnSegment(std::pair<unsigned long long, unsigned long long> segment, unsigned long long point) {
+    bool isPointOnSegment(const std::pair<unsigned long long, unsigned long long>& segment, unsigned long long point) {
         return (point <= std::max(segment.first, segment.second) and point >= std::min(segment.first, segment.second));
     }
 
@@ -279,8 +279,8 @@ namespace wrench {
      * @param segment2: second segment
      * @return bool
      */
-    bool isSegmentOverlappingXAxis(std::pair<unsigned long long, unsigned long long> segment1,
-                                   std::pair<unsigned long long, unsigned long long> segment2) {
+    bool isSegmentOverlappingXAxis(const std::pair<unsigned long long, unsigned long long>& segment1,
+                                   const std::pair<unsigned long long, unsigned long long>& segment2) {
         // Note: EPSILON looks big because we "blow up" the floats by 10^9 to do all computations
         //       with unsigned long longs instead of doubles (thus avoiding float comparison weirdness)
         //       And the goal of this EPSILON is to capture the fact that this is for a visual display
@@ -307,8 +307,8 @@ namespace wrench {
      * @param segment2: second segment
      * @return bool
      */
-    bool isSegmentOverlappingYAxis(std::pair<unsigned long long, unsigned long long> segment1,
-                                   std::pair<unsigned long long, unsigned long long> segment2) {
+    bool isSegmentOverlappingYAxis(const std::pair<unsigned long long, unsigned long long>& segment1,
+                                   const std::pair<unsigned long long, unsigned long long>& segment2) {
         if (segment1.second == segment2.first or segment2.second == segment1.first) {
             return false;
             // if any point of either segment lies within the other, we have overlap
@@ -851,13 +851,13 @@ namespace wrench {
 
                     if (current_state_watts.size() == 2) {
                         datum["pstates"].push_back({{"pstate", pstate},
-                                                    {"speed", host->get_pstate_speed((int) pstate)},
+                                                    {"speed", host->get_pstate_speed(static_cast<int>(pstate))},
                                                     {"idle", current_state_watts.at(0)},
                                                     {"epsilon", current_state_watts.at(0)},
                                                     {"all_cores", current_state_watts.at(1)}});
                     } else if (current_state_watts.size() == 3) {
                         datum["pstates"].push_back({{"pstate", pstate},
-                                                    {"speed", host->get_pstate_speed((int) pstate)},
+                                                    {"speed", host->get_pstate_speed(static_cast<int>(pstate))},
                                                     {"idle", current_state_watts.at(0)},
                                                     {"epsilon", current_state_watts.at(1)},
                                                     {"all_cores", current_state_watts.at(2)}});
@@ -906,7 +906,7 @@ namespace wrench {
                 output << std::setw(4) << nlohmann::json(energy_consumption) << std::endl;
                 output.close();
             }
-        } catch (std::runtime_error &e) {
+        } catch (std::runtime_error &) {
             // Just re-throw
             throw;
         }
@@ -1133,10 +1133,10 @@ namespace wrench {
                 auto next_link_itr = link_itr + 1;
 
                 if (next_link_itr != (*route_itr)["route"].end()) {
-                    source_id = (*link_itr).get<std::string>();
+                    source_id = link_itr->get<std::string>();
                     source_string = LINK + ":" + source_id;
 
-                    target_id = (*next_link_itr).get<std::string>();
+                    target_id = next_link_itr->get<std::string>();
                     target_string = LINK + ":" + target_id;
 
                     // check that the undirected edge doesn't already exist in set of edges
@@ -1395,7 +1395,6 @@ namespace wrench {
 
         nlohmann::json bandwidth_json;
 
-        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
         std::vector<simgrid::s4u::Link *> links = get_all_links();
 
         for (const auto &link: links) {
@@ -1442,23 +1441,23 @@ namespace wrench {
     SimulationOutput::SimulationOutput() {
         // Disable everything by default!
 
-        // By default disable all task timestamps
+        // By default, disable all task timestamps
         this->setEnabled<SimulationTimestampTaskStart>(false);
         this->setEnabled<SimulationTimestampTaskFailure>(false);
         this->setEnabled<SimulationTimestampTaskCompletion>(false);
         this->setEnabled<SimulationTimestampTaskTermination>(false);
 
-        // By default disable all file read timestamps
+        // By default, disable all file read timestamps
         this->setEnabled<SimulationTimestampFileReadStart>(false);
         this->setEnabled<SimulationTimestampFileReadFailure>(false);
         this->setEnabled<SimulationTimestampFileReadCompletion>(false);
 
-        // By default disable all file write timestamps
+        // By default, disable all file write timestamps
         this->setEnabled<SimulationTimestampFileWriteStart>(false);
         this->setEnabled<SimulationTimestampFileWriteFailure>(false);
         this->setEnabled<SimulationTimestampFileWriteCompletion>(false);
 
-        //By default disable (for now) all disk read timestamps
+        //By default, disable (for now) all disk read timestamps
         this->setEnabled<SimulationTimestampDiskReadStart>(false);
         this->setEnabled<SimulationTimestampDiskReadFailure>(false);
         this->setEnabled<SimulationTimestampDiskReadCompletion>(false);
@@ -1468,12 +1467,12 @@ namespace wrench {
         this->setEnabled<SimulationTimestampDiskWriteFailure>(false);
         this->setEnabled<SimulationTimestampDiskWriteCompletion>(false);
 
-        // By default disable all file copy timestamps
+        // By default, disable all file copy timestamps
         this->setEnabled<SimulationTimestampFileCopyStart>(false);
         this->setEnabled<SimulationTimestampFileCopyFailure>(false);
         this->setEnabled<SimulationTimestampFileCopyCompletion>(false);
 
-        // By default disable all power timestamps
+        // By default, disable all power timestamps
         this->setEnabled<SimulationTimestampPstateSet>(false);
         this->setEnabled<SimulationTimestampEnergyConsumption>(false);
 

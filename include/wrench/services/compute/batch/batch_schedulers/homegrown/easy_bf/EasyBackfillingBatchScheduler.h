@@ -26,7 +26,7 @@ namespace wrench {
     class EasyBackfillingBatchScheduler : public HomegrownBatchScheduler {
 
     public:
-        explicit EasyBackfillingBatchScheduler(BatchComputeService *cs, int depth);
+        explicit EasyBackfillingBatchScheduler(BatchComputeService *cs, int depth, unsigned long backfilling_depth);
 
         void processQueuedJobs() override;
 
@@ -42,6 +42,7 @@ namespace wrench {
 
     private:
         std::unique_ptr<NodeAvailabilityTimeLine> schedule;
+        unsigned long _backfilling_depth;
         int _depth;
     };
 

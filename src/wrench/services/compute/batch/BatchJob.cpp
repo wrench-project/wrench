@@ -93,7 +93,7 @@ namespace wrench {
      * @brief Get the memory_manager_service requirement
      * @return a size in bytes
      */
-    double BatchJob::getMemoryRequirement() {
+    sg_size_t BatchJob::getMemoryRequirement() {
         return this->compound_job->getMinimumRequiredMemory();
     }
 
