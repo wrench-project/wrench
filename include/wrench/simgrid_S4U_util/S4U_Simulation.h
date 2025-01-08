@@ -35,8 +35,8 @@ namespace wrench {
     public:
         static void enableSMPI();
         void initialize(int *argc, char **argv);
-        void setupPlatform(const std::string &filepath);
-        void setupPlatform(const std::function<void()> &creation_function);
+        void setupPlatformFromFile(const std::string &filepath);
+        void setupPlatformFromLambda(const std::function<void()> &creation_function);
         void runSimulation();
         static double getClock();
         static std::string getHostName();
@@ -75,7 +75,7 @@ namespace wrench {
         static std::vector<std::string> getDisks(const std::string &hostname);
         static simgrid::s4u::Disk *hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
 
-        void checkLinkBandwidths();
+        void checkLinkBandwidths() const;
 
         static void yield();
         static std::string getHostProperty(const std::string &hostname, const std::string &property_name);

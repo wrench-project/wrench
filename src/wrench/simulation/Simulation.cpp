@@ -317,7 +317,7 @@ namespace wrench {
     /**
      * @brief Instantiate a simulated platform
      *
-     * @param filename: the path to a SimGrid XML platform description file
+     * @param filename: the path to a SimGrid XML platform description file (.xml) or shared object platform file (.so/.dylib)
      *
      */
     void Simulation::instantiatePlatform(const std::string &filename) {
@@ -328,7 +328,7 @@ namespace wrench {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
 
-        this->s4u_simulation->setupPlatform(filename);
+        this->s4u_simulation->setupPlatformFromFile(filename);
 
         this->platformSanityCheck();
 
@@ -366,7 +366,7 @@ namespace wrench {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
 
-        this->s4u_simulation->setupPlatform(creation_function);
+        this->s4u_simulation->setupPlatformFromLambda(creation_function);
 
         this->platformSanityCheck();
 
