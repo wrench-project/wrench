@@ -1,6 +1,6 @@
 # API draft
 
-## A New WRENCH service: `ServerlessComputeService`
+## A new service: `ServerlessComputeService`
 
 ### Overview
 
@@ -45,7 +45,7 @@ It creates an internal bare-metal compute service on each host from the get go. 
 
 
 
-## A new server: `FunctionManager`
+## A new service: `FunctionManager`
 
 ### Overview
 
