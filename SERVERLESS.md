@@ -6,27 +6,30 @@
 
 This is a compute service for simulating a serverless infrastructure. It
 implements almost none of the standard `ComputeService` methods (throwing
-an exception) because it doesn't support any job. Most of its methods are
+an "not implemented" exception in them) because it doesn't support any job. Most of its methods are
 private, and called via the `FunctionManager` service (see next section).
 Its constructor should specify:
-		- specifies "# slots" per machine
-			- may be super sophisticated in the future
-		- specifies size of local storage for each invocation at
-		   head node (amazon's default is 512MB)
-		- the read of ram can be used for caching images at a node
-		- the two compete, with priority given to the function invocation disk space
-		- Some overhead properties (e.g., the hot start feature is just some overhead that happens or not)
+  - "# slots" per machine (may be super sophisticated in the future)
+  - size of local storage for each invocation on a compute node (amazon's default is 512MB)
+  - a storage service that will hold all images and running containers (the two compete with each other, with priority given to running containers)
+  - overhead properties (e.g., the hot start feature is just some overhead that happens or not)
 
-
-It creates an internal bare-metal compute service on each host from the get go. And then on each function invocation it:
-  - Create an internal short-lived storage service (amusingly, I don't think that WRENCH allows to create a storage service with some specific size, it always grabs the whole disk... an easy fix likely.... not sure)
-  - Create a custom action and submit it to one of the bare-metal services
+It creates an internal bare-metal compute service on each host from the get go, and whenever a function is invoked, a custom action is created and submitted to on of the bare-metal service. 
 
 ### Issues and Thoughts
 
-  - minor difficulty: it will need to handle concurrent requests (don't start a download of an image that's already being downloaded)
+  - Concurrency: we will need to handle concurrent requests rationally (don't start a download of an image that's already being downloaded)
 
-  - node allocation policy: right now, we'll hardcore something perhaps, but eventually perhaps the user can pass lambdas for customizing behavior? (likely beyond the scope of this ICS496 project)
+  - Node allocation policy: 
+    - right now, we'll hardcode something, but it's not trivial
+      - Say we have 2 2-slot compute nodes and we submit 2 function invocations... what do we do? 
+    - eventually perhaps the user can pass lambdas for customizing behavior? (likely beyond the scope of this ICS496 project)
+
+  - What about storage?
+    - There should be a short-lived storage service created for each invocation
+    - Currently WRENCH does not allow the creation of a storage service with some specific size (it always grabs the whole disk), so perhaps a feature request to wrench that Henri can implement in a second
+    - But then the ServerlessComputeService needs to keep track of storage manually, which is perhaps ok
+
 
 ### API draft
 
@@ -42,7 +45,6 @@ It creates an internal bare-metal compute service on each host from the get go. 
 		- Completion
 		- Timeout
 		- Failure (during the execution)
-
 
 
 ## A new service: `FunctionManager`
