@@ -29,17 +29,20 @@ Upon startup, the service creates an "internal" bare-metal compute service on ea
       - Say we have 2 2-slot compute nodes and we submit 2 function invocations... what do we do? 
     - eventually perhaps the user can pass lambdas for customizing behavior? (likely beyond the scope of this ICS496 project)
 
-  - Difficult one: What about storage?
+  - What about storage?
     - Ideally there would be a short-lived storage service created for each invocation, so that each invocation has its own playpen
-    - Currently WRENCH does not allow the creation of a storage service with some specific size (it always grabs the whole disk), so perhaps a feature request to wrench that Henri can implement in a second
-    - Furthermore, if we create a short-lived storage service for some function invocation, then we need to account for the fact that there is less available storage for caching images....
-    - But then the ServerlessComputeService needs to keep track of storage manually, raising the question: how do we limit the storage used by a particular function invocation
-    - One (ugly) solution would be to create a disk on the fly, which SimGrid allows. But then we need to remove storage capacity from the disk that stores images, which is terrible....
-    - Bottom line:
-      - We need to have a storage service with limited capacity for each function invocation, just so that the function, when it runs, will be isolated from everything and will get expected "out of storage" errors if it goes over its capacity
-      - But then, how do we deal with "when a function is running, we have less space to store images, and in fact, we may need to evict images upon a function starting...."
-      - It seems our current storage abstractions are not powerful enough
-
+    - Henri believes that this can be done with the current abstractions provided by WRENCH:
+      - Create a storage service on the compute node that is set to use LRU caching
+      - It is used to download the images
+      - Whenever a function is invoked: 
+        - Download the corresponding image if needed
+        - Read the corresponding image from the disk (which it's being read, it's unevictable)
+        - Create an unevitcable file of the container size
+        - Create a short-lived disk of that same size attached to the host
+        - Start a storage service on that disk
+        - Run the function
+        - Terminate the storage service and delete the disk
+        - Delete the unevictable file
 
 
 ### API draft
