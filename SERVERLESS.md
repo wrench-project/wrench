@@ -13,8 +13,8 @@ implements almost none of the standard `ComputeService` methods (throwing a
 the `CloudComputeService`) because it doesn't support any job submission.
 Most of its methods are private, and called via the `FunctionManager`
 service (see next section).  Its constructor should specify:
-  - a set of compute hosts each with a disk attached to it (for now, all homogeneous)
-  - "# slots" per compute host that defines the maximum number of concurrent function invocations (may be more sophisticated in the future)
+  - A set of compute hosts each with a disk attached to it (for now, all homogeneous)
+  - A "number of slots" per compute host that defines the maximum number of concurrent function invocations (may be more sophisticated in the future)
   - Time limit for function invocations
   - Size of local storage for each invocation on a compute host (AWS's default is 512MB)
   - A storage service at each compute host that will hold all images and provide local storage to running containers (the two compete with each other, with priority given to running containers)
@@ -46,7 +46,6 @@ Upon startup, the service creates an "internal" bare-metal compute service and a
         - Terminate the storage service and delete the disk
         - Close and delete the unevictable file
 
-
 ### API draft
 
   - `void registerFunction(Function)`
@@ -61,7 +60,6 @@ Upon startup, the service creates an "internal" bare-metal compute service and a
 		- Completion
 		- Timeout
 		- Failure (during the execution)
-
 
 ## A new service: `FunctionManager`
 
@@ -87,5 +85,4 @@ Just like the `JobManager` or `DataManager`, but for functions, with some twists
 	
 
 		
-
 
