@@ -1,24 +1,26 @@
 # API draft
 
 This document outlines thoughts and design choices regarding the implementation
-of a serverless feature in WRENCH
+of a serverless feature in WRENCH.
 
 ## A new service: `ServerlessComputeService`
 
 ### Overview
 
 This is a compute service in charge of a serverless infrastructure. It
-implements almost none of the standard `ComputeService` methods (throwing
-an "not implemented" exception in them) because it doesn't support any job. Most of its methods are
-private, and called via the `FunctionManager` service (see next section).
-Its constructor should specify:
-  - a set of compute hosts (for now, all homogeneous)
-  - "# slots" per compute host (may be super sophisticated in the future)
-  - size of local storage for each invocation on a compute host (amazon's default is 512MB)
-  - a storage service at each compute host that will hold all images and provide local storage to running containers (the two compete with each other, with priority given to running containers)
-  - various overhead properties (e.g., the hot start feature is just some overhead that happens or not)
+implements almost none of the standard `ComputeService` methods (throwing a
+"not implemented" exception in them, as done for instance quite a bit by
+the `CloudComputeService`) because it doesn't support any job submission.
+Most of its methods are private, and called via the `FunctionManager`
+service (see next section).  Its constructor should specify:
+  - a set of compute hosts each with a disk attached to it (for now, all homogeneous)
+  - "# slots" per compute host that defines the maximum number of concurrent function invocations (may be more sophisticated in the future)
+  - Time limit for function invocations
+  - Size of local storage for each invocation on a compute host (AWS's default is 512MB)
+  - A storage service at each compute host that will hold all images and provide local storage to running containers (the two compete with each other, with priority given to running containers)
+  - Various properties that define behaviors, overheads, etc.
 
-Upon startup, the service creates an "internal" bare-metal compute service on each host from the get go, and whenever a function is invoked, a custom action is created and submitted to one of the bare-metal service. 
+Upon startup, the service creates an "internal" bare-metal compute service and associated storage service on each compute host from the get go. Whenever a function is invoked, a custom action is created and submitted to one of the bare-metal service. The service keeps track of downloaded (and being downloaded) images for each compute host. 
 
 ### Issues and Thoughts
 
@@ -27,22 +29,22 @@ Upon startup, the service creates an "internal" bare-metal compute service on ea
   - Node allocation policy: 
     - right now, we'll hardcode something, but it's not trivial
       - Say we have 2 2-slot compute nodes and we submit 2 function invocations... what do we do? 
-    - eventually perhaps the user can pass lambdas for customizing behavior? (likely beyond the scope of this ICS496 project)
+    - eventually perhaps the user can pass lambdas for customizing behavior? (perhaps beyond the scope of this ICS496 project)
 
   - What about storage?
     - Ideally there would be a short-lived storage service created for each invocation, so that each invocation has its own playpen
     - Henri believes that this can be done with the current abstractions provided by WRENCH:
-      - Create a storage service on the compute node that is set to use LRU caching
-      - It is used to download the images
+      - The "internal" storage service on the compute node is set to use LRU caching
+      - It is where downloaded images are stored
       - Whenever a function is invoked: 
         - Download the corresponding image if needed
-        - Read the corresponding image from the disk (which it's being read, it's unevictable)
-        - Create an unevitcable file of the container size
+        - Read the corresponding image from the disk (while it's being read, it's unevictable)
+        - Create an unevictable (i.e., opened!) file of the container's size
         - Create a short-lived disk of that same size attached to the host
         - Start a storage service on that disk
         - Run the function
         - Terminate the storage service and delete the disk
-        - Delete the unevictable file
+        - Close and delete the unevictable file
 
 
 ### API draft
