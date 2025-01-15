@@ -13,18 +13,20 @@ implements almost none of the standard `ComputeService` methods (throwing a
 the `CloudComputeService`) because it doesn't support any job submission.
 Most of its methods are private, and called via the `FunctionManager`
 service (see next section).  Its constructor should specify:
+  - A head host, with a disk
   - A set of compute hosts each with a disk attached to it (for now, all homogeneous)
-  - A "number of slots" per compute host that defines the maximum number of concurrent function invocations (may be more sophisticated in the future)
-  - Time limit for function invocations
-  - Size of local storage for each invocation on a compute host (AWS's default is 512MB)
-  - A storage service at each compute host that will hold all images and provide local storage to running containers (the two compete with each other, with priority given to running containers)
+  - A define "number of slots" per compute host that defines the maximum number of concurrent function invocations (may be more sophisticated in the future)
+  - A storage service at the head host host that will hold all images (LRU fashion)
+  - A storage service at each compute host that will hold all images and provide local storage to running containers using LRU (the two compete with each other, with priority given to running containers who are never evictable, using LRU)
   - Various properties that define behaviors, overheads, etc.
 
-Upon startup, the service creates an "internal" bare-metal compute service and associated storage service on each compute host from the get go. Whenever a function is invoked, a custom action is created and submitted to one of the bare-metal service. The service keeps track of downloaded (and being downloaded) images for each compute host. 
+Upon startup, the service creates an "internal" bare-metal compute service and associated storage services on all host from the get go. Whenever a function is invoked, a custom action is created and submitted to one of the bare-metal service. 
+
 
 ### Issues and Thoughts
 
   - Concurrency: we will need to handle concurrent requests rationally (don't start a download of an image that's already being downloaded)
+    - The service keeps track of downloaded (and being downloaded) images to avoid redundant downloads. 
 
   - Node allocation policy: 
     - right now, we'll hardcode something, but it's not trivial
@@ -34,8 +36,6 @@ Upon startup, the service creates an "internal" bare-metal compute service and a
   - What about storage?
     - Ideally there would be a short-lived storage service created for each invocation, so that each invocation has its own playpen
     - Henri believes that this can be done with the current abstractions provided by WRENCH:
-      - The "internal" storage service on the compute node is set to use LRU caching
-      - It is where downloaded images are stored
       - Whenever a function is invoked: 
         - Download the corresponding image if needed
         - Read the corresponding image from the disk (while it's being read, it's unevictable)
@@ -48,14 +48,21 @@ Upon startup, the service creates an "internal" bare-metal compute service and a
 
 ### API draft
 
-  - `void registerFunction(Function)`
+  - `void registerFunction(Function, 
+                           time_limit_in_seconds, 
+                           disk_space_limit_in_bytes, 
+                           RAM_limit_in_bytes, 
+                           ingress_in_bytes, egress_in_bytes)`
     - Just registers a function
 
   - `void InvokeFunction(Function, FunctionInput)`
     - Sends a message and waits for a message back
       - Failure answers:
-		- function not registered
+		- function not registered, limits too big, whatever
 		- can't admit the function call right now
+           - For RAM: two modes:
+                - If not enough RAM anywhere right now reply "nope"; or
+                - admit the function and it will hang out until it can start 
 	  - If success, another message will come later:
 		- Completion
 		- Timeout
@@ -67,10 +74,14 @@ Upon startup, the service creates an "internal" bare-metal compute service and a
 
 Just like the `JobManager` or `DataManager`, but for functions, with some twists. 
 
-  - `static std::shared_ptr<Function> FunctionManager:createFunction( "name", std::shared_ptr<FunctionOutput> lambda( std::shared_ptr<FunctionInput> input, std::shared_ptr<StorateService> ss), FileLocation image)`
+  - `static Function FunctionManager:createFunction( "name", FunctionOutput lambda( FunctionInput input, StorateService ss), FileLocation image, FileLocation code)`
     - Create the notion of a function
 
-  - `std::shared_ptr<Function> FunctionManager:register(std::vector<ServerlessComputeService> providers)`
+  - `void FunctionManager:registerFunction(Function, ServerlessComputeService, 
+                            time_limit_in_seconds, 
+                            disk_space_limit_in_bytes, 
+                            RAM_limit_in_bytes, 
+                            ingress_in_bytes, egress_in_bytes )`
     - Registers a function at one or more providers
 
   - `FunctionInvocation FunctionManager::invokeFunction(ServerlessComputeService, Function, FunctionInput)` 
