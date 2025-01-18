@@ -1178,4 +1178,24 @@ namespace wrench {
         return false;
     }
 
+    /**
+     * @brief Method to submit a compound job to the service
+     *
+     * @param job: The job being submitted
+     * @param service_specific_args: the set of service-specific arguments
+     */
+    void CloudComputeService::submitCompoundJob(std::shared_ptr<CompoundJob> job,
+                                                const std::map<std::string, std::string> &service_specific_args) {
+        throw std::runtime_error("CloudComputeService::submitCompoundJob: should not be called");
+    }
+
+    /**
+     * @brief Method to terminate a compound job at the service
+     *
+     * @param job: The job being submitted
+     */
+    void CloudComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
+        throw std::runtime_error("CloudComputeService::terminateCompoundJob: should not be called");
+    }
+
 }// namespace wrench
