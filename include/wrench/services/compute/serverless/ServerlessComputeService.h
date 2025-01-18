@@ -47,17 +47,13 @@ namespace wrench {
         int main() override;
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                               const std::map<std::string, std::string> &service_specific_args) override{
-            throw std::runtime_error("not implemented");
-        }
+                               const std::map<std::string, std::string> &service_specific_args) override;
 
-        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override {
-            throw std::runtime_error("not implemented");
-        }
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 
-        std::map<std::string, double> constructResourceInformation(const std::string &key) override {
-            throw std::runtime_error("not implemented");
-        }
+        std::map<std::string, double> constructResourceInformation(const std::string &key) override;
+
+
 
 
         std::vector<std::string> _compute_hosts;
