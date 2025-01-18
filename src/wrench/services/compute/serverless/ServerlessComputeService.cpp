@@ -44,6 +44,7 @@ namespace wrench
     }
 
     int ServerlessComputeService::main() {
+        this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
         WRENCH_INFO("Serverless provider starting");
