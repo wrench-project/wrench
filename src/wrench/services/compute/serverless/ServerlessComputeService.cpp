@@ -43,6 +43,35 @@ namespace wrench
         return false;
     }
 
+    /**
+     * @brief Method to submit a compound job to the service
+     *
+     * @param job: The job being submitted
+     * @param service_specific_args: the set of service-specific arguments
+     */
+    void ServerlessComputeService::submitCompoundJob(std::shared_ptr<CompoundJob> job,
+                                                const std::map<std::string, std::string> &service_specific_args) {
+        throw std::runtime_error("ServerlessComputeService::submitCompoundJob: should not be called");
+    }
+
+    /**
+     * @brief Method to terminate a compound job at the service
+     *
+     * @param job: The job being submitted
+     */
+    void ServerlessComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
+        throw std::runtime_error("ServerlessComputeService::terminateCompoundJob: should not be called");
+    }
+
+    /**
+     * @brief Construct a dict for resource information
+     * @param key: the desired key
+     * @return a dictionary
+     */
+    std::map<std::string, double> ServerlessComputeService::constructResourceInformation(const std::string &key) {
+        throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
+    }
+
     int ServerlessComputeService::main() {
         this->state = Service::UP;
 
