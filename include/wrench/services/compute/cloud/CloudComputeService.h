@@ -122,9 +122,9 @@ namespace wrench {
         /***********************/
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                               const std::map<std::string, std::string> &service_specific_args) override{};
+                               const std::map<std::string, std::string> &service_specific_args) override;
 
-        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override{};
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 
         void validateProperties();
 
