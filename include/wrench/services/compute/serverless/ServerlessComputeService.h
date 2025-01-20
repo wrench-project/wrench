@@ -41,7 +41,8 @@ namespace wrench {
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
-
+        // TODO: public for now until FunctionManager is created to call the private methods and define Function
+        void registerFunction(const std::string& function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
 
     private:
         int main() override;
@@ -52,8 +53,6 @@ namespace wrench {
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
-
-
 
 
         std::vector<std::string> _compute_hosts;

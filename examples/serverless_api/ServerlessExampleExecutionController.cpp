@@ -47,6 +47,8 @@ namespace wrench {
         WRENCH_INFO("ServerlessExampleExecutionController started");
 
         // TODO: Interact with Serverless provider to do stuff
+        // Register a function
+        compute_service->registerFunction("First Function", 10, 16000, 160000, 100, 100);
 
         WRENCH_INFO("Execution complete");
         return 0;
