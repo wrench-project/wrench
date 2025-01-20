@@ -72,6 +72,10 @@ namespace wrench
         throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
     }
 
+    void ServerlessComputeService::registerFunction(const std::string& function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
+        WRENCH_INFO(("Serverless Provider Registered function " + function).c_str());
+    }
+
     int ServerlessComputeService::main() {
         this->state = Service::UP;
 
