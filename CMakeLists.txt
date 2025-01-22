@@ -55,7 +55,7 @@ if (DEFINED FSMOD_PATH)
         message(FATAL_ERROR "The specified FSMOD_PATH doesn't exit")
     else()
         file(GLOB LIBFSMOD_FILES
-                "${FSMOD_PATH}/liblibfsmod.so"
+                "${FSMOD_PATH}/lib/libfsmod.so"
                 "${FSMOD_PATH}/lib/libfsmod.dylib"
                 )
         if (NOT LIBFSMOD_FILES)
