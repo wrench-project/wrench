@@ -20,7 +20,7 @@
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 
-WRENCH_LOG_CATEGORY(custom_controller, "Log category for TwoActionsAtATimeExecutionController");
+WRENCH_LOG_CATEGORY(custom_controller, "Log category for ServerlessExampleExecutionController");
 
 namespace wrench {
 
@@ -33,8 +33,10 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     ServerlessExampleExecutionController::ServerlessExampleExecutionController(std::shared_ptr<ServerlessComputeService> compute_service,
+                                                                               std::shared_ptr<SimpleStorageService> storage_service,
                                                                                const std::string &hostname) : ExecutionController(hostname, "me"),
-                                                                                                              compute_service(std::move(compute_service)) {
+                                                                                                              compute_service(std::move(compute_service)),
+                                                                                                              storage_service(std::move(storage_service)) {
     }
 
     /**
@@ -48,7 +50,20 @@ namespace wrench {
 
         // TODO: Interact with Serverless provider to do stuff
         // Register a function
-        compute_service->registerFunction("First Function", 10, 16000, 160000, 100, 100);
+        auto function_manager = this->createFunctionManager();
+        std::function lambda = [](const std::string& input, const std::shared_ptr<StorageService>& service) -> std::string {
+            return "Processed: " + input;
+        };
+
+        auto image_file = wrench::Simulation::addFile("input_file_", 100 * MB);
+        auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
+        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
+
+        auto function = function_manager->createFunction("ServerlessExampleExecutionController::function", lambda, image_location, code_location);
+        function_manager->registerFunction(*function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+
+        // compute_service->registerFunction("First Function", 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         WRENCH_INFO("Execution complete");
         return 0;

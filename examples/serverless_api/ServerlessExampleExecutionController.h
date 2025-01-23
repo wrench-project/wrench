@@ -26,6 +26,7 @@ namespace wrench {
         // Constructor
         ServerlessExampleExecutionController(
                 std::shared_ptr<ServerlessComputeService> compute_service,
+                std::shared_ptr<SimpleStorageService> storage_service,
                 const std::string &hostname);
 
     protected:
@@ -35,6 +36,7 @@ namespace wrench {
         int main() override;
 
         const std::shared_ptr<ServerlessComputeService> compute_service;
+        const std::shared_ptr<SimpleStorageService> storage_service;
     };
 }// namespace wrench
 #endif//WRENCH_SERVERLESS_EXAMPLE_CONTROLLER_H
