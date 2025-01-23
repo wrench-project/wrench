@@ -1,4 +1,5 @@
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
+#include <wrench/managers/function_manager/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 
 #include "wrench/simulation/Simulation.h"
@@ -13,7 +14,7 @@ namespace wrench
                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
         ComputeService(hostname,
-                       "ServelessComputeService",
+                       "ServerlessComputeService",
                        scratch_space_mount_point) {
         _compute_hosts = compute_hosts;
 
@@ -72,8 +73,8 @@ namespace wrench
         throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
     }
 
-    void ServerlessComputeService::registerFunction(const std::string& function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
-        WRENCH_INFO(("Serverless Provider Registered function " + function).c_str());
+    void ServerlessComputeService::registerFunction(Function function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
+        WRENCH_INFO(("Serverless Provider Registered function " + function.getName()).c_str());
     }
 
     int ServerlessComputeService::main() {

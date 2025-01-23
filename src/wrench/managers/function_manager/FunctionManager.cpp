@@ -14,7 +14,7 @@
 
 #include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/managers/job_manager/FunctionManager.h"
+#include "wrench/managers/function_manager/FunctionManager.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
@@ -31,7 +31,20 @@
 WRENCH_LOG_CATEGORY(wrench_core_function_manager, "Log category for Function Manager");
 
 namespace wrench {
-    
+
+
+	   /**
+     * @brief Main method of the daemon that implements the JobManager
+     * @return 0 on success
+     */
+    int FunctionManager::main() {
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+
+        WRENCH_INFO("New Function Manager starting (%s)", this->commport->get_cname());
+
+        return 0;
+    }
+
     /**
      * @brief Constructor
      *
@@ -42,72 +55,94 @@ namespace wrench {
         this->creator_commport = creator_commport;
     }
 
+    void FunctionManager::stop() {
+        // Implementation of stop logic, e.g., cleanup resources or notify shutdown
+        this->Service::stop();
+    }
     /**
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
-    FunctionManager::~FunctionManager() = default;
+    FunctionManager::~FunctionManager() {
+    	// Any necessary cleanup (if needed) goes here.
+	}
+
 
     /**
      * 
      */
-    static Function FunctionManager:createFunction( "name", FunctionOutput lambda( FunctionInput input, StorateService ss), FileLocation image, FileLocation code) {
+    std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
+            const std::function<std::string(const std::string&, const std::shared_ptr<StorageService>&)>& lambda,
+            const std::shared_ptr<FileLocation>& image,
+            const std::shared_ptr<FileLocation>& code) {
         // Create the notion of a function
+        auto function = std::make_shared<Function>(name, lambda, image, code);
+        return function;
     }
 
     /**
      * 
      */
-    void FunctionManager:registerFunction(Function, ServerlessComputeService,  time_limit_in_seconds,  disk_space_limit_in_bytes,  RAM_limit_in_bytes,  ingress_in_bytes, egress_in_bytes) {
-        // Registers a function at one or more providers
+      void FunctionManager::registerFunction(
+        const Function function,
+        const std::shared_ptr<ServerlessComputeService>& compute_service,
+        int time_limit_in_seconds,
+        long disk_space_limit_in_bytes,
+        long RAM_limit_in_bytes,
+        long ingress_in_bytes,
+        long egress_in_bytes)
+    {
+        // Logic to register the function with the serverless compute service
+        compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
+        WRENCH_INFO("Function [%s] registered with compute service [%s]", function.getName().c_str(), compute_service->getName().c_str());
     }
 
-    /**
-     * 
-     */
-    FunctionInvocation FunctionManager::invokeFunction(ServerlessComputeService, Function, FunctionInput) {
-        // Places a function invocation
-    }
-
-    /**
-     * 
-     */
-    FunctionInvocation::is_running() {
-        // State finding method
-    }
-
-    /**
-     * 
-     */
-    FunctionInvocation::is_done() {
-        // State finding method
-    }
-
-    /**
-     * 
-     */
-    FunctionOutput FunctionInvocation::get_output() {
-        // State finding method
-    }
-
-    /**
-     * 
-     */
-    FunctionInvocation::wait_one(one) {
-        
-    }
-
-    /**
-     * 
-     */
-    FunctionInvocation::wait_any(one) {
-
-    }
-
-    /**
-     * 
-     */
-    FunctionInvocation::wait_all(list) {
-
-    }
+//    /**
+//     *
+//     */
+//    FunctionInvocation FunctionManager::invokeFunction(ServerlessComputeService, Function, FunctionInput) {
+//        // Places a function invocation
+//    }
+//
+//    /**
+//     *
+//     */
+//    FunctionInvocation::is_running() {
+//        // State finding method
+//    }
+//
+//    /**
+//     *
+//     */
+//    FunctionInvocation::is_done() {
+//        // State finding method
+//    }
+//
+//    /**
+//     *
+//     */
+//    FunctionOutput FunctionInvocation::get_output() {
+//        // State finding method
+//    }
+//
+//    /**
+//     *
+//     */
+//    FunctionInvocation::wait_one(one) {
+//
+//    }
+//
+//    /**
+//     *
+//     */
+//    FunctionInvocation::wait_any(one) {
+//
+//    }
+//
+//    /**
+//     *
+//     */
+//    FunctionInvocation::wait_all(list) {
+//
+//    }
 
 }// namespace wrench
