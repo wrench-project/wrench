@@ -75,14 +75,13 @@ namespace wrench {
             const std::shared_ptr<FileLocation>& image,
             const std::shared_ptr<FileLocation>& code) {
         // Create the notion of a function
-        auto function = std::make_shared<Function>(name, lambda, image, code);
-        return function;
+        return std::make_shared<Function>(name, lambda, image, code);
     }
 
     /**
      * 
      */
-      void FunctionManager::registerFunction(
+      bool FunctionManager::registerFunction(
         const Function function,
         const std::shared_ptr<ServerlessComputeService>& compute_service,
         int time_limit_in_seconds,
@@ -91,8 +90,9 @@ namespace wrench {
         long ingress_in_bytes,
         long egress_in_bytes)
     {
+
         // Logic to register the function with the serverless compute service
-        compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
+        return compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
         WRENCH_INFO("Function [%s] registered with compute service [%s]", function.getName().c_str(), compute_service->getName().c_str());
     }
 
