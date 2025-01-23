@@ -10,6 +10,7 @@
 #ifndef SERVERLESSCOMPUTESERVICE_H
 #define SERVERLESSCOMPUTESERVICE_H
 
+#include <wrench/managers/function_manager/Function.h>
 #include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
@@ -42,7 +43,7 @@ namespace wrench {
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
         // TODO: public for now until FunctionManager is created to call the private methods and define Function
-        void registerFunction(const std::string& function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
+        void registerFunction(Function function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
 
     private:
         int main() override;
