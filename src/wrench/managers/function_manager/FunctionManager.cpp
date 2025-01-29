@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2021. The WRENCH Team.
+ * Copyright (c) 2025. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,6 @@
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/simulation/SimulationMessage.h"
-#include "wrench/workflow/WorkflowTask.h"
-#include "wrench/job/StandardJob.h"
-#include "wrench/job/CompoundJob.h"
-#include "wrench/job/PilotJob.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
 #include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
 #include "wrench/managers/job_manager/JobManagerMessage.h"

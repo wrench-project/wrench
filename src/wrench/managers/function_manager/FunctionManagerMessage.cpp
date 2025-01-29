@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/managers/job_manager/FunctionManagerMessage.h"
+#include "wrench/managers/function_manager/FunctionManagerMessage.h"
 
 #include <utility>
 
@@ -25,8 +25,8 @@ namespace wrench {
      * @param sl_compute_service: the ServerlessComputeService on which it ran 
      */
     FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(std::shared_ptr<Function> function,
-                                                                                     std::shared_ptr<ServerlessComputeService> sl_compute_service
-        : FunctionManagerMessage() {
+                                                                                     std::shared_ptr<ServerlessComputeService> sl_compute_service)
+                                                                                     : FunctionManagerMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((function == nullptr) || (sl_compute_service == nullptr)) {
             throw std::invalid_argument("FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(): Invalid arguments");
@@ -44,7 +44,8 @@ namespace wrench {
      */
     FunctionManagerFunctionFailedMessage::FunctionManagerFunctionFailedMessage(std::shared_ptr<Function> function,
                                                                                std::shared_ptr<ServerlessComputeService> sl_compute_service,
-                                                                               std::shared_ptr<FailureCause> cause) : FunctionManagerMessage() {
+                                                                               std::shared_ptr<FailureCause> cause) 
+                                                                               : FunctionManagerMessage() {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((function == nullptr) || (sl_compute_service == nullptr) || (cause == nullptr)) {
             throw std::invalid_argument("FunctionManagerFunctionFailedMessage::FunctionManagerFunctionFailedMessage(): Invalid arguments");
@@ -60,6 +61,5 @@ namespace wrench {
      */
     FunctionManagerWakeupMessage::FunctionManagerWakeupMessage() : FunctionManagerMessage() {
     }
-
 
 }// namespace wrench
