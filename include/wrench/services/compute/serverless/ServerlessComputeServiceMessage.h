@@ -31,12 +31,23 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionRegisterRequestMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionRegisterRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, sg_size_t payload);
+        ServerlessComputeServiceFunctionRegisterRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         S4U_CommPort *answer_commport;
         /** @brief The function to register */
         std::shared_ptr<Function> function;
+        /** @brief The time limit for execution */
+        double time_limit_in_seconds;
+        /** @brief Disk space limit for the function in bytes */
+        sg_size_t disk_space_limit_in_bytes;
+        /** @brief RAM limit for the function in bytes */
+        sg_size_t ram_limit_in_bytes;
+        /** @brief Ingress data limit in bytes */
+        sg_size_t ingress_in_bytes;
+        /** @brief Egress data limit in bytes */
+        sg_size_t egress_in_bytes;
+
     };
 
     /**
