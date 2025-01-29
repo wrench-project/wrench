@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2017. The WRENCH Team.
+* Copyright (c) 2025. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,11 @@
 
 namespace wrench {
 
-    class StorageService;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
+    class ComputeService;
 
     /**
      * @brief Represents a serverless function, encapsulating its metadata and behavior.
@@ -59,6 +63,10 @@ namespace wrench {
         std::shared_ptr<FileLocation> _image; ///< The file location of the function's container image.
         std::shared_ptr<FileLocation> _code; ///< The file location of the function's code.
     };
+    
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 } // namespace wrench
 
