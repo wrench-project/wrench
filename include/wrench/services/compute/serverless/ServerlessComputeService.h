@@ -12,6 +12,7 @@
 
 #include <wrench/managers/function_manager/Function.h>
 #include "wrench/services/compute/ComputeService.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
 
@@ -43,7 +44,7 @@ namespace wrench {
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
         // TODO: public for now until FunctionManager is created to call the private methods and define Function
-        void registerFunction(Function function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
+        void registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
 
     private:
         int main() override;
@@ -52,10 +53,12 @@ namespace wrench {
                                const std::map<std::string, std::string> &service_specific_args) override;
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
+        void processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
+
+        bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
-
-
+        std::set<std::shared_ptr<Function>> _registeredFunctions;
         std::vector<std::string> _compute_hosts;
 
     };

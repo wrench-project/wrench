@@ -8,8 +8,11 @@
  */
 
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
+#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
+#include <wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h>
 #include <wrench/managers/function_manager/Function.h>
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/exceptions/ExecutionException.h>
 
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/simulation/Simulation.h"
@@ -89,17 +92,17 @@ namespace wrench
         throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
     }
 
-    void ServerlessComputeService::registerFunction(Function function, double time_limit_in_seconds,
+    void ServerlessComputeService::registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds,
                                                     sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
                                                     sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes)
     {
-        WRENCH_INFO(("Serverless Provider Registered function " + function.getName()).c_str());
+        WRENCH_INFO(("Serverless Provider Registered function " + function->getName()).c_str());
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
-                answer_commport, function, XXXX,
+                answer_commport, function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes,
                 this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -147,18 +150,21 @@ namespace wrench
         {
             // TODO: Die...
         }
-        if (auto scsfrrm_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegistrationRequestMessage>(message))
+        if (auto scsfrrm_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegisterRequestMessage>(message))
         {
-            processFunctionRegistrationRequest(message->answer_commport, message->function, message->time_limit_in_seconds,....);
+            processFunctionRegistrationRequest(scsfrrm_msg->answer_commport, scsfrrm_msg->function, scsfrrm_msg->time_limit_in_seconds, scsfrrm_msg->disk_space_limit_in_bytes, scsfrrm_msg->ram_limit_in_bytes, scsfrrm_msg->ingress_in_bytes, scsfrrm_msg->egress_in_bytes);
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
 
     }
 
-    void ServerlessComputeService::processFunctionRegistrationRequest(...)
-    {
+    void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
         // TODO: Do the registration
         // TODO: Reply to the request
+        _registeredFunctions.insert(function);
+        auto answer = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true);
+        
+        answer_commport->dputMessage(answer);
     }
 };
