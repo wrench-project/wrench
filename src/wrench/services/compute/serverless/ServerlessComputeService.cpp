@@ -31,6 +31,7 @@ namespace wrench
                        scratch_space_mount_point)
     {
         _compute_hosts = compute_hosts;
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
     /**
@@ -164,9 +165,15 @@ namespace wrench
     }
 
     void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
-        // TODO: Do the registration
-        // TODO: Reply to the request
-        _registeredFunctions.insert(function);
+        // TODO: Do the registration, right now function of same name will replace the old one
+        _registeredFunctions[function->getName()] = std::make_shared<RegisteredFunction>(
+            function, 
+            time_limit, 
+            disk_space_limit_in_bytes, 
+            ram_limit_in_bytes, 
+            ingress_in_bytes, 
+            egress_in_bytes
+        );
         auto answer = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true, nullptr);
         answer_commport->dputMessage(answer);
 

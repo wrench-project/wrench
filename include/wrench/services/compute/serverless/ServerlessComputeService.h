@@ -11,6 +11,8 @@
 #define SERVERLESSCOMPUTESERVICE_H
 
 #include <wrench/managers/function_manager/Function.h>
+#include <wrench/managers/function_manager/RegisteredFunction.h>
+#include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
@@ -60,6 +62,12 @@ namespace wrench {
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         std::vector<std::string> _compute_hosts;
+
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
+            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}
+        };
+
+
 
     };
 
