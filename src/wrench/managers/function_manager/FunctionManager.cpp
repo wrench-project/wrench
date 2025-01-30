@@ -28,7 +28,6 @@ WRENCH_LOG_CATEGORY(wrench_core_function_manager, "Log category for Function Man
 
 namespace wrench {
 
-
 	   /**
      * @brief Main method of the daemon that implements the JobManager
      * @return 0 on success
@@ -55,6 +54,7 @@ namespace wrench {
         // Implementation of stop logic, e.g., cleanup resources or notify shutdown
         this->Service::stop();
     }
+
     /**
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
