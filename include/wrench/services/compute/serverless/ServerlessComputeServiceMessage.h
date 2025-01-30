@@ -11,6 +11,8 @@
 #define SERVERLESSCOMPUTESERVICEMESSAGE_H
 
 #include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/failure_causes/FailureCause.h"
+#include "wrench/managers/function_manager/Function.h"
 
 namespace wrench {
 
@@ -59,6 +61,8 @@ namespace wrench {
 
         /** @brief Whether the registration was successtul */
         bool success;
+        /** @brief The cause of the failure, or nullptr on success */
+        std::shared_ptr<FailureCause> failure_cause;
         // TODO: Add a Failure Cause
     };
 
