@@ -167,8 +167,8 @@ namespace wrench
         // TODO: Do the registration
         // TODO: Reply to the request
         _registeredFunctions.insert(function);
-        auto answer = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true);
-        
+        auto answer = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true, nullptr);
         answer_commport->dputMessage(answer);
+
     }
 };

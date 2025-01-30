@@ -58,7 +58,7 @@ namespace wrench {
         bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
-        std::set<std::shared_ptr<Function>> _registeredFunctions;
+        std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         std::vector<std::string> _compute_hosts;
 
     };
