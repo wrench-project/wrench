@@ -63,7 +63,7 @@ namespace wrench {
         wrench::StorageService::createFileAtLocation(code_location);
 
         auto function = function_manager->createFunction("ServerlessExampleExecutionController::function", lambda, image_location, code_location);
-        function_manager->registerFunction(*function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         // compute_service->registerFunction("First Function", 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
