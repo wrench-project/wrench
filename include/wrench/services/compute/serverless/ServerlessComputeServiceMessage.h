@@ -57,7 +57,7 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionRegisterAnswerMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success);
+        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause);
 
         /** @brief Whether the registration was successtul */
         bool success;

@@ -9,6 +9,8 @@
 
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessage.h"
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -59,9 +61,8 @@ namespace wrench {
      * @brief Constructor for ServerlessComputeServiceFunctionRegisterAnswerMessage
      * @param success: whether the registration was successful
      */
-    ServerlessComputeServiceFunctionRegisterAnswerMessage::ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success)
-        : ServerlessComputeServiceMessage(0), success(success) {
-        this->failure_cause = nullptr;
+    ServerlessComputeServiceFunctionRegisterAnswerMessage::ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause)
+        : ServerlessComputeServiceMessage(0), success(success), failure_cause(std::move(failure_cause)) {
     }
 
 
