@@ -130,6 +130,7 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/compute/serverless/ServerlessComputeService.h
         include/wrench/services/compute/serverless/ServerlessComputeServiceMessage.h
+        include/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeService.h
         include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
@@ -333,6 +334,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/serverless/ServerlessComputeService.cpp
         src/wrench/services/compute/serverless/ServerlessComputeServiceMessage.cpp
+        src/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
         include/wrench/services/compute/cloud/CloudComputeServiceMessage.h
