@@ -92,7 +92,7 @@ namespace wrench
         throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
     }
 
-    void ServerlessComputeService::registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds,
+    bool ServerlessComputeService::registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds,
                                                     sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
                                                     sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes)
     {
@@ -112,9 +112,10 @@ namespace wrench
             "ServerlessComputeService::registerFunction(): Received an");
 
         // TODO: Deal with failures later
-        // if (not msg->success) {
-        //     throw ExecutionException(msg->failure_cause);
-        // }
+        if (not msg->success) {
+             throw ExecutionException(msg->failure_cause);
+        }
+        return true;
     }
 
     int ServerlessComputeService::main()
@@ -149,11 +150,14 @@ namespace wrench
         if (auto ss_mesg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message))
         {
             // TODO: Die...
+            return false;
         }
-        if (auto scsfrrm_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegisterRequestMessage>(message))
+        else if (auto scsfrrm_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegisterRequestMessage>(message))
         {
             processFunctionRegistrationRequest(scsfrrm_msg->answer_commport, scsfrrm_msg->function, scsfrrm_msg->time_limit_in_seconds, scsfrrm_msg->disk_space_limit_in_bytes, scsfrrm_msg->ram_limit_in_bytes, scsfrrm_msg->ingress_in_bytes, scsfrrm_msg->egress_in_bytes);
-        } else {
+            return true;
+        } else 
+        {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
 

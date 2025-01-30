@@ -57,8 +57,8 @@ namespace wrench {
          * @param ingress_in_bytes The maximum inbound data limit.
          * @param egress_in_bytes The maximum outbound data limit.
          */
-        void registerFunction(
-            const Function function,
+        bool registerFunction(
+            std::shared_ptr<Function> function,
             const std::shared_ptr<ServerlessComputeService>& compute_service,
             int time_limit_in_seconds,
             long disk_space_limit_in_bytes,
@@ -67,11 +67,10 @@ namespace wrench {
             long egress_in_bytes);
 
         ~FunctionManager() override;
+        protected:
+            friend class ExecutionController;
 
-    protected:
-        friend class ExecutionController;
-
-        explicit FunctionManager(const std::string& hostname, S4U_CommPort* creator_commport);
+            explicit FunctionManager(const std::string& hostname, S4U_CommPort *creator_commport);
 
     private:
         int main() override;
