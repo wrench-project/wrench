@@ -57,13 +57,59 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionRegisterAnswerMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause);
+        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success, std::shared_ptr<Function> function, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
 
         /** @brief Whether the registration was successtul */
         bool success;
+        /** @brief The function that was either registered on success or not on failure */
+        std::shared_ptr<Function> function;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
-        // TODO: Add a Failure Cause
+    };
+
+    /**
+     * @brief A message sent to a ServerlessComputeService to invoke a function
+     */
+    class ServerlessComputeServiceFunctionInvocationRequestMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, sg_size_t payload);
+
+        /** @brief The commport_name to answer to */
+        S4U_CommPort *answer_commport;
+        /** @brief The function to invoke */
+        std::shared_ptr<Function> function;
+
+    };
+
+    /**
+     * @brief A message sent from a ServerlessComputeService in reply to a function invocation request
+     */
+    class ServerlessComputeServiceFunctionInvocationAnswerMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceFunctionInvocationAnswerMessage(bool success, std::shared_ptr<Function> function, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+
+        /** @brief Whether the invocation will be completed or not at some point in the future*/
+        bool success;
+        /** @brief The function to be invoked at some point on success or not invoked on failure */
+        std::shared_ptr<Function> function;
+        /** @brief The cause of the failure, or nullptr on success */
+        std::shared_ptr<FailureCause> failure_cause;
+    };
+
+    /**
+     * @brief A message sent from a ServerlessComputeService when a function invocation is completed
+     * TODO: Needs to return the result of the function invocation
+     */
+    class ServerlessComputeServiceFunctionInvocationCompleteMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceFunctionInvocationCompleteMessage(bool success, std::shared_ptr<Function> function, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+
+        /** @brief Whether the invocation was successtul */
+        bool success;
+        /** @brief The function that was either invoked on success or not on failure */
+        std::shared_ptr<Function> function;
+        /** @brief The cause of the failure, or nullptr on success */
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
     /***********************/
