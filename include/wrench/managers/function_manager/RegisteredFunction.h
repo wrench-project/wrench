@@ -41,8 +41,8 @@ namespace wrench {
             : _function(function), _time_limit(time_limit_in_seconds), _disk_space(disk_space_limit_in_bytes), 
             _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
 
-    private:
         std::shared_ptr<Function> _function;
+    private:
         double _time_limit;
         sg_size_t _disk_space;
         sg_size_t _ram_limit;

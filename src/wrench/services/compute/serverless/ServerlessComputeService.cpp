@@ -13,6 +13,8 @@
 #include <wrench/managers/function_manager/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/ExecutionException.h>
+#include <wrench/failure_causes/NotAllowed.h>
+#include <wrench/failure_causes/FunctionNotFound.h>
 
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/simulation/Simulation.h"
@@ -119,15 +121,33 @@ namespace wrench
         return true;
     }
 
-    int ServerlessComputeService::main()
-    {
+    bool ServerlessComputeService::invokeFunction(std::string functionName) {
+        WRENCH_INFO(("Serverless Provider recieved invoke fuction" + functionName).c_str());
+        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
+
+        this->commport->dputMessage(
+            new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport, functionName, 0)
+        );
+
+        // Block here for return, if non blocking then function manager has to check up on it? or send a message
+        auto msg = answer_commport->getMessage<ServerlessComputeServiceFunctionInvocationAnswerMessage>(
+            this->network_timeout,
+            "ServerlessComputeService::invokeFunction(): Received an");
+
+        if (not msg->success) {
+            throw ExecutionException(msg->failure_cause);
+        }
+        return true;
+    }
+
+    int ServerlessComputeService::main() {
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
         WRENCH_INFO("Serverless provider starting");
 
         while (processNextMessage()) {
-            // Do stuff if needed
+            dispatchFunctionInvokation();
         }
         return 0;
     }
@@ -148,34 +168,58 @@ namespace wrench
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-        if (auto ss_mesg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message))
-        {
+        if (auto ss_mesg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // TODO: Die...
             return false;
         }
-        else if (auto scsfrrm_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegisterRequestMessage>(message))
-        {
+        else if (auto scsfrrm_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
             processFunctionRegistrationRequest(scsfrrm_msg->answer_commport, scsfrrm_msg->function, scsfrrm_msg->time_limit_in_seconds, scsfrrm_msg->disk_space_limit_in_bytes, scsfrrm_msg->ram_limit_in_bytes, scsfrrm_msg->ingress_in_bytes, scsfrrm_msg->egress_in_bytes);
             return true;
-        } else 
-        {
+        }
+        else if (auto scsfir_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
+            
+        }
+         else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+        }
+    }
+
+    void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
+        if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) {
+            auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(false, function, std::make_shared<NotAllowed>(this, "Duplicate Function"), 0);
+            answer_commport->dputMessage(answerMessage);
+        } else {        
+            _registeredFunctions[function->getName()] = std::make_shared<RegisteredFunction>(
+                function, 
+                time_limit, 
+                disk_space_limit_in_bytes, 
+                ram_limit_in_bytes, 
+                ingress_in_bytes, 
+                egress_in_bytes
+            );
+            auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true, function, nullptr, 0);
+            answer_commport->dputMessage(answerMessage);
+        }
+    }
+
+    void ServerlessComputeService::processFunctionInvokationRequest(S4U_CommPort *answer_commport, std::string functionName) {
+        if (_registeredFunctions.find(functionName) == _registeredFunctions.end()) {
+            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(false, nullptr, std::make_shared<FunctionNotFound>(this, functionName + "function not found"), 0);
+            answer_commport->dputMessage(answerMessage);
+        } else {
+            _invokeFunctions.push(_registeredFunctions.at(functionName));
+            // TODO: return some sort of function invocation object?
+            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(true, nullptr, nullptr, 0);
+            answer_commport->dputMessage(answerMessage);
         }
 
     }
 
-    void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
-        // TODO: Do the registration, right now function of same name will replace the old one
-        _registeredFunctions[function->getName()] = std::make_shared<RegisteredFunction>(
-            function, 
-            time_limit, 
-            disk_space_limit_in_bytes, 
-            ram_limit_in_bytes, 
-            ingress_in_bytes, 
-            egress_in_bytes
-        );
-        auto answer = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true, nullptr);
-        answer_commport->dputMessage(answer);
-
+    void ServerlessComputeService::dispatchFunctionInvokation() {
+        while (!_invokeFunctions.empty()) {
+            // Might need to think about how RegisteredFunction is storing info here...
+            WRENCH_INFO("Invoking function [%s]", _invokeFunctions.front()->_function->getName().c_str());
+            Simulation::sleep(1);
+        }
     }
 };
