@@ -516,9 +516,9 @@ namespace wrench
             processStartVM(ccsstmr_msg->answer_commport, ccsstmr_msg->vm_name);
             return true;
         }
-        else if (auto ccssvmr_msg = dynamic_cast<CloudComputeServiceSuspendVMRequestMessage*>(message.get()))
+        else if (auto ccssvmr2_msg = dynamic_cast<CloudComputeServiceSuspendVMRequestMessage*>(message.get()))
         {
-            processSuspendVM(ccssvmr_msg->answer_commport, ccssvmr_msg->vm_name);
+            processSuspendVM(ccssvmr2_msg->answer_commport, ccssvmr2_msg->vm_name);
             return true;
         }
         else if (auto ccsrvmr_msg = dynamic_cast<CloudComputeServiceResumeVMRequestMessage*>(message.get()))
@@ -1281,7 +1281,7 @@ namespace wrench
         {
             vm_boot_overhead = this->getPropertyValueAsTimeInSecond(CloudComputeServiceProperty::VM_BOOT_OVERHEAD);
         }
-        catch (std::invalid_argument& e)
+        catch (std::invalid_argument&)
         {
             success = false;
         }

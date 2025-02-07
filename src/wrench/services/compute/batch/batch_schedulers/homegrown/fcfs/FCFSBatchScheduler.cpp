@@ -131,7 +131,7 @@ namespace wrench {
 
         // Go through the pending jobs and update core availabilities
         for (auto const &job: this->cs->batch_queue) {
-            double duration = (double) job->getRequestedTime();
+            double duration = static_cast<double>(job->getRequestedTime());
             unsigned long num_hosts = job->getRequestedNumNodes();
             unsigned long num_cores_per_host = job->getRequestedCoresPerNode();
 
