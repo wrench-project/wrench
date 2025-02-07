@@ -11,6 +11,7 @@
 #define SERVERLESSCOMPUTESERVICE_H
 
 #include <wrench/managers/function_manager/Function.h>
+#include <wrench/managers/function_manager/FunctionManager.h>
 #include <wrench/managers/function_manager/RegisteredFunction.h>
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 #include "wrench/services/compute/ComputeService.h"
@@ -46,8 +47,10 @@ namespace wrench {
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
         // TODO: public for now until FunctionManager is created to call the private methods and define Function
+    protected:
+        friend class FunctionManager;
         bool registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
-
+        bool invokeFunction(std::string functionName);
     private:
         int main() override;
 
@@ -56,12 +59,15 @@ namespace wrench {
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
         void processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
-
+        void processFunctionInvokationRequest(S4U_CommPort *answer_commport, std::string functionName);
+        void dispatchFunctionInvokation();
         bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         std::vector<std::string> _compute_hosts;
+        std::queue<std::shared_ptr<RegisteredFunction>> _invokeFunctions;
+        std::queue<std::shared_ptr<RegisteredFunction>> _invokedFunctions;
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}

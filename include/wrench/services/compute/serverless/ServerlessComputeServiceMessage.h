@@ -72,7 +72,7 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionInvocationRequestMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort *answer_commport, std::string functionName, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         S4U_CommPort *answer_commport;
