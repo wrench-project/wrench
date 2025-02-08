@@ -54,7 +54,7 @@ namespace wrench {
         // Update the time origin
         double now = Simulation::getCurrentSimulatedDate();
 //        std::cerr << "** [" <<  now << "] IN PROCESSING QUEUE JOB (" << this->cs->batch_queue.size() << " JOBS IN THE QUEUE)" << std::endl;
-        this->schedule->setTimeOrigin((u_int32_t) now);
+        this->schedule->setTimeOrigin(static_cast<u_int32_t>(now));
 
         // While the first job can be scheduled now, schedule it
         unsigned int i;
@@ -200,7 +200,7 @@ namespace wrench {
     void EasyBackfillingBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         WRENCH_INFO("Notified of completion of BatchComputeService job, %lu", batch_job->getJobID());
 
-        auto now = (u_int32_t) Simulation::getCurrentSimulatedDate();
+        auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
         this->schedule->setTimeOrigin(now);
         this->schedule->remove(now, batch_job->easy_bf_expected_end_date + 100, batch_job);
 
@@ -250,7 +250,7 @@ namespace wrench {
         if (num_nodes > cs->available_nodes_to_cores.size()) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > (unsigned long) cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+        if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->get_core_count())) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
                                      std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");

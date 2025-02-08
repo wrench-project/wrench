@@ -285,7 +285,8 @@ namespace wrench {
             std::string error_message = "Non-grid universe jobs submitted to HTCondor cannot have service-specific arguments";
             answer_commport->dputMessage(
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<HTCondorComputeService>(), error_message)),
+                            job, this->getSharedPtr<HTCondorComputeService>(), false,
+                            std::make_shared<NotAllowed>(this->getSharedPtr<HTCondorComputeService>(), error_message),
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
