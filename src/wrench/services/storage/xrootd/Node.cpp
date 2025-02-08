@@ -158,7 +158,6 @@ namespace wrench {
                                         msg->answered));
                     } else {
                         if (!children.empty()) {
-
                             map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
@@ -220,7 +219,6 @@ namespace wrench {
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
 
                     if (!children.empty()) {
-
                         map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                         S4U_Simulation::compute(
                                 this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
@@ -247,13 +245,11 @@ namespace wrench {
                 return false;
 
             } else if (auto msg = dynamic_cast<FileNotFoundAlarm *>(message.get())) {
-
                 //WRENCH_INFO("Got message %p %d %d",msg,*msg->answered,msg->fileReadRequest);
                 if (!*msg->answered) {
                     *msg->answered = true;
                     // WRENCH_INFO("%p %p",msg,msg->answered.get());
                     if (msg->fileReadRequest) {
-
                         msg->answer_commport->dputMessage(
                                 new StorageServiceFileReadAnswerMessage(
                                         FileLocation::LOCATION(getSharedPtr<Node>(), msg->file),
@@ -290,7 +286,6 @@ namespace wrench {
                                             MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
                     if (internalStorage && internalStorage->hasFile(file)) {
-
                         msg->answer_commport->dputMessage(
                                 new StorageServiceFileLookupAnswerMessage(
                                         file,
@@ -299,8 +294,6 @@ namespace wrench {
                                                 MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
 
                     } else {//no internal storage
-
-
                         if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
@@ -361,7 +354,6 @@ namespace wrench {
                 return true;
 
             } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
-
                 auto file = msg->location->getFile();
 
                 WRENCH_DEBUG("External File Read Request for %s", file->getID().c_str());
@@ -380,9 +372,7 @@ namespace wrench {
                                     getMessagePayloadValue(
                                             MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
-                    if (internalStorage &&
-                        internalStorage->hasFile(file)) {
-
+                    if (internalStorage && internalStorage->hasFile(file)) {
                         WRENCH_DEBUG("File %s found in internal Storage", file->getID().c_str());
                         //File in internal storage
                         cache.add(file, FileLocation::LOCATION(internalStorage, file));
@@ -553,7 +543,6 @@ namespace wrench {
 
             } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
                 if (reduced) {//TODO use optimised search
-
                     shared_ptr<bool> answered = make_shared<bool>(false);
                     auto targets = metavisor->getFileNodes(msg->location->getFile());
                     auto search_stack = constructFileSearchTree(targets);
@@ -767,7 +756,6 @@ namespace wrench {
         */
         Node::Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                    const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "XRootDNode") {
-
             // Create /dev/null mountpoint so that Locations can be created
             // TODO: Removed this due to using simgrid:fsmod.... big deal?
 //            this->file_system->mount_dev_null_partition("/dev/null");
