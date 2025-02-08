@@ -130,7 +130,7 @@ namespace wrench {
                         "to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
-            if ((double) (h->get_core_count()) != num_cores_available) {
+            if (static_cast<double>(h->get_core_count()) != num_cores_available) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
@@ -822,7 +822,7 @@ namespace wrench {
 
         if ((requested_hosts > this->available_nodes_to_cores.size()) or
             (requested_num_cores_per_host >
-             (unsigned long) this->available_nodes_to_cores.begin()->first->get_core_count()) or
+             static_cast<unsigned long>(this->available_nodes_to_cores.begin()->first->get_core_count())) or
             (required_ram_per_host >
              S4U_Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
             {
@@ -1022,7 +1022,7 @@ namespace wrench {
         executor->simulation_ = this->simulation_;
         executor->start(executor, true, false);// Daemonized, no auto-restart
         batch_job->setBeginTimestamp(S4U_Simulation::getClock());
-        batch_job->setEndingTimestamp(S4U_Simulation::getClock() + (double) allocated_time);
+        batch_job->setEndingTimestamp(S4U_Simulation::getClock() + static_cast<double>(allocated_time));
         this->running_bare_metal_one_shot_compute_services[compound_job] = executor;
 
         //          this->running_jobs.insert(std::move(batch_job_ptr));
@@ -1052,17 +1052,17 @@ namespace wrench {
 
         if (key == "num_hosts") {
             // Num hosts
-            dict.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
+            dict.insert(std::make_pair(this->getName(), static_cast<double>(this->nodes_to_cores_map.size())));
 
         } else if (key == "num_cores") {
             for (const auto &h: this->nodes_to_cores_map) {
-                dict.insert(std::make_pair(h.first->get_name(), (double) (h.second)));
+                dict.insert(std::make_pair(h.first->get_name(), static_cast<double>(h.second)));
             }
 
         } else if (key == "num_idle_cores") {
             // Num idle cores per hosts
             for (const auto &h: this->available_nodes_to_cores) {
-                dict.insert(std::make_pair(h.first->get_name(), (double) (h.second)));
+                dict.insert(std::make_pair(h.first->get_name(), static_cast<double>(h.second)));
             }
 
         } else if (key == "flop_rates") {

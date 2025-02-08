@@ -19,7 +19,7 @@ namespace wrench {
 
         unsigned long join();
         unsigned long join(unsigned long desired_rank);
-        unsigned long getNumRanks();
+        unsigned long getNumRanks() const;
         void barrier();
         void sendAndReceive(const std::map<unsigned long, sg_size_t> &sends, int num_receives);
         void sendReceiveAndCompute(const std::map<unsigned long, sg_size_t> &sends, int num_receives, double flops);
@@ -47,8 +47,8 @@ namespace wrench {
 
         void performSMPIOperation(const std::string &op_name,
                                   std::vector<simgrid::s4u::Host *> &hosts,
-                                  simgrid::s4u::Host *root_hosts,
-                                  int bytes,
+                                  simgrid::s4u::Host *root_host,
+                                  sg_size_t bytes,
                                   const std::string &config);
     };
 

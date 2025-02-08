@@ -28,7 +28,7 @@ namespace wrench {
      * @param size the size of the communicator (# of processes)
      * @return a shared pointer to a communicator
      */
-    std::shared_ptr<Communicator> Communicator::createCommunicator(unsigned long size) {
+    std::shared_ptr<Communicator> Communicator::createCommunicator(const unsigned long size) {
         if (size <= 1) {
             throw std::invalid_argument("Communicator::createCommunicator(): invalid argument");
         }
@@ -40,7 +40,8 @@ namespace wrench {
      * @brief Get the number of processes participating in the communicator
      * @return a number of processes
      */
-    unsigned long Communicator::getNumRanks() {
+    unsigned long Communicator::getNumRanks() const
+    {
         return this->rank_to_commport.size();
     }
 
@@ -59,8 +60,8 @@ namespace wrench {
      * @param desired_rank: the desired rank
      * @return the desired rank
      */
-    unsigned long Communicator::join(unsigned long desired_rank) {
-        auto my_pid = simgrid::s4u::this_actor::get_pid();
+    unsigned long Communicator::join(const unsigned long desired_rank) {
+        const auto my_pid = simgrid::s4u::this_actor::get_pid();
 
         if (desired_rank >= this->size) {
             throw std::invalid_argument("Communicator::join(): invalid arguments");
@@ -97,7 +98,7 @@ namespace wrench {
      * @param sends: the specification of all outgoing communications as <rank, volume in bytes> pairs
      * @param num_receives: the number of expected received (from any source)
      */
-    void Communicator::sendAndReceive(const std::map<unsigned long, sg_size_t> &sends, int num_receives) {
+    void Communicator::sendAndReceive(const std::map<unsigned long, sg_size_t> &sends, const int num_receives) {
         this->sendReceiveAndCompute(sends, num_receives, 0);
     }
 
@@ -109,8 +110,8 @@ namespace wrench {
      * @param num_receives: the number of expected received (from any source)
      * @param flops: the number of floating point operations to compute
      */
-    void Communicator::sendReceiveAndCompute(const std::map<unsigned long, sg_size_t> &sends, int num_receives, double flops) {
-        auto my_pid = simgrid::s4u::this_actor::get_pid();
+    void Communicator::sendReceiveAndCompute(const std::map<unsigned long, sg_size_t> &sends, const int num_receives, const double flops) {
+        const auto my_pid = simgrid::s4u::this_actor::get_pid();
 
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
             throw std::invalid_argument("Communicator::communicate(): Calling process is not part of this communicator");
@@ -118,7 +119,7 @@ namespace wrench {
         // Post all the sends
         std::vector<std::shared_ptr<S4U_PendingCommunication>> posted_sends;
         for (auto const &send_operation: sends) {
-            auto dst_commport = this->rank_to_commport[send_operation.first];
+            const auto dst_commport = this->rank_to_commport[send_operation.first];
             posted_sends.push_back(dst_commport->iputMessage(new wrench::SimulationMessage(send_operation.second)));
         }
         // Post the computation (if any)
@@ -145,7 +146,7 @@ namespace wrench {
      * @brief Barrier method (all participants wait for each other), using standard WRENCH/SimGrid mechanisms
      */
     void Communicator::barrier() {
-        auto my_pid = simgrid::s4u::this_actor::get_pid();
+        const auto my_pid = simgrid::s4u::this_actor::get_pid();
         static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
             throw std::invalid_argument("Communicator::barrier(): Calling process is not part of this communicator");
@@ -171,7 +172,7 @@ namespace wrench {
      * @param bytes: the number of bytes in each message sent/received
      * @param config: the SMPI config option
      */
-    void Communicator::MPI_Alltoall(sg_size_t bytes, std::string config) {
+    void Communicator::MPI_Alltoall(const sg_size_t bytes, std::string config) {
         if (bytes < 1) {
             throw std::runtime_error("Communicator::MPI_Alltoall(): invalid argument (should be >= 1)");
         }
@@ -185,7 +186,7 @@ namespace wrench {
      * @param bytes: the number of bytes in each message sent/received
      * @param config: the SMPI config option
      */
-    void Communicator::MPI_Bcast(int root_rank, sg_size_t bytes, std::string config) {
+    void Communicator::MPI_Bcast(const int root_rank, const sg_size_t bytes, std::string config) {
         if ((bytes < 1) or (root_rank < 0) or (root_rank >= static_cast<int>(this->size))) {
             throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
         }
@@ -207,13 +208,13 @@ namespace wrench {
      * @param op_name: operation name
      * @param hosts: hosts involved
      * @param root_host: root hosts (nullptr if none)
-     * @param data_size: data size in bytes (0 if none)
+     * @param bytes: data size in bytes (0 if none)
      * @param config: the SMPI config option
      */
     void Communicator::performSMPIOperation(const std::string &op_name,
                                             std::vector<simgrid::s4u::Host *> &hosts,
                                             simgrid::s4u::Host *root_host,
-                                            int data_size,
+                                            sg_size_t bytes,
                                             const std::string &config) {
 
 
@@ -221,7 +222,7 @@ namespace wrench {
 
         // Global synchronization
         this->barrier();
-        auto my_pid = simgrid::s4u::this_actor::get_pid();
+        const auto my_pid = simgrid::s4u::this_actor::get_pid();
         static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
             throw std::invalid_argument("Communicator::MPI_AllToAll(): Calling process is not part of this communicator");
@@ -235,9 +236,9 @@ namespace wrench {
             simgrid::s4u::Engine::set_config(config);
 
             if (op_name == "Alltoall") {
-                SMPIExecutor::performAlltoall(hosts, data_size);
+                SMPIExecutor::performAlltoall(hosts, bytes);
             } else if (op_name == "Bcast") {
-                SMPIExecutor::performBcast(hosts, root_host, data_size);
+                SMPIExecutor::performBcast(hosts, root_host, bytes);
             } else if (op_name == "Barrier") {
                 SMPIExecutor::performBarrier(hosts);
             } else {
