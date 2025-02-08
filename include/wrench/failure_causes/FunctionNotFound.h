@@ -33,7 +33,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        FunctionNotFound(std::string functionName);
+        FunctionNotFound(std::shared_ptr<Function> function);
 
         /***********************/
         /** \endcond           */
@@ -42,9 +42,7 @@ namespace wrench {
         std::string toString() override;
 
     private:
-
-        std::string _functionName;
-
+        std::shared_ptr<Function> _function;
     };
 
     /***********************/
