@@ -8,7 +8,7 @@
  */
 
 #include <wrench/failure_causes/FunctionNotFound.h>
-
+#include <wrench/managers/function_manager/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/failure_causes/FailureCause.h>
 
@@ -20,10 +20,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param functionName: the function to be invoked
+     * @param function: the function to be invoked
      */
-    FunctionNotFound::FunctionNotFound(std::string functionName) {
-        _functionName = std::move(functionName);
+    FunctionNotFound::FunctionNotFound(std::shared_ptr<Function> function) {
+        _function = std::move(function);
     }
 
     /** 
@@ -31,7 +31,7 @@ namespace wrench {
      * @return the message
      */
     std::string FunctionNotFound::toString() {
-        return "The function (" + _functionName + ") was not found";
+        return "The function (" + _function->getName() + ") was not found";
     }
 
 } // namespace wrench
