@@ -84,18 +84,16 @@ namespace wrench {
         long disk_space_limit_in_bytes,
         long RAM_limit_in_bytes,
         long ingress_in_bytes,
-        long egress_in_bytes)
-    {
+        long egress_in_bytes) {
         WRENCH_INFO("Function [%s] registered with compute service [%s]", function->getName().c_str(), compute_service->getName().c_str());
         // Logic to register the function with the serverless compute service
         return compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
-
     }
 
-//    /**
-//     *
-//     */
-//    FunctionInvocation FunctionManager::invokeFunction(ServerlessComputeService, Function, FunctionInput) {
+   /**
+    *
+    */
+//    FunctionInvocation FunctionManager::invokeFunction(const std::shared_ptr<ServerlessComputeService>& compute_service, Function, FunctionInput) {
 //        // Places a function invocation
 //    }
 //

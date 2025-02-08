@@ -82,7 +82,7 @@ namespace wrench {
      */
     ServerlessComputeServiceFunctionInvocationRequestMessage::ServerlessComputeServiceFunctionInvocationRequestMessage(
             S4U_CommPort *answer_commport,
-            std::shared_ptr<Function> function,
+            std::string functionName,
             sg_size_t payload)
         : ServerlessComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -92,7 +92,7 @@ namespace wrench {
         }
 #endif
         this->answer_commport = answer_commport;
-        this->function = std::move(function);
+        this->functionName = functionName;
     }
 
     /**
