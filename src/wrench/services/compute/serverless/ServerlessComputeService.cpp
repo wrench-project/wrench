@@ -122,7 +122,7 @@ namespace wrench
     }
 
     bool ServerlessComputeService::invokeFunction(std::shared_ptr<Function> function) {
-        WRENCH_INFO(("Serverless Provider recieved invoke fuction" + function->getName()).c_str());
+        WRENCH_INFO(("Serverless Provider received invoke fuction " + function->getName()).c_str());
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         this->commport->dputMessage(
@@ -181,6 +181,7 @@ namespace wrench
         }
         else if (auto scsfir_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
             processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->function);
+            return true;
         }
          else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -188,7 +189,7 @@ namespace wrench
     }
 
     void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
-        if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) {
+        if (_registeredFunctions.find(function->getName()) != _registeredFunctions.end()) {
             std::string msg = "Duplicate Function";
             auto answerMessage = 
                 new ServerlessComputeServiceFunctionRegisterAnswerMessage(
