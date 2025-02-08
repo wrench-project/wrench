@@ -14,16 +14,16 @@
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_core_host_error, "Log category for FunctionNotFound");
+WRENCH_LOG_CATEGORY(wrench_core_function_not_found, "Log category for FunctionNotFound");
 
 namespace wrench {
 
     /**
      * @brief Constructor
-     * @param function: the function that is invoked
+     * @param functionName: the function to be invoked
      */
-    FunctionNotFound::FunctionNotFound(std::shared_ptr<Function> function) {
-        this->function = std::move(function);
+    FunctionNotFound::FunctionNotFound(std::string functionName) {
+        _functionName = std::move(functionName);
     }
 
     /** 
@@ -31,7 +31,7 @@ namespace wrench {
      * @return the message
      */
     std::string FunctionNotFound::toString() {
-        return "The function (" + this->function->getName() + ") was not found";
+        return "The function (" + _functionName + ") was not found";
     }
 
 } // namespace wrench

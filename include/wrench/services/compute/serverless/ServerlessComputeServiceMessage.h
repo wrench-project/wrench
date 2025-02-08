@@ -79,6 +79,8 @@ namespace wrench {
         /** @brief The function to invoke */
         std::shared_ptr<Function> function;
 
+        std::string functionName;
+
     };
 
     /**

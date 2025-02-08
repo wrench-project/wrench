@@ -147,7 +147,7 @@ namespace wrench
         WRENCH_INFO("Serverless provider starting");
 
         while (processNextMessage()) {
-            dispatchFunctionInvokation();
+            dispatchFunctionInvocation();
         }
         return 0;
     }
@@ -172,12 +172,15 @@ namespace wrench
             // TODO: Die...
             return false;
         }
-        else if (auto scsfrrm_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
-            processFunctionRegistrationRequest(scsfrrm_msg->answer_commport, scsfrrm_msg->function, scsfrrm_msg->time_limit_in_seconds, scsfrrm_msg->disk_space_limit_in_bytes, scsfrrm_msg->ram_limit_in_bytes, scsfrrm_msg->ingress_in_bytes, scsfrrm_msg->egress_in_bytes);
+        else if (auto scsfrr_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
+            processFunctionRegistrationRequest(
+                scsfrr_msg->answer_commport, scsfrr_msg->function, scsfrr_msg->time_limit_in_seconds, 
+                scsfrr_msg->disk_space_limit_in_bytes, scsfrr_msg->ram_limit_in_bytes, 
+                scsfrr_msg->ingress_in_bytes, scsfrr_msg->egress_in_bytes);
             return true;
         }
         else if (auto scsfir_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
-            
+            processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->functionName);
         }
          else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -186,7 +189,11 @@ namespace wrench
 
     void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
         if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) {
-            auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(false, function, std::make_shared<NotAllowed>(this, "Duplicate Function"), 0);
+            std::string msg = "Duplicate Function";
+            auto answerMessage = 
+                new ServerlessComputeServiceFunctionRegisterAnswerMessage(
+                    false, function, 
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<ServerlessComputeService>(), msg)), 0);
             answer_commport->dputMessage(answerMessage);
         } else {        
             _registeredFunctions[function->getName()] = std::make_shared<RegisteredFunction>(
@@ -202,9 +209,12 @@ namespace wrench
         }
     }
 
-    void ServerlessComputeService::processFunctionInvokationRequest(S4U_CommPort *answer_commport, std::string functionName) {
+    void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::string functionName) {
         if (_registeredFunctions.find(functionName) == _registeredFunctions.end()) {
-            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(false, nullptr, std::make_shared<FunctionNotFound>(this, functionName + "function not found"), 0);
+            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+                false, nullptr, 
+                std::shared_ptr<FailureCause>(new FunctionNotFound(functionName)), 0
+                );
             answer_commport->dputMessage(answerMessage);
         } else {
             _invokeFunctions.push(_registeredFunctions.at(functionName));
@@ -215,7 +225,7 @@ namespace wrench
 
     }
 
-    void ServerlessComputeService::dispatchFunctionInvokation() {
+    void ServerlessComputeService::dispatchFunctionInvocation() {
         while (!_invokeFunctions.empty()) {
             // Might need to think about how RegisteredFunction is storing info here...
             WRENCH_INFO("Invoking function [%s]", _invokeFunctions.front()->_function->getName().c_str());
