@@ -111,7 +111,7 @@ namespace wrench {
                 // If no failure cause was set, then it's a host failure
                 if (not this->action->getFailureCause()) {
                     this->action->setFailureCause(
-                            std::shared_ptr<HostError>(new HostError(this->hostname)));
+                        std::make_shared<HostError>(this->hostname));
                 }
             }
         }

@@ -258,8 +258,8 @@ namespace wrench {
                                 new StorageServiceFileReadAnswerMessage(
                                         FileLocation::LOCATION(getSharedPtr<Node>(), msg->file),
                                         false,
-                                        std::shared_ptr<FailureCause>(
-                                                new FileNotFound(FileLocation::LOCATION(getSharedPtr<Node>(), msg->file))),
+                                        std::make_shared<FileNotFound>(
+                                            FileLocation::LOCATION(getSharedPtr<Node>(), msg->file)),
                                         nullptr,
                                         0,
                                         1,
@@ -451,9 +451,8 @@ namespace wrench {
                             msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(
                                     FileLocation::LOCATION(internalStorage, file),
                                     false,
-                                    std::shared_ptr<FailureCause>(
-                                            new FileNotFound(
-                                                    FileLocation::LOCATION(internalStorage, file))),
+                                    std::make_shared<FileNotFound>(
+                                        FileLocation::LOCATION(internalStorage, file)),
                                     nullptr,
                                     0,
                                     1,
@@ -629,8 +628,7 @@ namespace wrench {
                             new StorageServiceFileWriteAnswerMessage(
                                     location,
                                     false,
-                                    std::shared_ptr<FailureCause>(
-                                            new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                    std::make_shared<NotAllowed>(getSharedPtr<Node>(), error_message),
                                     {},
                                     0,
                                     getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
