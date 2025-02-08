@@ -33,7 +33,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        FunctionNotFound(std::shared_ptr<Function> function);
+        FunctionNotFound(std::string functionName);
 
         /***********************/
         /** \endcond           */
@@ -43,7 +43,7 @@ namespace wrench {
 
     private:
 
-        std::shared_ptr<Function> function;
+        std::string _functionName;
 
     };
 

@@ -218,6 +218,7 @@ set(HEADER_FILES
         include/wrench/failure_causes/FileAlreadyBeingRead.h
         include/wrench/failure_causes/FileAlreadyBeingWritten.h
         include/wrench/failure_causes/FileNotFound.h
+        include/wrench/failure_causes/FunctionNotFound.h
         include/wrench/failure_causes/FunctionalityNotAvailable.h
         include/wrench/failure_causes/HostError.h
         include/wrench/failure_causes/InvalidDirectoryPath.h
@@ -411,6 +412,7 @@ set(SOURCE_FILES
         src/wrench/failure_causes/FileAlreadyBeingRead.cpp
         src/wrench/failure_causes/FileAlreadyBeingWritten.cpp
         src/wrench/failure_causes/FileNotFound.cpp
+        src/wrench/failure_causes/FunctionNotFound.cpp
         src/wrench/failure_causes/FunctionalityNotAvailable.cpp
         src/wrench/failure_causes/HostError.cpp
         src/wrench/failure_causes/InvalidDirectoryPath.cpp
