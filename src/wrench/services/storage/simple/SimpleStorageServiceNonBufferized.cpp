@@ -20,7 +20,6 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 //#include <wrench/services/memory/MemoryManager.h>
 

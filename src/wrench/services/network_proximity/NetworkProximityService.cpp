@@ -23,7 +23,6 @@
 #include <wrench/services/ServiceMessage.h>
 #include "wrench/services/network_proximity/NetworkProximityMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_network_proximity_service, "Log category for Network Proximity Service");
 

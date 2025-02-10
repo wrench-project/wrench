@@ -26,7 +26,6 @@
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/storage/StorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>

@@ -8,7 +8,6 @@
  */
 
 #include <wrench/services/compute/batch/BatchComputeService.h>
-#include <wrench/services/compute/batch/BatchComputeServiceProperty.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/failure_causes/NotEnoughResources.h>
 #include <wrench/failure_causes/NotAllowed.h>
