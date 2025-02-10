@@ -10,10 +10,8 @@
 #include <wrench/failure_causes/JobKilled.h>
 
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/data_file/DataFile.h>
 #include <wrench/job/Job.h>
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/services/Service.h>
 
 #include <utility>
 

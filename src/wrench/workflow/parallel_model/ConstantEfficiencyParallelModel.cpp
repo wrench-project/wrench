@@ -38,7 +38,7 @@ namespace wrench {
 
     /**
      * @brief Set the model's parallel efficiency
-     * @param eff: a parallel efficiency (a number between 0.0 and 1.0)
+     * @param efficiency: a parallel efficiency (a number between 0.0 and 1.0)
      */
     void wrench::ConstantEfficiencyParallelModel::setEfficiency(double efficiency) {
         this->efficiency_ = efficiency;
@@ -78,7 +78,7 @@ namespace wrench {
      * @return an amount of work (in flops)
      */
     double ConstantEfficiencyParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
-        return (total_work) / ((double) num_threads * this->efficiency_);
+        return (total_work) / (static_cast<double>(num_threads) * this->efficiency_);
     }
 
 }// namespace wrench
