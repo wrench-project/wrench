@@ -65,6 +65,6 @@ namespace wrench {
      * @return an amount of work in flops
      */
     double AmdahlParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
-        return (total_work * this->alpha_) / (double) num_threads;
+        return (total_work * this->alpha_) / static_cast<double>(num_threads);
     }
 }// namespace wrench

@@ -40,7 +40,7 @@ namespace wrench {
                     batch_job->getJobID(), batch_job->getRequestedNumNodes(), batch_job->getRequestedCoresPerNode());
 
         // Update the time origin
-        this->schedule->setTimeOrigin((u_int32_t) Simulation::getCurrentSimulatedDate());
+        this->schedule->setTimeOrigin(static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate()));
 
         // Find its earliest possible start time
         auto ret_value = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes(), batch_job->getRequestedCoresPerNode());
@@ -73,7 +73,7 @@ namespace wrench {
         }
 
         // Update the time origin
-        this->schedule->setTimeOrigin((u_int32_t) Simulation::getCurrentSimulatedDate());
+        this->schedule->setTimeOrigin(static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate()));
 
         // Start  all non-started the jobs in the next slot!
 
@@ -136,7 +136,7 @@ namespace wrench {
         //   - re-insert it as early as possible
 
         // Reset the time origin
-        auto now = (u_int32_t) Simulation::getCurrentSimulatedDate();
+        auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
         this->schedule->setTimeOrigin(now);
 
         // Go through the BatchComputeService queue
@@ -205,7 +205,7 @@ namespace wrench {
     void ConservativeBackfillingBatchSchedulerCoreLevel::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         WRENCH_INFO("Notified of completion of BatchComputeService job with id %lu", batch_job->getJobID());
 
-        auto now = (u_int32_t) Simulation::getCurrentSimulatedDate();
+        auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
         this->schedule->setTimeOrigin(now);
         this->schedule->remove(now, batch_job->conservative_bf_expected_end_date + 100, batch_job);
 
@@ -258,7 +258,7 @@ namespace wrench {
         if (num_nodes > cs->available_nodes_to_cores.size()) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > (unsigned long) cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+        if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->get_core_count())) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many cores per host (asking  for " +
                                      std::to_string(cores_per_node) + " but hosts have " +
                                      std::to_string(cs->available_nodes_to_cores.begin()->first->get_core_count()) + "cores)");
@@ -300,13 +300,13 @@ namespace wrench {
             if (std::get<3>(j) > UINT32_MAX) {
                 throw std::runtime_error("ConservativeBackfillingBatchSchedulerCoreLevel::getStartTimeEstimates(): job duration too large");
             }
-            auto duration = (u_int32_t) (std::get<3>(j));
+            auto duration = static_cast<u_int32_t>(std::get<3>(j));
 
             auto ret_value = this->schedule->findEarliestStartTime(duration, num_nodes, num_cores_per_host);
             auto est = ret_value.first;
             auto node_indices = ret_value.second;
             if (est < UINT32_MAX) {
-                to_return[id] = (double) est;
+                to_return[id] = static_cast<double>(est);
             } else {
                 to_return[id] = -1.0;
             }

@@ -17,7 +17,6 @@
 #include "wrench/services/storage/xrootd/XRootDMessage.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include "wrench/services/storage/xrootd/SearchStack.h"
-#include <wrench/services/storage/xrootd/XRootDProperty.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/failure_causes/NotAllowed.h>
@@ -158,7 +157,6 @@ namespace wrench {
                                         msg->answered));
                     } else {
                         if (!children.empty()) {
-
                             map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                             S4U_Simulation::compute(
                                     this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
@@ -220,7 +218,6 @@ namespace wrench {
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
 
                     if (!children.empty()) {
-
                         map<Node *, vector<stack<Node *>>> splitStacks = splitStack(msg->search_stack);
                         S4U_Simulation::compute(
                                 this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
@@ -247,19 +244,17 @@ namespace wrench {
                 return false;
 
             } else if (auto msg = dynamic_cast<FileNotFoundAlarm *>(message.get())) {
-
                 //WRENCH_INFO("Got message %p %d %d",msg,*msg->answered,msg->fileReadRequest);
                 if (!*msg->answered) {
                     *msg->answered = true;
                     // WRENCH_INFO("%p %p",msg,msg->answered.get());
                     if (msg->fileReadRequest) {
-
                         msg->answer_commport->dputMessage(
                                 new StorageServiceFileReadAnswerMessage(
                                         FileLocation::LOCATION(getSharedPtr<Node>(), msg->file),
                                         false,
-                                        std::shared_ptr<FailureCause>(
-                                                new FileNotFound(FileLocation::LOCATION(getSharedPtr<Node>(), msg->file))),
+                                        std::make_shared<FileNotFound>(
+                                            FileLocation::LOCATION(getSharedPtr<Node>(), msg->file)),
                                         nullptr,
                                         0,
                                         1,
@@ -290,7 +285,6 @@ namespace wrench {
                                             MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
                     if (internalStorage && internalStorage->hasFile(file)) {
-
                         msg->answer_commport->dputMessage(
                                 new StorageServiceFileLookupAnswerMessage(
                                         file,
@@ -299,8 +293,6 @@ namespace wrench {
                                                 MessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
 
                     } else {//no internal storage
-
-
                         if (!children.empty()) {//recursive search
                             shared_ptr<bool> answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
@@ -361,7 +353,6 @@ namespace wrench {
                 return true;
 
             } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
-
                 auto file = msg->location->getFile();
 
                 WRENCH_DEBUG("External File Read Request for %s", file->getID().c_str());
@@ -380,9 +371,7 @@ namespace wrench {
                                     getMessagePayloadValue(
                                             MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD)));
                 } else {//File Not Cached
-                    if (internalStorage &&
-                        internalStorage->hasFile(file)) {
-
+                    if (internalStorage && internalStorage->hasFile(file)) {
                         WRENCH_DEBUG("File %s found in internal Storage", file->getID().c_str());
                         //File in internal storage
                         cache.add(file, FileLocation::LOCATION(internalStorage, file));
@@ -451,9 +440,8 @@ namespace wrench {
                             msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(
                                     FileLocation::LOCATION(internalStorage, file),
                                     false,
-                                    std::shared_ptr<FailureCause>(
-                                            new FileNotFound(
-                                                    FileLocation::LOCATION(internalStorage, file))),
+                                    std::make_shared<FileNotFound>(
+                                        FileLocation::LOCATION(internalStorage, file)),
                                     nullptr,
                                     0,
                                     1,
@@ -554,7 +542,6 @@ namespace wrench {
 
             } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
                 if (reduced) {//TODO use optimised search
-
                     shared_ptr<bool> answered = make_shared<bool>(false);
                     auto targets = metavisor->getFileNodes(msg->location->getFile());
                     auto search_stack = constructFileSearchTree(targets);
@@ -629,8 +616,7 @@ namespace wrench {
                             new StorageServiceFileWriteAnswerMessage(
                                     location,
                                     false,
-                                    std::shared_ptr<FailureCause>(
-                                            new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                    std::make_shared<NotAllowed>(getSharedPtr<Node>(), error_message),
                                     {},
                                     0,
                                     getMessagePayloadValue(MessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -655,8 +641,7 @@ namespace wrench {
                                         msg->src,
                                         msg->dst,
                                         false,
-                                        std::shared_ptr<FailureCause>(
-                                                new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                        std::make_shared<NotAllowed>(getSharedPtr<Node>(), error_message),
                                         getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
                     }
 
@@ -769,7 +754,6 @@ namespace wrench {
         */
         Node::Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                    const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "XRootDNode") {
-
             // Create /dev/null mountpoint so that Locations can be created
             // TODO: Removed this due to using simgrid:fsmod.... big deal?
 //            this->file_system->mount_dev_null_partition("/dev/null");
@@ -957,8 +941,7 @@ namespace wrench {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(
-                                new NotAllowed(getSharedPtr<Node>(), error_message)));
+                    std::make_shared<NotAllowed>(getSharedPtr<Node>(), error_message));
             }
             // Replace the location with
             // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO

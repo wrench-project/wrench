@@ -11,12 +11,9 @@
 #include <utility>
 
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/simulation/Simulation.h>

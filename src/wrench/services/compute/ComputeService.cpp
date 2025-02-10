@@ -186,7 +186,7 @@ namespace wrench {
         std::map<std::string, double> dict;
         dict = this->getServiceResourceInformation("num_hosts", simulate_it);
 
-        return (unsigned long) (*(dict.begin())).second;
+        return static_cast<unsigned long>((*(dict.begin())).second);
     }
 
     /**
@@ -225,7 +225,7 @@ namespace wrench {
         std::map<std::string, unsigned long> to_return;
 
         for (auto const &x: dict) {
-            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+            to_return.insert(std::make_pair(x.first, static_cast<unsigned long>(x.second)));
         }
 
         return to_return;
@@ -244,7 +244,7 @@ namespace wrench {
 
         unsigned long count = 0;
         for (auto const &x: dict) {
-            count += (unsigned long) x.second;
+            count += static_cast<unsigned long>(x.second);
         }
         return count;
     }
@@ -267,7 +267,7 @@ namespace wrench {
         std::map<std::string, unsigned long> to_return;
 
         for (auto const &x: dict) {
-            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+            to_return.insert(std::make_pair(x.first, static_cast<unsigned long>(x.second)));
         }
 
         return to_return;
@@ -287,7 +287,7 @@ namespace wrench {
         std::map<std::string, double> to_return;
 
         for (auto const &x: dict) {
-            to_return.insert(std::make_pair(x.first, (double) x.second));
+            to_return.insert(std::make_pair(x.first, static_cast<double>(x.second)));
         }
 
         return to_return;
@@ -310,7 +310,7 @@ namespace wrench {
 
         unsigned long count = 0;
         for (auto const &x: dict) {
-            count += (unsigned long) x.second;
+            count += static_cast<unsigned long>(x.second);
         }
         return count;
     }

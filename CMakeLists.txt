@@ -29,6 +29,9 @@ endif ()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 
 # Find Boost
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
 find_package(Boost REQUIRED)
 
 # Find SimGrid
@@ -55,7 +58,7 @@ if (DEFINED FSMOD_PATH)
         message(FATAL_ERROR "The specified FSMOD_PATH doesn't exit")
     else()
         file(GLOB LIBFSMOD_FILES
-                "${FSMOD_PATH}/liblibfsmod.so"
+                "${FSMOD_PATH}/lib/libfsmod.so"
                 "${FSMOD_PATH}/lib/libfsmod.dylib"
                 )
         if (NOT LIBFSMOD_FILES)
@@ -592,7 +595,7 @@ if(GTEST_LIBRARY)
     endif ()
     set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
     set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
-    add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
+    add_custom_command(TARGET unit_tests POST_BUILD COMMAND find . -name *.gcda -delete)
 else()
     add_custom_target(unit_tests echo "ERROR: Cannot build unit_tests because Google Test (libgtest) was not found by cmake." COMMAND echo "       If you have installed Google Test, re-run cmake." VERBATIM)
 endif()

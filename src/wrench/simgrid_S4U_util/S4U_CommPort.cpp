@@ -24,7 +24,6 @@
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include "wrench/exceptions/ExecutionException.h"
-#include "wrench/failure_causes/FatalFailure.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_commport, "CommPort");
 
@@ -214,7 +213,7 @@ namespace wrench {
             this->mq_comm = nullptr;
         } else {
             throw std::runtime_error("S4U_CommPort::getMessage(): unknown completed communication - this should never happen: " +
-                                     std::to_string((unsigned long) (finished_recv.get())) + "  " + finished_recv->get_name());
+                                     std::to_string(reinterpret_cast<unsigned long>(finished_recv.get())) + "  " + finished_recv->get_name());
         }
 
 #ifdef MESSAGE_MANAGER
@@ -368,14 +367,14 @@ namespace wrench {
                 this, S4U_PendingCommunication::OperationType::RECEIVING);
 
         try {
-            auto comm_ptr = this->s4u_mb->get_async<void>((void **) (&(pending_communication->simulation_message)));
+            auto comm_ptr = this->s4u_mb->get_async<void>(reinterpret_cast<void**>(&(pending_communication->simulation_message)));
             pending_communication->comm_ptr = comm_ptr;
         } catch (simgrid::NetworkFailureException &e) {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name(), ""));
         }
 
-        simgrid::s4u::MessPtr mess_ptr = this->s4u_mq->get_async<void>((void **) (&(pending_communication->simulation_message)));
+        simgrid::s4u::MessPtr mess_ptr = this->s4u_mq->get_async<void>(reinterpret_cast<void**>(&(pending_communication->simulation_message)));
         pending_communication->mess_ptr = mess_ptr;
         return pending_communication;
     }

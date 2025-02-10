@@ -751,8 +751,8 @@ namespace wrench {
             double flop_rate = Simulation::getHostFlopRate(m);
             double ghz_rate = flop_rate / (1000.0 * 1000.0 * 1000.0);
             machines.push_back({{"nodeName", m},
-                                {"memory", (unsigned long) memory},
-                                {"cpu", {{"count", num_cores}, {"speed", (unsigned long) ghz_rate}}}});
+                                {"memory", static_cast<unsigned long>(memory)},
+                                {"cpu", {{"count", num_cores}, {"speed", static_cast<unsigned long>(ghz_rate)}}}});
         }
 
 

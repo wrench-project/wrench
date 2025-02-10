@@ -77,7 +77,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_copies) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
+                    std::make_shared<FileAlreadyBeingCopied>(src, dst));
             }
         }
 
@@ -112,7 +112,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_reads) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingRead(location)));
+                    std::make_shared<FileAlreadyBeingRead>(location));
             }
         }
 
@@ -140,7 +140,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_writes) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingWritten(location)));
+                    std::make_shared<FileAlreadyBeingWritten>(location));
             }
         }
 
@@ -175,7 +175,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_copies) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
+                    std::make_shared<FileAlreadyBeingCopied>(src, dst));
             }
         }
 

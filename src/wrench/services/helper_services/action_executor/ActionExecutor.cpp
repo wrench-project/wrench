@@ -14,7 +14,6 @@
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_action_executor, "Log category for  Action Executor");
@@ -111,7 +110,7 @@ namespace wrench {
                 // If no failure cause was set, then it's a host failure
                 if (not this->action->getFailureCause()) {
                     this->action->setFailureCause(
-                            std::shared_ptr<HostError>(new HostError(this->hostname)));
+                        std::make_shared<HostError>(this->hostname));
                 }
             }
         }

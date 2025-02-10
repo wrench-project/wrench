@@ -10,11 +10,9 @@
 
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
-#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_host_state_change_detector, "Log category for HostStateChangeDetector");
