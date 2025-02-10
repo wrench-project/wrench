@@ -90,7 +90,7 @@ namespace wrench {
         if (ptr[0] == '\0') {
             if (res == 0)
                 return res;// Ok, 0 can be unit-less
-            ptr = (char *) default_unit;
+            ptr = const_cast<char*>(default_unit);
         }
         auto u = units.find(ptr);
         if (u == units.end())
@@ -114,7 +114,7 @@ namespace wrench {
             if (value == DBL_MAX) {
                 return LLONG_MAX;
             } else {
-                return (sg_size_t) value;
+                return static_cast<sg_size_t>(value);
             }
         } catch (std::runtime_error &e) {
             throw std::invalid_argument(e.what());

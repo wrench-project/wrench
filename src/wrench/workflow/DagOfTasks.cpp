@@ -184,7 +184,7 @@ namespace wrench {
         std::vector<WorkflowTask *> children;
         for (boost::tie(eo, edge_end) = boost::out_edges(vertex, dag); eo != edge_end; ++eo) {
             // Discard the const qualifier
-            children.push_back((WorkflowTask *) (dag[target(*eo, dag)].task));
+            children.push_back(const_cast<WorkflowTask*>(dag[target(*eo, dag)].task));
         }
         return children;
     }
@@ -223,7 +223,7 @@ namespace wrench {
         std::vector<WorkflowTask *> parents;
         for (boost::tie(ei, edge_end) = boost::in_edges(vertex, dag); ei != edge_end; ++ei) {
             // Discard the const qualifier
-            parents.push_back((WorkflowTask *) (dag[source(*ei, dag)].task));
+            parents.push_back(const_cast<WorkflowTask*>(dag[source(*ei, dag)].task));
         }
         return parents;
     }

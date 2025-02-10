@@ -93,7 +93,8 @@ namespace wrench {
      * @brief Get the memory_manager_service requirement
      * @return a size in bytes
      */
-    sg_size_t BatchJob::getMemoryRequirement() {
+    sg_size_t BatchJob::getMemoryRequirement() const
+    {
         return this->compound_job->getMinimumRequiredMemory();
     }
 

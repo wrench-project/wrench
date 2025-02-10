@@ -495,7 +495,7 @@ namespace wrench {
      * @return the load on the service
      */
     double SimpleStorageServiceBufferized::getLoad() {
-        return (double)countRunningFileTransferThreads();
+        return static_cast<double>(countRunningFileTransferThreads());
     }
 
 

@@ -11,7 +11,6 @@
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <simgrid/plugins/live_migration.h>
 

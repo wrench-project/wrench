@@ -19,8 +19,6 @@
 #include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/util/PointerUtil.h>
 #include <wrench/util/TraceFileLoader.h>
 #include <wrench/job/PilotJob.h>
 #include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
@@ -32,7 +30,6 @@
 #include <wrench/failure_causes/FunctionalityNotAvailable.h>
 #include <wrench/failure_causes/JobKilled.h>
 #include <wrench/failure_causes/ServiceIsDown.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/NotEnoughResources.h>
 #include <wrench/failure_causes/JobTimeout.h>
 #include <wrench/failure_causes/NotAllowed.h>
@@ -58,7 +55,7 @@ namespace wrench {
      */
     BatchComputeService::BatchComputeService(const std::string &hostname,
                                              std::vector<std::string> compute_hosts,
-                                             std::string scratch_space_mount_point,
+                                             const std::string& scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
                                                                                                                                ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
@@ -130,7 +127,7 @@ namespace wrench {
                         "to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
-            if ((double) (h->get_core_count()) != num_cores_available) {
+            if (static_cast<double>(h->get_core_count()) != num_cores_available) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
@@ -199,29 +196,25 @@ namespace wrench {
         }
 
         if (batch_scheduling_alg == "fcfs") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new FCFSBatchScheduler(this));
+            this->scheduler = std::make_unique<FCFSBatchScheduler>(this);
         } else if (batch_scheduling_alg == "conservative_bf") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(
-                    new ConservativeBackfillingBatchScheduler(
-                            this,
-                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
+            this->scheduler = std::make_unique<ConservativeBackfillingBatchScheduler>(
+                this,
+                this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH));
         } else if (batch_scheduling_alg == "easy_bf_depth0") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(
-                    new EasyBackfillingBatchScheduler(
-                            this,
-                            0,
-                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
+            this->scheduler = std::make_unique<EasyBackfillingBatchScheduler>(
+                this,
+                0,
+                this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH));
         } else if (batch_scheduling_alg == "easy_bf_depth1") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(
-                    new EasyBackfillingBatchScheduler(
-                            this,
-                            1,
-                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
+            this->scheduler = std::make_unique<EasyBackfillingBatchScheduler>(
+                this,
+                1,
+                this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH));
         } else if (batch_scheduling_alg == "conservative_bf_core_level") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(
-                    new ConservativeBackfillingBatchSchedulerCoreLevel(
-                            this,
-                            this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH)));
+            this->scheduler = std::make_unique<ConservativeBackfillingBatchSchedulerCoreLevel>(
+                this,
+                this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BACKFILLING_DEPTH));
         }
 #endif
 
@@ -822,7 +815,7 @@ namespace wrench {
 
         if ((requested_hosts > this->available_nodes_to_cores.size()) or
             (requested_num_cores_per_host >
-             (unsigned long) this->available_nodes_to_cores.begin()->first->get_core_count()) or
+             static_cast<unsigned long>(this->available_nodes_to_cores.begin()->first->get_core_count())) or
             (required_ram_per_host >
              S4U_Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
             {
@@ -831,10 +824,9 @@ namespace wrench {
                                 job->getCompoundJob(),
                                 this->getSharedPtr<BatchComputeService>(),
                                 false,
-                                std::shared_ptr<FailureCause>(
-                                        new NotEnoughResources(
-                                                job->getCompoundJob(),
-                                                this->getSharedPtr<BatchComputeService>())),
+                                std::make_shared<NotEnoughResources>(
+                                    job->getCompoundJob(),
+                                    this->getSharedPtr<BatchComputeService>()),
                                 this->getMessagePayloadValue(
                                         BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
                 return;
@@ -1022,7 +1014,7 @@ namespace wrench {
         executor->simulation_ = this->simulation_;
         executor->start(executor, true, false);// Daemonized, no auto-restart
         batch_job->setBeginTimestamp(S4U_Simulation::getClock());
-        batch_job->setEndingTimestamp(S4U_Simulation::getClock() + (double) allocated_time);
+        batch_job->setEndingTimestamp(S4U_Simulation::getClock() + static_cast<double>(allocated_time));
         this->running_bare_metal_one_shot_compute_services[compound_job] = executor;
 
         //          this->running_jobs.insert(std::move(batch_job_ptr));
@@ -1052,17 +1044,17 @@ namespace wrench {
 
         if (key == "num_hosts") {
             // Num hosts
-            dict.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
+            dict.insert(std::make_pair(this->getName(), static_cast<double>(this->nodes_to_cores_map.size())));
 
         } else if (key == "num_cores") {
             for (const auto &h: this->nodes_to_cores_map) {
-                dict.insert(std::make_pair(h.first->get_name(), (double) (h.second)));
+                dict.insert(std::make_pair(h.first->get_name(), static_cast<double>(h.second)));
             }
 
         } else if (key == "num_idle_cores") {
             // Num idle cores per hosts
             for (const auto &h: this->available_nodes_to_cores) {
-                dict.insert(std::make_pair(h.first->get_name(), (double) (h.second)));
+                dict.insert(std::make_pair(h.first->get_name(), static_cast<double>(h.second)));
             }
 
         } else if (key == "flop_rates") {
@@ -1244,7 +1236,7 @@ namespace wrench {
             WRENCH_INFO(
                     "BatchComputeService::processAlarmJobTimeout(): Received a time out message for an unknown "
                     "BatchComputeService batch_job (%ld)... ignoring",
-                    (unsigned long) batch_job.get());
+                    reinterpret_cast<unsigned long>(batch_job.get()));
             return;
         }
         this->processCompoundJobTimeout(compound_job);

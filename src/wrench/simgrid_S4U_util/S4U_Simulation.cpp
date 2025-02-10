@@ -366,7 +366,7 @@ namespace wrench {
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
-        return (unsigned int) host->get_core_count();
+        return static_cast<unsigned int>(host->get_core_count());
     }
 
     /**

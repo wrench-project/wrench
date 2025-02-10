@@ -26,7 +26,6 @@
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/storage/StorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
@@ -292,9 +291,9 @@ namespace wrench {
             for (auto const &h: this->compute_resources) {
                 hosts_to_monitor.push_back(h.first);
             }
-            this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
-                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, true,
-                                                this->getSharedPtr<Service>(), this->commport));
+            this->host_state_change_monitor = std::make_shared<HostStateChangeDetector>(
+                this->hostname, hosts_to_monitor, true, true, true,
+                this->getSharedPtr<Service>(), this->commport);
             this->host_state_change_monitor->setSimulation(this->simulation_);
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
                                                    false);// Daemonized, no auto-restart
@@ -407,7 +406,7 @@ namespace wrench {
                 used_num_cores = required_num_cores;
             }
             // A totally heuristic load estimate
-            double load = ((((double) (num_running_threads + used_num_cores)) / (double) num_cores)) /
+            const double load = ((static_cast<double>(num_running_threads + used_num_cores) / static_cast<double>(num_cores))) /
                           (flop_rate / (1000.0 * 1000.0 * 1000.0));
             if (load < lowest_load) {
                 lowest_load = load;
@@ -462,15 +461,16 @@ namespace wrench {
 
             /** Dispatch it **/
             // Create an action executor on the target host
-            auto action_executor = std::shared_ptr<ActionExecutor>(
-                    new ActionExecutor(target_host->get_name(),
-                                       target_num_cores,
-                                       required_ram,
-                                       this->getPropertyValueAsTimeInSecond(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
-                                       this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
-                                       this->commport,
-                                       action,
-                                       this->getSharedPtr<ActionExecutionService>()));
+            auto action_executor = std::make_shared<ActionExecutor>(target_host->get_name(),
+                                                                    target_num_cores,
+                                                                    required_ram,
+                                                                    this->getPropertyValueAsTimeInSecond(
+                                                                        ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
+                                                                    this->getPropertyValueAsBoolean(
+                                                                        ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
+                                                                    this->commport,
+                                                                    action,
+                                                                    this->getSharedPtr<ActionExecutionService>());
 
             action_executor->setSimulation(this->simulation_);
             try {
@@ -483,8 +483,8 @@ namespace wrench {
 
             // Start a failure detector for this action executor (which will send me a message in case the
             // action executor has died)
-            auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(
-                    new ServiceTerminationDetector(this->hostname, action_executor, this->commport, true, false));
+            auto failure_detector = std::make_shared<ServiceTerminationDetector>(
+                this->hostname, action_executor, this->commport, true, false);
             failure_detector->setSimulation(this->simulation_);
             failure_detector->start(failure_detector, true, false);// Daemonized, no auto-restart
 
@@ -808,7 +808,7 @@ namespace wrench {
             std::string error_message = "Action cannot be terminated because it is not running";
             auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<ActionExecutionService>(), error_message)),
+                    std::make_shared<NotAllowed>(this->getSharedPtr<ActionExecutionService>(), error_message),
                     0.0);
             answer_commport->dputMessage(answer_message);
             return;
@@ -922,8 +922,7 @@ namespace wrench {
             answer_commport->dputMessage(
                     new ActionExecutionServiceSubmitActionAnswerMessage(
                             false,
-                            std::shared_ptr<FailureCause>(
-                                    new NotEnoughResources(action->getJob(), this->parent_service)),
+                            std::make_shared<NotEnoughResources>(action->getJob(), this->parent_service),
                             0.0));
             return;
         }
@@ -1007,8 +1006,8 @@ namespace wrench {
         } else if (key == "num_cores") {
             // Num cores per hosts
             std::map<std::string, double> num_cores;
-            for (auto r: this->compute_resources) {
-                num_cores.insert(std::make_pair(r.first->get_name(), (double) (std::get<0>(r.second))));
+            for (auto const &r: this->compute_resources) {
+                num_cores.insert(std::make_pair(r.first->get_name(), static_cast<double>(std::get<0>(r.second))));
             }
             return num_cores;
 
@@ -1017,9 +1016,9 @@ namespace wrench {
             std::map<std::string, double> num_idle_cores;
             for (auto const &r: this->running_thread_counts) {
                 unsigned long cores = std::get<0>(this->compute_resources[r.first]);
-                unsigned long running_threads = r.second;
+                const unsigned long running_threads = r.second;
                 num_idle_cores.insert(
-                        std::make_pair(r.first->get_name(), (double) (std::max<unsigned long>(cores - running_threads, 0))));
+                        std::make_pair(r.first->get_name(), static_cast<double>(std::max<unsigned long>(cores - running_threads, 0))));
             }
             return num_idle_cores;
 

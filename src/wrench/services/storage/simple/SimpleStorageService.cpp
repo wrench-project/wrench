@@ -19,9 +19,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
-#include <wrench/services/memory/MemoryManager.h>
+// #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/util/UnitParser.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/NotAllowed.h>
@@ -159,14 +158,14 @@ namespace wrench {
 
         if (not this->file_system->file_exists(location->getFilePath())) {
             if (not this->isScratch()) {
-                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(location));
+                failure_cause = std::make_shared<FileNotFound>(location);
             } // otherwise, we don't care, perhaps it was taken care of elsewhere...
         } else {
             try {
                 this->file_system->unlink_file(location->getFilePath());
             } catch (simgrid::Exception &e) {
                 std::string error_msg = "Cannot delete a file that's open for reading/writing";
-               failure_cause = std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<SimpleStorageService>(),error_msg));
+               failure_cause = std::make_shared<NotAllowed>(this->getSharedPtr<SimpleStorageService>(), error_msg);
             }
         }
 
@@ -481,10 +480,10 @@ namespace wrench {
 
         auto partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
         if ((not partition) or (not this->file_system->directory_exists(location->getDirectoryPath()))) {
-            return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
+            return std::make_shared<InvalidDirectoryPath>(location);
         }
         if (not this->file_system->file_exists(location->getFilePath())) {
-            return std::shared_ptr<FailureCause>(new FileNotFound(location));
+            return std::make_shared<FileNotFound>(location);
         }
         opened_file = this->file_system->open(location->getFilePath(), "r");
         return nullptr;
@@ -506,7 +505,7 @@ namespace wrench {
         // Is the partition valid?
         auto partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
         if (!partition) {
-            return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(location));
+            return std::make_shared<InvalidDirectoryPath>(location);
         }
 
         bool file_already_there = this->file_system->file_exists(location->getFilePath());
@@ -514,7 +513,7 @@ namespace wrench {
             if (not file_already_there) { // Open dot file
                 if (num_bytes_to_write < location->getFile()->getSize()) {
                     std::string err_msg = "Cannot write fewer number of bytes than the file size if the file isn't already present";
-                    return std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<Service>(), err_msg));
+                    return std::make_shared<NotAllowed>(this->getSharedPtr<Service>(), err_msg);
                 }
                 std::string dot_file_path = location->getADotFilePath();
                 this->file_system->create_file(dot_file_path, location->getFile()->getSize());
@@ -525,10 +524,9 @@ namespace wrench {
                 opened_file->seek(0, SEEK_SET);
             }
         } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
-            return std::shared_ptr<FailureCause>(
-                    new StorageServiceNotEnoughSpace(
-                            file,
-                            this->getSharedPtr<SimpleStorageService>()));
+            return std::make_shared<StorageServiceNotEnoughSpace>(
+                file,
+                this->getSharedPtr<SimpleStorageService>());
         }
         return nullptr;
     }
@@ -556,16 +554,16 @@ namespace wrench {
         auto src_partition = src_file_system->get_partition_for_path_or_null(src_location->getFilePath());
 
         if ((not src_partition) or (not src_file_system->directory_exists(src_location->getDirectoryPath()))) {
-            return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(src_location));
+            return std::make_shared<InvalidDirectoryPath>(src_location);
         }
         if (not src_file_system->file_exists(src_location->getFilePath())) {
-            return std::shared_ptr<FailureCause>(new FileNotFound(src_location));
+            return std::make_shared<FileNotFound>(src_location);
         }
 
         // Validate destination
         auto dst_partition = dst_file_system->get_partition_for_path_or_null(dst_location->getFilePath());
         if (!dst_partition) {
-            return std::shared_ptr<FailureCause>(new InvalidDirectoryPath(dst_location));
+            return std::make_shared<InvalidDirectoryPath>(dst_location);
         }
 
         // Open destination file (as it may fail)
@@ -581,8 +579,7 @@ namespace wrench {
                 dst_opened_file->seek(0, SEEK_SET);
             }
         } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
-            return std::shared_ptr<FailureCause>(
-                    new StorageServiceNotEnoughSpace(file, this->getSharedPtr<SimpleStorageService>()));
+            return std::make_shared<StorageServiceNotEnoughSpace>(file, this->getSharedPtr<SimpleStorageService>());
         }
 
         // Open source file
