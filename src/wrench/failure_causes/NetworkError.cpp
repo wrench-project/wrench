@@ -10,8 +10,6 @@
 #include <wrench/failure_causes/NetworkError.h>
 
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/data_file/DataFile.h>
-#include <wrench/job/Job.h>
 #include <wrench/services/compute/ComputeService.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_network_error, "Log category for NetworkError");

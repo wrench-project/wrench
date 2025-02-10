@@ -108,7 +108,7 @@ namespace wrench
         auto compute_resources = this->action_execution_service->getComputeResources();
         // Check that each action can run w.r.t. the resource I have
         unsigned long max_cores = 0;
-        double max_ram = 0;
+        sg_size_t max_ram = 0;
         for (auto const& cr : compute_resources)
         {
             max_cores = (std::get<0>(cr.second) > max_cores ? std::get<0>(cr.second) : max_cores);
@@ -260,14 +260,14 @@ namespace wrench
         const std::string& hostname,
         const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
         const std::string& scratch_space_mount_point,
-        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
+        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : ComputeService(hostname,
         "bare_metal",
         scratch_space_mount_point)
     {
         initiateInstance(hostname,
                          compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), nullptr);
+                         property_list, messagepayload_list, nullptr);
     }
 
     /**
@@ -283,8 +283,8 @@ namespace wrench
     BareMetalComputeService::BareMetalComputeService(const std::string& hostname,
                                                      const std::vector<std::string>& compute_hosts,
                                                      const std::string& scratch_space_mount_point,
-                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
+                                                     const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                                     const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) :
         ComputeService(hostname,
                        "bare_metal",
                        scratch_space_mount_point)
@@ -297,7 +297,7 @@ namespace wrench
 
         initiateInstance(hostname,
                          specified_compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), nullptr);
+                         property_list, messagepayload_list, nullptr);
     }
 
     /**
@@ -315,26 +315,26 @@ namespace wrench
      */
     BareMetalComputeService::BareMetalComputeService(
         const std::string& hostname,
-        std::map<std::string, std::tuple<unsigned long, sg_size_t>> compute_resources,
-        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+        const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
+        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
         std::shared_ptr<PilotJob> pj,
         const std::string& suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
         "bare_metal" + suffix,
         std::move(scratch_space))
     {
         initiateInstance(hostname,
-                         std::move(compute_resources),
-                         std::move(property_list),
-                         std::move(messagepayload_list),
-                         std::move(pj));
+                         compute_resources,
+                         property_list,
+                         messagepayload_list,
+                         pj);
     }
 
     /**
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_resources:: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
+     * @param compute_resources: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -343,15 +343,15 @@ namespace wrench
     BareMetalComputeService::BareMetalComputeService(
         const std::string& hostname,
         const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
-        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+        const WRENCH_PROPERTY_COLLECTION_TYPE &property_list,
+        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &messagepayload_list,
         std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                         "bare_metal",
                                                                         std::move(scratch_space))
     {
         initiateInstance(hostname,
                          compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), nullptr);
+                         property_list, messagepayload_list, nullptr);
     }
 
     /**
@@ -610,8 +610,7 @@ namespace wrench
             answer_commport->dputMessage(
                 new ComputeServiceSubmitCompoundJobAnswerMessage(
                     job, this->getSharedPtr<BareMetalComputeService>(), false,
-                    std::shared_ptr<FailureCause>(
-                        new ServiceIsDown(this->getSharedPtr<BareMetalComputeService>())),
+                    std::make_shared<ServiceIsDown>(this->getSharedPtr<BareMetalComputeService>()),
                     this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
@@ -633,8 +632,7 @@ namespace wrench
             answer_commport->dputMessage(
                 new ComputeServiceSubmitCompoundJobAnswerMessage(
                     job, this->getSharedPtr<BareMetalComputeService>(), false,
-                    std::shared_ptr<FailureCause>(
-                        new NotEnoughResources(job, this->getSharedPtr<BareMetalComputeService>())),
+                    std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()),
                     this->getMessagePayloadValue(
                         BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
             return;
@@ -733,7 +731,7 @@ namespace wrench
             std::string msg = "Job cannot be terminated because it is not running";
             auto answer_message = new ComputeServiceTerminateCompoundJobAnswerMessage(
                 job, this->getSharedPtr<BareMetalComputeService>(), false,
-                std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BareMetalComputeService>(), msg)),
+                std::make_shared<NotAllowed>(this->getSharedPtr<BareMetalComputeService>(), msg),
                 this->getMessagePayloadValue(
                     BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answer_message);
@@ -862,60 +860,34 @@ namespace wrench
                   {
                       if (a->getJob() != b->getJob())
                       {
-                          if (a->getJob()->getPriority() > b->getJob()->getPriority())
-                          {
+                          if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
                               return true;
-                          }
-                          else if (a->getJob()->getPriority() < b->getJob()->getPriority())
-                          {
+                          } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
                               return false;
-                          }
-                          else if (a->getPriority() > b->getPriority())
-                          {
+                          } else if (a->getPriority() > b->getPriority()) {
                               return true;
-                          }
-                          else if (a->getPriority() < b->getPriority())
-                          {
+                          } else if (a->getPriority() < b->getPriority()) {
                               return false;
-                          }
-                          else if (a->getJob()->getSubmitDate() < b->getJob()->getSubmitDate())
-                          {
+                          } else if (a->getJob()->getSubmitDate() < b->getJob()->getSubmitDate()) {
                               return true;
-                          }
-                          else if (a->getName() < b->getName())
-                          {
+                          } else if (a->getName() < b->getName()) {
                               return true;
-                          }
-                          else if (a->getName() < b->getName())
-                          {
+                          } else if (a->getName() < b->getName()) {
                               return false;
-                          }
-                          else
-                          {
+                          } else {
                               return reinterpret_cast<unsigned long>(a->getJob().get()) > reinterpret_cast<unsigned
                                   long>(b->getJob().get());
                           }
-                      }
-                      else
-                      {
-                          if (a->getPriority() > b->getPriority())
-                          {
+                      } else {
+                          if (a->getPriority() > b->getPriority()) {
                               return true;
-                          }
-                          else if (a->getPriority() < b->getPriority())
-                          {
+                          } else if (a->getPriority() < b->getPriority()) {
                               return false;
-                          }
-                          else if (a->getName() < b->getName())
-                          {
+                          } else if (a->getName() < b->getName()) {
                               return true;
-                          }
-                          else if (a->getName() > b->getName())
-                          {
+                          } else if (a->getName() > b->getName()) {
                               return false;
-                          }
-                          else
-                          {
+                          } else {
                               return reinterpret_cast<unsigned long>(a.get()) > reinterpret_cast<unsigned long>(b.
                                   get());
                           }
@@ -924,8 +896,7 @@ namespace wrench
 
         for (auto const& action : this->ready_actions)
         {
-            if (this->dispatched_actions.find(action) != this->dispatched_actions.end())
-            {
+            if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
                 // The action has been dispatched (but its state it not set to RUNNING yet,
                 // since there can be zero-size, instant communication!)
                 break;
@@ -947,8 +918,7 @@ namespace wrench
         //        for (auto const &a : this->dispatched_actions) {
         //            WRENCH_INFO("DISPATCHED LIST: %s", a->getName().c_str());
         //        }
-        if (this->dispatched_actions.find(action) == this->dispatched_actions.end())
-        {
+        if (this->dispatched_actions.find(action) == this->dispatched_actions.end()) {
             WRENCH_INFO(
                 "Received a notification about action %s being done, but I don't know anything about this action - ignoring",
                 action->getName().c_str());
@@ -961,10 +931,8 @@ namespace wrench
         this->num_dispatched_actions_for_cjob[action->getJob()]--;
 
         // Deal with action's ready children, if any
-        for (auto const& child : action->getChildren())
-        {
-            if (child->getState() == Action::State::READY)
-            {
+        for (auto const& child : action->getChildren()) {
+            if (child->getState() == Action::State::READY) {
                 this->not_ready_actions.erase(child);
                 this->ready_actions.push_back(child);
             }
@@ -973,8 +941,7 @@ namespace wrench
         // Is the job done?
         auto job = action->getJob();
 
-        try
-        {
+        try {
             if (job->hasSuccessfullyCompleted() and (this->num_dispatched_actions_for_cjob[job] == 0))
             {
                 this->current_jobs.erase(job);
@@ -1014,8 +981,7 @@ namespace wrench
     void BareMetalComputeService::terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob>& job,
                                                               ComputeService::TerminationCause termination_cause)
     {
-        for (auto const& action : job->getActions())
-        {
+        for (auto const& action : job->getActions()) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end())
             {
                 this->action_execution_service->terminateAction(action, termination_cause);

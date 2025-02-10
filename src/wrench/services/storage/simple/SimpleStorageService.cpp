@@ -19,9 +19,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
-#include <wrench/services/memory/MemoryManager.h>
+// #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/util/UnitParser.h>
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 #include <wrench/failure_causes/NotAllowed.h>

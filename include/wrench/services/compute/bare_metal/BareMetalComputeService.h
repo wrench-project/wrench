@@ -91,17 +91,17 @@ namespace wrench {
     public:
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
-                                const std::map<std::string, std::tuple<unsigned long, sg_size_t>> &compute_resources,
+                                const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
                                 const std::string &scratch_space_mount_point,
-                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::vector<std::string> &compute_hosts,
                                 const std::string &scratch_space_mount_point,
-                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
@@ -127,9 +127,9 @@ namespace wrench {
 
 
         BareMetalComputeService(const std::string &hostname,
-                                std::map<std::string, std::tuple<unsigned long, sg_size_t>> compute_resources,
-                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                                const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
+                                const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
                                 std::shared_ptr<PilotJob> pj, const std::string &suffix,
                                 std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
@@ -141,9 +141,9 @@ namespace wrench {
         //                                std::shared_ptr<StorageService> scratch_space);
 
         BareMetalComputeService(const std::string &hostname,
-                                const std::map<std::string, std::tuple<unsigned long, sg_size_t>> &compute_resources,
-                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                                const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
+                                const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
 
         void validateProperties();

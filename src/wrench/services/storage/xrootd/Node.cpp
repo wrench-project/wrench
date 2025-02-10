@@ -17,7 +17,6 @@
 #include "wrench/services/storage/xrootd/XRootDMessage.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include "wrench/services/storage/xrootd/SearchStack.h"
-#include <wrench/services/storage/xrootd/XRootDProperty.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/failure_causes/NotAllowed.h>
@@ -642,8 +641,7 @@ namespace wrench {
                                         msg->src,
                                         msg->dst,
                                         false,
-                                        std::shared_ptr<FailureCause>(
-                                                new NotAllowed(getSharedPtr<Node>(), error_message)),
+                                        std::make_shared<NotAllowed>(getSharedPtr<Node>(), error_message),
                                         getMessagePayloadValue(MessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
                     }
 
@@ -943,8 +941,7 @@ namespace wrench {
             if (internalStorage == nullptr) {
                 std::string error_message = "Cannot write file at non-storage XRootD node";
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(
-                                new NotAllowed(getSharedPtr<Node>(), error_message)));
+                    std::make_shared<NotAllowed>(getSharedPtr<Node>(), error_message));
             }
             // Replace the location with
             // TODO: THIS LOCATION REWRITE WAS DONE TO FIX SOMETHING BUT HENRI HAS NO

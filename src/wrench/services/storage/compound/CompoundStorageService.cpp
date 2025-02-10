@@ -1109,8 +1109,6 @@ namespace wrench {
     /**
      * @brief Get the total space across all internal services known by the CompoundStorageService
      *
-     * @param path: the path
-     *
      * @return A number of bytes
      */
     sg_size_t CompoundStorageService::getTotalSpace() {
