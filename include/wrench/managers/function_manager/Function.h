@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/managers/function_manager/FunctionInput.h"
 
 namespace wrench {
 
@@ -36,7 +37,7 @@ namespace wrench {
          * @param code The file location of the function's code.
          */
         Function(const std::string &name,
-                 const std::function<std::string(const std::string &, const std::shared_ptr<StorageService> &)> &lambda,
+                 const std::function<std::string(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
                  const std::shared_ptr<FileLocation> &image,
                  const std::shared_ptr<FileLocation> &code)
             : _name(name), _lambda(lambda), _image(image), _code(code) {}
@@ -53,13 +54,13 @@ namespace wrench {
          * @param storage_service A shared pointer to a StorageService instance.
          * @return The result of the function execution.
          */
-        std::string execute(const std::string &input, const std::shared_ptr<StorageService> &storage_service) const {
+        std::string execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const {
             return _lambda(input, storage_service);
         }
 
     private:
         std::string _name; ///< The name of the function.
-        std::function<std::string(const std::string &, const std::shared_ptr<StorageService> &)> _lambda; ///< The function logic.
+        std::function<std::string(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> _lambda; ///< The function logic.
         std::shared_ptr<FileLocation> _image; ///< The file location of the function's container image.
         std::shared_ptr<FileLocation> _code; ///< The file location of the function's code.
     };

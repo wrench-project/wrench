@@ -17,6 +17,7 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/managers/function_manager/FunctionInput.h"
 
 namespace wrench {
 
@@ -44,7 +45,7 @@ namespace wrench {
         void kill();
 
         static std::shared_ptr<Function> createFunction(const std::string& name,
-                                                        const std::function<std::string(const std::string&, const std::shared_ptr<StorageService>&)>& lambda,
+                                                        const std::function<std::string(const std::shared_ptr<FunctionInput>&, const std::shared_ptr<StorageService>&)>& lambda,
                                                         const std::shared_ptr<FileLocation>& image,
                                                         const std::shared_ptr<FileLocation>& code);
 
