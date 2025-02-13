@@ -59,7 +59,7 @@ namespace wrench {
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
         void processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
-        void processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function);
+        void processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::string function_invocation_args);
         void dispatchFunctionInvocation();
         bool processNextMessage();
 

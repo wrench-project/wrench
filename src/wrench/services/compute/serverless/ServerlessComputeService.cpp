@@ -213,14 +213,14 @@ namespace wrench
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::string function_invocation_args) {
         if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) {
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                false, nullptr, 
+                false, nullptr, function_invocation_args,
                 std::shared_ptr<FailureCause>(new FunctionNotFound(function)), 0
                 );
             answer_commport->dputMessage(answerMessage);
         } else {
             _invokeFunctions.push(_registeredFunctions.at(function->getName()));
             // TODO: return some sort of function invocation object?
-            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(true, nullptr, nullptr, nullptr, 0);
+            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(true, nullptr, function_invocation_args, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
         }
 
