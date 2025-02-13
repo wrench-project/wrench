@@ -24,6 +24,14 @@ WRENCH_LOG_CATEGORY(custom_controller, "Log category for ServerlessExampleExecut
 
 namespace wrench {
 
+    class MyFunctionInput: public FunctionInput {
+    public:
+        MyFunctionInput(int x1, int x2) : x1_(x1), x2_(x2) {}
+
+        int x1_;
+        int x2_;
+    };
+
     /**
      * @brief Constructor, which calls the super constructor
      *
@@ -51,8 +59,9 @@ namespace wrench {
         // TODO: Interact with Serverless provider to do stuff
         // Register a function
         auto function_manager = this->createFunctionManager();
-        std::function lambda = [](const std::string& input, const std::shared_ptr<StorageService>& service) -> std::string {
-            return "Processed: " + input;
+        std::function lambda = [](const std::shared_ptr<FunctionInput>& input, const std::shared_ptr<StorageService>& service) -> std::string {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
         auto image_file = wrench::Simulation::addFile("input_file_", 100 * MB);
@@ -76,8 +85,10 @@ namespace wrench {
         auto function2 = function_manager->createFunction("Function 2", lambda, image_location, code_location);
         
         // Try to invoke a function that is not registered yet
+        auto input = std::make_shared<MyFunctionInput>(1,2);
+
         try {
-            compute_service->invokeFunction(function2);
+            compute_service->invokeFunction(function2, input);
         } catch (ExecutionException& expected) {
             WRENCH_INFO(expected.getCause()->toString().c_str());
         }
@@ -85,9 +96,9 @@ namespace wrench {
         function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         //TODO: Bypass function manager for now until FunctionInvocation is created
-        compute_service->invokeFunction(function1);
-        compute_service->invokeFunction(function2);
-        compute_service->invokeFunction(function1);
+        compute_service->invokeFunction(function1, input);
+        compute_service->invokeFunction(function2, input);
+        compute_service->invokeFunction(function1, input);
 
         WRENCH_INFO("Execution complete");
         return 0;

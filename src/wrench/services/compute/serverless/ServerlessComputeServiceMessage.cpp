@@ -84,7 +84,8 @@ namespace wrench {
     ServerlessComputeServiceFunctionInvocationRequestMessage::ServerlessComputeServiceFunctionInvocationRequestMessage(
             S4U_CommPort *answer_commport,
             std::shared_ptr<Function> function,
-            std::string function_invocation_args,
+            std::shared_ptr<FunctionInput> function_input,
+            S4U_CommPort *notify_commport,
             sg_size_t payload)
         : ServerlessComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -95,25 +96,22 @@ namespace wrench {
 #endif
         this->answer_commport = answer_commport;
         this->function = std::move(function);
-        this->function_invocation_args = function_invocation_args;
+        this->function_input = function_input;
+        this->notify_commport = answer_commport;
     }
 
     /**
      * @brief Constructor
      * 
      * @param success: whether the invocation was successful or not
-     * @param function: the function that was either invoked on success or not on failure
      * @param failure_cause: a failure cause (or nullptr if success)
-     * @param function_invocation_args: input/arguments passed to the function
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationAnswerMessage::ServerlessComputeServiceFunctionInvocationAnswerMessage(
         bool success,
-        std::shared_ptr<Function> function,
-        std::string function_invocation_args,
         std::shared_ptr<FailureCause> failure_cause,
         sg_size_t payload)
-        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), function_invocation_args(function_invocation_args), failure_cause(std::move(failure_cause)) {}
+        : ServerlessComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor

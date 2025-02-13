@@ -72,14 +72,16 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionInvocationRequestMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::string function_invocation_args, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> function_input, S4U_CommPort *notify_commport, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         S4U_CommPort *answer_commport;
         /** @brief The function to invoke */
         std::shared_ptr<Function> function;
         /** @brief   */
-        std::string function_invocation_args;
+        std::shared_ptr<FunctionInput> function_input;
+        /** @brief The commport_name to send notifications to */
+        S4U_CommPort *notify_commport;
     };
 
     /**
@@ -87,14 +89,10 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionInvocationAnswerMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationAnswerMessage(bool success, std::shared_ptr<Function> function, std::string function_invocation_args, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
 
         /** @brief Whether the invocation will be completed or not at some point in the future*/
         bool success;
-        /** @brief The function to be invoked at some point on success or not invoked on failure */
-        std::shared_ptr<Function> function;
-        /** @brief   */
-        std::string function_invocation_args
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
     };
