@@ -18,11 +18,11 @@
 
 namespace wrench {
 
+    class ComputeService;
+
     /***********************/
     /** \cond DEVELOPER    */
     /***********************/
-
-    class ComputeService;
 
     /**
      * @brief Represents a serverless function, encapsulating its metadata and behavior.

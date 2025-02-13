@@ -28,17 +28,6 @@ WRENCH_LOG_CATEGORY(wrench_core_function_manager, "Log category for Function Man
 
 namespace wrench {
 
-	   /**
-     * @brief Main method of the daemon that implements the JobManager
-     * @return 0 on success
-     */
-    int FunctionManager::main() {
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
-
-        WRENCH_INFO("New Function Manager starting (%s)", this->commport->get_cname());
-
-        return 0;
-    }
 
     /**
      * @brief Constructor
@@ -62,81 +51,176 @@ namespace wrench {
     	// Any necessary cleanup (if needed) goes here.
 	}
 
-
     /**
+     * @brief 
      * 
+     * @param name 
+     * @param lambda 
+     * @param image 
+     * @param code 
+     * @return std::shared_ptr<Function> 
      */
-    std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
-            const std::function<std::string(const std::string&, const std::shared_ptr<StorageService>&)>& lambda,
-            const std::shared_ptr<FileLocation>& image,
-            const std::shared_ptr<FileLocation>& code) {
+    static std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
+                                                                     const std::function<std::string(const std::string&, const std::shared_ptr<StorageService>&)>& lambda,
+                                                                     const std::shared_ptr<FileLocation>& image,
+                                                                     const std::shared_ptr<FileLocation>& code) {
+                                                                        
         // Create the notion of a function
         return std::make_shared<Function>(name, lambda, image, code);
     }
 
     /**
+     * @brief 
      * 
+     * @param function 
+     * @param sl_compute_service 
+     * @param time_limit_in_seconds 
+     * @param disk_space_limit_in_bytes 
+     * @param RAM_limit_in_bytes 
+     * @param ingress_in_bytes 
+     * @param egress_in_bytes 
+     * @return true 
+     * @return false 
      */
-      bool FunctionManager::registerFunction(
-        const std::shared_ptr<Function> function,
-        const std::shared_ptr<ServerlessComputeService>& compute_service,
-        int time_limit_in_seconds,
-        long disk_space_limit_in_bytes,
-        long RAM_limit_in_bytes,
-        long ingress_in_bytes,
-        long egress_in_bytes) {
-        WRENCH_INFO("Function [%s] registered with compute service [%s]", function->getName().c_str(), compute_service->getName().c_str());
+    bool FunctionManager::registerFunction(const std::shared_ptr<Function> function,
+                                           const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
+                                           int time_limit_in_seconds,
+                                           long disk_space_limit_in_bytes,
+                                           long RAM_limit_in_bytes,
+                                           long ingress_in_bytes,
+                                           long egress_in_bytes) {
+
+        WRENCH_INFO("Function [%s] registered with compute service [%s]", function->getName().c_str(), sl_compute_service->getName().c_str());
         // Logic to register the function with the serverless compute service
-        return compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
+        return sl_compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
     }
 
-   /**
+
+    /**
     *
     */
-//    FunctionInvocation FunctionManager::invokeFunction(const std::shared_ptr<ServerlessComputeService>& compute_service, Function, FunctionInput) {
-//        // Places a function invocation
-//    }
-//
-//    /**
-//     *
-//     */
-//    FunctionInvocation::is_running() {
-//        // State finding method
-//    }
-//
-//    /**
-//     *
-//     */
-//    FunctionInvocation::is_done() {
-//        // State finding method
-//    }
-//
-//    /**
-//     *
-//     */
-//    FunctionOutput FunctionInvocation::get_output() {
-//        // State finding method
-//    }
-//
-//    /**
-//     *
-//     */
-//    FunctionInvocation::wait_one(one) {
-//
-//    }
-//
-//    /**
-//     *
-//     */
-//    FunctionInvocation::wait_any(one) {
-//
-//    }
-//
-//    /**
-//     *
-//     */
-//    FunctionInvocation::wait_all(list) {
-//
-//    }
+    std::shared_ptr<FunctionInvocation> FunctionManager::invokeFunction(const std::shared_ptr<ServerlessComputeService>& sl_compute_service, 
+                                                                        std::shared_ptr<Function> function, 
+                                                                        std::string function_invocation_args) {
+        WRENCH_INFO("Function [%s] invoked with arguments [%s] with compute service [%s]", function->getName().c_str(), function_invocation_args, sl_compute_service->getName().c_str());
+        // Logic to invoked the function with the serverless compute service
+        return sl_compute_service->invokeFunction(function, function_invocation_args);
+    }
+
+    // /**
+    // *
+    // */
+    // FunctionInvocation::is_running() {
+    //     // State finding method
+    // }
+
+    // /**
+    // *
+    // */
+    // FunctionInvocation::is_done() {
+    //     // State finding method
+    // }
+
+    // /**
+    // *
+    // */
+    // FunctionOutput FunctionInvocation::get_output() {
+    //     // State finding method
+    // }
+
+    // /**
+    // *
+    // */
+    // FunctionInvocation::wait_one(one) {
+
+    // }
+
+    // /**
+    // *
+    // */
+    // FunctionInvocation::wait_any(one) {
+
+    // }
+
+    // /**
+    // *
+    // */
+    // FunctionInvocation::wait_all(list) {
+
+    // }
+
+    /**
+     * @brief Main method of the daemon that implements the JobManager
+     * @return 0 on success
+     */
+    int FunctionManager::main() {
+        this->state = Service::UP;
+
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+        WRENCH_INFO("New Function Manager starting (%s)", this->commport->get_cname());
+        
+        while (processNextMessage()) {
+            // TODO: Do something
+        }
+
+        return 0;
+    }
+
+    /**
+     * @brief 
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool FunctionManager::processNextMessage() {
+        S4U_Simulation::computeZeroFlop();
+
+        // Wait for a message
+        std::shared_ptr<SimulationMessage> message;
+        try {
+            message = this->commport->getMessage();
+        } catch (ExecutionException &e) {
+            WRENCH_INFO(
+                    "Got a network error while getting some message... ignoring");
+            return true;
+        }
+
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+
+        if (std::dynamic_pointer_cast<FunctionManagerWakeupMessage>(message)) {
+            // wake up!!
+            return true;
+        }
+        else if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+            // TODO: Die...
+            return false;
+        }
+        else if (auto fmfc_msg = std::dynamic_pointer_cast<FunctionManagerFunctionCompletedMessage>(message)) {
+            // TODO: processFunctionInvocationCompletion();
+            return true;
+        }
+        else if (auto fmff_msg = std::dynamic_pointer_cast<FunctionManagerFunctionFailedMessage>(message)) {
+            // TODO: processFunctionInvocationFailure();
+            return true;
+        }
+    }
+
+    /**
+     * @brief TODO
+     * 
+     */
+    void FunctionManager::processFunctionInvocationComplete() {
+        
+    }
+
+    /**
+     * @brief TODO
+     * 
+     */
+    void FunctionManager::processFunctionInvocationFailure() {
+
+    }
+
 
 }// namespace wrench

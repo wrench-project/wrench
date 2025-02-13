@@ -121,12 +121,12 @@ namespace wrench
         return true;
     }
 
-    bool ServerlessComputeService::invokeFunction(std::shared_ptr<Function> function) {
+    bool ServerlessComputeService::invokeFunction(std::shared_ptr<Function> function, std::string function_invocation_args) {
         WRENCH_INFO(("Serverless Provider received invoke fuction " + function->getName()).c_str());
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         this->commport->dputMessage(
-            new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport, function, 0)
+            new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport, function, function_invocation_args, 0)
         );
 
         // Block here for return, if non blocking then function manager has to check up on it? or send a message
@@ -144,7 +144,7 @@ namespace wrench
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-        WRENCH_INFO("Serverless provider starting");
+        WRENCH_INFO("Serverless provider starting (%s)", this->commport->get_cname());
 
         while (processNextMessage()) {
             dispatchFunctionInvocation();
@@ -180,7 +180,7 @@ namespace wrench
             return true;
         }
         else if (auto scsfir_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
-            processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->function);
+            processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->function, scsfir_msg->function_invocation_args);
             return true;
         }
          else {
@@ -210,7 +210,7 @@ namespace wrench
         }
     }
 
-    void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function) {
+    void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::string function_invocation_args) {
         if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) {
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 false, nullptr, 
@@ -220,7 +220,7 @@ namespace wrench
         } else {
             _invokeFunctions.push(_registeredFunctions.at(function->getName()));
             // TODO: return some sort of function invocation object?
-            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(true, nullptr, nullptr, 0);
+            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(true, nullptr, nullptr, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
         }
 

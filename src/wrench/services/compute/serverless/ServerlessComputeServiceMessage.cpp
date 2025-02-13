@@ -83,6 +83,7 @@ namespace wrench {
     ServerlessComputeServiceFunctionInvocationRequestMessage::ServerlessComputeServiceFunctionInvocationRequestMessage(
             S4U_CommPort *answer_commport,
             std::shared_ptr<Function> function,
+            std::string function_invocation_args,
             sg_size_t payload)
         : ServerlessComputeServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -93,6 +94,7 @@ namespace wrench {
 #endif
         this->answer_commport = answer_commport;
         this->function = std::move(function);
+        this->function_invocation_args = function_invocation_args;
     }
 
     /**
@@ -106,9 +108,10 @@ namespace wrench {
     ServerlessComputeServiceFunctionInvocationAnswerMessage::ServerlessComputeServiceFunctionInvocationAnswerMessage(
         bool success,
         std::shared_ptr<Function> function,
+        std::string function_invocation_args,
         std::shared_ptr<FailureCause> failure_cause,
         sg_size_t payload)
-        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), failure_cause(std::move(failure_cause)) {}
+        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), function_invocation_args(function_invocation_args), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor
@@ -123,8 +126,9 @@ namespace wrench {
     ServerlessComputeServiceFunctionInvocationCompleteMessage::ServerlessComputeServiceFunctionInvocationCompleteMessage(
         bool success,
         std::shared_ptr<Function> function,
+        std::string function_invocation_args,
         std::shared_ptr<FailureCause> failure_cause,
         sg_size_t payload)
-        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), failure_cause(std::move(failure_cause)) {}
+        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), function_invocation_args(function_invocation_args), failure_cause(std::move(failure_cause)) {}
 
 } // namespace wrench
