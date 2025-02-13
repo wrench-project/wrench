@@ -78,6 +78,7 @@ namespace wrench {
      * 
      * @param answer_commport: commport to which the answer message should be sent
      * @param function: the function to invoke
+     * @param function_invocation_args: input/arguments passed to the function
      * @param payload: message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationRequestMessage::ServerlessComputeServiceFunctionInvocationRequestMessage(
@@ -103,6 +104,7 @@ namespace wrench {
      * @param success: whether the invocation was successful or not
      * @param function: the function that was either invoked on success or not on failure
      * @param failure_cause: a failure cause (or nullptr if success)
+     * @param function_invocation_args: input/arguments passed to the function
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationAnswerMessage::ServerlessComputeServiceFunctionInvocationAnswerMessage(
@@ -120,6 +122,7 @@ namespace wrench {
      * 
      * @param success: whether the invocation was successful or not
      * @param function: the function that was either invoked on success or not on failure
+     * @param function_invocation_args: input/arguments passed to the function
      * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
