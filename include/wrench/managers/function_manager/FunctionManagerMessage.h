@@ -17,7 +17,7 @@
 
 namespace wrench {
 
-     /***********************/
+    /***********************/
     /** \cond INTERNAL     */
     /***********************/
 
@@ -27,6 +27,14 @@ namespace wrench {
     class FunctionManagerMessage : public SimulationMessage {
     protected:
         explicit FunctionManagerMessage();
+    };
+
+    /**
+     * @brief Message sent to the function manager to wake it up
+     */
+    class FunctionManagerWakeupMessage : public FunctionManagerMessage {
+    public:
+        FunctionManagerWakeupMessage();
     };
 
     /**
@@ -57,14 +65,6 @@ namespace wrench {
         std::shared_ptr<ServerlessComputeService> sl_compute_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
-    };
-
-    /**
-     * @brief Message sent to the function manager to wake it up
-     */
-    class FunctionManagerWakeupMessage : public FunctionManagerMessage {
-    public:
-        FunctionManagerWakeupMessage();
     };
 
     /***********************/

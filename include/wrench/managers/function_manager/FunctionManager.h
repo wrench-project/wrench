@@ -21,8 +21,18 @@
 namespace wrench {
 
     class Function;
+
+    class RegisteredFunction;
+
     class ServerlessComputeService;
+
     class StorageService;
+
+    class FailureCause;
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
     /**
      * @brief A service to manage serverless function operations including creation and registration.
@@ -33,50 +43,54 @@ namespace wrench {
 
         void kill();
 
-        /**
-         * @brief Creates a new function.
-         * @param name The name of the function.
-         * @param lambda The lambda function to execute.
-         * @param image The file location of the associated container image.
-         * @param code The file location of the source code.
-         * @return A shared pointer to the created Function object.
-         */
-        static std::shared_ptr<Function> createFunction(
-            const std::string& name,
-            const std::function<std::string(const std::string&, const std::shared_ptr<StorageService>&)>& lambda,
-            const std::shared_ptr<FileLocation>& image,
-            const std::shared_ptr<FileLocation>& code);
+        static std::shared_ptr<Function> createFunction(const std::string& name,
+                                                        const std::function<std::string(const std::string&, const std::shared_ptr<StorageService>&)>& lambda,
+                                                        const std::shared_ptr<FileLocation>& image,
+                                                        const std::shared_ptr<FileLocation>& code);
 
-        /**
-         * @brief Registers a function with a serverless compute provider.
-         * @param function The function to register.
-         * @param compute_service The serverless compute service provider.
-         * @param time_limit_in_seconds The time limit for function execution.
-         * @param disk_space_limit_in_bytes The disk space limit for the function.
-         * @param RAM_limit_in_bytes The RAM limit for the function.
-         * @param ingress_in_bytes The maximum inbound data limit.
-         * @param egress_in_bytes The maximum outbound data limit.
-         */
-        bool registerFunction(
-            std::shared_ptr<Function> function,
-            const std::shared_ptr<ServerlessComputeService>& compute_service,
-            int time_limit_in_seconds,
-            long disk_space_limit_in_bytes,
-            long RAM_limit_in_bytes,
-            long ingress_in_bytes,
-            long egress_in_bytes);
+        bool registerFunction(std::shared_ptr<Function> function,
+                              const std::shared_ptr<ServerlessComputeService>& compute_service,
+                              int time_limit_in_seconds,
+                              long disk_space_limit_in_bytes,
+                              long RAM_limit_in_bytes,
+                              long ingress_in_bytes,
+                              long egress_in_bytes);
+
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
 
         ~FunctionManager() override;
-        protected:
-            friend class ExecutionController;
 
-            explicit FunctionManager(const std::string& hostname, S4U_CommPort *creator_commport);
+    protected:
+        friend class ExecutionController;
+
+        explicit FunctionManager(const std::string& hostname, S4U_CommPort *creator_commport);
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     private:
         int main() override;
 
-        S4U_CommPort* creator_commport;
+        bool processNextMessage();
+
+        void processFunctionInvocationComplete();
+
+        void processFunctionInvocationFailure();
+
+        S4U_CommPort *creator_commport;
+
+        // FunctionManager internal data structures
+        std::set<std::shared_ptr<RegisteredFunction>> _registered_functions; // do we store these here or in the Serverless Compute Service?
+        std::queue<std::shared_ptr<RegisteredFunction>> _functions_to_invoke;
+        // TODO: Data structure for invoked functions and their results
     };
+
+    /***********************/
+    /** \endcond            */
+    /***********************/
 
 } // namespace wrench
 

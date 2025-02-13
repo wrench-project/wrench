@@ -47,7 +47,7 @@ namespace wrench {
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
         // TODO: public for now until FunctionManager is created to call the private methods and define Function
-        bool invokeFunction(std::shared_ptr<Function> function);
+        bool invokeFunction(std::shared_ptr<Function> function, std::string function_invocation_args);
     protected:
         friend class FunctionManager;
         bool registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
