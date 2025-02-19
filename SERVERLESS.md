@@ -26,7 +26,7 @@ Upon startup, the service creates an "internal" bare-metal compute service and a
 ### Issues and Thoughts
 
   - Concurrency: we will need to handle concurrent requests rationally (don't start a download of an image that's already being downloaded)
-    - The service keeps track of downloaded (and being downloaded) images to avoid redundant downloads. 
+    - The service keeps track of downloaded (and being downloaded) images to avoid redundant downloads.
 
   - Node allocation policy: 
     - right now, we'll hardcode something, but it's not trivial
@@ -45,6 +45,10 @@ Upon startup, the service creates an "internal" bare-metal compute service and a
         - Run the function
         - Terminate the storage service and delete the disk
         - Close and delete the unevictable file
+
+  - What helper services to use?
+    - All the above can be done using `SimpleStorageService` and `ActionExecutor`
+
 
 ### API draft
 
@@ -92,8 +96,4 @@ Just like the `JobManager` or `DataManager`, but for functions, with some twists
 
   - `FunctionInvocation::wait_one(one)`, `FunctionInvocation::wait_any(one)`, `FunctionInvocation::wait_all(list)`
     - These are a bit annoying to implement.  Basically we need to implement some notion of "wait request" that the `FunctionManager` keeps track of. On each function completion/failure, it may trigger a response to one or more request.  These functions return an array of states (completed, failed, timeout)? or perhaps the user has then to go through an inspect states on their own...
-
-	
-
-		
 
