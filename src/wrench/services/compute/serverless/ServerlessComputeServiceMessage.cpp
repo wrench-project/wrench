@@ -97,21 +97,23 @@ namespace wrench {
         this->answer_commport = answer_commport;
         this->function = std::move(function);
         this->function_input = function_input;
-        this->notify_commport = answer_commport;
+        this->notify_commport = notify_commport;
     }
 
     /**
      * @brief Constructor
      * 
      * @param success: whether the invocation was successful or not
+     * @param invocation: the invocation object
      * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationAnswerMessage::ServerlessComputeServiceFunctionInvocationAnswerMessage(
-        bool success,
-        std::shared_ptr<FailureCause> failure_cause,
-        sg_size_t payload)
-        : ServerlessComputeServiceMessage(payload), success(success), failure_cause(std::move(failure_cause)) {}
+       bool success,
+       std::shared_ptr<Invocation> invocation,
+       std::shared_ptr<FailureCause> failure_cause,
+       sg_size_t payload)
+        : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor

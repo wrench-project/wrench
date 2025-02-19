@@ -15,6 +15,9 @@
 #include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/managers/function_manager/FunctionManager.h"
+
+#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
+
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
@@ -22,7 +25,7 @@
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
 #include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
-#include "wrench/managers/job_manager/JobManagerMessage.h"
+#include "wrench/managers/function_manager/FunctionManagerMessage.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_function_manager, "Log category for Function Manager");
 
@@ -60,7 +63,7 @@ namespace wrench {
      * @param code 
      * @return std::shared_ptr<Function> 
      */
-    static std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
+    std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
                                                                      const std::function<std::string(const std::shared_ptr<FunctionInput>&, const std::shared_ptr<StorageService>&)>& lambda,
                                                                      const std::shared_ptr<FileLocation>& image,
                                                                      const std::shared_ptr<FileLocation>& code) {
@@ -99,12 +102,12 @@ namespace wrench {
     /**
     *
     */
-    std::shared_ptr<FunctionInvocation> FunctionManager::invokeFunction(const std::shared_ptr<ServerlessComputeService>& sl_compute_service, 
-                                                                        std::shared_ptr<Function> function, 
-                                                                        std::string function_invocation_args) {
-        WRENCH_INFO("Function [%s] invoked with arguments [%s] with compute service [%s]", function->getName().c_str(), function_invocation_args, sl_compute_service->getName().c_str());
-        // Logic to invoked the function with the serverless compute service
-        return sl_compute_service->invokeFunction(function, function_invocation_args);
+    std::shared_ptr<Invocation> FunctionManager::invokeFunction(std::shared_ptr<Function> function,
+                                                                const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
+                                                                std::shared_ptr<FunctionInput> function_invocation_args) {
+        WRENCH_INFO("Function [%s] invoked with compute service [%s]", function->getName().c_str(), sl_compute_service->getName().c_str());
+        // Pass in the function manager's commport as the notify commport
+        return sl_compute_service->invokeFunction(function, function_invocation_args, this->commport);
     }
 
     // /**
@@ -196,13 +199,20 @@ namespace wrench {
             // TODO: Die...
             return false;
         }
+        else if (auto scsfic_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationCompleteMessage>(message)) {
+            processFunctionInvocationComplete();
+            return true;
+        }
         else if (auto fmfc_msg = std::dynamic_pointer_cast<FunctionManagerFunctionCompletedMessage>(message)) {
-            // TODO: processFunctionInvocationCompletion();
+            // TODO: Notify some controller?
             return true;
         }
         else if (auto fmff_msg = std::dynamic_pointer_cast<FunctionManagerFunctionFailedMessage>(message)) {
             // TODO: processFunctionInvocationFailure();
             return true;
+        }
+        else {
+            throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
 
@@ -211,7 +221,7 @@ namespace wrench {
      * 
      */
     void FunctionManager::processFunctionInvocationComplete() {
-        
+        WRENCH_INFO("Some Invocation Complete");
     }
 
     /**

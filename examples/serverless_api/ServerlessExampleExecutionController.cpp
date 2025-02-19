@@ -81,14 +81,13 @@ namespace wrench {
             WRENCH_INFO(expected.getCause()->toString().c_str());
 
         }
-        
         auto function2 = function_manager->createFunction("Function 2", lambda, image_location, code_location);
         
         // Try to invoke a function that is not registered yet
         auto input = std::make_shared<MyFunctionInput>(1,2);
 
         try {
-            compute_service->invokeFunction(function2, input);
+            function_manager->invokeFunction(function2, this->compute_service, input);
         } catch (ExecutionException& expected) {
             WRENCH_INFO(expected.getCause()->toString().c_str());
         }
@@ -96,9 +95,9 @@ namespace wrench {
         function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         //TODO: Bypass function manager for now until FunctionInvocation is created
-        compute_service->invokeFunction(function1, input);
-        compute_service->invokeFunction(function2, input);
-        compute_service->invokeFunction(function1, input);
+        function_manager->invokeFunction(function1, this->compute_service, input);
+        function_manager->invokeFunction(function2, this->compute_service, input);
+        function_manager->invokeFunction(function1, this->compute_service, input);
 
         WRENCH_INFO("Execution complete");
         return 0;

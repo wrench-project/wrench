@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <wrench/managers/function_manager/Function.h>
+#include <wrench/managers/function_manager/RegisteredFunction.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
 namespace wrench
@@ -17,7 +18,6 @@ namespace wrench
                                                                             _notify_commport(notify_commport)
         {
         }
-
 
         std::shared_ptr<wrench::RegisteredFunction> _registered_function;
         std::shared_ptr<wrench::FunctionInput> _function_input;
