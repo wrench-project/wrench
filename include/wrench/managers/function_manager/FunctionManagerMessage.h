@@ -11,8 +11,8 @@
 #define WRENCH_FUNCTIONMANAGERMESSAGE_H
 
 #include "wrench/simulation/SimulationMessage.h"
-#include "wrench/services/compute/ServerlessComputeService.h"
-#include "wrench/job/Function.h"
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
+#include "wrench/managers/function_manager/Function.h"
 #include "wrench-dev.h"
 
 namespace wrench {

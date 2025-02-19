@@ -21,6 +21,8 @@ namespace wrench {
          * @brief Default constructor
          */
         FunctionInput() = default;
+
+        virtual ~FunctionInput() = default;
     };
     
 } // namespace wrench
