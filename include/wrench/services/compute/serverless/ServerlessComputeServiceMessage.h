@@ -10,6 +10,7 @@
 #ifndef SERVERLESSCOMPUTESERVICEMESSAGE_H
 #define SERVERLESSCOMPUTESERVICEMESSAGE_H
 
+#include "Invocation.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/failure_causes/FailureCause.h"
 #include "wrench/managers/function_manager/Function.h"
@@ -89,10 +90,12 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionInvocationAnswerMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationAnswerMessage(bool success, std::shared_ptr<Invocation> invocation, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
 
         /** @brief Whether the invocation will be completed or not at some point in the future*/
         bool success;
+        /** @brief The invocation object **/
+        std::shared_ptr<Invocation> invocation;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
     };

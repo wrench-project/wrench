@@ -122,14 +122,13 @@ namespace wrench
         return true;
     }
 
-    bool ServerlessComputeService::invokeFunction(std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input) {
+    std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort* notify_commport) {
         WRENCH_INFO(("Serverless Provider received invoke function " + function->getName()).c_str());
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
-
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
                 function, input,
-                S4U_Daemon::getRunningActorRecvCommPort(),0)
+                notify_commport,0)
         );
 
         // Block here for return, if non blocking then function manager has to check up on it? or send a message
@@ -140,7 +139,7 @@ namespace wrench
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
-        return true;
+        return msg->invocation;
     }
 
     int ServerlessComputeService::main() {
@@ -196,8 +195,8 @@ namespace wrench
             std::string msg = "Duplicate Function";
             auto answerMessage = 
                 new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-                    false, function, 
-                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<ServerlessComputeService>(), msg)), 0);
+                    false, function,
+                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(), msg), 0);
             answer_commport->dputMessage(answerMessage);
         } else {        
             _registeredFunctions[function->getName()] = std::make_shared<RegisteredFunction>(
@@ -214,15 +213,16 @@ namespace wrench
     }
 
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort *notify_commport) {
-        if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) {
-            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                false, std::shared_ptr<FailureCause>(new FunctionNotFound(function)), 0
+        if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) { // Not found
+            const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+                false, nullptr, std::make_shared<FunctionNotFound>(function), 0
                 );
             answer_commport->dputMessage(answerMessage);
         } else {
-            _newInvocations.push(std::make_shared<Invocation>(_registeredFunctions.at(function->getName()), input, notify_commport));
+            const auto invocation = std::make_shared<Invocation>(_registeredFunctions.at(function->getName()), input, notify_commport);
+            _newInvocations.push(invocation);
             // TODO: return some sort of function invocation object?
-            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(true, nullptr, 0);
+            const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(true, invocation, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
         }
 
@@ -231,13 +231,17 @@ namespace wrench
     void ServerlessComputeService::dispatchFunctionInvocation() {
         while (!_newInvocations.empty()) {
             // Might need to think about how RegisteredFunction is storing info here...
-            WRENCH_INFO("Invoking function [%s]", _newInvocations.front()->_registered_function->_function->getName().c_str());
             auto invocation_to_place = _newInvocations.front();
+            WRENCH_INFO("Invoking function [%s]", invocation_to_place->_registered_function->_function->getName().c_str());
             _newInvocations.pop();
             // TODO: Do invocation for real
+            // invocation_to_place->is_running = true
             Simulation::sleep(1);
+            // invocation_to_place->output = whatever
             // invocation_to_place->_registered_function->_function->run_lambda()
-            invocation_to_place->_notify_commport->dputMessage(new ServerlessComputeServiceFunctionInvocationCompleteMessage(...));
+            invocation_to_place->_notify_commport->dputMessage(new ServerlessComputeServiceFunctionInvocationCompleteMessage(true,
+                                                                invocation_to_place->_registered_function->_function,
+                                                                "", nullptr, 0 ));
 
         }
     }

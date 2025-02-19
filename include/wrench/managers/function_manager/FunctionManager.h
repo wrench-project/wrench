@@ -14,6 +14,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <wrench/services/compute/serverless/Invocation.h>
 
 #include "wrench/services/Service.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
@@ -45,7 +46,8 @@ namespace wrench {
         void kill();
 
         static std::shared_ptr<Function> createFunction(const std::string& name,
-                                                        const std::function<std::string(const std::shared_ptr<FunctionInput>&, const std::shared_ptr<StorageService>&)>& lambda,
+                                                        const std::function<std::string(const std::shared_ptr<FunctionInput>&, 
+                                                        const std::shared_ptr<StorageService>&)>& lambda,
                                                         const std::shared_ptr<FileLocation>& image,
                                                         const std::shared_ptr<FileLocation>& code);
 
@@ -57,6 +59,9 @@ namespace wrench {
                               long ingress_in_bytes,
                               long egress_in_bytes);
 
+        std::shared_ptr<Invocation> invokeFunction(std::shared_ptr<Function> function,
+                                                    const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
+                                                    std::shared_ptr<FunctionInput> function_invocation_args);
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -87,6 +92,7 @@ namespace wrench {
         std::set<std::shared_ptr<RegisteredFunction>> _registered_functions; // do we store these here or in the Serverless Compute Service?
         std::queue<std::shared_ptr<RegisteredFunction>> _functions_to_invoke;
         // TODO: Data structure for invoked functions and their results
+        std::map<int, std::shared_ptr<Invocation>> _pending_invocations;
     };
 
     /***********************/
