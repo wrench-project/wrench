@@ -48,6 +48,7 @@ namespace wrench {
                 double thread_creation_overhead,
                 bool simulate_computation_as_sleep,
                 S4U_CommPort *callback_commport,
+                SimulationMessage *custom_callback_msg,
                 std::shared_ptr<Action> action,
                 std::shared_ptr<ActionExecutionService> action_execution_service);
 
@@ -61,6 +62,7 @@ namespace wrench {
         std::shared_ptr<Action> action;
         std::shared_ptr<ActionExecutionService> action_execution_service;
         S4U_CommPort *callback_commport;
+        SimulationMessage *custom_callback_message;
         bool killed_on_purpose;
 
         bool simulation_compute_as_sleep;

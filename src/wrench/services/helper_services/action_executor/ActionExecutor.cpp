@@ -31,8 +31,9 @@ namespace wrench {
      * @param thread_creation_overhead: the thread creation overhead in seconds
      * @param simulate_computation_as_sleep: whether to simulate computation as sleep
      * @param callback_commport: the callback commport to which a "action done" or "action failed" message will be sent
+     * @param callback_message: a custom callback message (if nullptr, an ActionExecutorDoneMessage message wil be sent)
      * @param action: the action to perform
-     * @param action_execution_service: the parent action execution service
+     * @param action_execution_service: the parent action execution service (nullptr if none)
      */
     ActionExecutor::ActionExecutor(
             const std::string& hostname,
@@ -41,6 +42,7 @@ namespace wrench {
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
             S4U_CommPort *callback_commport,
+            SimulationMessage *custom_callback_msg,
             std::shared_ptr<Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
 
@@ -51,6 +53,7 @@ namespace wrench {
 #endif
 
         this->callback_commport = callback_commport;
+        this->custom_callback_message = custom_callback_msg;
         this->action = action;
         this->action_execution_service = action_execution_service;
         this->num_cores = num_cores;
@@ -151,13 +154,12 @@ namespace wrench {
         }
         this->action->setEndDate(S4U_Simulation::getClock());
 
-        auto msg_to_send_back = new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>());
-
         WRENCH_INFO("Action executor for action %s terminating and action has %s",
                     this->action->getName().c_str(),
                     (this->action->getState() == Action::State::COMPLETED ? "succeeded" : ("failed (" + this->action->getFailureCause()->toString() + ")").c_str()));
         try {
-            this->callback_commport->putMessage(msg_to_send_back);
+            this->callback_commport->putMessage(
+                (this->custom_callback_message) ? this->custom_callback_message : new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>()));
         } catch (ExecutionException &e) {
             WRENCH_INFO("Action executor can't report back due to network error.. oh well!");
         }
