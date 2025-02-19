@@ -469,6 +469,7 @@ namespace wrench {
                                        this->getPropertyValueAsTimeInSecond(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
                                        this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
                                        this->commport,
+                                       nullptr,
                                        action,
                                        this->getSharedPtr<ActionExecutionService>()));
 
