@@ -142,7 +142,7 @@ private:
 
         // Create a file read action executor
         auto file_delete_action_executor = std::make_shared<wrench::ActionExecutor>(
-                "Host2", 0, 0.0, 0, false, this->commport, file_delete_action, nullptr);
+                "Host2", 0, 0.0, 0, false, this->commport, nullptr, file_delete_action, nullptr);
         // Start it
         file_delete_action_executor->setSimulation(this->getSimulation());
         file_delete_action_executor->start(file_delete_action_executor, true, false);
