@@ -109,29 +109,25 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationAnswerMessage::ServerlessComputeServiceFunctionInvocationAnswerMessage(
-       bool success,
-       std::shared_ptr<Invocation> invocation,
-       std::shared_ptr<FailureCause> failure_cause,
-       sg_size_t payload)
+            bool success,
+            std::shared_ptr<Invocation> invocation,
+            std::shared_ptr<FailureCause> failure_cause,
+            sg_size_t payload)
         : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor
      * 
-     * TODO: Needs to return result of function invocation
-     * 
      * @param success: whether the invocation was successful or not
-     * @param function: the function that was either invoked on success or not on failure
-     * @param function_invocation_args: input/arguments passed to the function
+     * @param invocation: the invocation object
      * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationCompleteMessage::ServerlessComputeServiceFunctionInvocationCompleteMessage(
-        bool success,
-        std::shared_ptr<Function> function,
-        std::string function_invocation_args,
-        std::shared_ptr<FailureCause> failure_cause,
-        sg_size_t payload)
-        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), function_invocation_args(function_invocation_args), failure_cause(std::move(failure_cause)) {}
+            bool success,
+            std::shared_ptr<Invocation> invocation,
+            std::shared_ptr<FailureCause> failure_cause,
+            sg_size_t payload)
+        : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
 } // namespace wrench

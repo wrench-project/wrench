@@ -37,6 +37,14 @@ namespace wrench {
         FunctionManagerWakeupMessage();
     };
 
+    class FunctionManagerFunctionInvocationRequestMessage : public FunctionManagerMessage {
+
+    };
+
+    class FunctionManagerFunctionInvocationAnswerMessage : public FunctionManagerMessage {
+        
+    };
+
     /**
      * @brief A message sent by the FunctionManager to notify some submitter that a Function has completed
      */
