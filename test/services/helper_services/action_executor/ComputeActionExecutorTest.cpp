@@ -158,6 +158,7 @@ private:
                                            0.1,
                                            simulation_computation_as_sleep,
                                            this->commport,
+                                           nullptr,
                                            action,
                                            nullptr));
 
@@ -290,6 +291,7 @@ private:
                                            0.1,
                                            false,
                                            this->commport,
+                                           nullptr,
                                            action,
                                            nullptr));
 

@@ -108,6 +108,10 @@ set(HEADER_FILES
         include/wrench/managers/data_movement_manager/FileReaderThread.h
         include/wrench/managers/data_movement_manager/FileWriterThread.h
         include/wrench/managers/job_manager/JobManager.h
+        include/wrench/managers/function_manager/FunctionManager.h
+        include/wrench/managers/function_manager/FunctionManagerMessage.h
+        include/wrench/managers/function_manager/Function.h
+        include/wrench/managers/function_manager/RegisteredFunction.h
         include/wrench/services/Service.h
         include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceMessagePayload.h
@@ -127,6 +131,9 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchJob.h
         include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/compute/serverless/ServerlessComputeService.h
+        include/wrench/services/compute/serverless/ServerlessComputeServiceMessage.h
+        include/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h
+        include/wrench/services/compute/serverless/Invocation.h
         include/wrench/services/compute/cloud/CloudComputeService.h
         include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
@@ -214,6 +221,7 @@ set(HEADER_FILES
         include/wrench/failure_causes/FileAlreadyBeingRead.h
         include/wrench/failure_causes/FileAlreadyBeingWritten.h
         include/wrench/failure_causes/FileNotFound.h
+        include/wrench/failure_causes/FunctionNotFound.h
         include/wrench/failure_causes/FunctionalityNotAvailable.h
         include/wrench/failure_causes/HostError.h
         include/wrench/failure_causes/InvalidDirectoryPath.h
@@ -275,6 +283,10 @@ set(SOURCE_FILES
         src/wrench/managers/job_manager/JobManager.cpp
         src/wrench/managers/job_manager/JobManagerMessage.cpp
         include/wrench/managers/job_manager/JobManagerMessage.h
+        src/wrench/managers/function_manager/FunctionManager.cpp
+        src/wrench/managers/function_manager/FunctionManagerMessage.cpp
+        src/wrench/managers/function_manager/Function.cpp
+        src/wrench/managers/function_manager/RegisteredFunction.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -328,6 +340,9 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/serverless/ServerlessComputeService.cpp
+        src/wrench/services/compute/serverless/ServerlessComputeServiceMessage.cpp
+        src/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.cpp
+        src/wrench/services/compute/serverless/Invocation.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
         include/wrench/services/compute/cloud/CloudComputeServiceMessage.h
@@ -404,6 +419,7 @@ set(SOURCE_FILES
         src/wrench/failure_causes/FileAlreadyBeingRead.cpp
         src/wrench/failure_causes/FileAlreadyBeingWritten.cpp
         src/wrench/failure_causes/FileNotFound.cpp
+        src/wrench/failure_causes/FunctionNotFound.cpp
         src/wrench/failure_causes/FunctionalityNotAvailable.cpp
         src/wrench/failure_causes/HostError.cpp
         src/wrench/failure_causes/InvalidDirectoryPath.cpp
