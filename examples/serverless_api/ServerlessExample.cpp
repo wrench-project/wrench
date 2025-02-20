@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
     auto wms = simulation->add(
-            new wrench::ServerlessExampleExecutionController(serverless_provider, "UserHost"));
+            new wrench::ServerlessExampleExecutionController(serverless_provider, storage_service, "UserHost"));
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
