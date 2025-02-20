@@ -38,43 +38,76 @@ namespace wrench {
     class ServerlessComputeService : public ComputeService {
 
     public:
+
         ServerlessComputeService(const std::string &hostname,
-                            std::vector<std::string> compute_hosts,
-                            std::string scratch_space_mount_point,
-                            WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                 std::vector<std::string> compute_hosts,
+                                 std::string scratch_space_mount_point,
+                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                 WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
+
     protected:
+
         friend class FunctionManager;
-        std::shared_ptr<Invocation> invokeFunction(std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort *notify_commport);
-        bool registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
+
+        std::shared_ptr<Invocation> invokeFunction(std::shared_ptr<Function> function, 
+                                                   std::shared_ptr<FunctionInput> input, 
+                                                   S4U_CommPort *notify_commport);
+
+        bool registerFunction(std::shared_ptr<Function> function, 
+                              double time_limit_in_seconds, 
+                              sg_size_t disk_space_limit_in_bytes, 
+                              sg_size_t RAM_limit_in_bytes, 
+                              sg_size_t ingress_in_bytes, 
+                              sg_size_t egress_in_bytes);
+
     private:
+
         int main() override;
 
+        // 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                               const std::map<std::string, std::string> &service_specific_args) override;
+                               const std::map<std::string, std::string> &service_specific_args) 
+                               override;
 
-        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
-        void processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes);
-        void processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort *notify_commport);
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) 
+                                  override;
+
+        void processFunctionRegistrationRequest(S4U_CommPort *answer_commport, 
+                                                std::shared_ptr<Function> function, double time_limit, 
+                                                sg_size_t disk_space_limit_in_bytes, 
+                                                sg_size_t ram_limit_in_bytes, 
+                                                sg_size_t ingress_in_bytes, 
+                                                sg_size_t egress_in_bytes);
+
+        void processFunctionInvocationRequest(S4U_CommPort *answer_commport, 
+                                              std::shared_ptr<Function> function, 
+                                              std::shared_ptr<FunctionInput> input, 
+                                              S4U_CommPort *notify_commport);
+
         void dispatchFunctionInvocation();
+
         bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
+
+        // map of Registered functions sorted by function name
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
+        // vector of compute host names
         std::vector<std::string> _compute_hosts;
+        // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _newInvocations;
+        // queue of function invocations currently being processed
         std::queue<std::shared_ptr<Invocation>> _runningInvocations;
+        // queue of function invocations that have finished being processed
         std::queue<std::shared_ptr<Invocation>> _finishedInvocations;
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}
         };
-
-
 
     };
 

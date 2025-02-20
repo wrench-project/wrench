@@ -96,6 +96,18 @@ namespace wrench
         throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
     }
 
+    /**
+     * @brief 
+     * 
+     * @param function 
+     * @param time_limit_in_seconds 
+     * @param disk_space_limit_in_bytes 
+     * @param RAM_limit_in_bytes 
+     * @param ingress_in_bytes 
+     * @param egress_in_bytes 
+     * @return true 
+     * @return false 
+     */
     bool ServerlessComputeService::registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds,
                                                     sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
                                                     sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes)
@@ -122,13 +134,21 @@ namespace wrench
         return true;
     }
 
+    /**
+     * @brief 
+     * 
+     * @param function 
+     * @param input 
+     * @param notify_commport 
+     * @return std::shared_ptr<Invocation> 
+     */
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort* notify_commport) {
         WRENCH_INFO(("Serverless Provider received invoke function " + function->getName()).c_str());
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
                 function, input,
-                notify_commport,0)
+                notify_commport, 0)
         );
 
         // Block here for return, if non blocking then function manager has to check up on it? or send a message
@@ -154,6 +174,12 @@ namespace wrench
         return 0;
     }
 
+    /**
+     * @brief 
+     * 
+     * @return true 
+     * @return false 
+     */
     bool ServerlessComputeService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
 
@@ -190,8 +216,20 @@ namespace wrench
         }
     }
 
+    /**
+     * @brief 
+     * 
+     * @param answer_commport 
+     * @param function 
+     * @param time_limit 
+     * @param disk_space_limit_in_bytes 
+     * @param ram_limit_in_bytes 
+     * @param ingress_in_bytes 
+     * @param egress_in_bytes 
+     */
     void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
         if (_registeredFunctions.find(function->getName()) != _registeredFunctions.end()) {
+            // TODO: Create failure case for duplicate function?
             std::string msg = "Duplicate Function";
             auto answerMessage = 
                 new ServerlessComputeServiceFunctionRegisterAnswerMessage(
@@ -212,11 +250,18 @@ namespace wrench
         }
     }
 
+    /**
+     * @brief 
+     * 
+     * @param answer_commport 
+     * @param function 
+     * @param input 
+     * @param notify_commport 
+     */
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort *notify_commport) {
         if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end()) { // Not found
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                false, nullptr, std::make_shared<FunctionNotFound>(function), 0
-                );
+                false, nullptr, std::make_shared<FunctionNotFound>(function), 0);
             answer_commport->dputMessage(answerMessage);
         } else {
             const auto invocation = std::make_shared<Invocation>(_registeredFunctions.at(function->getName()), input, notify_commport);
@@ -228,6 +273,10 @@ namespace wrench
 
     }
 
+    /**
+     * @brief 
+     * 
+     */
     void ServerlessComputeService::dispatchFunctionInvocation() {
         while (!_newInvocations.empty()) {
             // Might need to think about how RegisteredFunction is storing info here...
@@ -240,8 +289,7 @@ namespace wrench
             // invocation_to_place->output = whatever
             // invocation_to_place->_registered_function->_function->run_lambda()
             invocation_to_place->_notify_commport->dputMessage(new ServerlessComputeServiceFunctionInvocationCompleteMessage(true,
-                                                                invocation_to_place->_registered_function->_function,
-                                                                "", nullptr, 0 ));
+                                                                invocation_to_place, nullptr, 0 ));
 
         }
     }
