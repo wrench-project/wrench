@@ -19,6 +19,14 @@ namespace wrench {
     FunctionManagerMessage::FunctionManagerMessage() : SimulationMessage(0) {
     }
 
+    // FunctionManagerFunctionInvocationRequestMessage::FunctionManagerFunctionInvocationRequestMessage() {
+
+    // }
+
+    // FunctionManagerFunctionInvocationAnswerMessage::FunctionManagerFunctionInvocationAnswerMessage() {
+        
+    // }
+
     /**
      * @brief Constructor 
      * @param function: the function that is invoked

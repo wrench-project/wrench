@@ -109,7 +109,9 @@ set(HEADER_FILES
         include/wrench/managers/data_movement_manager/FileWriterThread.h
         include/wrench/managers/job_manager/JobManager.h
         include/wrench/managers/function_manager/FunctionManager.h
+        include/wrench/managers/function_manager/FunctionManagerMessage.h
         include/wrench/managers/function_manager/Function.h
+        include/wrench/managers/function_manager/RegisteredFunction.h
         include/wrench/services/Service.h
         include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceMessagePayload.h
@@ -131,6 +133,7 @@ set(HEADER_FILES
         include/wrench/services/compute/serverless/ServerlessComputeService.h
         include/wrench/services/compute/serverless/ServerlessComputeServiceMessage.h
         include/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h
+        include/wrench/services/compute/serverless/Invocation.h
         include/wrench/services/compute/cloud/CloudComputeService.h
         include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
@@ -281,6 +284,9 @@ set(SOURCE_FILES
         src/wrench/managers/job_manager/JobManagerMessage.cpp
         include/wrench/managers/job_manager/JobManagerMessage.h
         src/wrench/managers/function_manager/FunctionManager.cpp
+        src/wrench/managers/function_manager/FunctionManagerMessage.cpp
+        src/wrench/managers/function_manager/Function.cpp
+        src/wrench/managers/function_manager/RegisteredFunction.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -336,6 +342,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/serverless/ServerlessComputeService.cpp
         src/wrench/services/compute/serverless/ServerlessComputeServiceMessage.cpp
         src/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.cpp
+        src/wrench/services/compute/serverless/Invocation.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
         include/wrench/services/compute/cloud/CloudComputeServiceMessage.h

@@ -102,18 +102,15 @@ namespace wrench {
 
     /**
      * @brief A message sent from a ServerlessComputeService when a function invocation is completed
-     * TODO: Needs to return the result of the function invocation
      */
     class ServerlessComputeServiceFunctionInvocationCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationCompleteMessage(bool success, std::shared_ptr<Function> function, std::string function_invocation_args, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationCompleteMessage(bool success, std::shared_ptr<Invocation> invocation, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
 
-        /** @brief Whether the invocation was successtul */
+        /** @brief Whether the invocation was successful */
         bool success;
-        /** @brief The function that was either invoked on success or not on failure */
-        std::shared_ptr<Function> function;
-        /** @brief  */
-        std::string function_invocation_args;
+        /** @brief The invocation object */
+        std::shared_ptr<Invocation> invocation;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
     };

@@ -18,51 +18,51 @@
 
 namespace wrench {
 
+    class ServerlessComputeService;
+
     /***********************/
     /** \cond DEVELOPER    */
     /***********************/
 
-    class ComputeService;
-
     /**
-     * @brief Represents a serverless function, encapsulating its metadata and behavior.
+     * @brief 
      */
     class Function {
     public:
         /**
-         * @brief Constructs a Function object.
-         * @param name The name of the function.
-         * @param lambda The function logic implemented as a lambda.
-         * @param image The file location of the function's container image.
-         * @param code The file location of the function's code.
+         * @brief 
+         * @param name 
+         * @param lambda 
+         * @param image 
+         * @param code 
          */
         Function(const std::string &name,
                  const std::function<std::string(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
                  const std::shared_ptr<FileLocation> &image,
-                 const std::shared_ptr<FileLocation> &code)
-            : _name(name), _lambda(lambda), _image(image), _code(code) {}
+                 const std::shared_ptr<FileLocation> &code);
 
         /**
-         * @brief Gets the name of the function.
-         * @return The name of the function.
+         * @brief 
+         * @return 
          */
-        std::string getName() const { return _name; }
+        std::string getName() const;
 
         /**
-         * @brief Executes the function with the provided input and storage service.
-         * @param input The input string for the function.
-         * @param storage_service A shared pointer to a StorageService instance.
-         * @return The result of the function execution.
+         * @brief 
+         * @param input 
+         * @param storage_service 
+         * @return 
          */
-        std::string execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const {
-            return _lambda(input, storage_service);
-        }
+        std::string execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const;
 
     private:
-        std::string _name; ///< The name of the function.
-        std::function<std::string(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> _lambda; ///< The function logic.
-        std::shared_ptr<FileLocation> _image; ///< The file location of the function's container image.
-        std::shared_ptr<FileLocation> _code; ///< The file location of the function's code.
+        friend class FunctionManager;
+        friend class ServerlessComputeService;
+
+        std::string _name; // the name of the function
+        std::function<std::string(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> _lambda; // the function logic
+        std::shared_ptr<FileLocation> _image; // the file location of the function's container image
+        std::shared_ptr<FileLocation> _code; // the file location of the function's code
     };
     
     /***********************/

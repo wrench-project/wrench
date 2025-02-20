@@ -93,6 +93,7 @@ namespace wrench {
         std::queue<std::shared_ptr<RegisteredFunction>> _functions_to_invoke;
         // TODO: Data structure for invoked functions and their results
         std::map<int, std::shared_ptr<Invocation>> _pending_invocations;
+        std::map<int, std::shared_ptr<Invocation>> _finished_invocations;
     };
 
     /***********************/

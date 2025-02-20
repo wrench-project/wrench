@@ -18,7 +18,7 @@
 
 namespace wrench {
 
-    class ComputeService;
+    class ServerlessComputeService;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -30,25 +30,31 @@ namespace wrench {
     class RegisteredFunction {
     public:
         /**
-         * @brief Constructs a Function object.
-         * @param name The name of the function.
-         * @param lambda The function logic implemented as a lambda.
-         * @param image The file location of the function's container image.
-         * @param code The file location of the function's code.
+         * @brief Constructs a RegisteredFunction object.
+         * @param function The function to be registered.
+         * @param time_limit_in_seconds The time limit for the function execution.
+         * @param disk_space_limit_in_bytes The disk space limit for the function.
+         * @param RAM_limit_in_bytes The RAM limit for the function.
+         * @param ingress_in_bytes The ingress data limit for the function.
+         * @param egress_in_bytes The egress data limit for the function.
          */
-        RegisteredFunction(const std::shared_ptr<Function> function, double time_limit_in_seconds, sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
-                                                    sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes)
-            : _function(function), _time_limit(time_limit_in_seconds), _disk_space(disk_space_limit_in_bytes), 
-            _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
+        RegisteredFunction(const std::shared_ptr<Function> function, 
+                           double time_limit_in_seconds, 
+                           sg_size_t disk_space_limit_in_bytes, 
+                           sg_size_t RAM_limit_in_bytes,
+                           sg_size_t ingress_in_bytes, 
+                           sg_size_t egress_in_bytes);
 
-        std::shared_ptr<Function> _function;
     private:
-        double _time_limit;
-        sg_size_t _disk_space;
-        sg_size_t _ram_limit;
-        sg_size_t _ingress;
-        sg_size_t _egress;
-
+        friend class FunctionManager;
+        friend class ServerlessComputeService;
+        
+        std::shared_ptr<Function> _function; // the function to be registered
+        double _time_limit; // the time limit for the function execution
+        sg_size_t _disk_space; // the disk space limit for the function
+        sg_size_t _ram_limit; // the RAM limit for the function
+        sg_size_t _ingress; // the ingress data limit for the function
+        sg_size_t _egress; // the egress data limit for the function
     };
     
     /***********************/
@@ -57,4 +63,4 @@ namespace wrench {
 
 } // namespace wrench
 
-#endif // WRENCH_FUNCTION_H
+#endif // WRENCH_REGISTEREDFUNCTION_H

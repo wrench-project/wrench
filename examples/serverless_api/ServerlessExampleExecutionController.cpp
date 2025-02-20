@@ -94,7 +94,7 @@ namespace wrench {
 
         function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
-        //TODO: Bypass function manager for now until FunctionInvocation is created
+        //TODO: Should the EC be responsibile for keeping track of its invocations?
         function_manager->invokeFunction(function1, this->compute_service, input);
         function_manager->invokeFunction(function2, this->compute_service, input);
         function_manager->invokeFunction(function1, this->compute_service, input);
