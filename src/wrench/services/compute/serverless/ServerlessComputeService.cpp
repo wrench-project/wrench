@@ -38,6 +38,9 @@ namespace wrench {
         _compute_hosts = std::move(compute_hosts);
         _head_storage_service_mount_point = std::move(head_storage_service_mount_point);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
+
+        // Set default and specified properties
+        this->setProperties(this->default_property_values, property_list);
     }
 
     /**
@@ -108,7 +111,7 @@ namespace wrench {
     bool ServerlessComputeService::registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds,
                                                     sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
                                                     sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
-        WRENCH_INFO(("Serverless Provider Registered function " + function->getName()).c_str());
+        WRENCH_INFO("Serverless Provider Registered function %s", function->getName().c_str());
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
@@ -142,7 +145,7 @@ namespace wrench {
      */
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(
         std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort* notify_commport) {
-        WRENCH_INFO(("Serverless Provider received invoke function %s", function->getName()).c_str());
+        WRENCH_INFO("Serverless Provider received invoke function %s", function->getName().c_str());
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
@@ -171,8 +174,7 @@ namespace wrench {
         // Start the Head Storage Service
         startHeadStorageService();
 
-        while (processNextMessage())
-        {
+        while (processNextMessage()) {
             admitInvocations();
             scheduleInvocations();
             dispatchFunctionInvocation();
@@ -203,7 +205,6 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-        //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto ss_mesg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message))
         {
@@ -386,6 +387,7 @@ namespace wrench {
 
         while (!_newInvocations.empty())
         {
+            WRENCH_INFO("Admitting an invocation...");
             auto invocation = _newInvocations.front();
             auto image = invocation->_registered_function->_function->_image;
 
@@ -428,12 +430,17 @@ namespace wrench {
         // Create a custom action (we could use a simple FileCopyAction here, but we are using a CustomAction
         // to demonstrate its use)
         const std::function lambda_execute = [invocation, this](std::shared_ptr<ActionExecutor> action_executor) {
+            WRENCH_INFO("In the lambda execute!!");
             const auto src_location = invocation->_registered_function->_function->_image;
             const auto dst_location = FileLocation::LOCATION(_head_storage_service, src_location->getFile());
             StorageService::copyFile(src_location, dst_location);
         };
+        const std::function lambda_terminate = [](std::shared_ptr<ActionExecutor> action_executor) {};
+
         auto action = std::shared_ptr<CustomAction>(
-            new CustomAction(name, 0, 0, lambda_execute, nullptr));
+            new CustomAction(
+                "download_image_" + invocation->_registered_function->_function->_image->getFile()->getID(),
+                0, 0, lambda_execute, lambda_terminate));
 
         // Spin up an ActionExecutor service, and have it send us back a custom message
         auto custom_message = new ServerlessComputeServiceDownloadCompleteMessage(
@@ -452,15 +459,17 @@ namespace wrench {
             nullptr);
 
         action_executor->setSimulation(this->simulation_);
+        WRENCH_INFO("Starting an action executor...");
         action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
     }
 
     void ServerlessComputeService::scheduleInvocations() {
         // TODO: Implement something fancy.
-        WRENCH_INFO("I should be scheduling invocations, but for now I am just making them runnable instantly");
         while (!_schedulableInvocations.empty())
         {
+            WRENCH_INFO("I should be scheduling an invocation, but for now I am just making it runnable instantly");
             _scheduledInvocations.push(std::move(_schedulableInvocations.front()));
+            _schedulableInvocations.pop();
         }
         return;
     }
