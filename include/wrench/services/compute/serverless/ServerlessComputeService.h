@@ -17,6 +17,7 @@
 #include "wrench/services/compute/serverless/Invocation.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 
 namespace wrench {
 
@@ -25,6 +26,11 @@ namespace wrench {
      *        controls access to their resource via function registration/invocation operations.
      */
     class ServerlessComputeService : public ComputeService {
+
+    private:
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+            {ServerlessComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}
+        };
 
     public:
 

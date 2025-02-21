@@ -64,7 +64,7 @@ namespace wrench {
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
-        auto image_file = wrench::Simulation::addFile("input_file_", 100 * MB);
+        auto image_file = wrench::Simulation::addFile("input_file", 100 * MB);
         auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
@@ -72,32 +72,45 @@ namespace wrench {
         wrench::StorageService::createFileAtLocation(code_location);
 
         auto function1 = function_manager->createFunction("Function 1", lambda, image_location, code_location);
+
+        WRENCH_INFO("Registering function 1");
         function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
-        
+        WRENCH_INFO("Function 1 registered");
+
         // Try to register the same function name
+        WRENCH_INFO("Trying to register function 1 again");
         try {
             function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         } catch (ExecutionException& expected) {
-            WRENCH_INFO(expected.getCause()->toString().c_str());
+            WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
 
         }
+
         auto function2 = function_manager->createFunction("Function 2", lambda, image_location, code_location);
-        
         // Try to invoke a function that is not registered yet
+        WRENCH_INFO("Invoking a non-registered function");
         auto input = std::make_shared<MyFunctionInput>(1,2);
 
         try {
             function_manager->invokeFunction(function2, this->compute_service, input);
         } catch (ExecutionException& expected) {
-            WRENCH_INFO(expected.getCause()->toString().c_str());
+            WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
         }
 
+        WRENCH_INFO("Registering function 2");
         function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        WRENCH_INFO("Function 2 registered");
 
-        //TODO: Should the EC be responsibile for keeping track of its invocations?
+
+        //TODO: Should the EC be responsible for keeping track of its invocations?
+        WRENCH_INFO("Invoking function 1");
         function_manager->invokeFunction(function1, this->compute_service, input);
-        function_manager->invokeFunction(function2, this->compute_service, input);
-        function_manager->invokeFunction(function1, this->compute_service, input);
+        WRENCH_INFO("Function 1 invoked");
+
+        wrench::Simulation::sleep(1000000);
+
+        // function_manager->invokeFunction(function2, this->compute_service, input);
+        // function_manager->invokeFunction(function1, this->compute_service, input);
 
         WRENCH_INFO("Execution complete");
         return 0;
