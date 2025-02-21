@@ -130,4 +130,8 @@ namespace wrench {
             sg_size_t payload)
         : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
+
+    ServerlessComputeServiceDownloadCompleteMessage::ServerlessComputeServiceDownloadCompleteMessage(
+        std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image_file(std::move(image_file)) {}
+
 } // namespace wrench
