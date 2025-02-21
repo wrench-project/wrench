@@ -115,6 +115,19 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
     };
 
+    /**
+     * @brief A message sent to a ServerlessComputeService to notify it that an image download has completed
+     */
+    class ServerlessComputeServiceDownloadCompleteMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceDownloadCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, sg_size_t payload);
+
+        /** @brief The action that did the download */
+        std::shared_ptr<CustomAction> _action;
+        /** @brief The invocation the download was for */
+        std::shared_ptr<DataFile> _image_file;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/
