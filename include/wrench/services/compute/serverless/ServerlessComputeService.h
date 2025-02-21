@@ -21,19 +21,8 @@
 namespace wrench {
 
 /**
-     * @brief A batch-scheduled compute service that manages a set of compute hosts and
-     *        controls access to their resource via a batch queue.
-     *
-     *        In the current implementation of
-     *        this service, like for many of its real-world counterparts, memory_manager_service
-     *        partitioning among jobs onq the same host is not handled.  When multiple jobs share hosts,
-     *        which can happen when jobs require only a few cores per host and can thus
-     *        be co-located on the same hosts in a non-exclusive fashion,
-     *        each job simply runs as if it had access to the
-     *        full RAM of each compute host it is scheduled on. The simulation of these
-     *        memory_manager_service contended scenarios is thus, for now, not realistic as there is no simulation
-     *        of the effects
-     *        of memory_manager_service sharing (e.g., swapping).
+     * @brief A serverless compute service that manages a set of compute hosts and
+     *        controls access to their resource via function registration/invocation operations.
      */
     class ServerlessComputeService : public ComputeService {
 
@@ -41,7 +30,7 @@ namespace wrench {
 
         ServerlessComputeService(const std::string &hostname,
                                  std::vector<std::string> compute_hosts,
-                                 std::string scratch_space_mount_point,
+                                 std::string head_node_storage_mount_point,
                                  WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                  WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
@@ -68,7 +57,6 @@ namespace wrench {
 
         int main() override;
 
-        // 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                const std::map<std::string, std::string> &service_specific_args) 
                                override;
@@ -88,22 +76,44 @@ namespace wrench {
                                               std::shared_ptr<FunctionInput> input, 
                                               S4U_CommPort *notify_commport);
 
+        void processImageDownloadCompletion(const std::shared_ptr<Action>& action, const std::shared_ptr<DataFile>& image_file);
+
+        void admitInvocations();
+        void scheduleInvocations();
         void dispatchFunctionInvocation();
 
         bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 
+        void startHeadStorageService();
+        void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
+
+
         // map of Registered functions sorted by function name
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         // vector of compute host names
         std::vector<std::string> _compute_hosts;
+
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _newInvocations;
-        // queue of function invocations currently being processed
+        // queues of function invocations whose images are being downloaded
+        std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admittedInvocations;
+        // queue of function invocations whose images have been downloaded
+        std::queue<std::shared_ptr<Invocation>> _schedulableInvocations;
+        // queue of function invocations whose are scheduled on a host and whose
+        // images are being copied there
+        std::queue<std::shared_ptr<Invocation>> _scheduledInvocations;
+        // queue of function invocations currently running
         std::queue<std::shared_ptr<Invocation>> _runningInvocations;
-        // queue of function invocations that have finished being processed
+        // queue of function invocations that have finished executing
         std::queue<std::shared_ptr<Invocation>> _finishedInvocations;
+
+        std::string _head_storage_service_mount_point;
+        std::shared_ptr<StorageService> _head_storage_service;
+        std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
+        std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
+        sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shennanigans
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}
