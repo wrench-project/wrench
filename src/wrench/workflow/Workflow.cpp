@@ -113,6 +113,11 @@ namespace wrench {
             throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
         }
 
+        // Remove the task from the ready tasks, just in case
+        if (this->ready_tasks.find(task) != this->ready_tasks.end()) {
+            this->ready_tasks.erase(task);
+        }
+
         // Fix all files
         for (auto &f: task->getInputFiles()) {
             this->task_input_files[f].erase(task);
@@ -123,6 +128,7 @@ namespace wrench {
         for (auto &f: task->getOutputFiles()) {
             this->task_output_files.erase(f);
         }
+
 
         // Get the children
         auto children = this->dag.getChildren(task.get());
@@ -136,7 +142,7 @@ namespace wrench {
         tasks.erase(tasks.find(task->id));
 
         // Brute-force update of the top-level of all the children and the bottom-level
-        // of the parents of the removed task
+        // of the parents of the removed task (if we're doing it dynamically)
         if (this->update_top_bottom_levels_dynamically) {
             for (auto const &child: children) {
                 child->updateTopLevel();
