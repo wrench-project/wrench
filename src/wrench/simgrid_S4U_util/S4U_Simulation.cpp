@@ -39,7 +39,7 @@ namespace wrench {
     void S4U_Simulation::initialize(int *argc, char **argv) {
         this->engine = new simgrid::s4u::Engine(argc, argv);
         if (not Simulation::isSurfPrecisionSetByUser()) {
-            simgrid::s4u::Engine::set_config("surf/precision:1e-9");
+            simgrid::s4u::Engine::set_config("precision/timing:1e-9");
         }
 
 

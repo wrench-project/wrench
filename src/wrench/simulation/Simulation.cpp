@@ -123,7 +123,7 @@ namespace wrench {
 
         // Determine if specific --cfg arguments were passed
         for (i = 0; i < *argc; i++) {
-            if (!strncmp(argv[i], "--cfg=surf/precision:", strlen("--cfg=surf/precision:"))) {
+            if (!strncmp(argv[i], "--cfg=precision/timing:", strlen("--cfg=precision/timing:"))) {
                 Simulation::surf_precision_set_by_user = true;
             }
         }
