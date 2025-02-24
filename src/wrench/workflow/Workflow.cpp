@@ -132,6 +132,7 @@ namespace wrench {
 
         // Get the children
         auto children = this->dag.getChildren(task.get());
+
         // Get the parents
         auto parents = this->dag.getParents(task.get());
 
@@ -140,6 +141,11 @@ namespace wrench {
 
         // Remove the task from the master list
         tasks.erase(tasks.find(task->id));
+
+        // Make the children ready, if the case
+        for (auto const &child: children) {
+            this->updateReadiness(child);
+        }
 
         // Brute-force update of the top-level of all the children and the bottom-level
         // of the parents of the removed task (if we're doing it dynamically)
@@ -234,18 +240,26 @@ namespace wrench {
             }
 
             /* Update state */
-            if ((dst->getState() == WorkflowTask::State::NOT_READY) and (dst->getInternalState() == WorkflowTask::InternalState::TASK_NOT_READY)) {
-                bool ready = true;
-                for (auto const &p: dst->getParents()) {
-                    if (p->getState() != WorkflowTask::State::COMPLETED) {
-                        ready = false;
-                        break;
-                    }
+            this->updateReadiness(dst.get());
+        }
+    }
+
+    /**
+     * @brief Update the readiness of a task
+     * @param task : workflow task
+     */
+    void Workflow::updateReadiness(WorkflowTask *task) {
+        if ((task->getState() == WorkflowTask::State::NOT_READY) and (task->getInternalState() == WorkflowTask::InternalState::TASK_NOT_READY)) {
+            bool ready = true;
+            for (auto const &p: task->getParents()) {
+                if (p->getState() != WorkflowTask::State::COMPLETED) {
+                    ready = false;
+                    break;
                 }
-                if (ready) {
-                    dst->setInternalState(WorkflowTask::InternalState::TASK_READY);
-                    dst->setState(WorkflowTask::State::READY);
-                }
+            }
+            if (ready) {
+                task->setInternalState(WorkflowTask::InternalState::TASK_READY);
+                task->setState(WorkflowTask::State::READY);
             }
         }
     }
