@@ -64,6 +64,8 @@ namespace wrench {
         void addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dest, bool redundant_dependencies = false);
         void removeControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dest);
 
+        void updateReadiness(WorkflowTask *task);
+
         unsigned long getNumberOfTasks();
 
         unsigned long getNumLevels();
