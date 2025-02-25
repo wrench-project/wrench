@@ -918,7 +918,7 @@ namespace wrench {
                 for (auto const &dwmb: msg->data_write_commport_and_bytes) {
                     // Bufferized
                     sg_size_t remaining = dwmb.second;
-                    while (remaining - buffer_size > 0) {
+                    while (remaining > buffer_size) {
                         dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
                                 file, buffer_size, false));
                         remaining -= buffer_size;
