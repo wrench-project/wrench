@@ -689,6 +689,7 @@ private:
         std::vector<std::map<std::string, std::string>> bogus_args;
         bogus_args.push_back({{"bogus_action", "somehost"}});
         bogus_args.push_back({{"my_computation", "somehost"}});
+        bogus_args.push_back({{"my_computation", "somehost:1"}});
         bogus_args.push_back({{"my_computation", "Host4:30:123:12:ba"}});
         bogus_args.push_back({{"my_computation", "Host4:1"}});
         bogus_args.push_back({{"my_computation", "Host4:12"}});
@@ -742,7 +743,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);

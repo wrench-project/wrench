@@ -144,7 +144,7 @@ namespace wrench {
 
         // Make the children ready, if the case
         for (auto const &child: children) {
-            this->updateReadiness(child);
+            Workflow::updateReadiness(child);
         }
 
         // Brute-force update of the top-level of all the children and the bottom-level
@@ -240,7 +240,7 @@ namespace wrench {
             }
 
             /* Update state */
-            this->updateReadiness(dst.get());
+            Workflow::updateReadiness(dst.get());
         }
     }
 
@@ -561,7 +561,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(int min, int max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(int min, int max) const {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getTopLevel() >= min) and (task->getTopLevel() <= max)) {
@@ -577,7 +577,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(int min, int max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(int min, int max) const {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getBottomLevel() >= min) and (task->getBottomLevel() <= max)) {
@@ -740,19 +740,6 @@ namespace wrench {
         }
         return to_return;
     }
-
-    //    /**
-    //     * @brief Add a file to the workflow
-    //     * @param id : file name
-    //     * @param size : file size in bytes
-    //     * @return a file
-    //     */
-    //    std::shared_ptr<DataFile> Workflow::addFile(const std::string &id, double size) {
-    //        //        std::cerr << "CREATING DATA FILE " << id << "\n";
-    //        auto data_file = Simulation::addFile(id, size);
-    ////        this->data_files.insert(data_file);
-    //        return data_file;
-    //    }
 
     /**
       * @brief Get the list of all files in the workflow/simulation
