@@ -125,7 +125,6 @@ namespace wrench {
         simgrid::s4u::Engine *engine = nullptr;
         bool initialized = false;
         bool platform_setup = false;
-
     };
 
     /***********************/
