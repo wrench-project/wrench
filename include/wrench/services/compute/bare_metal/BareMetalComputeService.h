@@ -130,7 +130,7 @@ namespace wrench {
                                 const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
                                 const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                                 const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
-                                std::shared_ptr<PilotJob> pj, const std::string &suffix,
+                                const std::shared_ptr<PilotJob>& pj, const std::string &suffix,
                                 std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         //        BareMetalComputeService(const std::string &hostname,

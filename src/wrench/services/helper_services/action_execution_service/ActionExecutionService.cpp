@@ -185,17 +185,17 @@ namespace wrench {
             const std::string &hostname,
             const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &compute_resources,
             std::shared_ptr<Service> parent_service,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : Service(hostname,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : Service(hostname,
                                                                                  "action_execution_service") {
         // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
+        this->setProperties(this->default_property_values, property_list);
 
         // Validate that properties are correct
         this->validateProperties();
 
         // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         // Check that there is at least one core per host and that hosts have enough cores
         if (compute_resources.empty()) {
@@ -207,7 +207,7 @@ namespace wrench {
             unsigned long available_cores;
             try {
                 available_cores = host.first->get_core_count();
-            } catch (std::runtime_error &e) {
+            } catch (std::runtime_error &) {
                 throw std::invalid_argument(
                         "ActionExecutionService::ActionExecutionService(): Host '" + host.first->get_name() + "' does not exist");
             }
@@ -227,10 +227,6 @@ namespace wrench {
 
             sg_size_t requested_ram = std::get<1>(host.second);
             sg_size_t available_ram = S4U_Simulation::getHostMemoryCapacity(host.first);
-            if (requested_ram < 0) {
-                throw std::invalid_argument(
-                        "ActionExecutionService::ActionExecutionService(): requested RAM should be non-negative");
-            }
 
             if (requested_ram == ComputeService::ALL_RAM) {
                 requested_ram = available_ram;
@@ -326,8 +322,8 @@ namespace wrench {
      */
     std::tuple<simgrid::s4u::Host *, unsigned long> ActionExecutionService::pickAllocation(
             const std::shared_ptr<Action> &action,
-            simgrid::s4u::Host *required_host,
-            unsigned long required_num_cores,
+            const simgrid::s4u::Host *required_host,
+            const unsigned long required_num_cores,
             std::set<simgrid::s4u::Host *> &hosts_to_avoid) {
 
         // Compute possible hosts
@@ -475,7 +471,7 @@ namespace wrench {
             action_executor->setSimulation(this->simulation_);
             try {
                 action_executor->start(action_executor, true, false);// Daemonized, no auto-restart
-            } catch (ExecutionException &e) {
+            } catch (ExecutionException &) {
                 // This is an error on the target host!!
                 throw std::runtime_error(
                         "ActionSchedule::dispatchReadyActions(): got a host error on the target host - this shouldn't happen");
@@ -528,7 +524,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
         try {
             message = this->commport->getMessage();
-        } catch (ExecutionException &e) {
+        } catch (ExecutionException &) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;
         }
@@ -566,36 +562,36 @@ namespace wrench {
                 }
             }
 
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-            this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
+        } else if (auto ssdm = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+            this->terminate(ssdm->send_failure_notifications, (ComputeService::TerminationCause)(ssdm->termination_cause));
 
             // This is Synchronous
             try {
-                msg->ack_commport->putMessage(
+                ssdm->ack_commport->putMessage(
                         new ServiceDaemonStoppedMessage(0.0));
             } catch (ExecutionException &e) {
                 return false;
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceSubmitActionRequestMessage>(message)) {
-            processSubmitAction(msg->reply_commport, msg->action);
+        } else if (auto aessarm = std::dynamic_pointer_cast<ActionExecutionServiceSubmitActionRequestMessage>(message)) {
+            processSubmitAction(aessarm->reply_commport, aessarm->action);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutionServiceTerminateActionRequestMessage>(message)) {
-            processActionTerminationRequest(msg->action, msg->reply_commport, msg->termination_cause);
+        } else if (auto aestarm = std::dynamic_pointer_cast<ActionExecutionServiceTerminateActionRequestMessage>(message)) {
+            processActionTerminationRequest(aestarm->action, aestarm->reply_commport, aestarm->termination_cause);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ActionExecutorDoneMessage>(message)) {
-            if (msg->action_executor->getAction()->getState() == Action::State::COMPLETED) {
-                processActionExecutorCompletion(msg->action_executor);
+        } else if (auto aedm = std::dynamic_pointer_cast<ActionExecutorDoneMessage>(message)) {
+            if (aedm->action_executor->getAction()->getState() == Action::State::COMPLETED) {
+                processActionExecutorCompletion(aedm->action_executor);
             } else {
-                processActionExecutorFailure(msg->action_executor);
+                processActionExecutorFailure(aedm->action_executor);
             }
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
-            auto service = msg->service;
+        } else if (auto shcm = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
+            auto service = shcm->service;
             auto action_executor = std::dynamic_pointer_cast<ActionExecutor>(service);
             if (not action_executor) {
                 throw std::runtime_error(
@@ -786,7 +782,7 @@ namespace wrench {
         try {
             auto msg = new ActionExecutionServiceActionDoneMessage(action, 0);
             this->parent_service->commport->dputMessage(msg);
-        } catch (ExecutionException &e) {
+        } catch (ExecutionException &) {
             return;
         }
     }
@@ -1056,11 +1052,11 @@ namespace wrench {
      *
      */
     void ActionExecutionService::validateProperties() {
-        bool success = true;
+        // bool success = true;
 
-        if (not success) {
-            throw std::invalid_argument("ActionExecutionService: Invalid properties");
-        }
+        // if (not success) {
+        //     throw std::invalid_argument("ActionExecutionService: Invalid properties");
+        // }
     }
 
     /**
@@ -1095,7 +1091,7 @@ namespace wrench {
             try {
                 this->parent_service->commport->dputMessage(
                         new ActionExecutionServiceActionDoneMessage(action, 0));
-            } catch (ExecutionException &e) {
+            } catch (ExecutionException &) {
                 return;
             }
         }

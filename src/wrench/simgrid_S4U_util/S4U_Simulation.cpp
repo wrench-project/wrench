@@ -145,7 +145,7 @@ namespace wrench {
             this->engine->load_platform(filename);
         } catch (simgrid::ParseError &e) {
             throw std::invalid_argument("Platform description file error: " + std::string(e.what()));
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &) {
             throw;
         }
 
@@ -808,7 +808,7 @@ namespace wrench {
         }
         try {
             energy_consumed = sg_host_get_consumed_energy(host);
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
                     "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the "
                     "energy consumed by the host. Make sure the energy plugin is enabled (--wrench-energy-simulation)");
@@ -875,7 +875,7 @@ namespace wrench {
         }
         try {
             return static_cast<int>(host->get_pstate_count());
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
                     "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
@@ -913,7 +913,7 @@ namespace wrench {
         }
         try {
             return sg_host_get_wattmin_at(host, static_cast<int>(host->get_pstate()));
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
                     "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
@@ -933,7 +933,7 @@ namespace wrench {
         try {
             return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
                                           static_cast<int>((simgrid::s4u::Host::by_name(hostname))->get_pstate()));
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
                     "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. "
                     "Make sure the energy plugin is enabled (--wrench-energy-simulation)"
@@ -959,7 +959,7 @@ namespace wrench {
             for (int i = 0; i < num_pstates; i++) {
                 list.push_back(i);
             }
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
                     "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. "
                     "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
@@ -989,7 +989,7 @@ namespace wrench {
         simgrid::s4u::Host *host;
         try {
             host = S4U_Simulation::get_host_or_vm_by_name(hostname);
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
         }
 
@@ -1017,7 +1017,7 @@ namespace wrench {
         simgrid::s4u::Host *host;
         try {
             host = simgrid::s4u::Host::by_name(hostname);
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::invalid_argument("S4U_Simulation::hostHasMountPoint(): Unknown host " + hostname);
         }
 
@@ -1049,12 +1049,12 @@ namespace wrench {
         simgrid::s4u::Host *src, *dst;
         try {
             src = S4U_Simulation::get_host_or_vm_by_name(src_host);
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::invalid_argument("S4U_Simulation::getRoute(): Unknown host " + src_host);
         }
         try {
             dst = S4U_Simulation::get_host_or_vm_by_name(dst_host);
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::invalid_argument("S4U_Simulation::getRoute(): Unknown host " + dst_host);
         }
         std::vector<simgrid::s4u::Link *> links;
@@ -1080,7 +1080,7 @@ namespace wrench {
         simgrid::s4u::Host *host;
         try {
             host = S4U_Simulation::get_host_or_vm_by_name(hostname);
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown host " + hostname);
         }
 
@@ -1106,7 +1106,7 @@ namespace wrench {
             if (capacity_str) {
                 try {
                     capacity = UnitParser::parse_size(capacity_str);
-                } catch (std::invalid_argument &e) {
+                } catch (std::invalid_argument &) {
                     throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Disk " + d->get_name() +
                                                 " at host " + hostname + " has invalid size");
                 }
@@ -1184,7 +1184,7 @@ namespace wrench {
  */
     simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name(const std::string &name) {
         if (name.empty()) return nullptr;
-        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(name);
+        const auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(name);
         if (!host) {
             throw std::invalid_argument("S4U_Simulation::get_host_or_vm_by_name(): Unknown host '" + name + "'");
         }

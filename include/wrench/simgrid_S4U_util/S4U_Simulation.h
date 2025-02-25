@@ -11,7 +11,6 @@
 #ifndef WRENCH_S4U_SIMULATION_H
 #define WRENCH_S4U_SIMULATION_H
 
-#include <set>
 #include <climits>
 #include <limits>
 #include <simgrid/s4u.hpp>
