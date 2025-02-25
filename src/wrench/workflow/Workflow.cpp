@@ -46,7 +46,7 @@ namespace wrench {
                                                     unsigned long min_num_cores,
                                                     unsigned long max_num_cores,
                                                     sg_size_t memory_requirement) {
-        if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) || (memory_requirement < 0)) {
+        if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores)) {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
         }
 
