@@ -30,6 +30,8 @@ WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation
 
 namespace wrench {
 
+    // simgrid::s4u::MutexPtr S4U_Simulation::global_lock;
+
     /**
      * @brief Initialize the Simgrid simulation
      *
@@ -48,7 +50,7 @@ namespace wrench {
         S4U_CommPort::NULL_COMMPORT = new S4U_CommPort();
         this->initialized = true;
 
-        //        sg_storage_file_system_init();
+        // this->global_lock = simgrid::s4u::Mutex::create();
     }
 
     /**

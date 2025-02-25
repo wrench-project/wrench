@@ -115,6 +115,8 @@ namespace wrench {
 
         static sg_size_t getHostMemoryCapacity(simgrid::s4u::Host *host);
 
+        // static simgrid::s4u::MutexPtr global_lock;
+
     private:
         static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string,
                                                  std::vector<std::string>> &result,
@@ -124,6 +126,7 @@ namespace wrench {
         simgrid::s4u::Engine *engine = nullptr;
         bool initialized = false;
         bool platform_setup = false;
+
     };
 
     /***********************/
