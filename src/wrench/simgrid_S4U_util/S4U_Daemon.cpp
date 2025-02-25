@@ -30,7 +30,7 @@ std::unordered_map<std::string, unsigned long> num_actors;
 namespace wrench {
 
     std::unordered_map<aid_t, S4U_CommPort *> S4U_Daemon::map_actor_to_recv_commport;
-    std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> S4U_Daemon::map_actor_to_held_mutexes;
+    // std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> S4U_Daemon::map_actor_to_held_mutexes;
 
     int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
@@ -300,6 +300,17 @@ namespace wrench {
         this->recv_commport->s4u_mb->set_receiver(nullptr);
         S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
         //        S4U_Daemon::running_actors.erase(this->getSharedPtr<S4U_Daemon>());
+
+
+        // There is a potential problem here:
+        //  - this could be the only non-daemonized actor
+        //  - a non-daemonized actor currently holds a lock
+        //  This would cause a "mutex is being destroyed but still held by an actor" exception
+        // TODO: One idea: sleep a little bit (ugly, breaks one test!!)
+        // TODO: One idea: lock/unlock a (new) global lock (breaks many tests!!)
+        // S4U_Simulation::sleep(0.0000001);
+        // S4U_Simulation::global_lock->lock();
+        // S4U_Simulation::global_lock->unlock();
     }
 
 
@@ -398,6 +409,7 @@ namespace wrench {
  * @brief Lock the daemon's lock
  */
     void S4U_Daemon::acquireDaemonLock() {
+        // S4U_Simulation::global_lock->lock();
         this->daemon_lock->lock();
         //        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].insert(this->daemon_lock);
     }
@@ -407,6 +419,8 @@ namespace wrench {
  */
     void S4U_Daemon::releaseDaemonLock() {
         this->daemon_lock->unlock();
+        // S4U_Simulation::global_lock->unlock();
+
         //        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
     }
 
