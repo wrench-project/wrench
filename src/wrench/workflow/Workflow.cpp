@@ -269,7 +269,7 @@ namespace wrench {
      *
      * @return the number of tasks
      */
-    unsigned long Workflow::getNumberOfTasks() {
+    unsigned long Workflow::getNumberOfTasks() const {
         return this->tasks.size();
     }
 
@@ -317,7 +317,7 @@ namespace wrench {
      *
      * @return map of workflow cluster tasks
      */
-    std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> Workflow::getReadyClusters() {
+    std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> Workflow::getReadyClusters() const {
         // TODO: Implement this more efficiently
 
         std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> task_map;
@@ -351,7 +351,7 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool Workflow::isDone() {
+    bool Workflow::isDone() const {
         for (const auto &it: this->tasks) {
             auto task = it.second;
             if (task->getState() != WorkflowTask::State::COMPLETED) {
@@ -375,7 +375,7 @@ namespace wrench {
      *
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasks() {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasks() const {
         std::vector<std::shared_ptr<WorkflowTask>> all_tasks;
         for (auto const &t: this->tasks) {
             all_tasks.push_back(t.second);
@@ -659,7 +659,7 @@ namespace wrench {
      * @brief Returns the number of levels in the workflow
      * @return the number of levels
      */
-    unsigned long Workflow::getNumLevels() {
+    unsigned long Workflow::getNumLevels() const {
         int max_top_level = 0;
         for (auto const &t: this->tasks) {
             auto task = t.second.get();

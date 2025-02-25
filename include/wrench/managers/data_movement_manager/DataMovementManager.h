@@ -65,7 +65,7 @@ namespace wrench {
         friend class WMS;
         friend class ExecutionController;
 
-        explicit DataMovementManager(std::string hostname, S4U_CommPort *creator_commport);
+        explicit DataMovementManager(const std::string& hostname, S4U_CommPort *creator_commport);
 
         /***********************/
         /** \endcond           */

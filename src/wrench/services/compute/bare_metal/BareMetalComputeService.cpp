@@ -318,7 +318,7 @@ namespace wrench
         const std::map<std::string, std::tuple<unsigned long, sg_size_t>>& compute_resources,
         const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
         const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
-        std::shared_ptr<PilotJob> pj,
+        const std::shared_ptr<PilotJob>& pj,
         const std::string& suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
         "bare_metal" + suffix,
         std::move(scratch_space))
@@ -470,7 +470,7 @@ namespace wrench
         {
             message = this->commport->getMessage();
         }
-        catch (ExecutionException& e)
+        catch (ExecutionException&)
         {
             WRENCH_INFO(
                 "Got a network error while getting some message... ignoring");
@@ -492,7 +492,7 @@ namespace wrench
                     new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                         BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             }
-            catch (ExecutionException& e)
+            catch (ExecutionException&)
             {
                 return false;
             }
@@ -604,7 +604,7 @@ namespace wrench
         {
             this->action_execution_service->assertServiceIsUp();
         }
-        catch (ExecutionException& e)
+        catch (ExecutionException&)
         {
             // And send a reply!
             answer_commport->dputMessage(
@@ -681,7 +681,7 @@ namespace wrench
             {
                 this->terminateCurrentCompoundJob(job, termination_cause);
             }
-            catch (ExecutionException& e)
+            catch (ExecutionException&)
             {
                 // If we get an exception, nevermind
             }
@@ -702,7 +702,7 @@ namespace wrench
                             this->getMessagePayloadValue(
                                 BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
                 }
-                catch (ExecutionException& e)
+                catch (ExecutionException&)
                 {
                     return; // ignore
                 }
@@ -787,9 +787,7 @@ namespace wrench
     void BareMetalComputeService::processGetResourceInformation(S4U_CommPort* answer_commport,
                                                                 const std::string& key)
     {
-        std::map<std::string, double> dict;
-
-        dict = this->constructResourceInformation(key);
+        std::map<std::string, double> dict = this->constructResourceInformation(key);
 
         // Send the reply
         auto* answer_message = new ComputeServiceResourceInformationAnswerMessage(
@@ -832,7 +830,7 @@ namespace wrench
             thread_startup_overhead = this->getPropertyValueAsTimeInSecond(
                 BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
         }
-        catch (std::invalid_argument& e)
+        catch (std::invalid_argument&)
         {
             success = false;
         }
@@ -967,7 +965,7 @@ namespace wrench
                 // job is not one
             }
         }
-        catch (ExecutionException& e)
+        catch (ExecutionException&)
         {
             return; // ignore
         }
