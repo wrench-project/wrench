@@ -40,7 +40,7 @@ namespace wrench {
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
             S4U_CommPort *callback_commport,
-            std::shared_ptr<Action> action,
+            const std::shared_ptr<Action>& action,
             const std::shared_ptr<ActionExecutionService>& action_execution_service) : ExecutionController(hostname, "action_executor") {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
