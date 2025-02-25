@@ -43,8 +43,8 @@ namespace wrench {
         S4U_VirtualMachine(const std::string &vm_hostname,
                            unsigned long num_cores,
                            sg_size_t ram_memory,
-                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list);
+                           const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                           const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list);
 
         void start(std::string &pm_name);
 

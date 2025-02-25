@@ -47,7 +47,7 @@ namespace wrench {
                                       double non_grid_post_overhead,
                                       bool fast_bmcs_resource_availability,
                                       bool fcfs,
-                                      std::set<std::shared_ptr<ComputeService>> compute_services,
+                                      const std::set<std::shared_ptr<ComputeService>>& compute_services,
                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                       WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 

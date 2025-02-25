@@ -11,12 +11,9 @@
 #define WRENCH_ACTION_SCHEDULER_H
 
 
-#include <queue>
-
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
 #include "wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h"
-
 
 namespace wrench {
 
@@ -57,8 +54,8 @@ namespace wrench {
         ActionExecutionService(const std::string &hostname,
                                const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &compute_resources,
                                std::shared_ptr<Service> parent_service,
-                               WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                               WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                               const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                               const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL     */
@@ -122,8 +119,6 @@ namespace wrench {
 
         void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-        void failCurrentActions();
-
         void processActionExecutorCompletion(const std::shared_ptr<ActionExecutor> &executor);
 
         void processActionExecutorFailure(const std::shared_ptr<ActionExecutor> &executor);
@@ -149,15 +144,13 @@ namespace wrench {
             COMPUTE_SERVICE_KILLED
         };
 
-        void terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancellation);
-
         void killAction(const std::shared_ptr<Action> &action, const std::shared_ptr<FailureCause> &cause);
 
 
         void processSubmitAction(S4U_CommPort *answer_commport, const std::shared_ptr<Action> &action);
 
         std::tuple<simgrid::s4u::Host *, unsigned long> pickAllocation(const std::shared_ptr<Action> &action,
-                                                                       simgrid::s4u::Host *required_host, unsigned long required_num_cores,
+                                                                       const simgrid::s4u::Host *required_host, unsigned long required_num_cores,
                                                                        std::set<simgrid::s4u::Host *> &hosts_to_avoid);
 
 
