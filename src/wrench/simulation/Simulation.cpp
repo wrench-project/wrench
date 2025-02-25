@@ -583,7 +583,6 @@ namespace wrench {
      *
      */
     void Simulation::startAllProcesses() {
-
         // Start the execution controllers
         for (const auto &execution_controller: this->execution_controllers) {
             execution_controller->start(execution_controller, execution_controller->daemonized_, false);// Not daemonized, no auto-restart
