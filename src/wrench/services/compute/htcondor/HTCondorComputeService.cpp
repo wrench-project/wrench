@@ -47,11 +47,6 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
-        //        // Check that there are child services
-        //        if (compute_services.empty()) {
-        //            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): at least one 'child' compute service should be provided");
-        //        }
-
         // Check that all services are of allowed types
         for (auto const &cs: compute_services) {
             if ((not std::dynamic_pointer_cast<BatchComputeService>(cs)) and
@@ -60,35 +55,6 @@ namespace wrench {
                         "HTCondorComputeService::HTCondorComputeService(): Only BatchComputeService or BareMetalComputeService instances can be used as 'child' services");
             }
         }
-
-#if 0
-        // Determine pilot job support
-        bool at_least_one_service_supports_pilot_jobs = false;
-        for (auto const &cs: compute_services) {
-            if (cs->supportsPilotJobs()) {
-                at_least_one_service_supports_pilot_jobs = true;
-                break;
-            }
-        }
-
-        // Determine standard job support
-        bool at_least_one_service_supports_standard_jobs = false;
-        for (auto const &cs: compute_services) {
-            if (cs->supportsStandardJobs()) {
-                at_least_one_service_supports_standard_jobs = true;
-                break;
-            }
-        }
-
-        // Determine if there is at least one BatchComputeService service
-        bool at_least_one_batch_service = false;
-        for (auto const &cs: compute_services) {
-            if (std::dynamic_pointer_cast<BatchComputeService>(cs)) {
-                at_least_one_batch_service = true;
-                break;
-            }
-        }
-#endif
 
         // create central manager service
         this->central_manager = std::make_shared<HTCondorCentralManagerService>(
@@ -112,8 +78,8 @@ namespace wrench {
      * @brief Add a new 'child' compute service
      * @param compute_service: the compute service to add
      */
-    void HTCondorComputeService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
-        this->central_manager->addComputeService(std::move(compute_service));
+    void HTCondorComputeService::addComputeService(const std::shared_ptr<ComputeService>& compute_service) {
+        this->central_manager->addComputeService(compute_service);
     }
 
     /**
@@ -127,7 +93,7 @@ namespace wrench {
                                                    const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
-        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
+        auto answer_commport = getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
@@ -168,7 +134,7 @@ namespace wrench {
      *
      * @return true if grid-universe, false otherwise
      */
-    bool HTCondorComputeService::isJobGridUniverse(std::shared_ptr<CompoundJob> &job) {
+    bool HTCondorComputeService::isJobGridUniverse(const std::shared_ptr<CompoundJob> &job) {
         auto service_specific_arguments = job->getServiceSpecificArguments();
         return (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
                (service_specific_arguments["-universe"] == "grid");
@@ -213,7 +179,7 @@ namespace wrench {
 
         try {
             message = this->commport->getMessage();
-        } catch (ExecutionException &e) {
+        } catch (ExecutionException &) {
             return true;
         }
 
@@ -224,11 +190,11 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto ssdm = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate();
             // This is Synchronous
             try {
-                msg->ack_commport->putMessage(
+                ssdm->ack_commport->putMessage(
                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                 HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (ExecutionException &e) {
@@ -236,8 +202,8 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobRequestMessage>(message)) {
-            processSubmitCompoundJob(msg->answer_commport, msg->job, msg->service_specific_args);
+        } else if (auto csscjrm = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobRequestMessage>(message)) {
+            processSubmitCompoundJob(csscjrm->answer_commport, csscjrm->job, csscjrm->service_specific_args);
             return true;
 
         } else {
