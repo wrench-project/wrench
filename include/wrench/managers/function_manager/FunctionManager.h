@@ -62,6 +62,9 @@ namespace wrench {
         std::shared_ptr<Invocation> invokeFunction(std::shared_ptr<Function> function,
                                                     const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
                                                     std::shared_ptr<FunctionInput> function_invocation_args);
+
+        bool isDone(std::shared_ptr<Invocation> invocation);
+        void wait_one(std::shared_ptr<Invocation> invocation);
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -85,6 +88,12 @@ namespace wrench {
         void processFunctionInvocationComplete();
 
         void processFunctionInvocationFailure();
+
+        void processWaitOne(std::shared_ptr<Invocation> invocation, S4U_CommPort* answer_commport);
+
+        void processWaitAll(std::vector<std::shared_ptr<Invocation>> invocations, S4U_CommPort* answer_commport);
+
+        void processInvocationsBeingWaitedFor();
 
         S4U_CommPort *creator_commport;
 

@@ -118,7 +118,7 @@ namespace wrench {
      * @return false if the invocation is not done
      */
     bool FunctionManager::isDone(std::shared_ptr<Invocation> invocation) {
-        if (_finished_invocations->find(invocation) != _finished_invocations->end()) {
+        if (_finished_invocations.find(invocation) != _finished_invocations.end()) {
             return true;
         }
         return false;
