@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #include "wrench/managers/function_manager/Function.h"
 
 namespace wrench {

@@ -14,6 +14,7 @@
 #include <memory>
 #include <wrench/managers/function_manager/Function.h>
 #include <wrench/managers/function_manager/RegisteredFunction.h>
+#include <wrench/managers/function_manager/FunctionOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
 namespace wrench {
@@ -39,31 +40,17 @@ namespace wrench {
          * @brief Gets the output of the function invocation.
          * @return A shared pointer to the function output.
          */
-        // std::shared_ptr<FunctionOutput> get_output();
-
-        /**
-         * @brief Checks if the function is currently running.
-         * @return True if the function is running, false otherwise.
-         */
-        bool is_running();
-
-        /**
-         * @brief Checks if the function invocation is done.
-         * @return True if the function invocation is done, false otherwise.
-         */
-        bool is_done();
+        std::shared_ptr<FunctionOutput> get_output();
 
     private:
         friend class FunctionManager;
         friend class ServerlessComputeService;
 
-        std::shared_ptr<RegisteredFunction> _registered_function; ///< The registered function to be invoked.
-        std::shared_ptr<FunctionInput> _function_input; ///< The input for the function.
-        // std::shared_ptr<FunctionOutput> _function_output; ///< The output of the function invocation.
-        S4U_CommPort* _notify_commport; ///< The communication port for notifications.
+        std::shared_ptr<RegisteredFunction> _registered_function; // the registered function to be invoked
+        std::shared_ptr<FunctionInput> _function_input; // the input for the function
+        std::shared_ptr<FunctionOutput> _function_output; // the output of the function invocation
+        S4U_CommPort* _notify_commport; // the communication port for notifications
 
-        bool running = false; ///< Indicates if the function is currently running.
-        bool done = false; ///< Indicates if the function invocation is done.
     };
 }
 

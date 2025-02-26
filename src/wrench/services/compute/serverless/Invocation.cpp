@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2025. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 #include "wrench/services/compute/serverless/Invocation.h"
 
 namespace wrench {
@@ -20,18 +29,6 @@ namespace wrench {
      * @brief Gets the output of the function invocation.
      * @return A shared pointer to the function output.
      */
-    // std::shared_ptr<FunctionOutput> Invocation::get_output() { return _function_output; }
-
-    /**
-     * @brief Checks if the function is currently running.
-     * @return True if the function is running, false otherwise.
-     */
-    bool Invocation::is_running() { return running; }
-
-    /**
-     * @brief Checks if the function invocation is done.
-     * @return True if the function invocation is done, false otherwise.
-     */
-    bool Invocation::is_done() { return done; }
+    std::shared_ptr<FunctionOutput> Invocation::get_output() const { return _function_output; }
 
 } // namespace wrench

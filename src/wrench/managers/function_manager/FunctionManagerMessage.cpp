@@ -19,6 +19,12 @@ namespace wrench {
     FunctionManagerMessage::FunctionManagerMessage() : SimulationMessage(0) {
     }
 
+    /**
+     * @brief Message sent to the job manager to wake it up
+     */
+    FunctionManagerWakeupMessage::FunctionManagerWakeupMessage() : FunctionManagerMessage() {
+    }
+
     // FunctionManagerFunctionInvocationRequestMessage::FunctionManagerFunctionInvocationRequestMessage() {
 
     // }
@@ -65,9 +71,23 @@ namespace wrench {
     }
 
     /**
-     * @brief Message sent to the job manager to wake it up
+     * @brief Construct a new Function Manager Wait One Message:: Function Manager Wait One Message object
+     * 
+     * @param answer_commport 
+     * @param invocation 
      */
-    FunctionManagerWakeupMessage::FunctionManagerWakeupMessage() : FunctionManagerMessage() {
+    FunctionManagerWaitOneMessage::FunctionManagerWaitOneMessage(S4U_CommPort *answer_commport,
+                                                                 std::shared_ptr<Invocation> invocation) 
+                                                                 : FunctionManagerMessage() {
+        this->answer_commport = answer_commport;
+        this->invocation = std::move(invocation);
+    }
+
+    FunctionManagerWaitAllMessage::FunctionManagerWaitAllMessage(S4U_CommPort *answer_commport,
+                                                                 std::vector<std::shared_ptr<Invocation>> invocations) 
+                                                                 : FunctionManagerMessage() {
+        this->answer_commport = answer_commport;
+        this->invocations = std::move(invocations);
     }
 
 }// namespace wrench

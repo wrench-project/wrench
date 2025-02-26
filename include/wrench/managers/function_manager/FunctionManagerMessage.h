@@ -50,7 +50,8 @@ namespace wrench {
      */
     class FunctionManagerFunctionCompletedMessage : public FunctionManagerMessage {
     public:
-        FunctionManagerFunctionCompletedMessage(std::shared_ptr<Function> function, std::shared_ptr<ServerlessComputeService> sl_compute_service);
+        FunctionManagerFunctionCompletedMessage(std::shared_ptr<Function> function, 
+                                                std::shared_ptr<ServerlessComputeService> sl_compute_service);
 
         /** @brief The function that is invoked */
         std::shared_ptr<Function> function;
@@ -73,6 +74,32 @@ namespace wrench {
         std::shared_ptr<ServerlessComputeService> sl_compute_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
+    };
+
+    /**
+     * @brief 
+     * 
+     */
+    class FunctionManagerWaitOneMessage : public FunctionManagerMessage {
+    public:
+        FunctionManagerWaitOneMessage(S4U_CommPort *answer_commport, 
+                                      std::shared_ptr<Invocation> invocation);
+
+        S4U_CommPort *answer_commport;
+        std::shared_ptr<Invocation> invocation;
+    };
+
+    /**
+     * @brief 
+     * 
+     */
+    class FunctionManagerWaitAllMessage : public FunctionManagerMessage {
+    public:
+        FunctionManagerWaitAllMessage(S4U_CommPort *answer_commport,
+                                      std::vector<std::shared_ptr<Invocation>> invocations);
+
+        S4U_CommPort *answer_commport;
+        std::vector<std::shared_ptr<Invocation>> invocations;
     };
 
     /***********************/
