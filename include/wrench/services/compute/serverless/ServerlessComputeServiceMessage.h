@@ -128,6 +128,19 @@ namespace wrench {
         std::shared_ptr<DataFile> _image_file;
     };
 
+    /**
+     * @brief A message sent to a ServerlessComputeService to notify it that an image download has completed
+     */
+    class ServerlessComputeServiceInvocationExecutionCompleteMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceInvocationExecutionCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<Invocation> invocation, sg_size_t payload);
+
+        /** @brief The action that did the download */
+        std::shared_ptr<CustomAction> _action;
+        /** @brief The invocation the download was for */
+        std::shared_ptr<Invocation> _invocation;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

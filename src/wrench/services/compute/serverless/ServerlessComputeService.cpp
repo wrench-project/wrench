@@ -27,14 +27,15 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
 
-namespace wrench {
-    ServerlessComputeService::ServerlessComputeService(const std::string& hostname,
+namespace wrench
+{
+    ServerlessComputeService::ServerlessComputeService(const std::string &hostname,
                                                        std::vector<std::string> compute_hosts,
                                                        std::string head_storage_service_mount_point,
                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                       WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
-        ComputeService(hostname,
-                       "ServerlessComputeService", "") {
+                                                       WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
+                                                                                                                                    "ServerlessComputeService", "")
+    {
         _compute_hosts = std::move(compute_hosts);
         _head_storage_service_mount_point = std::move(head_storage_service_mount_point);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
@@ -47,7 +48,8 @@ namespace wrench {
      * @brief Returns true if the service supports standard jobs
      * @return true or false
      */
-    bool ServerlessComputeService::supportsStandardJobs() {
+    bool ServerlessComputeService::supportsStandardJobs()
+    {
         return false;
     }
 
@@ -55,7 +57,8 @@ namespace wrench {
      * @brief Returns true if the service supports compound jobs
      * @return true or false
      */
-    bool ServerlessComputeService::supportsCompoundJobs() {
+    bool ServerlessComputeService::supportsCompoundJobs()
+    {
         return false;
     }
 
@@ -63,7 +66,8 @@ namespace wrench {
      * @brief Returns true if the service supports pilot jobs
      * @return true or false
      */
-    bool ServerlessComputeService::supportsPilotJobs() {
+    bool ServerlessComputeService::supportsPilotJobs()
+    {
         return false;
     }
 
@@ -74,7 +78,8 @@ namespace wrench {
      * @param service_specific_args: the set of service-specific arguments
      */
     void ServerlessComputeService::submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                                                     const std::map<std::string, std::string>& service_specific_args) {
+                                                     const std::map<std::string, std::string> &service_specific_args)
+    {
         throw std::runtime_error("ServerlessComputeService::submitCompoundJob: should not be called");
     }
 
@@ -83,7 +88,8 @@ namespace wrench {
      *
      * @param job: The job being submitted
      */
-    void ServerlessComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
+    void ServerlessComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job)
+    {
         throw std::runtime_error("ServerlessComputeService::terminateCompoundJob: should not be called");
     }
 
@@ -92,7 +98,8 @@ namespace wrench {
      * @param key: the desired key
      * @return a dictionary
      */
-    std::map<std::string, double> ServerlessComputeService::constructResourceInformation(const std::string& key) {
+    std::map<std::string, double> ServerlessComputeService::constructResourceInformation(const std::string &key)
+    {
         throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
     }
 
@@ -110,7 +117,8 @@ namespace wrench {
      */
     bool ServerlessComputeService::registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds,
                                                     sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
-                                                    sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
+                                                    sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes)
+    {
         WRENCH_INFO("Serverless Provider Registered function %s", function->getName().c_str());
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
@@ -144,14 +152,14 @@ namespace wrench {
      * @return std::shared_ptr<Invocation>
      */
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(
-        std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort* notify_commport) {
+        std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort *notify_commport)
+    {
         WRENCH_INFO("Serverless Provider received invoke function %s", function->getName().c_str());
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
                                                                          function, input,
-                                                                         notify_commport, 0)
-        );
+                                                                         notify_commport, 0));
 
         // Block here for return, if non-blocking then function manager has to check up on it? or send a message
         auto msg = answer_commport->getMessage<ServerlessComputeServiceFunctionInvocationAnswerMessage>(
@@ -165,7 +173,8 @@ namespace wrench {
         return msg->invocation;
     }
 
-    int ServerlessComputeService::main() {
+    int ServerlessComputeService::main()
+    {
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
@@ -173,8 +182,11 @@ namespace wrench {
 
         // Start the Head Storage Service
         startHeadStorageService();
+        // Start a BareMetalComputeService and storage on each host.
+        startComputeHostsServices();
 
-        while (processNextMessage()) {
+        while (processNextMessage())
+        {
             admitInvocations();
             scheduleInvocations();
             dispatchFunctionInvocation();
@@ -188,7 +200,8 @@ namespace wrench {
      * @return true
      * @return false
      */
-    bool ServerlessComputeService::processNextMessage() {
+    bool ServerlessComputeService::processNextMessage()
+    {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -197,7 +210,7 @@ namespace wrench {
         {
             message = this->commport->getMessage();
         }
-        catch (ExecutionException& e)
+        catch (ExecutionException &e)
         {
             WRENCH_INFO(
                 "Got a network error while getting some message... ignoring");
@@ -212,7 +225,7 @@ namespace wrench {
             return false;
         }
         else if (auto scsfrr_msg = std::dynamic_pointer_cast<
-            ServerlessComputeServiceFunctionRegisterRequestMessage>(message))
+                     ServerlessComputeServiceFunctionRegisterRequestMessage>(message))
         {
             processFunctionRegistrationRequest(
                 scsfrr_msg->answer_commport, scsfrr_msg->function, scsfrr_msg->time_limit_in_seconds,
@@ -221,16 +234,23 @@ namespace wrench {
             return true;
         }
         else if (auto scsfir_msg = std::dynamic_pointer_cast<
-            ServerlessComputeServiceFunctionInvocationRequestMessage>(message))
+                     ServerlessComputeServiceFunctionInvocationRequestMessage>(message))
         {
             processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->function,
                                              scsfir_msg->function_input, scsfir_msg->notify_commport);
             return true;
         }
         else if (auto scsdc_msg = std::dynamic_pointer_cast<
-            ServerlessComputeServiceDownloadCompleteMessage>(message))
+                     ServerlessComputeServiceDownloadCompleteMessage>(message))
         {
             processImageDownloadCompletion(scsdc_msg->_action, scsdc_msg->_image_file);
+            return true;
+        }
+        else if (auto scsiec_msg = std::dynamic_pointer_cast<ServerlessComputeServiceInvocationExecutionCompleteMessage>(message))
+        {
+            scsiec_msg->_invocation->_notify_commport->dputMessage(
+                new ServerlessComputeServiceFunctionInvocationCompleteMessage(true,
+                                                                              scsiec_msg->_invocation, nullptr, 0));
             return true;
         }
         else
@@ -250,13 +270,14 @@ namespace wrench {
      * @param ingress_in_bytes
      * @param egress_in_bytes
      */
-    void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort* answer_commport,
+    void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport,
                                                                       std::shared_ptr<Function> function,
                                                                       double time_limit,
                                                                       sg_size_t disk_space_limit_in_bytes,
                                                                       sg_size_t ram_limit_in_bytes,
                                                                       sg_size_t ingress_in_bytes,
-                                                                      sg_size_t egress_in_bytes) {
+                                                                      sg_size_t egress_in_bytes)
+    {
         if (_registeredFunctions.find(function->getName()) != _registeredFunctions.end())
         {
             // TODO: Create failure case for duplicate function?
@@ -275,8 +296,7 @@ namespace wrench {
                 disk_space_limit_in_bytes,
                 ram_limit_in_bytes,
                 ingress_in_bytes,
-                egress_in_bytes
-            );
+                egress_in_bytes);
             auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true, function, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
         }
@@ -290,10 +310,11 @@ namespace wrench {
      * @param input
      * @param notify_commport
      */
-    void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort* answer_commport,
+    void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport,
                                                                     std::shared_ptr<Function> function,
                                                                     std::shared_ptr<FunctionInput> input,
-                                                                    S4U_CommPort* notify_commport) {
+                                                                    S4U_CommPort *notify_commport)
+    {
         if (_registeredFunctions.find(function->getName()) == _registeredFunctions.end())
         {
             // Not found
@@ -313,12 +334,19 @@ namespace wrench {
         }
     }
 
-    void ServerlessComputeService::processImageDownloadCompletion(const std::shared_ptr<Action>& action,
-                                                                  const std::shared_ptr<DataFile>& image_file) {
+    /**
+     * @brief
+     * 
+     * @param action to get failure cause from
+     * @param image_file The image file that was downloaded, used as key to map downloading functions
+     */
+    void ServerlessComputeService::processImageDownloadCompletion(const std::shared_ptr<Action> &action,
+                                                                  const std::shared_ptr<DataFile> &image_file)
+    {
         if (action->getFailureCause())
         {
             throw std::runtime_error("ServerlessComputeService::processImageDownloadCompletion(): "
-                "An image download (from remote) has failed. Handling of such failures is currently not implemented");
+                                     "An image download (from remote) has failed. Handling of such failures is currently not implemented");
         }
         WRENCH_INFO("ServerlessComputeService::processImageDownloadCompletion(): Image file %s was downloaded",
                     image_file->getID().c_str());
@@ -326,7 +354,7 @@ namespace wrench {
         _downloaded_image_files.insert(image_file);
 
         // Move all relevant invocations from the admitted to the schedulable queue
-        auto& queue = _admittedInvocations[image_file];
+        auto &queue = _admittedInvocations[image_file];
         while (not queue.empty())
         {
             _schedulableInvocations.push(std::move(queue.front()));
@@ -335,49 +363,128 @@ namespace wrench {
         _admittedInvocations.erase(image_file);
     }
 
-
     /**
      * @brief
      *
      */
-    void ServerlessComputeService::dispatchFunctionInvocation() {
+    void ServerlessComputeService::dispatchFunctionInvocation()
+    {
         while (!_scheduledInvocations.empty())
         {
-            // Might need to think about how RegisteredFunction is storing info here...
             auto invocation_to_place = _scheduledInvocations.front();
             WRENCH_INFO("Invoking function [%s]",
                         invocation_to_place->_registered_function->_function->getName().c_str());
             _scheduledInvocations.pop();
-            // TODO: Do invocation for real
-            // invocation_to_place->is_running = true
-            Simulation::sleep(1);
+            // TODO: schedule on a host, right now it is on 0th host
+            const std::function lambda_execute = [invocation_to_place, this](std::shared_ptr<ActionExecutor> action_executor)
+            {
+                WRENCH_INFO("In the function invocation lambda execute!!");
+                auto function = invocation_to_place->_registered_function->_function;
+                auto image_file = function->_image->getFile();
+                auto head_host_image_path = FileLocation::LOCATION(this->_head_storage_service, image_file);
+                auto compute_service_image_path = FileLocation::LOCATION(_compute_services[0]->getScratch(), image_file);
+                auto container_size = image_file->getSize();
+
+                // Copy the file from the headHost to the current host
+                StorageService::copyFile(head_host_image_path, compute_service_image_path);
+
+                // Create a disk for the container
+                S4U_Simulation::createNewDisk(_compute_hosts[0], "container_disk_" + image_file->getID(), 1000, 1000, container_size, _compute_services[0]->getScratch()->getMountPoint() + "/container_disk_" + image_file->getID());
+                auto storage_service = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(
+                    _compute_services[0]->getHostname(),
+                    {_compute_services[0]->getScratch()->getMountPoint() + "/container_disk_" + image_file->getID()},
+                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
+                      this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}},
+                    {}));
+                storage_service->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
+                storage_service->setSimulation(this->simulation_);
+
+                // Read file from scratch to disk
+                storage_service->readFile(getRunningActorRecvCommPort(), compute_service_image_path, container_size, true);
+                _compute_storages[0]->createFile(image_file);
+                function->_lambda(invocation_to_place->_function_input, storage_service);
+                // TODO: return some output to the invocation
+                // Clean up
+                // TODO: how to delete disk from simulation
+                storage_service->stop();
+            };
+            const std::function lambda_terminate = [](std::shared_ptr<ActionExecutor> action_executor) {};
+
+            auto action = std::shared_ptr<CustomAction>(
+                new CustomAction(
+                    "run_invocation_" + invocation_to_place->_registered_function->_function->getName(),
+                    0, 0, lambda_execute, lambda_terminate));
+
+            auto custom_message = new ServerlessComputeServiceInvocationExecutionCompleteMessage(
+                action,
+                invocation_to_place, 0);
+
+            auto action_executor = std::make_shared<ActionExecutor>(
+                _compute_hosts[0],
+                0,
+                0,
+                0,
+                false,
+                this->commport,
+                custom_message,
+                action,
+                nullptr);
+
+            action_executor->setSimulation(this->simulation_);
+            WRENCH_INFO("Starting an action executor...");
+            action_executor->start(action_executor, true, false);
+
+            _runningInvocations.push(invocation_to_place);
             WRENCH_INFO("Function [%s] invoked",
                         invocation_to_place->_registered_function->_function->getName().c_str());
             // invocation_to_place->output = whatever
             // invocation_to_place->_registered_function->_function->run_lambda()
-            invocation_to_place->_notify_commport->dputMessage(
-                new ServerlessComputeServiceFunctionInvocationCompleteMessage(true,
-                                                                              invocation_to_place, nullptr, 0));
         }
     }
 
-    void ServerlessComputeService::startHeadStorageService() {
+    /**
+     * @brief Start a BareMetalComputeService and SimpleStorageService for each compute host
+     */
+    void ServerlessComputeService::startComputeHostsServices()
+    {
+        for (std::string host : _compute_hosts)
+        {
+            std::map<std::string, std::tuple<unsigned long, sg_size_t>> compute_resources = {
+                std::make_pair(host, std::make_tuple(2, 64 * 1000000))};
+            auto cs = std::shared_ptr<BareMetalComputeService>(
+                new BareMetalComputeService(this->hostname,
+                                            compute_resources,
+                                            "/"));
+            _compute_services.push_back(cs);
+            cs->setSimulation(this->simulation_);
+            auto ss = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(
+                host,
+                {"/"},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
+                  this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}},
+                {}));
+            ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
+            ss->setSimulation(this->simulation_);
+            _compute_storages.push_back(ss);
+        }
+    }
+
+    void ServerlessComputeService::startHeadStorageService()
+    {
         auto ss = SimpleStorageService::createSimpleStorageService(
             hostname,
             {_head_storage_service_mount_point},
-            {
-                {
-                    wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
-                    this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)
-                }
-            }, {});
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
+              this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}},
+            {});
         ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
         ss->setSimulation(this->simulation_);
         _head_storage_service = this->simulation_->startNewService(ss);
         _free_space_on_head_storage = _head_storage_service->getTotalSpace();
     }
 
-    void ServerlessComputeService::admitInvocations() {
+    void ServerlessComputeService::admitInvocations()
+    {
         // This implements a FCFS algorith. That is, if an invocation is placed for an image
         // that cannot be downloaded right now (due to lack of space), then we stop and do not
         // consider invocations that were placed later, even if their images have been downloaded
@@ -425,11 +532,12 @@ namespace wrench {
         }
     }
 
-
-    void ServerlessComputeService::initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation) {
+    void ServerlessComputeService::initiateImageDownloadFromRemote(const std::shared_ptr<Invocation> &invocation)
+    {
         // Create a custom action (we could use a simple FileCopyAction here, but we are using a CustomAction
         // to demonstrate its use)
-        const std::function lambda_execute = [invocation, this](std::shared_ptr<ActionExecutor> action_executor) {
+        const std::function lambda_execute = [invocation, this](std::shared_ptr<ActionExecutor> action_executor)
+        {
             WRENCH_INFO("In the lambda execute!!");
             const auto src_location = invocation->_registered_function->_function->_image;
             const auto dst_location = FileLocation::LOCATION(_head_storage_service, src_location->getFile());
@@ -463,7 +571,8 @@ namespace wrench {
         action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
     }
 
-    void ServerlessComputeService::scheduleInvocations() {
+    void ServerlessComputeService::scheduleInvocations()
+    {
         // TODO: Implement something fancy.
         while (!_schedulableInvocations.empty())
         {
@@ -473,4 +582,5 @@ namespace wrench {
         }
         return;
     }
+
 };
