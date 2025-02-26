@@ -40,7 +40,7 @@ namespace wrench {
          * @brief Gets the output of the function invocation.
          * @return A shared pointer to the function output.
          */
-        std::shared_ptr<FunctionOutput> get_output();
+        std::shared_ptr<FunctionOutput> get_output() const;
 
     private:
         friend class FunctionManager;
