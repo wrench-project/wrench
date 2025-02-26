@@ -16,6 +16,7 @@
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 #include "wrench/services/compute/serverless/Invocation.h"
 #include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 
@@ -93,6 +94,7 @@ namespace wrench {
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 
         void startHeadStorageService();
+        void startComputeHostsServices();
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
 
 
@@ -116,6 +118,8 @@ namespace wrench {
         std::queue<std::shared_ptr<Invocation>> _finishedInvocations;
 
         std::string _head_storage_service_mount_point;
+        std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
+        std::vector<std::shared_ptr<StorageService>> _compute_storages;
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
         std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
