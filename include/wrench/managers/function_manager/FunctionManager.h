@@ -91,9 +91,9 @@ namespace wrench {
         // FunctionManager internal data structures
         std::set<std::shared_ptr<RegisteredFunction>> _registered_functions; // do we store these here or in the Serverless Compute Service?
         std::queue<std::shared_ptr<RegisteredFunction>> _functions_to_invoke;
-        // TODO: Data structure for invoked functions and their results
-        std::map<int, std::shared_ptr<Invocation>> _pending_invocations;
-        std::map<int, std::shared_ptr<Invocation>> _finished_invocations;
+        std::set<std::shared_ptr<Invocation>> _pending_invocations; // do we really need this?
+        std::set<std::shared_ptr<Invocation>> _finished_invocations;
+        std::vector<std::pair<std::shared_ptr<Invocation>, S4U_CommPort*>> _invocations_being_waited_for; // should it be S4U_CommPort or a pointer to one?
     };
 
     /***********************/
