@@ -91,7 +91,7 @@ namespace wrench {
         * @param payload: the message size in bytes
         * @param timeToLive:  The max number of hops this message can take
         */
-        RippleDelete::RippleDelete(std::shared_ptr<DataFile> file, sg_size_t payload, int timeToLive) : Message(payload), file(std::move(std::move(file))), timeToLive(timeToLive){};
+        RippleDelete::RippleDelete(std::shared_ptr<DataFile> file, sg_size_t payload, int timeToLive) : Message(payload), file(std::move(std::move(file))), timeToLive(timeToLive){}
         /**
         * @brief Copy Constructor
         * @param other: The message to copy.

@@ -17,7 +17,7 @@ namespace wrench {
          * @return true if the file is cached and if timestamp (not implemented) is valid, false otherwise
          */
         bool Cache::isCached(const std::shared_ptr<DataFile>& file) {
-            double earliestAllowedTime = wrench::S4U_Simulation::getClock() - maxCacheTime;
+            double earliestAllowedTime = S4U_Simulation::getClock() - maxCacheTime;
             auto entries = cache[file];
             //after getting all possible cache entries, loop through them "all" and check the timestamps, removing any that fail.  If you find even 1 success, return true and stop cleaning.
             for (auto ittr = entries.begin(); ittr != entries.end(); /*intentionally blank*/) {

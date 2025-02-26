@@ -1326,7 +1326,7 @@ namespace wrench {
         }
 
         service->simulation_ = this;
-        std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
+        auto shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
         //        if (service->hasScratch()) {
