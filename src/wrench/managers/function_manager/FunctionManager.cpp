@@ -110,33 +110,39 @@ namespace wrench {
         return sl_compute_service->invokeFunction(function, function_invocation_args, this->commport);
     }
 
-    // /**
-    // *
-    // */
-    // FunctionInvocation::is_running() {
-    //     // State finding method
-    // }
+    /**
+     * @brief State finding method to check if an invocation is done
+     * 
+     * @param invocation the invocation to check
+     * @return true if the invocation is done
+     * @return false if the invocation is not done
+     */
+    bool FunctionManager::isDone(std::shared_ptr<Invocation> invocation) {
+        if (_finished_invocations->find(invocation) != _finished_invocations->end()) {
+            return true;
+        }
+        return false;
+    }
 
-    // /**
-    // *
-    // */
-    // FunctionInvocation::is_done() {
-    //     // State finding method
-    // }
+    /**
+    *
+    */
+    void FunctionManager::wait_one(std::shared_ptr<Invocation> invocation) {
+        
+        auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
-    // /**
-    // *
-    // */
-    // FunctionOutput FunctionInvocation::get_output() {
-    //     // State finding method
-    // }
+        //  send a "run a standard job" message to the daemon's commport
+        this->commport->putMessage(
+            new FunctionManagerWaitOneMessage(
+                answer_commport, 
+                invocation
+            ));
 
-    // /**
-    // *
-    // */
-    // FunctionInvocation::wait_one(one) {
-
-    // }
+        // Get the answer
+        auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
+            this->network_timeout,
+            "FunctionManager::wait_one(): Received an");
+    }
 
     // /**
     // *
@@ -164,6 +170,7 @@ namespace wrench {
         
         while (processNextMessage()) {
             // TODO: Do something
+            processInvocationsBeingWaitedFor();
         }
 
         return 0;
@@ -211,6 +218,14 @@ namespace wrench {
             // TODO: processFunctionInvocationFailure();
             return true;
         }
+        else if (auto wait_one_msg = std::dynamic_pointer_cast<FunctionManagerWaitOneMessage>(message)) {
+            processWaitOne(wait_one_msg->invocation, wait_one_msg->answer_commport);
+            return true;
+        }
+        else if (auto wait_many_msg = std::dynamic_pointer_cast<FunctionManagerWaitAllMessage>(message)) {
+            processWaitMany(wait_many_msg->invocations, wait_many_msg->answer_commport);
+            return true;
+        }
         else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
@@ -232,5 +247,47 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief processes a wait_one message from the EC
+     * 
+     * @param invocation the invocation being waited for
+     * @param answer_commport the answer commport to send the wakeup message to when the invocation is finished
+     */
+    void FunctionManager::processWaitOne(std::shared_ptr<Invocation> invocation, S4U_CommPort* answer_commport) {
+        WRENCH_INFO("Processing a wait_one message");
+        _invocations_being_waited_for.push_back(std::make_pair<invocation, answer_commport>);
+    }
+
+    /**
+     * @brief processes a wait_many message from the EC
+     * 
+     * @param invocations the invocations being waited for
+     * @param answer_commport the answer commport to send the wakeup message to when the invocations are finished
+     */
+    void FunctionManager::processWaitAll(std::vector<std::shared_ptr<Invocation>> invocations, S4U_CommPort* answer_commport) {
+        WRENCH_INFO("Processing a wait_many message");
+        for (auto invocation : invocations) {
+            _invocations_being_waited_for.push_back(std::make_pair<invocation, answer_commport>);
+        }
+    }
+
+    /**
+     * @brief iterates through the list of invocations being waited for and checks if they are finished
+     * 
+     * TODO: There has to be a better way to do this than storing the answer commport in every single invocation LOL
+     */
+    void FunctionManager::processInvocationsBeingWaitedFor() {
+        // iterate through the list of invocations being waited for
+        for (auto it = _invocations_being_waited_for.begin(); it != _invocations_being_waited_for.end(); it++) {
+            // check if the invocation is finished
+            if (_finished_invocations.find(it->first) != _finished_invocations.end()) {
+                // if theres only 1 invocation being waited for remaining, send a wakeup message
+                if (_invocations_being_waited_for.size() == 1) {
+                    it->second->putMessage(new FunctionManagerWakeupMessage());
+                }
+                _invocations_being_waited_for.erase(it); // remove the invocation from the list
+            }
+        }
+    }
 
 }// namespace wrench
