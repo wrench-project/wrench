@@ -363,7 +363,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Igetting a message from commport '%s'", this->get_cname());
 
-        std::shared_ptr<S4U_PendingCommunication> pending_communication = std::make_shared<S4U_PendingCommunication>(
+        auto pending_communication = std::make_shared<S4U_PendingCommunication>(
                 this, S4U_PendingCommunication::OperationType::RECEIVING);
 
         try {

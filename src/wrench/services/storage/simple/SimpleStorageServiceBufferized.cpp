@@ -451,10 +451,10 @@ namespace wrench {
         // This is sort of annoying as doing "the right thing" breaks the Link-Failure test (which is non-critical),
         // But there is something perhaps fishy here... 
 //        if ((success or (not std::dynamic_pointer_cast<NetworkError>(failure_cause))) and ftt->dst_location == nullptr) {
-        if ((true) and ftt->dst_location == nullptr) {
+        if (ftt->dst_location == nullptr) {
             ftt->answer_commport_if_read->dputMessage(new StorageServiceAckMessage(ftt->src_location));
 //        } else if ((success or (not std::dynamic_pointer_cast<NetworkError>(failure_cause))) and ftt->src_location == nullptr) {
-        } else if (true and ftt->src_location == nullptr) {
+        } else if (ftt->src_location == nullptr) {
             ftt->answer_commport_if_write->dputMessage(new StorageServiceAckMessage(ftt->dst_location));
         } else {
             if (success and ftt->dst_location->getStorageService() == shared_from_this()) {
