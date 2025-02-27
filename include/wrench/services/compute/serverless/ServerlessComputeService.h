@@ -103,6 +103,9 @@ namespace wrench {
         // vector of compute host names
         std::vector<std::string> _compute_hosts;
 
+        std::map<std::string, unsigned long> _available_cores;
+        std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
+
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _newInvocations;
         // queues of function invocations whose images are being downloaded
@@ -118,7 +121,7 @@ namespace wrench {
         std::queue<std::shared_ptr<Invocation>> _finishedInvocations;
 
         std::string _head_storage_service_mount_point;
-        std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
+        // std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
         std::vector<std::shared_ptr<StorageService>> _compute_storages;
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;

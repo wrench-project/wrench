@@ -103,16 +103,25 @@ namespace wrench {
 
 
         //TODO: Should the EC be responsible for keeping track of its invocations?
-        WRENCH_INFO("Invoking function 1");
-        function_manager->invokeFunction(function1, this->compute_service, input);
-        WRENCH_INFO("Function 1 invoked");
+        for (unsigned char i=0; i < 200; i++) {
+            WRENCH_INFO("Invoking function 1");
+            function_manager->invokeFunction(function1, this->compute_service, input);
+            WRENCH_INFO("Function 1 invoked");
+            // wrench::Simulation::sleep(1);
+        }
+
+        // wrench::Simulation::sleep(100);
+        //
+        // WRENCH_INFO("Invoking function 1 AGAIN");
+        // function_manager->invokeFunction(function1, this->compute_service, input);
+        // WRENCH_INFO("Function 1 invoked");
 
         wrench::Simulation::sleep(1000000);
+        // WRENCH_INFO("Execution complete");
 
         // function_manager->invokeFunction(function2, this->compute_service, input);
         // function_manager->invokeFunction(function1, this->compute_service, input);
 
-        WRENCH_INFO("Execution complete");
         return 0;
     }
 

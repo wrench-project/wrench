@@ -150,6 +150,7 @@ namespace wrench {
             "FunctionManager::wait_one(): Received an");
     }
 
+#if 0
     /**
      * @brief Waits for a list of invocations to finish
      * 
@@ -170,6 +171,7 @@ namespace wrench {
             this->network_timeout,
             "FunctionManager::wait_one(): Received an");
     }
+#endif
 
     // /**
     // *
@@ -238,10 +240,12 @@ namespace wrench {
             processWaitOne(wait_one_msg->invocation, wait_one_msg->answer_commport);
             return true;
         }
+#if 0
         else if (auto wait_many_msg = std::dynamic_pointer_cast<FunctionManagerWaitAllMessage>(message)) {
             processWaitMany(wait_many_msg->invocations, wait_many_msg->answer_commport);
             return true;
         }
+#endif
         else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
@@ -263,7 +267,7 @@ namespace wrench {
      */
     void FunctionManager::processWaitOne(std::shared_ptr<Invocation> invocation, S4U_CommPort* answer_commport) {
         WRENCH_INFO("Processing a wait_one message");
-        _invocations_being_waited_for.push_back(std::make_pair<invocation, answer_commport>);
+        _invocations_being_waited_for.push_back(std::make_pair(invocation, answer_commport));
     }
 
     /**
@@ -275,7 +279,7 @@ namespace wrench {
     void FunctionManager::processWaitAll(std::vector<std::shared_ptr<Invocation>> invocations, S4U_CommPort* answer_commport) {
         WRENCH_INFO("Processing a wait_many message");
         for (auto invocation : invocations) {
-            _invocations_being_waited_for.push_back(std::make_pair<invocation, answer_commport>);
+            _invocations_being_waited_for.push_back(std::make_pair(invocation, answer_commport));
         }
     }
 
