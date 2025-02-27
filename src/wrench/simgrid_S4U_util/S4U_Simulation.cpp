@@ -1153,7 +1153,7 @@ namespace wrench {
             }
         }
         // Create the disk
-        auto disk = host->create_disk(disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec);
+        auto disk = host->add_disk(disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec);
         // Add the required disk properties
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
