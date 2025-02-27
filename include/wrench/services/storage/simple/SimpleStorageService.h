@@ -15,7 +15,6 @@
 #include "SimpleStorageServiceProperty.h"
 #include "SimpleStorageServiceMessagePayload.h"
 #include "wrench/services/memory/MemoryManager.h"
-#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include <fsmod.hpp>
 
@@ -85,6 +84,7 @@ namespace wrench {
                                                                 const std::set<std::string>& mount_points,
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                                 const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
+
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -221,6 +221,7 @@ namespace wrench {
         /***********************/
         SimpleStorageService(const std::string &hostname,
                              const std::set<std::string> &mount_points,
+                             const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                              const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                              const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
                              const std::string &suffix);
@@ -266,6 +267,18 @@ namespace wrench {
         friend class Simulation;
 
         void validateProperties();
+
+        static SimpleStorageService *createSimpleStorageServiceWithExistingFileSystem(const std::string &hostname,
+                                                                const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
+                                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
+
+
+        static SimpleStorageService *createSimpleStorageServiceInternal(const std::string &hostname,
+                                                                const std::set<std::string>& mount_points,
+                                                                const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
+                                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
 
 #ifdef PAGE_CACHE_SIMULATION
