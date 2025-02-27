@@ -265,6 +265,7 @@ namespace wrench {
 
     private:
         friend class Simulation;
+        friend class ServerlessComputeService;
 
         void validateProperties();
 

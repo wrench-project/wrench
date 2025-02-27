@@ -60,6 +60,12 @@ namespace wrench {
         std::shared_ptr<FunctionOutput> _function_output; // the output of the function invocation
         S4U_CommPort* _notify_commport; // the communication port for notifications
 
+        // TODO: All the members below are really implementation details of the service
+        // TODO: and could be instead storage in some server-side "ConcreteInvocation" object
+        // TODO: that merely holds a pointer to a client-side "Invocation" object
+        std::shared_ptr<FileLocation> _tmp_file;
+        std::shared_ptr<StorageService> _tmp_storage_service;
+
     };
 }
 
