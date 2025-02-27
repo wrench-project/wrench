@@ -48,9 +48,10 @@ namespace wrench {
      */
     SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(const std::string &hostname,
                                                                          const std::set<std::string>& mount_points,
+                                                                         const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                          WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
-            SimpleStorageService(hostname, mount_points, std::move(property_list), std::move(messagepayload_list),
+            SimpleStorageService(hostname, mount_points, file_system, std::move(property_list), std::move(messagepayload_list),
                                  "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
         this->buffer_size = 0;
         this->is_bufferized = false;
