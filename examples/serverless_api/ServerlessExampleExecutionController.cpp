@@ -111,6 +111,8 @@ namespace wrench {
             // wrench::Simulation::sleep(1);
         }
 
+#if 1
+
         WRENCH_INFO("Waiting for all invocations to complete");
         function_manager->wait_all(invocations);
         WRENCH_INFO("All invocations completed");
@@ -150,7 +152,7 @@ namespace wrench {
             WRENCH_INFO("Not expected, got exception");
         }
 
-
+#endif
 
         // wrench::Simulation::sleep(100);
         //
