@@ -104,16 +104,16 @@ namespace wrench
     }
 
     /**
-     * @brief
+     * @brief Register a function in the serverless compute service
      *
-     * @param function
-     * @param time_limit_in_seconds
-     * @param disk_space_limit_in_bytes
-     * @param RAM_limit_in_bytes
-     * @param ingress_in_bytes
-     * @param egress_in_bytes
-     * @return true
-     * @return false
+     * @param function the function to register
+     * @param time_limit_in_seconds the time limit for execution
+     * @param disk_space_limit_in_bytes the disk space limit for the function
+     * @param RAM_limit_in_bytes the RAM limit for the function 
+     * @param ingress_in_bytes the ingress data limit
+     * @param egress_in_bytes the egress data limit
+     * @return true if the function was registered successfully
+     * @throw ExecutionException if the function registration fails
      */
     bool ServerlessComputeService::registerFunction(std::shared_ptr<Function> function, double time_limit_in_seconds,
                                                     sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
@@ -144,12 +144,12 @@ namespace wrench
     }
 
     /**
-     * @brief
+     * @brief Invoke a function in the serverless compute service
      *
-     * @param function
-     * @param input
-     * @param notify_commport
-     * @return std::shared_ptr<Invocation>
+     * @param function the function to invoke
+     * @param input the input to the function
+     * @param notify_commport the ExecutionController commport to notify
+     * @return std::shared_ptr<Invocation> Pointer to the invocation created by the ServerlessComputeService
      */
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(
         std::shared_ptr<Function> function, std::shared_ptr<FunctionInput> input, S4U_CommPort *notify_commport)
@@ -173,6 +173,11 @@ namespace wrench
         return msg->invocation;
     }
 
+    /**
+     * @brief Main method of the daemon 
+     * 
+     * @return 0 on termination
+     */
     int ServerlessComputeService::main()
     {
         this->state = Service::UP;
@@ -195,10 +200,10 @@ namespace wrench
     }
 
     /**
-     * @brief
+     * @brief Process the next message in the commport
      *
-     * @return true
-     * @return false
+     * @return true if the ServerlessComputeService daemon should continue processing messages
+     * @return false if the ServerlessComputeService daemon should die
      */
     bool ServerlessComputeService::processNextMessage()
     {
@@ -260,15 +265,15 @@ namespace wrench
     }
 
     /**
-     * @brief
+     * @brief Processes a "function registration request" message
      *
-     * @param answer_commport
-     * @param function
-     * @param time_limit
-     * @param disk_space_limit_in_bytes
-     * @param ram_limit_in_bytes
-     * @param ingress_in_bytes
-     * @param egress_in_bytes
+     * @param answer_commport the FunctionManager commport to answer to
+     * @param function the function to register
+     * @param time_limit the time limit for execution
+     * @param disk_space_limit_in_bytes the disk space limit for the function
+     * @param ram_limit_in_bytes the RAM limit for the function
+     * @param ingress_in_bytes the ingress data limit
+     * @param egress_in_bytes the egress data limit
      */
     void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort *answer_commport,
                                                                       std::shared_ptr<Function> function,
@@ -303,12 +308,12 @@ namespace wrench
     }
 
     /**
-     * @brief
+     * @brief Processes a "function invocation request" message
      *
-     * @param answer_commport
-     * @param function
-     * @param input
-     * @param notify_commport
+     * @param answer_commport the FunctionManager commport to answer to
+     * @param function the function to invoke
+     * @param input the input to the function
+     * @param notify_commport the ExecutionController commport to notify
      */
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort *answer_commport,
                                                                     std::shared_ptr<Function> function,
@@ -335,7 +340,7 @@ namespace wrench
     }
 
     /**
-     * @brief
+     * @brief Processes an "image download completion" message
      * 
      * @param action to get failure cause from
      * @param image_file The image file that was downloaded, used as key to map downloading functions
@@ -364,7 +369,7 @@ namespace wrench
     }
 
     /**
-     * @brief
+     * @brief Dispatches scheduled function invocations to compute hosts
      *
      */
     void ServerlessComputeService::dispatchFunctionInvocation()
@@ -469,6 +474,10 @@ namespace wrench
         }
     }
 
+    /**
+     * @brief 
+     * 
+     */
     void ServerlessComputeService::startHeadStorageService()
     {
         auto ss = SimpleStorageService::createSimpleStorageService(
@@ -483,6 +492,10 @@ namespace wrench
         _free_space_on_head_storage = _head_storage_service->getTotalSpace();
     }
 
+    /**
+     * @brief 
+     * 
+     */
     void ServerlessComputeService::admitInvocations()
     {
         // This implements a FCFS algorith. That is, if an invocation is placed for an image
@@ -532,6 +545,11 @@ namespace wrench
         }
     }
 
+    /**
+     * @brief 
+     * 
+     * @param invocation 
+     */
     void ServerlessComputeService::initiateImageDownloadFromRemote(const std::shared_ptr<Invocation> &invocation)
     {
         // Create a custom action (we could use a simple FileCopyAction here, but we are using a CustomAction
@@ -571,6 +589,10 @@ namespace wrench
         action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
     }
 
+    /**
+     * @brief 
+     * 
+     */
     void ServerlessComputeService::scheduleInvocations()
     {
         // TODO: Implement something fancy.
