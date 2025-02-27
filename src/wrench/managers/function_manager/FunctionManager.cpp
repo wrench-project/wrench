@@ -55,13 +55,13 @@ namespace wrench {
 	}
 
     /**
-     * @brief 
+     * @brief Creates a shared pointer to a Function object and returns it
      * 
-     * @param name 
+     * @param name the name of the function
      * @param lambda 
-     * @param image 
-     * @param code 
-     * @return std::shared_ptr<Function> 
+     * @param image the location of image to execute the function on
+     * @param code the location of the code to execute
+     * @return std::shared_ptr<Function> a shared pointer to the Function object created
      */
     std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
                                                                      const std::function<std::string(const std::shared_ptr<FunctionInput>&, const std::shared_ptr<StorageService>&)>& lambda,
@@ -73,17 +73,17 @@ namespace wrench {
     }
 
     /**
-     * @brief 
+     * @brief Registers a function with the ServerlessComputeService
      * 
-     * @param function 
-     * @param sl_compute_service 
-     * @param time_limit_in_seconds 
-     * @param disk_space_limit_in_bytes 
-     * @param RAM_limit_in_bytes 
-     * @param ingress_in_bytes 
-     * @param egress_in_bytes 
-     * @return true 
-     * @return false 
+     * @param function the function to register
+     * @param sl_compute_service the ServerlessComputeService to register the function on
+     * @param time_limit_in_seconds the time limit for the function execution
+     * @param disk_space_limit_in_bytes the disk space limit for the function
+     * @param RAM_limit_in_bytes the RAM limit for the function
+     * @param ingress_in_bytes the ingress data limit
+     * @param egress_in_bytes the egress data limit
+     * @return true if the function was registered successfully
+     * @throw ExecutionException if the function registration fails
      */
     bool FunctionManager::registerFunction(const std::shared_ptr<Function> function,
                                            const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
@@ -98,10 +98,14 @@ namespace wrench {
         return sl_compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
     }
 
-
     /**
-    *
-    */
+     * @brief Invokes a function on a ServerlessComputeService
+     * 
+     * @param function the function to invoke
+     * @param sl_compute_service the ServerlessComputeService to invoke the function on
+     * @param function_invocation_args arguments to pass to the function
+     * @return std::shared_ptr<Invocation> a shared pointer to the Invocation object created by the ServerlessComputeService
+     */
     std::shared_ptr<Invocation> FunctionManager::invokeFunction(std::shared_ptr<Function> function,
                                                                 const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
                                                                 std::shared_ptr<FunctionInput> function_invocation_args) {
@@ -125,20 +129,43 @@ namespace wrench {
     }
 
     /**
-    *
-    */
+     * @brief Waits for a single invocation to finish
+     * 
+     * @param invocation the invocation to wait for
+     */
     void FunctionManager::wait_one(std::shared_ptr<Invocation> invocation) {
         
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
-        //  send a "run a standard job" message to the daemon's commport
+        // send a "wait one" message to the FunctionManager's commport
         this->commport->putMessage(
             new FunctionManagerWaitOneMessage(
                 answer_commport, 
                 invocation
             ));
 
-        // Get the answer
+        // unblock up the EC with a wakeup message
+        auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
+            this->network_timeout,
+            "FunctionManager::wait_one(): Received an");
+    }
+
+    /**
+     * @brief Waits for a list of invocations to finish
+     * 
+     */
+    void FunctionManager::wait_all(std::vector<std::shared_ptr<Invocation>>) {
+        
+        auto answer_commport = S4U_CommPort::getTemporaryCommPort();
+
+        // send a "wait one" message to the FunctionManager's commport
+        this->commport->putMessage(
+            new FunctionManagerWaitOneMessage(
+                answer_commport, 
+                invocation
+            ));
+
+        // unblock the EC with a wakeup message
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
             this->network_timeout,
             "FunctionManager::wait_one(): Received an");
@@ -147,19 +174,12 @@ namespace wrench {
     // /**
     // *
     // */
-    // FunctionInvocation::wait_any(one) {
-
-    // }
-
-    // /**
-    // *
-    // */
-    // FunctionInvocation::wait_all(list) {
+    // FunctionManager::wait_any(one) {
 
     // }
 
     /**
-     * @brief Main method of the daemon that implements the JobManager
+     * @brief Main method of the daemon that implements the FunctionManager
      * @return 0 on success
      */
     int FunctionManager::main() {
@@ -177,10 +197,10 @@ namespace wrench {
     }
 
     /**
-     * @brief 
+     * @brief Processes the next message in the commport
      * 
-     * @return true 
-     * @return false 
+     * @return true when the FunctionManager daemon should continue processing messages
+     * @return false when the FunctionManager daemon should die
      */
     bool FunctionManager::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
@@ -214,10 +234,6 @@ namespace wrench {
             // TODO: Notify some controller?
             return true;
         }
-        else if (auto fmff_msg = std::dynamic_pointer_cast<FunctionManagerFunctionFailedMessage>(message)) {
-            // TODO: processFunctionInvocationFailure();
-            return true;
-        }
         else if (auto wait_one_msg = std::dynamic_pointer_cast<FunctionManagerWaitOneMessage>(message)) {
             processWaitOne(wait_one_msg->invocation, wait_one_msg->answer_commport);
             return true;
@@ -240,15 +256,7 @@ namespace wrench {
     }
 
     /**
-     * @brief TODO
-     * 
-     */
-    void FunctionManager::processFunctionInvocationFailure() {
-
-    }
-
-    /**
-     * @brief processes a wait_one message from the EC
+     * @brief Processes a "wait one" message
      * 
      * @param invocation the invocation being waited for
      * @param answer_commport the answer commport to send the wakeup message to when the invocation is finished
@@ -259,7 +267,7 @@ namespace wrench {
     }
 
     /**
-     * @brief processes a wait_many message from the EC
+     * @brief Processes a "wait many" message
      * 
      * @param invocations the invocations being waited for
      * @param answer_commport the answer commport to send the wakeup message to when the invocations are finished
@@ -272,7 +280,7 @@ namespace wrench {
     }
 
     /**
-     * @brief iterates through the list of invocations being waited for and checks if they are finished
+     * @brief Iterates through the list of invocations being waited for and checks if they are finished
      * 
      * TODO: There has to be a better way to do this than storing the answer commport in every single invocation LOL
      */
