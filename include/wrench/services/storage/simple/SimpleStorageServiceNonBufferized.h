@@ -107,9 +107,10 @@ namespace wrench {
     private:
         friend class SimpleStorageService;
 
-        //  Constructor
+        //  Constructors
         SimpleStorageServiceNonBufferized(const std::string &hostname,
                                           const std::set<std::string>& mount_points,
+                                          const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
