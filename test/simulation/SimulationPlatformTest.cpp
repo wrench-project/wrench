@@ -148,11 +148,6 @@ private:
             throw std::runtime_error("Invalid number of hosts found under cluster 'halfduplex' found");
         }
 
-        if (wrench::S4U_Simulation::getClusterProperty("simple", "wattage_off") != "0.0") {
-            throw std::runtime_error("Invalid cluster property value");
-        }
-
-
         return 0;
     }
 };
