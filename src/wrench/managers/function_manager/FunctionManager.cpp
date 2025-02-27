@@ -135,6 +135,7 @@ namespace wrench {
      */
     void FunctionManager::wait_one(std::shared_ptr<Invocation> invocation) {
         
+        WRENCH_INFO("FunctionManager::wait_one(): Waiting for invocation to finish");
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
@@ -148,30 +149,33 @@ namespace wrench {
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
             this->network_timeout,
             "FunctionManager::wait_one(): Received an");
+
+        WRENCH_INFO("FunctionManager::wait_one(): Received a wakeup message");
     }
 
-#if 0
     /**
      * @brief Waits for a list of invocations to finish
      * 
      */
-    void FunctionManager::wait_all(std::vector<std::shared_ptr<Invocation>>) {
+    void FunctionManager::wait_all(std::vector<std::shared_ptr<Invocation>> invocations) {
         
+        WRENCH_INFO("FunctionManager::wait_all(): Waiting for list of invocations to finish");
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
         this->commport->putMessage(
-            new FunctionManagerWaitOneMessage(
+            new FunctionManagerWaitAllMessage(
                 answer_commport, 
-                invocation
+                invocations
             ));
 
         // unblock the EC with a wakeup message
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
             this->network_timeout,
             "FunctionManager::wait_one(): Received an");
+        
+        WRENCH_INFO("FunctionManager::wait_all(): Received a wakeup message");
     }
-#endif
 
     // /**
     // *
@@ -229,7 +233,7 @@ namespace wrench {
             return false;
         }
         else if (auto scsfic_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationCompleteMessage>(message)) {
-            processFunctionInvocationComplete();
+            processFunctionInvocationComplete(scsfic_msg->invocation);
             return true;
         }
         else if (auto fmfc_msg = std::dynamic_pointer_cast<FunctionManagerFunctionCompletedMessage>(message)) {
@@ -240,12 +244,10 @@ namespace wrench {
             processWaitOne(wait_one_msg->invocation, wait_one_msg->answer_commport);
             return true;
         }
-#if 0
         else if (auto wait_many_msg = std::dynamic_pointer_cast<FunctionManagerWaitAllMessage>(message)) {
-            processWaitMany(wait_many_msg->invocations, wait_many_msg->answer_commport);
+            processWaitAll(wait_many_msg->invocations, wait_many_msg->answer_commport);
             return true;
         }
-#endif
         else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
@@ -255,8 +257,9 @@ namespace wrench {
      * @brief TODO
      * 
      */
-    void FunctionManager::processFunctionInvocationComplete() {
+    void FunctionManager::processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation) {
         WRENCH_INFO("Some Invocation Complete");
+        _finished_invocations.insert(invocation);
     }
 
     /**
@@ -289,15 +292,22 @@ namespace wrench {
      * TODO: There has to be a better way to do this than storing the answer commport in every single invocation LOL
      */
     void FunctionManager::processInvocationsBeingWaitedFor() {
+        WRENCH_INFO("Processing invocations being waited for");
         // iterate through the list of invocations being waited for
-        for (auto it = _invocations_being_waited_for.begin(); it != _invocations_being_waited_for.end(); it++) {
+        if (_invocations_being_waited_for.empty()) {
+            return;
+        }
+        auto it = _invocations_being_waited_for.begin();
+        while (it != _invocations_being_waited_for.end()) {
             // check if the invocation is finished
             if (_finished_invocations.find(it->first) != _finished_invocations.end()) {
-                // if theres only 1 invocation being waited for remaining, send a wakeup message
-                if (_invocations_being_waited_for.size() == 1) {
+                // if there's only 1 invocation being waited for remaining, send a wakeup message
+                if (_invocations_being_waited_for.size() <= 1) {
                     it->second->putMessage(new FunctionManagerWakeupMessage());
                 }
-                _invocations_being_waited_for.erase(it); // remove the invocation from the list
+                it = _invocations_being_waited_for.erase(it);
+            } else {
+                it++;
             }
         }
     }
