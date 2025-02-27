@@ -22,7 +22,7 @@ namespace wrench {
          * @brief Constructor
          * @param data_size: number of data_size to send/recv
          */
-        explicit MPI_Alltoall_participant(int data_size) : data_size(data_size) {}
+        explicit MPI_Alltoall_participant(const int data_size) : data_size(data_size) {}
 
         /**
 	 * @brief The actor's main method
@@ -46,10 +46,10 @@ namespace wrench {
      * @param hosts: list of hosts
      * @param data_size: size in data_size of each message sent/received
      */
-    void SMPIExecutor::performAlltoall(std::vector<simgrid::s4u::Host *> &hosts,
-                                       int data_size) {
+    void SMPIExecutor::performAlltoall(const std::vector<simgrid::s4u::Host *> &hosts,
+                                       const int data_size) {
         // Start actors to do an MPI_AllToAll
-        std::string instance_id = "MPI_AllToAll_" + std::to_string(simgrid::s4u::this_actor::get_pid());
+        const std::string instance_id = "MPI_AllToAll_" + std::to_string(simgrid::s4u::this_actor::get_pid());
         SMPI_app_instance_start(instance_id.c_str(),
                                 MPI_Alltoall_participant(data_size),
                                 hosts);
@@ -70,7 +70,8 @@ namespace wrench {
         /**
 	 * @brief The actor's main method
 	 */
-        void operator()() {
+        void operator()() const
+        {
 
             MPI_Init();
             MPI_Barrier(MPI_COMM_WORLD);
@@ -83,7 +84,7 @@ namespace wrench {
      * @brief Method to perform an SMPI Barrier
      * @param hosts: list of hosts
      */
-    void SMPIExecutor::performBarrier(std::vector<simgrid::s4u::Host *> &hosts) {
+    void SMPIExecutor::performBarrier(const std::vector<simgrid::s4u::Host *> &hosts) {
         std::string instance_id = "MPI_Barrier_" + std::to_string(simgrid::s4u::this_actor::get_pid());
         // Start actors to do an MPI_AllToAll
         SMPI_app_instance_start(instance_id.c_str(),
@@ -102,7 +103,7 @@ namespace wrench {
          * @brief Constructor
          * @param data_size: number of data_size to send/recv
          */
-        explicit MPI_Bcast_participant(int data_size) : data_size(data_size) {}
+        explicit MPI_Bcast_participant(const int data_size) : data_size(data_size) {}
 
         /**
 	 * @brief The actor's main method
@@ -127,8 +128,8 @@ namespace wrench {
      * @param data_size: size in data_size of each message sent/received
      */
     void SMPIExecutor::performBcast(std::vector<simgrid::s4u::Host *> &hosts,
-                                    simgrid::s4u::Host *root_host,
-                                    int data_size) {
+                                    const simgrid::s4u::Host *root_host,
+                                    const int data_size) {
 
         // Make sure that the root_host is the first host in the list of hosts, so that it's always rank 0
         auto it = std::find(hosts.begin(), hosts.end(), root_host);

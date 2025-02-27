@@ -31,7 +31,7 @@ namespace wrench {
     * @param num_bytes_to_read: the number of bytes to read
     */
     FileReadAction::FileReadAction(const std::string &name,
-                                   std::vector<std::shared_ptr<FileLocation>> file_locations,
+                                   const std::vector<std::shared_ptr<FileLocation>>& file_locations,
                                    sg_size_t num_bytes_to_read) : Action(name, "file_read_"),
                                                                file_locations(file_locations) {
 

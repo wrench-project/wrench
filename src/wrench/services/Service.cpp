@@ -156,7 +156,7 @@ namespace wrench {
         if (string_value == "zero") {
             return 0;
         }
-        value = (sg_size_t) this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_size);
+        value = static_cast<sg_size_t>(this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_size));
 
         return value;
     }
@@ -466,11 +466,11 @@ namespace wrench {
     void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {
             throw ExecutionException(
-                    std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr<Service>())));
+                std::make_shared<ServiceIsDown>(this->getSharedPtr<Service>()));
         }
         if (this->state == Service::SUSPENDED) {
             throw ExecutionException(
-                    std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
+                std::make_shared<ServiceIsSuspended>(this->getSharedPtr<Service>()));
         }
     }
 

@@ -8,7 +8,6 @@
  */
 
 #include <wrench/services/ServiceMessage.h>
-#include <wrench/failure_causes/FailureCause.h>
 
 namespace wrench {
 

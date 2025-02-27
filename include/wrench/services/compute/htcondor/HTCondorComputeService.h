@@ -15,8 +15,6 @@
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerService.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h"
-#include "wrench/job/PilotJob.h"
-#include "wrench/job/StandardJob.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 namespace wrench {
@@ -72,7 +70,7 @@ namespace wrench {
         void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &compound_job,
                                               std::map<std::string, std::string> &service_specific_args) override;
 
-        void addComputeService(std::shared_ptr<ComputeService> compute_service);
+        void addComputeService(const std::shared_ptr<ComputeService>& compute_service);
 
         //        void submitStandardJob(std::shared_ptr<StandardJob> job,
         //                               const std::map<std::string, std::string> &service_specific_arguments);
@@ -100,7 +98,7 @@ namespace wrench {
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override{};
 
-        static bool isJobGridUniverse(std::shared_ptr<CompoundJob> &job);
+        static bool isJobGridUniverse(const std::shared_ptr<CompoundJob> &job);
 
 
         /***********************/

@@ -138,7 +138,7 @@ namespace wrench {
         }
 
         /**
-         * @brief Unreserve space at the storage service (basically, remove bytes to a hidden un-evictable file in zero time)
+         * @brief Un-reserve space at the storage service (basically, remove bytes to a hidden un-evictable file in zero time)
          * @param location: a location
          */
         void unreserveSpace(std::shared_ptr<FileLocation> &location) override {

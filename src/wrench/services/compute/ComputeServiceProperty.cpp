@@ -13,4 +13,4 @@ namespace wrench {
 
     SET_PROPERTY_NAME(ComputeServiceProperty, SCRATCH_SPACE_BUFFER_SIZE);
 
-};
+}
