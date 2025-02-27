@@ -10,7 +10,6 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include <wrench/data_file/DataFile.h>
 #include <typeinfo>
 #include <boost/core/demangle.hpp>
 

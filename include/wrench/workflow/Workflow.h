@@ -64,9 +64,11 @@ namespace wrench {
         void addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dest, bool redundant_dependencies = false);
         void removeControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dest);
 
-        unsigned long getNumberOfTasks();
+        static void updateReadiness(WorkflowTask *task);
 
-        unsigned long getNumLevels();
+        unsigned long getNumberOfTasks() const;
+
+        unsigned long getNumLevels() const;
 
         double getStartDate();
         double getCompletionDate();
@@ -76,7 +78,7 @@ namespace wrench {
         std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
         std::map<std::string, std::shared_ptr<DataFile>> getOutputFileMap() const;
 
-        std::vector<std::shared_ptr<WorkflowTask>> getTasks();
+        std::vector<std::shared_ptr<WorkflowTask>> getTasks() const;
         std::map<std::string, std::shared_ptr<WorkflowTask>> getTaskMap();
         std::map<std::string, std::shared_ptr<WorkflowTask>> getEntryTaskMap() const;
         std::vector<std::shared_ptr<WorkflowTask>> getEntryTasks() const;
@@ -94,7 +96,7 @@ namespace wrench {
         bool isFileOutputOfSomeTask(const std::shared_ptr<DataFile> &file);
 
         std::set<std::shared_ptr<WorkflowTask>> getTasksThatInput(const std::shared_ptr<DataFile> &file);
-        bool isDone();
+        bool isDone() const;
 
         void enableTopBottomLevelDynamicUpdates(bool enabled);
         void updateAllTopBottomLevels();
@@ -103,12 +105,12 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        std::vector<std::shared_ptr<WorkflowTask>> getTasksInTopLevelRange(int min, int max);
-        std::vector<std::shared_ptr<WorkflowTask>> getTasksInBottomLevelRange(int min, int max);
+        std::vector<std::shared_ptr<WorkflowTask>> getTasksInTopLevelRange(int min, int max) const;
+        std::vector<std::shared_ptr<WorkflowTask>> getTasksInBottomLevelRange(int min, int max) const;
 
         std::vector<std::shared_ptr<WorkflowTask>> getReadyTasks();
 
-        std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> getReadyClusters();
+        std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> getReadyClusters() const;
 
         /***********************/
         /** \endcond           */

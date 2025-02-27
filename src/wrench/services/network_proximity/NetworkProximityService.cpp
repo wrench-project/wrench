@@ -23,7 +23,6 @@
 #include <wrench/services/ServiceMessage.h>
 #include "wrench/services/network_proximity/NetworkProximityMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_network_proximity_service, "Log category for Network Proximity Service");
 
@@ -74,8 +73,8 @@ namespace wrench {
         validateProperties();
 
         // Seed the master_rng
-        this->master_rng.seed((unsigned int) (this->getPropertyValueAsDouble(
-                wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED)));
+        this->master_rng.seed(static_cast<unsigned int>(this->getPropertyValueAsDouble(
+            wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED)));
     }
 
     /**
@@ -380,7 +379,7 @@ namespace wrench {
 
         // if the network_service type is 'alltoall', sender_daemon selects from a pool of all other network daemons
         // if the network_service type is 'vivaldi', sender_daemon selects from a subset of the max_pool_size
-        auto pool_size = (unsigned long) (std::ceil(coverage * max_pool_size));
+        auto pool_size = static_cast<unsigned long>(std::ceil(coverage * max_pool_size));
 
         std::hash<std::string> hash_func;
         // uniform distribution to be used by the sending daemon's rng
@@ -411,7 +410,7 @@ namespace wrench {
      */
     void NetworkProximityService::vivaldiUpdate(double proximity_value, const std::string& sender_hostname,
                                                 const std::string& peer_hostname) {
-        const std::complex<double> sensitivity(0.25, 0.25);
+        constexpr std::complex<double> sensitivity(0.25, 0.25);
 
         std::complex<double> sender_coordinates, peer_coordinates;
 

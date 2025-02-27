@@ -18,7 +18,6 @@
 #include "wrench/failure_causes/HostError.h"
 #include "wrench/services/storage/StorageServiceProperty.h"
 #include "wrench/services/storage/proxy/StorageServiceProxyProperty.h"
-#include "wrench/services/storage/proxy/StorageServiceProxyProperty.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_proxy_file_server,
                     "Log category for ProxyFileServers");

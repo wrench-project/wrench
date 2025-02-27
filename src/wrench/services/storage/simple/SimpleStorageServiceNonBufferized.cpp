@@ -20,7 +20,6 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 //#include <wrench/services/memory/MemoryManager.h>
 
@@ -208,7 +207,7 @@ namespace wrench {
             // Create an async recv on the mailbox if needed
             if (not comm_has_been_posted) {
                 try {
-                    comm_ptr = this->commport->s4u_mb->get_async<void>((void **) (&(simulation_message)));
+                    comm_ptr = this->commport->s4u_mb->get_async<void>(reinterpret_cast<void**>(&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
                     continue;
@@ -218,7 +217,7 @@ namespace wrench {
 
             // Create an async recv on the message queue if needed
             if (not mess_has_been_posted) {
-                mess_ptr = this->commport->s4u_mq->get_async<void>((void **) (&(simulation_message)));
+                mess_ptr = this->commport->s4u_mq->get_async<void>(reinterpret_cast<void**>(&(simulation_message)));
                 mess_has_been_posted = true;
             } else {
 
@@ -353,15 +352,14 @@ namespace wrench {
                         new StorageServiceFileWriteAnswerMessage(
                                 location,
                                 false,
-                                std::shared_ptr<FailureCause>(
-                                        new StorageServiceNotEnoughSpace(
-                                                location->getFile(),
-                                                this->getSharedPtr<SimpleStorageService>())),
+                                std::make_shared<StorageServiceNotEnoughSpace>(
+                                    location->getFile(),
+                                    this->getSharedPtr<SimpleStorageService>()),
                                 {},
                                 0,
                                 this->getMessagePayloadValue(
                                         SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (wrench::ExecutionException &e) {
+            } catch (wrench::ExecutionException &) {
                 return true;
             }
             return true;
@@ -565,7 +563,7 @@ namespace wrench {
     * @return the load on the service
     */
     double SimpleStorageServiceNonBufferized::getLoad() {
-        return (double) this->running_transactions.size() + (double) this->pending_transactions.size();
+        return static_cast<double>(this->running_transactions.size()) + static_cast<double>(this->pending_transactions.size());
     }
 
 

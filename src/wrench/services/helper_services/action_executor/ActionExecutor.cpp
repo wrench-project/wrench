@@ -14,7 +14,6 @@
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
-#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_action_executor, "Log category for  Action Executor");
@@ -30,7 +29,7 @@ namespace wrench {
      * @param ram_footprint: the RAM footprint
      * @param thread_creation_overhead: the thread creation overhead in seconds
      * @param simulate_computation_as_sleep: whether to simulate computation as sleep
-     * @param callback_commport: the callback commport to which a "action done" or "action failed" message will be sent
+     * @param callback_commport: the callback commport to which an "action done" or "action failed" message will be sent
      * @param callback_message: a custom callback message (if nullptr, an ActionExecutorDoneMessage message wil be sent)
      * @param action: the action to perform
      * @param action_execution_service: the parent action execution service (nullptr if none)
@@ -43,8 +42,8 @@ namespace wrench {
             bool simulate_computation_as_sleep,
             S4U_CommPort *callback_commport,
             SimulationMessage *custom_callback_msg,
-            std::shared_ptr<Action> action,
-            std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
+            const std::shared_ptr<Action> &action,
+            const std::shared_ptr<ActionExecutionService> &action_execution_service) : ExecutionController(hostname, "action_executor") {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (action == nullptr) {
@@ -114,7 +113,7 @@ namespace wrench {
                 // If no failure cause was set, then it's a host failure
                 if (not this->action->getFailureCause()) {
                     this->action->setFailureCause(
-                            std::shared_ptr<HostError>(new HostError(this->hostname)));
+                        std::make_shared<HostError>(this->hostname));
                 }
             }
         }

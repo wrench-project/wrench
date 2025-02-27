@@ -32,9 +32,9 @@ namespace wrench {
         friend class S4U_Daemon;
 
     public:
-        static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
+        static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, const std::string& hostname,
                                                           S4U_CommPort *reply_commport,
-                                                          SimulationMessage *msg, std::string suffix);
+                                                          SimulationMessage *msg, const std::string& suffix);
 
         void kill();
 

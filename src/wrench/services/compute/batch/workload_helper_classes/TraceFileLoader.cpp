@@ -27,13 +27,13 @@ namespace wrench {
      */
     std::string generateRandomUsername(unsigned long userid) {
         //Type of random number distribution
-        const char charset[] =
+        constexpr char charset[] =
                 "aabccdeeefghijklmnooopqrstttuuvwxyzz";
         std::uniform_int_distribution<int> dist(0, sizeof(charset) - 2);
         //Mersenne Twister: Good quality random number generator
         std::mt19937 rng;
         rng.seed(userid);// Consistent for the same userid
-        std::string username = "";
+        std::string username;
         int username_length = 3 + dist(rng) % 5;
         while (username_length--) {
             username += charset[dist(rng)];
@@ -284,7 +284,7 @@ namespace wrench {
                 std::tuple<std::string, double, double, double, double, unsigned int, std::string> job =
                         std::tuple<std::string, double, double, double, double, unsigned int, std::string>(
                                 username, sub_time, time, requested_time, requested_ram,
-                                (unsigned int) requested_num_nodes, username);
+                                static_cast<unsigned int>(requested_num_nodes), username);
                 trace_file_jobs.push_back(job);
             }
         }
@@ -397,7 +397,7 @@ namespace wrench {
             //      // Add the job to the list
             std::tuple<std::string, double, double, double, double, unsigned int, std::string> job =
                     std::tuple<std::string, double, double, double, double, unsigned int, std::string>(
-                            std::to_string(id), subtime, walltime, requested_time, 0.0, (unsigned int) res, "user");
+                            std::to_string(id), subtime, walltime, requested_time, 0.0, static_cast<unsigned int>(res), "user");
             trace_file_jobs.push_back(job);
         }
 

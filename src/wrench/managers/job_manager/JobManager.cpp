@@ -424,7 +424,7 @@ namespace wrench {
             } else {
                 throw;
             }
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &) {
             throw;
         }
 
@@ -450,7 +450,7 @@ namespace wrench {
         // Send a message to wake up the daemon
         try {
             this->commport->putMessage(new JobManagerWakeupMessage());
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error("Cannot connect to job manager");
         }
     }
@@ -509,7 +509,7 @@ namespace wrench {
             } else {
                 throw;
             }
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &) {
             throw;
         }
 
@@ -535,7 +535,7 @@ namespace wrench {
         // Send a message to wake up the daemon
         try {
             this->commport->putMessage(new JobManagerWakeupMessage());
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error("Cannot connect to job manager");
         }
     }
@@ -623,10 +623,9 @@ namespace wrench {
             job->compound_job = nullptr;
             if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
                 throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
-            } else {
-                throw;
             }
-        } catch (std::invalid_argument &e) {
+            throw;
+        } catch (std::invalid_argument &) {
             throw;
         }
 
@@ -658,7 +657,7 @@ namespace wrench {
         // Send a message to wake up the daemon
         try {
             this->commport->putMessage(new JobManagerWakeupMessage());
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error("Cannot connect to job manager");
         }
     }
@@ -675,7 +674,7 @@ namespace wrench {
 
         if (job->getParentComputeService() == nullptr) {
             std::string err_msg = "Job cannot be terminated because it doesn't have a parent compute service";
-            throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
+            throw ExecutionException(std::make_shared<NotAllowed>(nullptr, err_msg));
         }
 
         switch (job->state) {
@@ -683,7 +682,7 @@ namespace wrench {
             case StandardJob::State::FAILED:
             case StandardJob::State::NOT_SUBMITTED: {
                 std::string err_msg = "job cannot be terminated because it's not pending/running";
-                throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
+                throw ExecutionException(std::make_shared<NotAllowed>(nullptr, err_msg));
             }
             default:
                 break;
@@ -732,7 +731,7 @@ namespace wrench {
 
         if (job->getParentComputeService() == nullptr) {
             std::string err_msg = "Job cannot be terminated because it doesn't have a parent compute service";
-            throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
+            throw ExecutionException(std::make_shared<NotAllowed>(nullptr, err_msg));
         }
 
         job->getParentComputeService()->terminateJob(job);
@@ -752,7 +751,7 @@ namespace wrench {
 
         if (job->getParentComputeService() == nullptr) {
             std::string err_msg = "Job cannot be terminated because it doesn't have a parent compute service";
-            throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
+            throw ExecutionException(std::make_shared<NotAllowed>(nullptr, err_msg));
         }
 
         job->getParentComputeService()->terminateJob(job->compound_job);
@@ -853,7 +852,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
         try {
             message = this->commport->getMessage();
-        } catch (ExecutionException &e) {
+        } catch (ExecutionException &) {
             WRENCH_INFO("Error while receiving message... ignoring");
             return true;
         }

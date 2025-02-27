@@ -36,7 +36,7 @@ namespace wrench {
      * @param hostname: the hostname on which the data movement manager is to run
      * @param creator_commport: the commport of the manager's creator
      */
-    DataMovementManager::DataMovementManager(std::string hostname, S4U_CommPort *creator_commport) : Service(hostname, "data_movement_manager") {
+    DataMovementManager::DataMovementManager(const std::string& hostname, S4U_CommPort *creator_commport) : Service(hostname, "data_movement_manager") {
         this->creator_commport = creator_commport;
     }
 
@@ -77,7 +77,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_copies) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
+                    std::make_shared<FileAlreadyBeingCopied>(src, dst));
             }
         }
 
@@ -112,7 +112,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_reads) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingRead(location)));
+                    std::make_shared<FileAlreadyBeingRead>(location));
             }
         }
 
@@ -140,7 +140,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_writes) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingWritten(location)));
+                    std::make_shared<FileAlreadyBeingWritten>(location));
             }
         }
 
@@ -175,7 +175,7 @@ namespace wrench {
         for (auto const &p: this->pending_file_copies) {
             if (*p == request) {
                 throw ExecutionException(
-                        std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(src, dst)));
+                    std::make_shared<FileAlreadyBeingCopied>(src, dst));
             }
         }
 

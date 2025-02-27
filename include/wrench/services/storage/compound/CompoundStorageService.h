@@ -105,14 +105,14 @@ namespace wrench {
         using StorageService::writeFile;
 
         CompoundStorageService(const std::string &hostname,
-                               std::set<std::shared_ptr<StorageService>> storage_services,
-                               WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                               WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                               const std::set<std::shared_ptr<StorageService>>& storage_services,
+                               const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                               const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         CompoundStorageService(const std::string &hostname,
-                               std::set<std::shared_ptr<StorageService>> storage_services,
+                               const std::set<std::shared_ptr<StorageService>>& storage_services,
                                StorageSelectionStrategyCallback &allocate,
-                               WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                               const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         /***********************/

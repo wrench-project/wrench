@@ -123,7 +123,7 @@ namespace wrench {
 
         // Determine if specific --cfg arguments were passed
         for (i = 0; i < *argc; i++) {
-            if (!strncmp(argv[i], "--cfg=surf/precision:", strlen("--cfg=surf/precision:"))) {
+            if (!strncmp(argv[i], "--cfg=precision/timing:", strlen("--cfg=precision/timing:"))) {
                 Simulation::surf_precision_set_by_user = true;
             }
         }
@@ -583,7 +583,6 @@ namespace wrench {
      *
      */
     void Simulation::startAllProcesses() {
-
         // Start the execution controllers
         for (const auto &execution_controller: this->execution_controllers) {
             execution_controller->start(execution_controller, execution_controller->daemonized_, false);// Not daemonized, no auto-restart
@@ -1327,7 +1326,7 @@ namespace wrench {
         }
 
         service->simulation_ = this;
-        std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
+        auto shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
         //        if (service->hasScratch()) {

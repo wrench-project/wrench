@@ -11,7 +11,6 @@
 #ifndef WRENCH_S4U_SIMULATION_H
 #define WRENCH_S4U_SIMULATION_H
 
-#include <set>
 #include <climits>
 #include <limits>
 #include <simgrid/s4u.hpp>
@@ -114,6 +113,8 @@ namespace wrench {
         static simgrid::s4u::Host *get_host_or_vm_by_name(const std::string &name);
 
         static sg_size_t getHostMemoryCapacity(simgrid::s4u::Host *host);
+
+        // static simgrid::s4u::MutexPtr global_lock;
 
     private:
         static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string,
