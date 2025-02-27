@@ -37,6 +37,10 @@ namespace wrench
                                                                                                                                     "ServerlessComputeService", "")
     {
         _compute_hosts = std::move(compute_hosts);
+        for (const auto &compute_host : _compute_hosts) {
+            _available_cores[compute_host] = S4U_Simulation::getHostNumCores(compute_host);
+        }
+
         _head_storage_service_mount_point = std::move(head_storage_service_mount_point);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
@@ -253,6 +257,10 @@ namespace wrench
         }
         else if (auto scsiec_msg = std::dynamic_pointer_cast<ServerlessComputeServiceInvocationExecutionCompleteMessage>(message))
         {
+            auto invocation = scsiec_msg->_invocation;
+            auto host = _scheduling_decisions[invocation];
+            _scheduling_decisions.erase(invocation);
+            _available_cores[host]++;
             scsiec_msg->_invocation->_notify_commport->dputMessage(
                 new ServerlessComputeServiceFunctionInvocationCompleteMessage(true,
                                                                               scsiec_msg->_invocation, nullptr, 0));
@@ -377,18 +385,25 @@ namespace wrench
         while (!_scheduledInvocations.empty())
         {
             auto invocation_to_place = _scheduledInvocations.front();
+            auto target_host = _scheduling_decisions[invocation_to_place];
             WRENCH_INFO("Invoking function [%s]",
                         invocation_to_place->_registered_function->_function->getName().c_str());
             _scheduledInvocations.pop();
+
             // TODO: schedule on a host, right now it is on 0th host
             const std::function lambda_execute = [invocation_to_place, this](std::shared_ptr<ActionExecutor> action_executor)
             {
                 WRENCH_INFO("In the function invocation lambda execute!!");
+                // S4U_Simulation::sleep(10);
+                WRENCH_INFO("Done with the lambda execute!!");
+
+#if 0
                 auto function = invocation_to_place->_registered_function->_function;
                 auto image_file = function->_image->getFile();
                 auto head_host_image_path = FileLocation::LOCATION(this->_head_storage_service, image_file);
-                auto compute_service_image_path = FileLocation::LOCATION(_compute_services[0]->getScratch(), image_file);
+                // auto compute_service_image_path = FileLocation::LOCATION(action_executor-, image_file);
                 auto container_size = image_file->getSize();
+
 
                 // Copy the file from the headHost to the current host
                 StorageService::copyFile(head_host_image_path, compute_service_image_path);
@@ -396,7 +411,7 @@ namespace wrench
                 // Create a disk for the container
                 S4U_Simulation::createNewDisk(_compute_hosts[0], "container_disk_" + image_file->getID(), 1000, 1000, container_size, _compute_services[0]->getScratch()->getMountPoint() + "/container_disk_" + image_file->getID());
                 auto storage_service = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(
-                    _compute_services[0]->getHostname(),
+                    action_executor->getHostname(),
                     {_compute_services[0]->getScratch()->getMountPoint() + "/container_disk_" + image_file->getID()},
                     {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
                       this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}},
@@ -412,6 +427,7 @@ namespace wrench
                 // Clean up
                 // TODO: how to delete disk from simulation
                 storage_service->stop();
+#endif
             };
             const std::function lambda_terminate = [](std::shared_ptr<ActionExecutor> action_executor) {};
 
@@ -425,8 +441,8 @@ namespace wrench
                 invocation_to_place, 0);
 
             auto action_executor = std::make_shared<ActionExecutor>(
-                _compute_hosts[0],
-                0,
+                target_host,
+                1,
                 0,
                 0,
                 false,
@@ -452,6 +468,7 @@ namespace wrench
      */
     void ServerlessComputeService::startComputeHostsServices()
     {
+#if 0
         for (std::string host : _compute_hosts)
         {
             std::map<std::string, std::tuple<unsigned long, sg_size_t>> compute_resources = {
@@ -472,6 +489,7 @@ namespace wrench
             ss->setSimulation(this->simulation_);
             _compute_storages.push_back(ss);
         }
+#endif
     }
 
     /**
@@ -498,7 +516,7 @@ namespace wrench
      */
     void ServerlessComputeService::admitInvocations()
     {
-        // This implements a FCFS algorith. That is, if an invocation is placed for an image
+        // This implements a FCFS algorithm. That is, if an invocation is placed for an image
         // that cannot be downloaded right now (due to lack of space), then we stop and do not
         // consider invocations that were placed later, even if their images have been downloaded
         // and are available right now. This is an arbitrary non-backfilling choice, that can later
@@ -512,7 +530,7 @@ namespace wrench
             auto image = invocation->_registered_function->_function->_image;
 
             // If the image file is already downloaded, make the invocation schedulable immediately
-            if (_being_downloaded_image_files.find(image->getFile()) != _being_downloaded_image_files.end())
+            if (_downloaded_image_files.find(image->getFile()) != _downloaded_image_files.end())
             {
                 _newInvocations.pop();
                 _schedulableInvocations.push(invocation);
@@ -534,6 +552,7 @@ namespace wrench
                 // "Reserve" space on the storage service
                 _free_space_on_head_storage -= image->getFile()->getSize();
                 // initiate the download
+                _being_downloaded_image_files.insert(image->getFile());
                 initiateImageDownloadFromRemote(invocation);
                 _newInvocations.pop();
                 _admittedInvocations[image->getFile()].push(invocation);
@@ -598,8 +617,23 @@ namespace wrench
         // TODO: Implement something fancy.
         while (!_schedulableInvocations.empty())
         {
-            WRENCH_INFO("I should be scheduling an invocation, but for now I am just making it runnable instantly");
-            _scheduledInvocations.push(std::move(_schedulableInvocations.front()));
+            // Find the first core available
+            std::string picked_host;
+            for (auto const &item : _available_cores) {
+                if (item.second > 0) {
+                    picked_host = item.first;
+                    _available_cores[picked_host]--;
+                    break;
+                }
+            }
+            if (picked_host.empty()) {
+                break;
+            }
+
+            WRENCH_INFO("Scheduling an invocation on host %s", picked_host.c_str());
+            auto scheduled_invocation = _schedulableInvocations.front();
+            _scheduling_decisions[scheduled_invocation] = picked_host;
+            _scheduledInvocations.push(std::move(scheduled_invocation));
             _schedulableInvocations.pop();
         }
         return;
