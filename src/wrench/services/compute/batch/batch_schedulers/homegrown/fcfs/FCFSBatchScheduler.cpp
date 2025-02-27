@@ -21,7 +21,8 @@ namespace wrench {
     *
     * @return A BatchComputeService job, or nullptr is none is found
     */
-    std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() {
+    std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() const
+    {
         if (this->cs->batch_queue.empty()) {
             return nullptr;
         } else {
@@ -31,7 +32,7 @@ namespace wrench {
 
 
     /**
-     * @brief Override Method to find hosts on which to scheduled a  job
+     * @brief Override Method to find hosts on which to schedule a  job
      * @param num_nodes: the job's requested num nodes
      * @param cores_per_node: the job's num cores per node
      * @param ram_per_node: the job's ram per node
@@ -53,7 +54,7 @@ namespace wrench {
         if (num_nodes > cs->available_nodes_to_cores.size()) {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
-        if (cores_per_node > (unsigned long) cs->available_nodes_to_cores.begin()->first->get_core_count()) {
+        if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->get_core_count())) {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many cores per host");
         }
 
@@ -102,14 +103,14 @@ namespace wrench {
         for (auto const &job: cs->running_jobs) {
             auto batch_job = job.second;
             double time_to_finish = std::max<double>(0, batch_job->getBeginTimestamp() +
-                                                                (double) batch_job->getRequestedTime() -
+                                                                static_cast<double>(batch_job->getRequestedTime()) -
                                                                 wrench::Simulation::getCurrentSimulatedDate());
             for (auto resource: batch_job->getResourcesAllocated()) {
                 auto host = resource.first;
                 unsigned long num_cores = std::get<0>(resource.second);
-                sg_size_t ram = std::get<1>(resource.second);
+                // sg_size_t ram = std::get<1>(resource.second);
                 // Update available_times
-                double new_available_time = *(core_available_times[host].begin() + num_cores - 1) + time_to_finish;
+                double new_available_time = *(core_available_times[host].begin() + static_cast<double>(num_cores) - 1) + time_to_finish;
                 for (unsigned int i = 0; i < num_cores; i++) {
                     *(core_available_times[host].begin() + i) = new_available_time;
                 }
@@ -131,7 +132,7 @@ namespace wrench {
 
         // Go through the pending jobs and update core availabilities
         for (auto const &job: this->cs->batch_queue) {
-            double duration = (double) job->getRequestedTime();
+            double duration = static_cast<double>(job->getRequestedTime());
             unsigned long num_hosts = job->getRequestedNumNodes();
             unsigned long num_cores_per_host = job->getRequestedCoresPerNode();
 
@@ -154,11 +155,11 @@ namespace wrench {
                       });
 
             // Compute the actual earliest start time
-            double earliest_job_start_time = (*(earliest_start_times.begin() + num_hosts - 1)).second;
+            double earliest_job_start_time = ((earliest_start_times.begin() + num_hosts - 1))->second;
 
             // Update the core available times on each host used for the job
             for (unsigned int i = 0; i < num_hosts; i++) {
-                auto host = (*(earliest_start_times.begin() + i)).first;
+                auto host = ((earliest_start_times.begin() + i))->first;
                 for (unsigned int j = 0; j < num_cores_per_host; j++) {
                     *(core_available_times[host].begin() + j) = earliest_job_start_time + duration;
                 }
@@ -198,7 +199,7 @@ namespace wrench {
             std::string id = std::get<0>(job);
             unsigned int num_hosts = std::get<1>(job);
             unsigned int num_cores_per_host = std::get<2>(job);
-            double duration = std::get<3>(job);
+            // double duration = std::get<3>(job);
 
             double earliest_job_start_time;
 
@@ -226,7 +227,7 @@ namespace wrench {
                               return std::get<1>(a) < std::get<1>(b);
                           });
 
-                earliest_job_start_time = (*(earliest_start_times.begin() + num_hosts - 1)).second;
+                earliest_job_start_time = ((earliest_start_times.begin() + num_hosts - 1))->second;
             }
 
 

@@ -47,15 +47,15 @@ namespace wrench {
                                       double non_grid_post_overhead,
                                       bool fast_bmcs_resource_availability,
                                       bool fcfs,
-                                      std::set<std::shared_ptr<ComputeService>> compute_services,
-                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                      WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                      const std::set<std::shared_ptr<ComputeService>>& compute_services,
+                                      const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                                      const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
 
-        void addComputeService(std::shared_ptr<ComputeService> compute_service);
+        void addComputeService(const std::shared_ptr<ComputeService>& compute_service);
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override;
@@ -77,7 +77,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processSubmitCompoundJob(S4U_CommPort *answer_commport, std::shared_ptr<CompoundJob> job,
+        void processSubmitCompoundJob(S4U_CommPort *answer_commport, const std::shared_ptr<CompoundJob>& job,
                                       std::map<std::string, std::string> &service_specific_args);
 
         void processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job);

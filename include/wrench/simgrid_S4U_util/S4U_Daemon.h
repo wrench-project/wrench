@@ -93,11 +93,11 @@ namespace wrench {
         bool isSetToAutoRestart() const;
         void setupOnExitFunction();
 
-        std::pair<bool, int> join();
+        std::pair<bool, int> join() const;
 
-        void suspendActor();
+        void suspendActor() const;
 
-        void resumeActor();
+        void resumeActor() const;
 
 
         std::string getName() const;
@@ -114,18 +114,18 @@ namespace wrench {
             SUSPENDED,
         };
 
-        S4U_Daemon::State getState();
+        S4U_Daemon::State getState() const;
 
         /** @brief The daemon's life saver */
         LifeSaver *life_saver = nullptr;
 
         /** @brief Method to acquire the daemon's lock */
-        void acquireDaemonLock();
+        void acquireDaemonLock() const;
 
         /** @brief Method to release the daemon's lock */
-        void releaseDaemonLock();
+        void releaseDaemonLock() const;
 
-        Simulation *getSimulation();
+        Simulation *getSimulation() const;
 
         void setSimulation(Simulation *simulation);
 

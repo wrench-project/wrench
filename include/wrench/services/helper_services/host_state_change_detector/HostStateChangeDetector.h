@@ -30,7 +30,7 @@ namespace wrench {
 
     public:
         explicit HostStateChangeDetector(std::string host_on_which_to_run,
-                                         std::vector<simgrid::s4u::Host *> hosts_to_monitor,
+                                         const std::vector<simgrid::s4u::Host *>& hosts_to_monitor,
                                          bool notify_when_turned_on,
                                          bool notify_when_turned_off,
                                          bool notify_when_speed_change,

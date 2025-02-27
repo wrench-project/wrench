@@ -183,10 +183,8 @@ namespace wrench {
      *
      */
     unsigned long ComputeService::getNumHosts(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_hosts", simulate_it);
-
-        return (unsigned long) (*(dict.begin())).second;
+        auto dict = this->getServiceResourceInformation("num_hosts", simulate_it);
+        return static_cast<unsigned long>((dict.begin())->second);
     }
 
     /**
@@ -225,7 +223,7 @@ namespace wrench {
         std::map<std::string, unsigned long> to_return;
 
         for (auto const &x: dict) {
-            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+            to_return.insert(std::make_pair(x.first, static_cast<unsigned long>(x.second)));
         }
 
         return to_return;
@@ -244,7 +242,7 @@ namespace wrench {
 
         unsigned long count = 0;
         for (auto const &x: dict) {
-            count += (unsigned long) x.second;
+            count += static_cast<unsigned long>(x.second);
         }
         return count;
     }
@@ -267,7 +265,7 @@ namespace wrench {
         std::map<std::string, unsigned long> to_return;
 
         for (auto const &x: dict) {
-            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+            to_return.insert(std::make_pair(x.first, static_cast<unsigned long>(x.second)));
         }
 
         return to_return;
@@ -287,7 +285,7 @@ namespace wrench {
         std::map<std::string, double> to_return;
 
         for (auto const &x: dict) {
-            to_return.insert(std::make_pair(x.first, (double) x.second));
+            to_return.insert(std::make_pair(x.first, static_cast<double>(x.second)));
         }
 
         return to_return;
@@ -310,7 +308,7 @@ namespace wrench {
 
         unsigned long count = 0;
         for (auto const &x: dict) {
-            count += (unsigned long) x.second;
+            count += static_cast<unsigned long>(x.second);
         }
         return count;
     }
@@ -354,8 +352,7 @@ namespace wrench {
     *
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("flop_rates", simulate_it);
+        auto dict = this->getServiceResourceInformation("flop_rates", simulate_it);
 
         std::map<std::string, double> to_return;
         for (auto const &x: dict) {
@@ -373,8 +370,7 @@ namespace wrench {
     *
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("ram_capacities", simulate_it);
+        auto dict = this->getServiceResourceInformation("ram_capacities", simulate_it);
 
         std::map<std::string, double> to_return;
 
@@ -420,7 +416,7 @@ namespace wrench {
      * @brief Get the total capacity of the compute service's scratch storage space
      * @return a size (in bytes)
      */
-    double ComputeService::getTotalScratchSpaceSize() {
+    double ComputeService::getTotalScratchSpaceSize() const {
         // A scratch space SS is always created with a single mount point
         return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
@@ -429,7 +425,7 @@ namespace wrench {
      * @brief Get the free space on the compute service's scratch storage space
      * @return a size (in bytes)
      */
-    double ComputeService::getFreeScratchSpaceSize() {
+    double ComputeService::getFreeScratchSpaceSize() const {
         return this->scratch_space_storage_service->getTotalFreeSpace();
     }
 
@@ -440,14 +436,6 @@ namespace wrench {
     std::shared_ptr<StorageService> ComputeService::getScratch() {
         return this->scratch_space_storage_service;
     }
-
-    //    /**
-    //    * @brief Get a shared pointer to the compute service's scratch storage space
-    //    * @return a shared pointer to the shared scratch space
-    //    */
-    //    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
-    //        return this->scratch_space_storage_service_shared_ptr;
-    //    }
 
     /**
     * @brief Checks if the compute service has a scratch space
@@ -477,6 +465,5 @@ namespace wrench {
             throw std::invalid_argument("Compute service (" + this->getName() + ") does not have scratch space");
         }
     }
-
 
 }// namespace wrench

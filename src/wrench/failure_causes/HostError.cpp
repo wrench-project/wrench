@@ -10,7 +10,6 @@
 #include <wrench/failure_causes/HostError.h>
 
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/failure_causes/FailureCause.h>
 
 #include <utility>
 

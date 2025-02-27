@@ -10,11 +10,9 @@
 
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
-#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_host_state_change_detector, "Log category for HostStateChangeDetector");
@@ -46,7 +44,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  *
  */
 wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
-                                                         std::vector<simgrid::s4u::Host *> hosts_to_monitor,
+                                                         const std::vector<simgrid::s4u::Host *>& hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off, bool notify_when_speed_change,
                                                          std::shared_ptr<S4U_Daemon> creator,
                                                          S4U_CommPort *commport_to_notify,
