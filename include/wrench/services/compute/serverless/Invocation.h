@@ -16,6 +16,7 @@
 #include <wrench/managers/function_manager/RegisteredFunction.h>
 #include <wrench/managers/function_manager/FunctionOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
+#include <wrench/failure_causes/FailureCause.h>
 
 namespace wrench {
    
@@ -36,11 +37,16 @@ namespace wrench {
                    std::shared_ptr<FunctionInput> function_input,
                    S4U_CommPort* notify_commport);
 
+
+        bool isDone() const;
+        bool isSuccess() const;
+        std::shared_ptr<FailureCause> getFailureCause() const;
         /**
          * @brief Gets the output of the function invocation.
-         * @return A shared pointer to the function output.
          */
-        std::shared_ptr<FunctionOutput> get_output() const;
+        std::shared_ptr<FunctionOutput> getOutput() const;
+
+
 
     private:
         friend class FunctionManager;
@@ -48,6 +54,9 @@ namespace wrench {
 
         std::shared_ptr<RegisteredFunction> _registered_function; // the registered function to be invoked
         std::shared_ptr<FunctionInput> _function_input; // the input for the function
+        bool _done; // whether the invocation is done
+        bool _success; // whether the invocation was successful
+        std::shared_ptr<FailureCause> _failure_cause; // the cause of failure
         std::shared_ptr<FunctionOutput> _function_output; // the output of the function invocation
         S4U_CommPort* _notify_commport; // the communication port for notifications
 
