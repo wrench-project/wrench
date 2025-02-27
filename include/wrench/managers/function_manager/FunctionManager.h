@@ -86,7 +86,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation);
+        void processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation, bool success, std::shared_ptr<FailureCause> failure_cause);
 
         void processFunctionInvocationFailure();
 
