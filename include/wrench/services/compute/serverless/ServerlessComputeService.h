@@ -87,7 +87,7 @@ namespace wrench {
 
         void admitInvocations();
         void scheduleInvocations();
-        void dispatchFunctionInvocation();
+        void dispatchInvocations();
 
         bool processNextMessage();
 
@@ -96,6 +96,7 @@ namespace wrench {
         void startHeadStorageService();
         void startComputeHostsServices();
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
+        void dispatchFunctionInvocation(const std::shared_ptr<Invocation>& invocation);
 
 
         // map of Registered functions sorted by function name
@@ -122,7 +123,7 @@ namespace wrench {
 
         std::string _head_storage_service_mount_point;
         // std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
-        std::vector<std::shared_ptr<StorageService>> _compute_storages;
+        std::unordered_map<std::string, std::shared_ptr<StorageService>> _compute_storages;
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
         std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
