@@ -65,6 +65,7 @@ namespace wrench {
 
         bool isDone(std::shared_ptr<Invocation> invocation);
         void wait_one(std::shared_ptr<Invocation> invocation);
+        void wait_all(std::vector<std::shared_ptr<Invocation>> invocations);
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -85,7 +86,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processFunctionInvocationComplete();
+        void processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation, bool success, std::shared_ptr<FailureCause> failure_cause);
 
         void processFunctionInvocationFailure();
 

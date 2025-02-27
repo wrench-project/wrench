@@ -101,14 +101,56 @@ namespace wrench {
         function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 2 registered");
 
+        std::vector<std::shared_ptr<Invocation>> invocations;
 
         //TODO: Should the EC be responsible for keeping track of its invocations?
         for (unsigned char i=0; i < 200; i++) {
             WRENCH_INFO("Invoking function 1");
-            function_manager->invokeFunction(function1, this->compute_service, input);
+            invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
             WRENCH_INFO("Function 1 invoked");
             // wrench::Simulation::sleep(1);
         }
+
+        WRENCH_INFO("Waiting for all invocations to complete");
+        function_manager->wait_all(invocations);
+        WRENCH_INFO("All invocations completed");
+
+        WRENCH_INFO("Invoking function 2");
+        std::shared_ptr<Invocation> new_invocation = function_manager->invokeFunction(function2, this->compute_service, input);
+        WRENCH_INFO("Function 2 invoked");
+
+        try {
+            new_invocation->isSuccess();
+        } catch (std::runtime_error& expected) {
+            WRENCH_INFO("As expected, got exception");
+        }
+
+        try {
+            new_invocation->getOutput();
+        } catch (std::runtime_error& expected) {
+            WRENCH_INFO("As expected, got exception");
+        }
+
+        try {
+            new_invocation->getFailureCause();
+        } catch (std::runtime_error& expected) {
+            WRENCH_INFO("As expected, got exception");
+        }
+
+        function_manager->wait_one(new_invocation);
+
+        try {
+            new_invocation->getOutput();
+            WRENCH_INFO("First check passed");
+            new_invocation->isSuccess();
+            WRENCH_INFO("Second check passed");
+            new_invocation->getFailureCause();
+            WRENCH_INFO("Third check passed");
+        } catch (std::runtime_error& expected) {
+            WRENCH_INFO("Not expected, got exception");
+        }
+
+
 
         // wrench::Simulation::sleep(100);
         //
@@ -116,7 +158,7 @@ namespace wrench {
         // function_manager->invokeFunction(function1, this->compute_service, input);
         // WRENCH_INFO("Function 1 invoked");
 
-        wrench::Simulation::sleep(1000000);
+        // wrench::Simulation::sleep(1000000);
         // WRENCH_INFO("Execution complete");
 
         // function_manager->invokeFunction(function2, this->compute_service, input);
