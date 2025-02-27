@@ -62,25 +62,25 @@ private:
 
     void create_platform() const {
         // Create the top-level zone
-        auto zone = sg4::create_full_zone("AS0");
+        auto zone = simgrid::s4u::Engine::get_instance()->get_netzone_root();
         // Create the WMSHost host with its disk
-        auto wms_host = zone->create_host("WMSHost", "10Gf");
+        auto wms_host = zone->add_host("WMSHost", "10Gf");
         wms_host->set_core_count(1);
-        auto wms_host_disk = wms_host->create_disk("hard_drive",
+        auto wms_host_disk = wms_host->add_disk("hard_drive",
                                                    "100MBps",
                                                    "100MBps");
         wms_host_disk->set_property("size", "5000GiB");
         wms_host_disk->set_property("mount", "/");
 
         // Create a ComputeHost
-        auto compute_host = zone->create_host("ComputeHost", "1Gf");
+        auto compute_host = zone->add_host("ComputeHost", "1Gf");
         compute_host->set_core_count(10);
         compute_host->set_property("ram", "16GB");
 
         // Create three network links
-        auto network_link = zone->create_link("network_link", link_bw)->set_latency("20us");
-        auto loopback_WMSHost = zone->create_link("loopback_WMSHost", "1000EBps")->set_latency("0us");
-        auto loopback_ComputeHost = zone->create_link("loopback_ComputeHost", "1000EBps")->set_latency("0us");
+        auto network_link = zone->add_link("network_link", link_bw)->set_latency("20us");
+        auto loopback_WMSHost = zone->add_link("loopback_WMSHost", "1000EBps")->set_latency("0us");
+        auto loopback_ComputeHost = zone->add_link("loopback_ComputeHost", "1000EBps")->set_latency("0us");
 
         // Add routes
         {
