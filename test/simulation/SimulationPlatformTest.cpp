@@ -87,8 +87,8 @@ private:
 
         // Testing finding subzones
         auto subnetzones = wrench::S4U_Simulation::getAllSubZoneIDsByZone();
-        if (subnetzones.size() != 1) {
-            throw std::runtime_error("Invalid number of netzones found");
+        if (subnetzones.size() != 2) {
+            throw std::runtime_error("Invalid number of netzones found " + std::to_string(subnetzones.size()) + " (should be 2)");
         }
         if (subnetzones["world"].size() != 2) {
             throw std::runtime_error("Invalid number of netzones found under the 'world' netzone");
