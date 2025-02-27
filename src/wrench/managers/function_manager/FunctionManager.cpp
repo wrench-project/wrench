@@ -233,7 +233,7 @@ namespace wrench {
             return false;
         }
         else if (auto scsfic_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationCompleteMessage>(message)) {
-            processFunctionInvocationComplete(scsfic_msg->invocation);
+            processFunctionInvocationComplete(scsfic_msg->invocation, scsfic_msg->success, scsfic_msg->failure_cause);
             return true;
         }
         else if (auto fmfc_msg = std::dynamic_pointer_cast<FunctionManagerFunctionCompletedMessage>(message)) {
@@ -257,8 +257,14 @@ namespace wrench {
      * @brief TODO
      * 
      */
-    void FunctionManager::processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation) {
+    void FunctionManager::processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation, 
+                                                            bool success, 
+                                                            std::shared_ptr<FailureCause> failure_cause) {
         WRENCH_INFO("Some Invocation Complete");
+        invocation->_done = true;
+        invocation->_success = success;
+        invocation->_failure_cause = failure_cause;
+        // _pending_invocations.erase(invocation);
         _finished_invocations.insert(invocation);
     }
 
