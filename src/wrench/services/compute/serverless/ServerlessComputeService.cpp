@@ -612,6 +612,8 @@ namespace wrench {
      */
     void ServerlessComputeService::scheduleInvocations() {
         // TODO: Implement something fancy.
+        // TODO: Deal with Disk space issues
+        // TODO: Deal with RAM space issues
         while (!_schedulableInvocations.empty()) {
             // Find the first core available
             std::string picked_host;
