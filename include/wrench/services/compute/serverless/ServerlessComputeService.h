@@ -97,6 +97,7 @@ namespace wrench {
         void startComputeHostsServices();
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
         void dispatchFunctionInvocation(const std::shared_ptr<Invocation>& invocation);
+        std::shared_ptr<StorageService> startInvocationStorageService(const std::shared_ptr<Invocation>& invocation);
 
 
         // map of Registered functions sorted by function name

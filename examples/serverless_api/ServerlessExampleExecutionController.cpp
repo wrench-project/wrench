@@ -61,6 +61,7 @@ namespace wrench {
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<FunctionInput>& input, const std::shared_ptr<StorageService>& service) -> std::string {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            WRENCH_INFO("I AM USER CODE");
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
@@ -111,7 +112,7 @@ namespace wrench {
             // wrench::Simulation::sleep(1);
         }
 
-#if 1
+#if 0
 
         WRENCH_INFO("Waiting for all invocations to complete");
         function_manager->wait_all(invocations);
@@ -160,7 +161,7 @@ namespace wrench {
         // function_manager->invokeFunction(function1, this->compute_service, input);
         // WRENCH_INFO("Function 1 invoked");
 
-        // wrench::Simulation::sleep(1000000);
+        wrench::Simulation::sleep(1000000);
         // WRENCH_INFO("Execution complete");
 
         // function_manager->invokeFunction(function2, this->compute_service, input);

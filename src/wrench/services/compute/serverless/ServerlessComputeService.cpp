@@ -180,7 +180,7 @@ namespace wrench {
         // Start the Head Storage Service
         startHeadStorageService();
         // Start a storage service on each host.
-        // startComputeHostsServices();
+        startComputeHostsServices();
 
         while (processNextMessage()) {
             admitInvocations();
@@ -368,47 +368,43 @@ namespace wrench {
     void ServerlessComputeService::dispatchFunctionInvocation(const std::shared_ptr<Invocation>& invocation) {
         auto target_host = _scheduling_decisions[invocation];
 
-        // TODO: schedule on a host, right now it is on 0th host
-        const std::function lambda_execute = [invocation, this](std::shared_ptr<ActionExecutor> action_executor) {
-            WRENCH_INFO("In the function invocation lambda execute!!");
-            S4U_Simulation::sleep(10);
-            WRENCH_INFO("Done with the lambda execute!!");
+        auto ss = startInvocationStorageService(invocation);
 
-#if 0
-                auto function = invocation_to_place->_registered_function->_function;
-                auto image_file = function->_image->getFile();
-                auto head_host_image_path = FileLocation::LOCATION(this->_head_storage_service, image_file);
-                // auto compute_service_image_path = FileLocation::LOCATION(action_executor-, image_file);
-                auto container_size = image_file->getSize();
-
-
-                // Copy the file from the headHost to the current host
-                StorageService::copyFile(head_host_image_path, compute_service_image_path);
-
-                // Create a disk for the container
-                S4U_Simulation::createNewDisk(_compute_hosts[0], "container_disk_" + image_file->getID(), 1000, 1000, container_size, _compute_services[0]->getScratch()->getMountPoint() + "/container_disk_" + image_file->getID());
-                auto storage_service = std::shared_ptr<SimpleStorageService>(SimpleStorageService::createSimpleStorageService(
-                    action_executor->getHostname(),
-                    {_compute_services[0]->getScratch()->getMountPoint() + "/container_disk_" + image_file->getID()},
-                    {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
-                      this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}},
-                    {}));
-                storage_service->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
-                storage_service->setSimulation(this->simulation_);
-
-                // Read file from scratch to disk
-                storage_service->readFile(getRunningActorRecvCommPort(), compute_service_image_path, container_size, true);
-                _compute_storages[0]->createFile(image_file);
-                function->_lambda(invocation_to_place->_function_input, storage_service);
-                // TODO: return some output to the invocation
-                // Clean up
-                // TODO: how to delete disk from simulation
-                storage_service->stop();
-#endif
-        };
         const std::function lambda_terminate = [](std::shared_ptr<ActionExecutor> action_executor) {
         };
 
+        const std::function lambda_execute = [invocation, target_host, this](std::shared_ptr<ActionExecutor> action_executor) {
+            WRENCH_INFO("In the function invocation lambda execute!!");
+            auto function = invocation->_registered_function->_function;
+
+            // Copy the image file from the head host to the current host's storage service
+            // TODO: This probably shouldn't be done here as (i) the file could already be here or being copied
+            // TODO: which screams "let's use yet another list/state". Not sure yet...
+            auto image_file = function->_image->getFile();
+            auto head_host_image_path = FileLocation::LOCATION(this->_head_storage_service, image_file);
+            auto local_image_path = wrench::FileLocation::LOCATION(_compute_storages[target_host], image_file);
+            StorageService::copyFile(head_host_image_path, local_image_path);
+
+            // Simulate the reading of the image from disk into ram to spin up the container
+            StorageService::readFileAtLocation(local_image_path);
+
+            // Simulate the git-clone by copying from the remote location to the tmp storage service
+            auto code_file = function->_code->getFile();
+            StorageService::copyFile(invocation->_registered_function->_function->_code,
+                wrench::FileLocation::LOCATION(invocation->_tmp_storage_service, code_file));
+
+            // Invoke the user's lambda function
+            function->_lambda(invocation->_function_input, invocation->_tmp_storage_service);
+
+            // Clean up
+            invocation->_tmp_storage_service->stop();
+            invocation->_tmp_storage_service = nullptr; // Should free up all memory...
+            StorageService::removeFileAtLocation(invocation->_tmp_file);
+
+            WRENCH_INFO("Done with the lambda execute!!");
+        };
+
+        // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
                 "run_invocation_" + invocation->_registered_function->_function->getName(),
@@ -458,6 +454,43 @@ namespace wrench {
             ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
             _compute_storages[host] = ss;
         }
+    }
+
+    /**
+     * @brief Method to create a tmp storage service for an invocation
+     *
+     * @param invocation A function invocation
+     * @return A storage service
+     */
+    std::shared_ptr<StorageService> ServerlessComputeService::startInvocationStorageService(const std::shared_ptr<Invocation>& invocation) {
+        static unsigned long seq = -1;
+        seq++;
+        auto host = _scheduling_decisions[invocation];
+
+        WRENCH_INFO("Starting a new storage service for an invocation...");
+        // Reserve space on the storage service
+        auto tmp_file = wrench::FileLocation::LOCATION(_compute_storages[host],
+            Simulation::addFile("tmp_" + std::to_string(seq), invocation->_registered_function->_disk_space));
+        StorageService::createFileAtLocation(tmp_file);
+
+        // Create a tmp file system
+        auto disk = S4U_Simulation::hostHasMountPoint(host, "/");
+        auto ods = simgrid::fsmod::OneDiskStorage::create("is_" + std::to_string(seq), disk);
+        auto fs = simgrid::fsmod::FileSystem::create("fs" + std::to_string(seq));
+        fs->mount_partition("/", ods, invocation->_registered_function->_disk_space);
+
+        // Create a tmp storage service
+        auto ss = std::shared_ptr<SimpleStorageService>(
+            SimpleStorageService::createSimpleStorageServiceWithExistingFileSystem(host, fs, {}, {}));
+        ss->setSimulation(this->simulation_);
+        ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
+        ss->start(ss, true, false);
+
+        // Keep track of all this
+        invocation->_tmp_file = tmp_file;
+        invocation->_tmp_storage_service = ss;
+
+        return ss;
     }
 
     /**
@@ -599,6 +632,5 @@ namespace wrench {
             _scheduledInvocations.push(std::move(scheduled_invocation));
             _schedulableInvocations.pop();
         }
-        return;
     }
 };

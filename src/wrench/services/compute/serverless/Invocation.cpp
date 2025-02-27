@@ -21,8 +21,8 @@ namespace wrench {
                            std::shared_ptr<FunctionInput> function_input,
                            S4U_CommPort* notify_commport) : _registered_function(registered_function),
                                                             _function_input(function_input),
-                                                            _notify_commport(notify_commport),
-                                                            _done(false)
+                                                            _done(false),
+                                                            _notify_commport(notify_commport)
     {
     }
 
