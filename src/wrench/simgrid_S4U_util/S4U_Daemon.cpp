@@ -30,7 +30,7 @@ std::unordered_map<std::string, unsigned long> num_actors;
 namespace wrench {
 
     std::unordered_map<aid_t, S4U_CommPort *> S4U_Daemon::map_actor_to_recv_commport;
-    std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> S4U_Daemon::map_actor_to_held_mutexes;
+    // std::unordered_map<aid_t, std::set<simgrid::s4u::MutexPtr>> S4U_Daemon::map_actor_to_held_mutexes;
 
     int S4U_Daemon::num_non_daemonized_actors_running = 0;
 
@@ -115,7 +115,7 @@ namespace wrench {
     /**
      * @brief Cleanup function called when the daemon terminates (for whatever reason). The
      *        default behavior is to throw an exception if the host is off. This method
-     *        should be overriden in a daemons implements some fault-tolerant behavior, or
+     *        should be overridden in a daemons implements some fault-tolerant behavior, or
      *        is naturally tolerant.
      *
      * @param has_returned_from_main: whether the daemon returned from main() by itself
@@ -141,12 +141,12 @@ namespace wrench {
      * @brief Get the daemon's state
      * @return a state
      */
-    S4U_Daemon::State S4U_Daemon::getState() {
+    S4U_Daemon::State S4U_Daemon::getState() const {
         return this->state;
     }
 
     /**
-     * @brief Delete the daemon's life-saver (use at your own risks, if your not the Simulation class)
+     * @brief Delete the daemon's life-saver (use at your own risks, if you're not the Simulation class)
      */
     void S4U_Daemon::deleteLifeSaver() {
         if (this->life_saver) {
@@ -195,10 +195,10 @@ namespace wrench {
         // Create the s4u_actor
 
         try {
-            this->s4u_actor = simgrid::s4u::Actor::create(this->process_name,
+            this->s4u_actor = simgrid::s4u::Engine::get_instance()->add_actor(this->process_name,
                                                           this->host,
                                                           S4U_DaemonActor(this));
-        } catch (simgrid::Exception &e) {
+        } catch (simgrid::Exception &) {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
 
@@ -237,7 +237,7 @@ namespace wrench {
             if (not this->daemonized_) {
                 S4U_Daemon::num_non_daemonized_actors_running--;
             }
-            //          std::cerr << "*** NUM_NON_DAEMIONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
+            //          std::cerr << "*** NUM_NON_DAEMONIZED_ACTORS_RUNNING = " << S4U_Daemon::num_non_daemonized_actors_running << "\n";
             // Set state to down
             this->state = S4U_Daemon::State::DOWN;
             // Call cleanup
@@ -278,7 +278,7 @@ namespace wrench {
         //        this->commport = S4U_CommPort::getTemporaryCommPort();
         //        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
         // Set the commport receiver
-        // Causes Mailbox::put() to no longer implement a rendez-vous communication.
+        // Causes Mailbox::put() to no longer implement a rendezvous communication.
         this->commport->s4u_mb->set_receiver(this->s4u_actor);
         //        this->recv_commport->set_receiver(this->s4u_actor);
 
@@ -300,6 +300,17 @@ namespace wrench {
         this->recv_commport->s4u_mb->set_receiver(nullptr);
         S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
         //        S4U_Daemon::running_actors.erase(this->getSharedPtr<S4U_Daemon>());
+
+
+        // There is a potential problem here:
+        //  - this could be the only non-daemonized actor
+        //  - a non-daemonized actor currently holds a lock
+        //  This would cause a "mutex is being destroyed but still held by an actor" exception
+        // TODO: One idea: sleep a little bit (ugly, breaks one test!!)
+        // TODO: One idea: lock/unlock a (new) global lock (breaks many tests!!)
+        // S4U_Simulation::sleep(0.0000001);
+        // S4U_Simulation::global_lock->lock();
+        // S4U_Simulation::global_lock->unlock();
     }
 
 
@@ -313,7 +324,7 @@ namespace wrench {
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main_)) {
             try {
                 this->s4u_actor->kill();
-            } catch (simgrid::Exception &e) {
+            } catch (simgrid::Exception &) {
                 throw std::runtime_error("simgrid::s4u::Actor::kill() failed... this shouldn't have happened");
             }
             // Really not sure why now we're setting this to true... but if we don't some tests fail.
@@ -328,7 +339,7 @@ namespace wrench {
     /**
  * @brief Suspend the daemon/actor.
  */
-    void S4U_Daemon::suspendActor() {
+    void S4U_Daemon::suspendActor() const {
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main_)) {
             this->s4u_actor->suspend();
         }
@@ -337,7 +348,7 @@ namespace wrench {
     /**
  * @brief Resume the daemon/actor.
  */
-    void S4U_Daemon::resumeActor() {
+    void S4U_Daemon::resumeActor() const {
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main_)) {
             this->s4u_actor->resume();
         }
@@ -349,7 +360,7 @@ namespace wrench {
  * @return a pair <A,B> where A is boolean (true if the daemon terminated cleanly (i.e., main() returned), or false otherwise)
  *          and B is the int returned from main() (if main returned).
  */
-    std::pair<bool, int> S4U_Daemon::join() {
+    std::pair<bool, int> S4U_Daemon::join() const {
         if (this->s4u_actor != nullptr) {
             this->s4u_actor->join();
         } else {
@@ -384,7 +395,7 @@ namespace wrench {
     }
 
     /**
- * @brief Create a life saver for the daemon
+ * @brief Create a life-saver for the daemon
  * @param reference
  */
     void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
@@ -397,7 +408,8 @@ namespace wrench {
     /**
  * @brief Lock the daemon's lock
  */
-    void S4U_Daemon::acquireDaemonLock() {
+    void S4U_Daemon::acquireDaemonLock() const {
+        // S4U_Simulation::global_lock->lock();
         this->daemon_lock->lock();
         //        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].insert(this->daemon_lock);
     }
@@ -405,8 +417,10 @@ namespace wrench {
     /**
  * @brief Unlock the daemon's lock
  */
-    void S4U_Daemon::releaseDaemonLock() {
+    void S4U_Daemon::releaseDaemonLock() const {
         this->daemon_lock->unlock();
+        // S4U_Simulation::global_lock->unlock();
+
         //        S4U_Daemon::map_actor_to_held_mutexes[simgrid::s4u::this_actor::get_pid()].erase(this->daemon_lock);
     }
 
@@ -414,7 +428,7 @@ namespace wrench {
      * @brief Get the service's simulation
      * @return a simulation
      */
-    Simulation *S4U_Daemon::getSimulation() {
+    Simulation *S4U_Daemon::getSimulation() const {
         return this->simulation_;
     }
 

@@ -23,7 +23,7 @@ namespace wrench {
      * @param hostname: the hostname on which the service should start
      * @param measurement_periods: the measurement period for each metered host
      */
-    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) : Service(hostname, "energy_meter") {
+    EnergyMeterService::EnergyMeterService(const std::string& hostname, const std::map<std::string, double> &measurement_periods) : Service(hostname, "energy_meter") {
         if (measurement_periods.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }

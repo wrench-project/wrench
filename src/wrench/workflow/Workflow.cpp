@@ -46,7 +46,7 @@ namespace wrench {
                                                     unsigned long min_num_cores,
                                                     unsigned long max_num_cores,
                                                     sg_size_t memory_requirement) {
-        if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) || (memory_requirement < 0)) {
+        if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores)) {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
         }
 
@@ -113,6 +113,11 @@ namespace wrench {
             throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
         }
 
+        // Remove the task from the ready tasks, just in case
+        if (this->ready_tasks.find(task) != this->ready_tasks.end()) {
+            this->ready_tasks.erase(task);
+        }
+
         // Fix all files
         for (auto &f: task->getInputFiles()) {
             this->task_input_files[f].erase(task);
@@ -124,8 +129,10 @@ namespace wrench {
             this->task_output_files.erase(f);
         }
 
+
         // Get the children
         auto children = this->dag.getChildren(task.get());
+
         // Get the parents
         auto parents = this->dag.getParents(task.get());
 
@@ -135,8 +142,13 @@ namespace wrench {
         // Remove the task from the master list
         tasks.erase(tasks.find(task->id));
 
+        // Make the children ready, if the case
+        for (auto const &child: children) {
+            Workflow::updateReadiness(child);
+        }
+
         // Brute-force update of the top-level of all the children and the bottom-level
-        // of the parents of the removed task
+        // of the parents of the removed task (if we're doing it dynamically)
         if (this->update_top_bottom_levels_dynamically) {
             for (auto const &child: children) {
                 child->updateTopLevel();
@@ -228,18 +240,26 @@ namespace wrench {
             }
 
             /* Update state */
-            if ((dst->getState() == WorkflowTask::State::NOT_READY) and (dst->getInternalState() == WorkflowTask::InternalState::TASK_NOT_READY)) {
-                bool ready = true;
-                for (auto const &p: dst->getParents()) {
-                    if (p->getState() != WorkflowTask::State::COMPLETED) {
-                        ready = false;
-                        break;
-                    }
+            Workflow::updateReadiness(dst.get());
+        }
+    }
+
+    /**
+     * @brief Update the readiness of a task
+     * @param task : workflow task
+     */
+    void Workflow::updateReadiness(WorkflowTask *task) {
+        if ((task->getState() == WorkflowTask::State::NOT_READY) and (task->getInternalState() == WorkflowTask::InternalState::TASK_NOT_READY)) {
+            bool ready = true;
+            for (auto const &p: task->getParents()) {
+                if (p->getState() != WorkflowTask::State::COMPLETED) {
+                    ready = false;
+                    break;
                 }
-                if (ready) {
-                    dst->setInternalState(WorkflowTask::InternalState::TASK_READY);
-                    dst->setState(WorkflowTask::State::READY);
-                }
+            }
+            if (ready) {
+                task->setInternalState(WorkflowTask::InternalState::TASK_READY);
+                task->setState(WorkflowTask::State::READY);
             }
         }
     }
@@ -249,7 +269,7 @@ namespace wrench {
      *
      * @return the number of tasks
      */
-    unsigned long Workflow::getNumberOfTasks() {
+    unsigned long Workflow::getNumberOfTasks() const {
         return this->tasks.size();
     }
 
@@ -297,7 +317,7 @@ namespace wrench {
      *
      * @return map of workflow cluster tasks
      */
-    std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> Workflow::getReadyClusters() {
+    std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> Workflow::getReadyClusters() const {
         // TODO: Implement this more efficiently
 
         std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> task_map;
@@ -331,7 +351,7 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool Workflow::isDone() {
+    bool Workflow::isDone() const {
         for (const auto &it: this->tasks) {
             auto task = it.second;
             if (task->getState() != WorkflowTask::State::COMPLETED) {
@@ -355,7 +375,7 @@ namespace wrench {
      *
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasks() {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasks() const {
         std::vector<std::shared_ptr<WorkflowTask>> all_tasks;
         for (auto const &t: this->tasks) {
             all_tasks.push_back(t.second);
@@ -541,7 +561,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(int min, int max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(int min, int max) const {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getTopLevel() >= min) and (task->getTopLevel() <= max)) {
@@ -557,7 +577,7 @@ namespace wrench {
      * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(int min, int max) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(int min, int max) const {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
         for (auto const &task: this->getTasks()) {
             if ((task->getBottomLevel() >= min) and (task->getBottomLevel() <= max)) {
@@ -639,7 +659,7 @@ namespace wrench {
      * @brief Returns the number of levels in the workflow
      * @return the number of levels
      */
-    unsigned long Workflow::getNumLevels() {
+    unsigned long Workflow::getNumLevels() const {
         int max_top_level = 0;
         for (auto const &t: this->tasks) {
             auto task = t.second.get();
@@ -720,19 +740,6 @@ namespace wrench {
         }
         return to_return;
     }
-
-    //    /**
-    //     * @brief Add a file to the workflow
-    //     * @param id : file name
-    //     * @param size : file size in bytes
-    //     * @return a file
-    //     */
-    //    std::shared_ptr<DataFile> Workflow::addFile(const std::string &id, double size) {
-    //        //        std::cerr << "CREATING DATA FILE " << id << "\n";
-    //        auto data_file = Simulation::addFile(id, size);
-    ////        this->data_files.insert(data_file);
-    //        return data_file;
-    //    }
 
     /**
       * @brief Get the list of all files in the workflow/simulation

@@ -41,9 +41,9 @@ namespace wrench {
      */
 
     CompoundStorageService::CompoundStorageService(const std::string &hostname,
-                                                   std::set<std::shared_ptr<StorageService>> storage_services,
-                                                   WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                   WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : CompoundStorageService(hostname, storage_services, NullAllocator,
+                                                   const std::set<std::shared_ptr<StorageService>>& storage_services,
+                                                   const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+                                                   const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : CompoundStorageService(hostname, storage_services, NullAllocator,
                                                                                                                                        property_list, messagepayload_list){};
 
     /**
@@ -56,9 +56,9 @@ namespace wrench {
      */
     CompoundStorageService::CompoundStorageService(
             const std::string &hostname,
-            std::set<std::shared_ptr<StorageService>> storage_services,
+            const std::set<std::shared_ptr<StorageService>>& storage_services,
             StorageSelectionStrategyCallback &allocate,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
             const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "compound_storage_" + std::to_string(getNewUniqueNumber())), allocate(allocate) {
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
@@ -122,7 +122,6 @@ namespace wrench {
         }
 
         /** Main loop **/
-        bool comm_ptr_has_been_posted = false;
         simgrid::s4u::CommPtr comm_ptr;
         std::unique_ptr<SimulationMessage> simulation_message;
         while (true) {
@@ -153,12 +152,12 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message)) {
             return processStopDaemonRequest(msg->ack_commport);
-        } else if (auto msg = dynamic_cast<CompoundStorageAllocationRequestMessage *>(message)) {
-            WRENCH_INFO("Calling processStorageSelectionMessage for file :  %s", msg->file->getID().c_str());
-            return processStorageSelectionMessage(msg);
-        } else if (auto msg = dynamic_cast<CompoundStorageLookupRequestMessage *>(message)) {
-            WRENCH_INFO("Calling processStorageLookupMessage for file :  %s", msg->file->getID().c_str());
-            return processStorageLookupMessage(msg);
+        } else if (auto csarm = dynamic_cast<CompoundStorageAllocationRequestMessage *>(message)) {
+            WRENCH_INFO("Calling processStorageSelectionMessage for file :  %s", csarm->file->getID().c_str());
+            return processStorageSelectionMessage(csarm);
+        } else if (auto cslrm = dynamic_cast<CompoundStorageLookupRequestMessage *>(message)) {
+            WRENCH_INFO("Calling processStorageLookupMessage for file :  %s", cslrm->file->getID().c_str());
+            return processStorageLookupMessage(cslrm);
         } else {
             throw std::runtime_error(
                     "CSS::processNextMessage(): Unexpected [" + message->getName() + "] message." +
@@ -696,7 +695,7 @@ namespace wrench {
 
         // Now run the copy(ies) between the source(s) and the destination(s)
         auto copy_idx = 0;
-        int total_parts = src_parts.size();// = dst_parts.size()
+        auto total_parts = src_parts.size();// = dst_parts.size()
 
         auto tmp_commport = S4U_CommPort::getTemporaryCommPort();
 
@@ -740,7 +739,7 @@ namespace wrench {
 
             // That's quite dirty, but : space is reserved during the call to lookupOrDesignateFileLocation, so that
             // we keep track of future space usage on various storage nodes while allocating multiple chunks of a given
-            // file. So right before we actually start the copy, we unreserve space.
+            // file. So right before we actually start the copy, we un-reserve space.
             dst_parts[copy_idx]->getStorageService()->unreserveSpace(dst_parts[copy_idx]);
             commport_to_contact->dputMessage(
                     new StorageServiceFileCopyRequestMessage(
@@ -918,7 +917,7 @@ namespace wrench {
                 for (auto const &dwmb: msg->data_write_commport_and_bytes) {
                     // Bufferized
                     sg_size_t remaining = dwmb.second;
-                    while (remaining - buffer_size > 0) {
+                    while (remaining > buffer_size) {
                         dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
                                 file, buffer_size, false));
                         remaining -= buffer_size;
@@ -1179,10 +1178,10 @@ namespace wrench {
             throw std::invalid_argument("CSS::getFileLastWriteDate(): File not known to the CompoundStorageService. Unable to forward to underlying StorageService");
         }
 
-        for (const auto &location: designated_locations) {
-            auto designated_storage_service = std::dynamic_pointer_cast<SimpleStorageService>(location->getStorageService());
+        for (const auto &loc: designated_locations) {
+            auto designated_storage_service = std::dynamic_pointer_cast<SimpleStorageService>(loc->getStorageService());
             if (designated_storage_service)// In case of multiple file parts, return LastWriteDate from first part found (they should be all the same, or very close)
-                return designated_storage_service->getFileLastWriteDate(location);
+                return designated_storage_service->getFileLastWriteDate(loc);
         }
 
         return -1;
@@ -1228,7 +1227,7 @@ namespace wrench {
         try {
             ack_commport->putMessage(new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                     CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &e) {
+        } catch (ExecutionException &) {
             return false;
         }
         return false;

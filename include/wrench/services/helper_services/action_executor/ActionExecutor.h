@@ -10,10 +10,7 @@
 #ifndef WRENCH_ACTION_EXECUTOR_H
 #define WRENCH_ACTION_EXECUTOR_H
 
-#include <set>
-
 #include "wrench/execution_controller/ExecutionController.h"
-#include "wrench/services/Service.h"
 #include "wrench/action/Action.h"
 
 namespace wrench {
@@ -27,7 +24,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief An service that performs an Action
+     * @brief A service that performs an Action
      */
     class ActionExecutor : public ExecutionController {
 
@@ -48,8 +45,8 @@ namespace wrench {
                 double thread_creation_overhead,
                 bool simulate_computation_as_sleep,
                 S4U_CommPort *callback_commport,
-                std::shared_ptr<Action> action,
-                std::shared_ptr<ActionExecutionService> action_execution_service);
+                const std::shared_ptr<Action>& action,
+                const std::shared_ptr<ActionExecutionService>& action_execution_service);
 
         int main() override;
         void kill(bool job_termination);

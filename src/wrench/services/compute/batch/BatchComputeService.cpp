@@ -1038,7 +1038,6 @@ namespace wrench {
      * @return a dictionary
      */
     std::map<std::string, double> BatchComputeService::constructResourceInformation(const std::string &key) {
-
         // Build a dictionary
         std::map<std::string, double> dict;
 
@@ -1091,7 +1090,6 @@ namespace wrench {
     */
     void BatchComputeService::processGetResourceInformation(S4U_CommPort *answer_commport,
                                                             const std::string &key) {
-
         auto dict = this->constructResourceInformation(key);
 
         // Send the reply
