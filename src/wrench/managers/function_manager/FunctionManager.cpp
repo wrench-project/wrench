@@ -147,7 +147,7 @@ namespace wrench {
 
         // unblock up the EC with a wakeup message
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
-            this->network_timeout,
+            // this->network_timeout, // commented out for unlimited timeout time
             "FunctionManager::wait_one(): Received an");
 
         WRENCH_INFO("FunctionManager::wait_one(): Received a wakeup message");
@@ -171,7 +171,7 @@ namespace wrench {
 
         // unblock the EC with a wakeup message
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
-            this->network_timeout,
+            // this->network_timeout, // commented out for unlimited timeout time
             "FunctionManager::wait_one(): Received an");
         
         WRENCH_INFO("FunctionManager::wait_all(): Received a wakeup message");
