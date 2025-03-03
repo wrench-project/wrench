@@ -105,14 +105,12 @@ namespace wrench {
         std::vector<std::shared_ptr<Invocation>> invocations;
 
         //TODO: Should the EC be responsible for keeping track of its invocations?
-        for (unsigned char i=0; i < 200; i++) {
+        for (unsigned char i = 0; i < 200; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
             WRENCH_INFO("Function 1 invoked");
             // wrench::Simulation::sleep(1);
         }
-
-#if 0
 
         WRENCH_INFO("Waiting for all invocations to complete");
         function_manager->wait_all(invocations);
@@ -152,8 +150,6 @@ namespace wrench {
         } catch (std::runtime_error& expected) {
             WRENCH_INFO("Not expected, got exception");
         }
-
-#endif
 
         // wrench::Simulation::sleep(100);
         //
