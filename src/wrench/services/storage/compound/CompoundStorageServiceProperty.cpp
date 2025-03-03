@@ -15,4 +15,4 @@ namespace wrench {
 
     SET_PROPERTY_NAME(CompoundStorageServiceProperty, INTERNAL_STRIPING);
 
-};// namespace wrench
+} // namespace wrench

@@ -55,9 +55,9 @@ namespace wrench {
             double non_grid_post_overhead,
             bool fast_bmcs_resource_availability,
             bool fcfs,
-            std::set<shared_ptr<ComputeService>> compute_services,
-            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list)
+            const std::set<shared_ptr<ComputeService>>& compute_services,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list)
         : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
 
@@ -71,10 +71,10 @@ namespace wrench {
         this->compute_services = compute_services;
 
         // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
+        this->setProperties(this->default_property_values, property_list);
 
         // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
     /**
@@ -87,7 +87,7 @@ namespace wrench {
      *
      * @param compute_service: the compute service to add
      */
-    void HTCondorCentralManagerService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
+    void HTCondorCentralManagerService::addComputeService(const std::shared_ptr<ComputeService>& compute_service) {
         this->compute_services.insert(compute_service);
         //  send a "wake up" message to the daemon's commport
         this->commport->putMessage(
@@ -106,7 +106,7 @@ namespace wrench {
             const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
-        auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
+        auto answer_commport = getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
         this->commport->putMessage(
@@ -249,7 +249,7 @@ namespace wrench {
      *
      */
     void HTCondorCentralManagerService::processSubmitCompoundJob(
-            S4U_CommPort *answer_commport, std::shared_ptr<CompoundJob> job,
+            S4U_CommPort *answer_commport, const std::shared_ptr<CompoundJob>& job,
             std::map<std::string, std::string> &service_specific_args) {
         this->pending_jobs.emplace_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
@@ -491,9 +491,9 @@ namespace wrench {
                     continue;
                 }
                 auto ram_resources = cs->getMemoryCapacity();
-                double max_ram = 0;
+                sg_size_t max_ram = 0;
                 for (auto const &entry: ram_resources) {
-                    max_ram = std::max<double>(max_ram, entry.second);
+                    max_ram = std::max<sg_size_t>(max_ram, entry.second);
                 }
                 if (max_ram < job->getMinimumRequiredMemory()) {
                     continue;

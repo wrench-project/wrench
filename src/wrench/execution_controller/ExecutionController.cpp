@@ -39,7 +39,7 @@ namespace wrench {
      * @return a job manager
      */
     std::shared_ptr<JobManager> ExecutionController::createJobManager() {
-        std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(
+        auto job_manager = std::shared_ptr<JobManager>(
                 new JobManager(this->hostname, this->commport));
         job_manager->simulation_ = this->simulation_;
         job_manager->start(job_manager, true, false);// Always daemonize, no auto-restart

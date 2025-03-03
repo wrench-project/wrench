@@ -29,7 +29,7 @@ namespace wrench {
      * @param ram_footprint: the RAM footprint
      * @param thread_creation_overhead: the thread creation overhead in seconds
      * @param simulate_computation_as_sleep: whether to simulate computation as sleep
-     * @param callback_commport: the callback commport to which a "action done" or "action failed" message will be sent
+     * @param callback_commport: the callback commport to which an "action done" or "action failed" message will be sent
      * @param action: the action to perform
      * @param action_execution_service: the parent action execution service
      */
@@ -40,8 +40,8 @@ namespace wrench {
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
             S4U_CommPort *callback_commport,
-            std::shared_ptr<Action> action,
-            std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
+            const std::shared_ptr<Action>& action,
+            const std::shared_ptr<ActionExecutionService>& action_execution_service) : ExecutionController(hostname, "action_executor") {
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (action == nullptr) {

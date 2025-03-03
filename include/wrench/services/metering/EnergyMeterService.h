@@ -22,7 +22,7 @@ namespace wrench {
 
     public:
         EnergyMeterService(std::string hostname, const std::vector<std::string> &hostnames, double period);
-        EnergyMeterService(std::string hostname, const std::map<std::string, double> &measurement_periods);
+        EnergyMeterService(const std::string& hostname, const std::map<std::string, double> &measurement_periods);
 
         /***********************/
         /** \cond DEVELOPER    */

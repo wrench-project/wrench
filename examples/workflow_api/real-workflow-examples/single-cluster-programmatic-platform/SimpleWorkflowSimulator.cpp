@@ -40,23 +40,23 @@ private:
 
     void create_platform() const {
         // Create the top-level zone
-        auto zone = sg4::create_full_zone("AS0");
+        auto zone = simgrid::s4u::Engine::get_instance()->get_netzone_root();
 
         // Create the WMSHost host with its disk
-        auto wms_host = zone->create_host("WMSHost", "10Gf");
+        auto wms_host = zone->add_host("WMSHost", "10Gf");
         wms_host->set_core_count(1);
-        auto wms_host_disk = wms_host->create_disk("hard_drive",
+        auto wms_host_disk = wms_host->add_disk("hard_drive",
                                                    "100MBps",
                                                    "100MBps");
         wms_host_disk->set_property("size", "5000GiB");
         wms_host_disk->set_property("mount", "/");
 
         // Create a single network link that abstracts the wide-area network
-        auto network_link = zone->create_link("network_link", 100 * MBPS)->set_latency("20us");
+        auto network_link = zone->add_link("network_link", 100 * MBPS)->set_latency("20us");
 
         // Create the compute hosts and routes to them (could be done as a single cluster)
         for (int i=0; i < num_compute_hosts; i++) {
-            auto compute_host = zone->create_host("ComputeHost_" + std::to_string(i), "1Gf");
+            auto compute_host = zone->add_host("ComputeHost_" + std::to_string(i), "1Gf");
             compute_host->set_core_count(1);
             sg4::LinkInRoute network_link_in_route{network_link};
             zone->add_route(compute_host,
