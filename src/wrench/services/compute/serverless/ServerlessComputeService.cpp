@@ -246,6 +246,11 @@ namespace wrench {
                                                                               scsiec_msg->_invocation, nullptr, 0));
             return true;
         }
+        else if (auto scsncc_msg = std::dynamic_pointer_cast<
+            ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
+            // Do the main loop again to schedule the invocation?
+            return true;
+        }
         else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
@@ -376,14 +381,8 @@ namespace wrench {
         const std::function lambda_execute = [invocation, target_host, this](std::shared_ptr<ActionExecutor> action_executor) {
             WRENCH_INFO("In the function invocation lambda execute!!");
             auto function = invocation->_registered_function->_function;
-
-            // Copy the image file from the head host to the current host's storage service
-            // TODO: This probably shouldn't be done here as (i) the file could already be here or being copied
-            // TODO: which screams "let's use yet another list/state". Not sure yet...
             auto image_file = function->_image->getFile();
-            auto head_host_image_path = FileLocation::LOCATION(this->_head_storage_service, image_file);
             auto local_image_path = wrench::FileLocation::LOCATION(_compute_storages[target_host], image_file);
-            StorageService::copyFile(head_host_image_path, local_image_path);
 
             // Simulate the reading of the image from disk into ram to spin up the container
             StorageService::readFileAtLocation(local_image_path);
@@ -608,31 +607,100 @@ namespace wrench {
 
     /**
      * @brief
-     *
+     * 
      */
     void ServerlessComputeService::scheduleInvocations() {
-        // TODO: Implement something fancy.
-        // TODO: Deal with Disk space issues
-        // TODO: Deal with RAM space issues
+        // Build or retrieve the current state snapshot.
+        auto state = nullptr;
+    
+        // Collect all invocations that are now schedulable (i.e. their image is on the head node)
+        std::vector<std::shared_ptr<Invocation>> schedulableInvocations;
         while (!_schedulableInvocations.empty()) {
-            // Find the first core available
-            std::string picked_host;
-            for (auto const& item : _available_cores) {
-                if (item.second > 0) {
-                    picked_host = item.first;
-                    _available_cores[picked_host]--;
-                    break;
-                }
-            }
-            if (picked_host.empty()) {
-                break;
-            }
-
-            WRENCH_INFO("Scheduling an invocation on host %s", picked_host.c_str());
-            auto scheduled_invocation = _schedulableInvocations.front();
-            _scheduling_decisions[scheduled_invocation] = picked_host;
-            _scheduledInvocations.push(std::move(scheduled_invocation));
+            auto invocation = _schedulableInvocations.front();
             _schedulableInvocations.pop();
+            schedulableInvocations.push_back(invocation);
+        }
+    
+        auto imageDecision = _scheduler->manageImages(schedulableInvocations, state);
+    
+        // For each compute node, initiate image copy (from head node) for any required images that are missing.
+        for (const auto& nodeEntry : imageDecision.imagesToCopy) {
+            const std::string& computeHost = nodeEntry.first;
+            for (const auto& image : nodeEntry.second) {
+                initiateImageCopyToComputeHost(computeHost, image);
+            }
+        }
+    
+        // Similarly, trigger removal actions for images that are present but not needed.
+        for (const auto& nodeEntry : imageDecision.imagesToRemove) {
+            const std::string& computeHost = nodeEntry.first;
+            for (const auto& image : nodeEntry.second) {
+                initiateImageRemovalFromComputeHost(computeHost, image);
+            }
+        }
+    
+        // use the scheduler to assign invocations to compute nodes.
+        auto schedulingDecisions = _scheduler->scheduleFunctions(schedulableInvocations, state);
+        for (const auto& decision : schedulingDecisions) {
+            auto invocation = decision.first;
+            auto target_host = decision.second;
+            // Record the scheduling decision.
+            _scheduling_decisions[invocation] = target_host;
+            // Enqueue the invocation for dispatch.
+            _scheduledInvocations.push(invocation);
         }
     }
-};
+
+    void ServerlessComputeService::initiateImageCopyToComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image) {
+        // Initiate an asynchronous action that copies the image (identified by imageID)
+        // from the head node storage service to the compute node's storage service.
+        // This might involve creating and starting a dedicated ActionExecutor.
+        const std::function lambda_terminate = [](std::shared_ptr<ActionExecutor> action_executor) {
+        };
+
+        const std::function lambda_execute = [computeHost, image, this](std::shared_ptr<ActionExecutor> action_executor) {
+            WRENCH_INFO("In the image copy lambda execute!!");
+
+            // Copy the image file from the head host to the current host's storage service
+            auto head_host_image_path = FileLocation::LOCATION(this->_head_storage_service, image);
+            auto local_image_path = wrench::FileLocation::LOCATION(_compute_storages[computeHost], image);
+            StorageService::copyFile(head_host_image_path, local_image_path);
+            WRENCH_INFO("Done with the lambda execute!!");
+        };
+
+        // Create the action and run it in an action executor
+        auto action = std::shared_ptr<CustomAction>(
+            new CustomAction(
+                "copy_image_" + image->getID() + "_to_" + computeHost,
+                0, 0, lambda_execute, lambda_terminate));
+
+        auto custom_message = new ServerlessComputeServiceNodeCopyCompleteMessage(
+            action,
+            image, 0);
+
+        auto action_executor = std::make_shared<ActionExecutor>(
+            computeHost,
+            1,
+            0,
+            0,
+            false,
+            this->commport,
+            custom_message,
+            action,
+            nullptr);
+
+        action_executor->setSimulation(this->simulation_);
+        WRENCH_INFO("Starting an action executor...");
+        action_executor->start(action_executor, true, false);
+
+        WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID(), computeHost.c_str());
+    }
+    
+    void ServerlessComputeService::initiateImageRemovalFromComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image) {
+        // Initiate an asynchronous action that removes the specified image from the compute node.
+        WRENCH_INFO("Initiating image removal for image [%s] from compute host [%s]", image->getID(), computeHost.c_str());
+    }
+
+}; // namespace wrench
+
+    
