@@ -45,6 +45,8 @@ namespace wrench {
                            sg_size_t ingress_in_bytes, 
                            sg_size_t egress_in_bytes);
 
+        std::shared_ptr<DataFile> getFunctionImage();
+
     private:
         friend class FunctionManager;
         friend class ServerlessComputeService;

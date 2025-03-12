@@ -30,6 +30,8 @@ namespace wrench {
      */
     std::string Function::getName() const { return _name; }
 
+    std::shared_ptr<FileLocation> Function::getImage() const { return _image; }
+
     /**
      * @brief Executes the function with the provided input and storage service.
      * @param input The input string for the function.

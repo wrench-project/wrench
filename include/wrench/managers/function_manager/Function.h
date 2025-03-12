@@ -49,6 +49,12 @@ namespace wrench {
 
         /**
          * @brief 
+         * @return 
+         */
+        std::shared_ptr<FileLocation> getImage() const;
+
+        /**
+         * @brief 
          * @param input 
          * @param storage_service 
          * @return 

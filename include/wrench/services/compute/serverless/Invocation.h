@@ -40,6 +40,7 @@ namespace wrench {
 
         bool isDone() const;
         bool isSuccess() const;
+        std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;
         std::shared_ptr<FailureCause> getFailureCause() const;
         /**
          * @brief Gets the output of the function invocation.
