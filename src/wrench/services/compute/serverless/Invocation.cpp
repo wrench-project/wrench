@@ -55,6 +55,12 @@ namespace wrench {
     }
 
     /**
+     * @brief Gets the registered function.
+     * @return A shared pointer to the registered function.
+     */
+    std::shared_ptr<RegisteredFunction> Invocation::getRegisteredFunction() const { return _registered_function; }
+
+    /**
      * @brief Gets the cause of failure.
      * @return A shared pointer to the failure cause.
      */
