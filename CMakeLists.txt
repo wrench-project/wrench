@@ -137,6 +137,7 @@ set(HEADER_FILES
         include/wrench/services/compute/serverless/ServerlessComputeServiceMessage.h
         include/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h
         include/wrench/services/compute/serverless/Invocation.h
+        include/wrench/services/compute/serverless/ServerlessScheduler.h
         include/wrench/services/compute/cloud/CloudComputeService.h
         include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
