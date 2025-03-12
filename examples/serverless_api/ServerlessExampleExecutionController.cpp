@@ -32,6 +32,126 @@ namespace wrench {
         int x2_;
     };
 
+    class FCFSServerlessScheduler : public ServerlessScheduler {
+        public:
+            FCFSServerlessScheduler() = default;
+            virtual ~FCFSServerlessScheduler() = default;
+        
+            // Analyze the list of schedulable invocations and determine per-compute-node image copy/removal decisions.
+            virtual ImageManagementDecision manageImages(
+                const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
+                std::shared_ptr<StateOfTheSystem> state
+            ) override {
+                ImageManagementDecision decision;
+                
+                // TODO: Implement this.
+                // auto availableCores = state->getAvailableCoresMap();
+                
+                // requiredImageIDs: compute node -> set of required image IDs.
+                std::map<std::string, std::unordered_set<std::string>> requiredImageIDs;
+                // requiredDataFiles: compute node -> vector of required DataFile pointers.
+                std::map<std::string, std::vector<std::shared_ptr<DataFile>>> requiredDataFiles;
+                
+                // FCFS assignment: for each invocation, assign it to the first compute node with an available core.
+                for (const auto& inv : schedulableInvocations) {
+                    // Retrieve the DataFile for the image associated with this invocation.
+                    auto imageDataFile = inv->getRegisteredFunction()->getFunctionImage();
+                    std::string imageID = imageDataFile->getID();
+                    bool assigned = false;
+                    for (auto& nodeEntry : availableCores) {
+                        if (nodeEntry.second > 0) {
+                            // Record that this node requires this image.
+                            requiredImageIDs[nodeEntry.first].insert(imageID);
+                            auto& vec = requiredDataFiles[nodeEntry.first];
+                            // Add the DataFile pointer if not already added.
+                            bool exists = false;
+                            for (const auto& df : vec) {
+                                if (df->getID() == imageID) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (!exists) {
+                                vec.push_back(imageDataFile);
+                            }
+                            nodeEntry.second--; // Use one core from this node.
+                            assigned = true;
+                            break;
+                        }
+                    }
+                    // If no node was available, the invocation is not assigned.
+                }
+                
+                // For each compute node, determine which images are missing (to be copied)
+                // and which are extra (to be removed).
+                auto computeNodes = state->getComputeNodes();
+                for (const auto& node : computeNodes) {
+                    std::unordered_set<std::string> reqIDs;
+                    if (requiredImageIDs.find(node) != requiredImageIDs.end()) {
+                        reqIDs = requiredImageIDs[node];
+                    }
+                    // Get the current images on the compute node.
+                    auto currentDataFiles = state->getImagesOnComputeNode(node);
+                    std::unordered_set<std::string> currentIDs;
+                    for (const auto& df : currentDataFiles) {
+                        currentIDs.insert(df->getID());
+                    }
+                    
+                    // For each required image missing from the node, add it to imagesToCopy.
+                    for (const auto& reqID : reqIDs) {
+                        if (currentIDs.find(reqID) == currentIDs.end()) {
+                            for (const auto& df : requiredDataFiles[node]) {
+                                if (df->getID() == reqID) {
+                                    decision.imagesToCopy[node].push_back(df);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // For each image present on the node that is not required, add it to imagesToRemove.
+                    for (const auto& currID : currentIDs) {
+                        if (reqIDs.find(currID) == reqIDs.end()) {
+                            for (const auto& df : currentDataFiles) {
+                                if (df->getID() == currID) {
+                                    decision.imagesToRemove[node].push_back(df);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                return decision;
+            }
+            
+            // Assign invocations to compute nodes in FCFS order.
+            virtual std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> scheduleFunctions(
+                const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
+                std::shared_ptr<StateOfTheSystem> state
+            ) override {
+                std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> schedulingDecisions;
+                auto availableCores = state->getAvailableCoresMap();
+                // For each invocation, assign it to the first compute node with an available core.
+                for (const auto& inv : schedulableInvocations) {
+                    bool scheduled = false;
+                    for (auto& nodeEntry : availableCores) {
+                        if (nodeEntry.second > 0) {
+                            schedulingDecisions.push_back({inv, nodeEntry.first});
+                            nodeEntry.second--;
+                            scheduled = true;
+                            break;
+                        }
+                    }
+                    if (!scheduled) {
+                        // No available cores remain; break out.
+                        break;
+                    }
+                }
+                return schedulingDecisions;
+            }
+        };        
+
     /**
      * @brief Constructor, which calls the super constructor
      *
