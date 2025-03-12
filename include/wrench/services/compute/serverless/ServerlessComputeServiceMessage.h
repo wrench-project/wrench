@@ -141,6 +141,15 @@ namespace wrench {
         std::shared_ptr<Invocation> _invocation;
     };
 
+    class ServerlessComputeServiceNodeCopyCompleteMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceNodeCopyCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, sg_size_t payload);
+        /** @brief The action that did the copy */
+        std::shared_ptr<CustomAction> _action;
+        /** @brief The image that was copied */
+        std::shared_ptr<DataFile> _image_file;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

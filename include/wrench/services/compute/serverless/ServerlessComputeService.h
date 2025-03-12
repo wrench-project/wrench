@@ -19,6 +19,7 @@
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
+#include "wrench/services/compute/serverless/ServerlessScheduler.h"
 
 namespace wrench {
 
@@ -92,11 +93,15 @@ namespace wrench {
         bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
+        std::shared_ptr<wrench::ServerlessScheduler> _scheduler;
 
         void startHeadStorageService();
         void startComputeHostsServices();
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
         void dispatchFunctionInvocation(const std::shared_ptr<Invocation>& invocation);
+        void initiateImageCopyToComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image);
+        void initiateImageRemovalFromComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image);
+
         std::shared_ptr<StorageService> startInvocationStorageService(const std::shared_ptr<Invocation>& invocation);
 
 
