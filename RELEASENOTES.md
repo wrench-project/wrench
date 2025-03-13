@@ -1,7 +1,7 @@
 WRENCH Release Notes
 ------
 
-### wrench 2.6-dev
+### wrench 2.6
 
 - Implementation of a "backfilling depth" feature for EASY and convervative_bf batch scheduling algorithms
 - Upgrade to SimGrid v4.0 and FSMod v0.3
