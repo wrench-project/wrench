@@ -4,14 +4,21 @@ if (NOT DOXYGEN_FOUND)
 endif()
 
 find_program(SWAGGER_CODEGEN_FOUND "swagger-codegen" QUIET)
-
 if (NOT SWAGGER_CODEGEN_FOUND) 
     message("-- swagger-codegen: No (warning: swagger-codegen is needed in case you want to generate WRENCH documentation)")
 else()
     message("-- Found swagger-codegen")
 endif()
 
-if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND)
+find_program(SPHINX_FOUND "sphinx-build" QUIET)
+if (NOT SPHINX_FOUND) 
+    message("-- sphinx: No (warning: sphinx is needed in case you want to generate WRENCH documentation)")
+else()
+    message("-- Found sphinx")
+endif()
+
+
+if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND AND SPHINX_FOUND)
 
     # WRENCH APIs documentation
     foreach (SECTION USER DEVELOPER INTERNAL)
@@ -56,20 +63,24 @@ if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND)
     add_custom_target(doc DEPENDS wrench ${WRENCH_SECTIONS_LIST})
 
     add_custom_command(TARGET doc
+	    POST_BUILD
             COMMAND swagger-codegen generate -i ${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon/doc/wrench-openapi.json -l html2 -o ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}/restapi
             COMMENT "Generating REST API HTML"
             VERBATIM
             )
-    add_custom_command(TARGET doc COMMAND python3 
+	    add_custom_command(TARGET doc COMMAND python3 
                         ${CMAKE_HOME_DIRECTORY}/doc/scripts/generate_rst.py 
                         ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}
                         ${CMAKE_HOME_DIRECTORY}/doc/source
                         ${WRENCH_RELEASE_VERSION})
-    add_custom_command(TARGET doc COMMAND sphinx-build 
+    	    add_custom_command(TARGET doc COMMAND sphinx-build 
                         ${CMAKE_HOME_DIRECTORY}/doc/source 
                         ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION})
-    add_custom_command(TARGET doc COMMAND cp -R
+	    add_custom_command(TARGET doc COMMAND cp -R
                         ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}
                         ${CMAKE_HOME_DIRECTORY}/docs/build/latest)
+
+else()
+	add_custom_target(doc echo "ERROR: Cannot build documentation because at least one of Doxygen, Swagger-Codegen, or Sphinx is not installed." COMMAND echo "       If you have installed them, re-run cmake." VERBATIM)
 
 endif()
