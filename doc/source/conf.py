@@ -15,7 +15,7 @@ author = 'WRENCH Team'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'recommonmark',
+    'myst_parser',
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
@@ -94,4 +94,12 @@ breathe_projects = {
 }
 version = '2.4-dev'
 release = '2.4-dev'
+
+breathe_projects = {
+    "user": "../../docs/2.6-dev/user/xml/",
+    "developer": "../../docs/2.6-dev/developer/xml/",
+    "internal": "../../docs/2.6-dev/internal/xml/",
+}
+version = '2.6-dev'
+release = '2.6-dev'
 

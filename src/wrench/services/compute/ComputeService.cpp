@@ -416,16 +416,16 @@ namespace wrench {
      * @brief Get the total capacity of the compute service's scratch storage space
      * @return a size (in bytes)
      */
-    double ComputeService::getTotalScratchSpaceSize() const {
+    sg_size_t ComputeService::getTotalScratchSpaceSize() const {
         // A scratch space SS is always created with a single mount point
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0;
     }
 
     /**
      * @brief Get the free space on the compute service's scratch storage space
      * @return a size (in bytes)
      */
-    double ComputeService::getFreeScratchSpaceSize() const {
+    sg_size_t ComputeService::getFreeScratchSpaceSize() const {
         return this->scratch_space_storage_service->getTotalFreeSpace();
     }
 

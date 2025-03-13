@@ -78,9 +78,9 @@ namespace wrench {
                 const std::string &mount_point,
                 WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,
                 WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE storage_messagepayload_list,
-                WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
-                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list) {
-            std::shared_ptr<Node> ret = createNode(hostname, std::move(node_property_list), std::move(node_messagepayload_list));
+                const WRENCH_PROPERTY_COLLECTION_TYPE& node_property_list,
+                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& node_messagepayload_list) {
+            std::shared_ptr<Node> ret = createNode(hostname, node_property_list, node_messagepayload_list);
             ret->makeFileServer({mount_point}, std::move(storage_property_list), std::move(storage_messagepayload_list));
             simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
@@ -122,7 +122,7 @@ namespace wrench {
         *
         * @return the number of nodes in the federation
         */
-        unsigned int Deployment::size() {
+        unsigned int Deployment::size() const {
             return nodes.size();
         }
 
