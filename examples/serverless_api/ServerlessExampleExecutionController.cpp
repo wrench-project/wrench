@@ -176,7 +176,6 @@ namespace wrench {
     int ServerlessExampleExecutionController::main() {
         WRENCH_INFO("ServerlessExampleExecutionController started");
 
-        // TODO: Interact with Serverless provider to do stuff
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<FunctionInput>& input, const std::shared_ptr<StorageService>& service) -> std::string {
@@ -224,7 +223,6 @@ namespace wrench {
 
         std::vector<std::shared_ptr<Invocation>> invocations;
 
-        //TODO: Should the EC be responsible for keeping track of its invocations?
         for (unsigned char i = 0; i < 200; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
