@@ -120,9 +120,9 @@ namespace wrench {
 
         std::map<std::string, double> getCoreFlopRate(bool simulate_it = false);
 
-        double getTotalScratchSpaceSize() const;
+        sg_size_t getTotalScratchSpaceSize() const;
 
-        double getFreeScratchSpaceSize() const;
+        sg_size_t getFreeScratchSpaceSize() const;
 
 
         /***********************/
