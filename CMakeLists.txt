@@ -138,6 +138,7 @@ set(HEADER_FILES
         include/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h
         include/wrench/services/compute/serverless/Invocation.h
         include/wrench/services/compute/serverless/ServerlessScheduler.h
+        include/wrench/services/compute/serverless/ServerlessStateOfTheSystem.h
         include/wrench/services/compute/cloud/CloudComputeService.h
         include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
@@ -347,6 +348,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/serverless/ServerlessComputeServiceMessage.cpp
         src/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.cpp
         src/wrench/services/compute/serverless/Invocation.cpp
+        src/wrench/services/compute/serverless/ServerlessStateOfTheSystem.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
         include/wrench/services/compute/cloud/CloudComputeServiceMessage.h
