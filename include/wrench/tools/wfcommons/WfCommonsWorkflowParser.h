@@ -135,7 +135,7 @@ namespace wrench {
          * @param workflow: a workflow
          * @return a JSON string
          */
-        static std::string createJSONStringFromWorkflow(std::shared_ptr<Workflow> workflow);
+        static std::string createJSONStringFromWorkflow(const std::shared_ptr<Workflow>& workflow);
 
     };
 
