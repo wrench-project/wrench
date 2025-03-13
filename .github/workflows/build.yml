@@ -18,19 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: "Debian Bullseye - g++-10"
-            DIST: debian-bullseye
-            COMPILER: gcc10
-            batsched: off
-
           - build: "Debian Bookworm - g++-12"
             DIST: debian-bookworm
             COMPILER: gcc12
-            batsched: off
-
-          - build: "Ubuntu Jammy Jellyfish - clang++-14"
-            DIST: ubuntu-jammy
-            COMPILER: clang14
             batsched: off
 
           - build: "Ubuntu Jammy Jellyfish - g++-11"
@@ -38,9 +28,19 @@ jobs:
             COMPILER: gcc11
             batsched: off
 
-          - build: "Ubuntu Jammy Jellyfish - g++-11 - batsched"
-            DIST: ubuntu-jammy
-            COMPILER: gcc11-batsched
+          - build: "Ubuntu Noble Numbat - clang++-18"
+            DIST: ubuntu-noble
+            COMPILER: clang18
+            batsched: off
+
+          - build: "Ubuntu Noble Numbat - g++-13"
+            DIST: ubuntu-noble
+            COMPILER: gcc13
+            batsched: off
+
+          - build: "Ubuntu Noble Numbat - g++-13 - batsched"
+            DIST: ubuntu-noble
+            COMPILER: gcc13-batsched
             batsched: on
 
 
@@ -95,7 +95,7 @@ jobs:
           batsched: ${{ matrix.batsched }}
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: |
-          if [[ "$DIST" == "ubuntu-jammy" && "$COMPILER" == "gcc11" && "$batsched" == "off" ]]; then
+          if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
             docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
             docker exec -w /home/wrench/wrench/build wrench make doc;
             docker cp wrench:/home/wrench/wrench/docs .;
@@ -124,9 +124,9 @@ jobs:
           batsched: ${{ matrix.batsched }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          if [[ "$DIST" == "ubuntu-jammy" && "$COMPILER" == "gcc11" && "$batsched" == "off" ]]; then
-            docker exec -w /home/wrench/wrench/build wrench lcov --directory . --capture --output-file coverage.info;
-            docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+          if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
+            docker exec -w /home/wrench/wrench/build wrench lcov --ignore-errors mismatch --directory . --capture --output-file coverage.info;
+            docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info --ignore-errors unused,unused '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
             docker cp wrench:/home/wrench/wrench/build/coverage.info .;
             bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
           fi
