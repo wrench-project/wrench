@@ -32,6 +32,7 @@ namespace wrench {
         int x2_;
     };
 
+    // TODO: use the getter methods of the ServerlessStateOfTheService class
     class FCFSServerlessScheduler : public ServerlessScheduler {
         public:
             FCFSServerlessScheduler() = default;
@@ -40,7 +41,7 @@ namespace wrench {
             // Analyze the list of schedulable invocations and determine per-compute-node image copy/removal decisions.
             virtual ImageManagementDecision manageImages(
                 const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-                std::shared_ptr<StateOfTheSystem> state
+                std::shared_ptr<ServerlessStateOfTheSystem> state
             ) override {
                 ImageManagementDecision decision;
                 
