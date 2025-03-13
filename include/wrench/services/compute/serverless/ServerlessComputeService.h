@@ -20,6 +20,7 @@
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 #include "wrench/services/compute/serverless/ServerlessScheduler.h"
+#include "wrench/services/compute/serverless/ServerlessStateOfTheSystem.h"
 
 namespace wrench {
 
