@@ -22,12 +22,37 @@
  
 namespace wrench {
  
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class ServerlessStateOfTheSystem {
+    public:
+    
+        // getter methods
+        // TODO: what does the scheduler need and what does it not?
+        std::vector<std::string> getComputeHosts();
+        std::map<std::string, unsigned long> getAvailableCores();
+        std::queue<std::shared_ptr<Invocation>> getNewInvocations();
+        std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> getAdmittedInvocations();
+        std::queue<std::shared_ptr<Invocation>> getScheduableInvocations();
+        std::queue<std::shared_ptr<Invocation>> getScheduledInvocations();
+        std::queue<std::shared_ptr<Invocation>> getRunningInvocations();
+        std::queue<std::shared_ptr<Invocation>> getFinishedInvocations();
+        std::unordered_map<std::string, std::shared_ptr<StorageService>> getComputeStorages();
+        std::shared_ptr<StorageService> getHeadStorageService();
+        std::set<std::shared_ptr<DataFile>> getDownloadedImageFiles();
+        sg_size_t getFreeSpaceOnHeadStorage();
+
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
     private:
 
         friend class ServerlessComputeService;
 
-        explicit StateOfTheSystem(std::vector<std::string> compute_hosts);
+        explicit ServerlessStateOfTheSystem(std::vector<std::string> compute_hosts);
 
         // map of Registered functions sorted by function name
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
@@ -39,6 +64,7 @@ namespace wrench {
         // map of scheduling decisions for each invocation
         std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
 
+        // TODO: change all of these to vectors instead of queues
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _newInvocations;
         // queues of function invocations whose images are being downloaded
@@ -61,14 +87,12 @@ namespace wrench {
         std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
         sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shennanigans
 
-        ~StateOfTheSystem();
-
-    public:
-    
-        
-
+        ~ServerlessStateOfTheSystem();
     }
 
+    /***********************/
+    /** \endcond           */
+    /***********************/
  
 } // namespace wrench
  

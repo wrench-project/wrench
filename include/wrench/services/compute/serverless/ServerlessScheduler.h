@@ -14,6 +14,7 @@
  #include <wrench/managers/function_manager/FunctionManager.h>
  #include <wrench/managers/function_manager/RegisteredFunction.h>
  #include <wrench/services/compute/serverless/Invocation.h>
+ #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
  #include <memory>
  #include <vector>
  #include <string>
@@ -22,7 +23,7 @@
  namespace wrench {
  
      // Forward declaration for StateOfTheSystem; TODO: Implement this.
-     class StateOfTheSystem;
+     class ServerlessStateOfTheSystem;
  
      /**
       * @brief Represents a decision for image management.
@@ -56,7 +57,7 @@
           */
          virtual ImageManagementDecision manageImages(
              const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-             std::shared_ptr<StateOfTheSystem> state
+             std::shared_ptr<ServerlessStateOfTheSystem> state
          ) = 0;
  
          /**
@@ -70,7 +71,7 @@
           */
          virtual std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> scheduleFunctions(
              const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-             std::shared_ptr<StateOfTheSystem> state
+             std::shared_ptr<ServerlessStateOfTheSystem> state
          ) = 0;
      };
  
