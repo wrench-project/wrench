@@ -83,7 +83,7 @@ namespace wrench {
 
         try {
             flop_rate = UnitParser::parse_compute_speed(reference_flop_rate);
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &) {
             throw;
         }
 
@@ -93,7 +93,7 @@ namespace wrench {
         nlohmann::json schema_version;
         try {
             schema_version = j.at("schemaVersion");
-        } catch (std::out_of_range &e) {
+        } catch (std::out_of_range &) {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'schema_version' key");
         }
         if (schema_version != "1.5") {
@@ -104,7 +104,7 @@ namespace wrench {
         nlohmann::json workflow_spec;
         try {
             workflow_spec = j.at("workflow");
-        } catch (std::out_of_range &e) {
+        } catch (std::out_of_range &) {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'workflow' key");
         }
 
@@ -126,13 +126,13 @@ namespace wrench {
                 unsigned long num_cores;
                 try {
                     num_cores = core_spec.at("coreCount");
-                } catch (nlohmann::detail::out_of_range &e) {
+                } catch (nlohmann::detail::out_of_range &) {
                     num_cores = 1;
                 }
                 double mhz;
                 try {
                     mhz = core_spec.at("speedInMHz");
-                } catch (nlohmann::detail::out_of_range &e) {
+                } catch (nlohmann::detail::out_of_range &) {
                     if (show_warnings) std::cerr << "[WARNING]: Machine " + name + " does not define a speed\n";
                     mhz = -1.0;// unknown
                 }
@@ -148,9 +148,9 @@ namespace wrench {
                 std::shared_ptr<DataFile> data_file;
                 try {
                     Simulation::getFileByID(file_name);
-                } catch (const std::invalid_argument &e) {
+                } catch (const std::invalid_argument &) {
                     // making a new file
-                    double file_size = file_spec.at("sizeInBytes");
+                    sg_size_t file_size = file_spec.at("sizeInBytes");
                     Simulation::addFile(file_name, file_size);
                 }
             }
@@ -190,14 +190,14 @@ namespace wrench {
             double avg_cpu = -1.0;
             try {
                 avg_cpu = task_exec.at("avgCPU");
-            } catch (nlohmann::json::out_of_range &e) {
+            } catch (nlohmann::json::out_of_range &) {
                 // do nothing
             }
 
             double num_cores = -1.0;
             try {
                 num_cores = task_exec.at("coreCount");
-            } catch (nlohmann::json::out_of_range &e) {
+            } catch (nlohmann::json::out_of_range &) {
                 // do nothing
             }
             if (num_cores <= 0) {
@@ -224,7 +224,7 @@ namespace wrench {
                     avg_cpu = 100.0 * num_cores;
                 } else if (avg_cpu > 100 * num_cores) {
                     if (show_warnings) {
-                        std::cerr << "[WARNING]: Task " << task->getID() << " specifies " << (unsigned long) num_cores << " cores and avgCPU " << avg_cpu << "%, "
+                        std::cerr << "[WARNING]: Task " << task->getID() << " specifies " << static_cast<unsigned long>(num_cores) << " cores and avgCPU " << avg_cpu << "%, "
                                   << "which is impossible: Assuming avgCPU " << 100.0 * num_cores << " instead.\n";
                     }
                     avg_cpu = 100.0 * num_cores;
@@ -249,13 +249,13 @@ namespace wrench {
             // Deal with the flop amount
             double flop_amount;
             std::string execution_machine;
-            if (task_exec.contains("machines") and machines.size() > 0) {
-                std::vector<std::string> machines = task_exec.at("machines");
-                if (machines.size() > 1) {
+            if (task_exec.contains("machines") and !machines.empty()) {
+                std::vector<std::string> task_machines = task_exec.at("machines");
+                if (task_machines.size() > 1) {
                     throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJSON(): Task " + task->getID() +
                                                 " was executed on multiple machines, which WRENCH currently does not support");
                 }
-                execution_machine = machines.at(0);
+                execution_machine = task_machines.at(0);
             }
             if (ignore_machine_specs or execution_machine.empty()) {
                 flop_amount = runtimeInSeconds * flop_rate;
@@ -267,11 +267,11 @@ namespace wrench {
                 }
                 if (machines[execution_machine].second >= 0) {
                     double core_ghz = (machines[execution_machine].second) / 1000.0;
-                    double total_compute_power_used = core_ghz * (double) min_num_cores;
+                    double total_compute_power_used = core_ghz * static_cast<double>(min_num_cores);
                     double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
                     flop_amount = runtimeInSeconds * actual_flop_rate;
                 } else {
-                    flop_amount = (double) min_num_cores * runtimeInSeconds * flop_rate;// Assume a min-core execution
+                    flop_amount = static_cast<double>(min_num_cores) * runtimeInSeconds * flop_rate;// Assume a min-core execution
                 }
             }
 
@@ -312,9 +312,9 @@ namespace wrench {
                 try {
                     auto parent_task = workflow->getTaskByID(parent);
                     workflow->addControlDependency(parent_task, task, redundant_dependencies);
-                } catch (std::invalid_argument &e) {
+                } catch (std::invalid_argument &) {
                     // do nothing
-                } catch (std::runtime_error &e) {
+                } catch (std::runtime_error &) {
                     if (ignore_cycle_creating_dependencies) {
                         // nothing
                     } else {
@@ -327,9 +327,9 @@ namespace wrench {
                 try {
                     auto child_task = workflow->getTaskByID(child);
                     workflow->addControlDependency(task, child_task, redundant_dependencies);
-                } catch (std::invalid_argument &e) {
+                } catch (std::invalid_argument &) {
                     // do nothing
-                } catch (std::runtime_error &e) {
+                } catch (std::runtime_error &) {
                     if (ignore_cycle_creating_dependencies) {
                         // nothing
                     } else {
@@ -351,7 +351,7 @@ namespace wrench {
      * @param workflow
      * @return
      */
-    nlohmann::json build_workflow_specification_json(std::shared_ptr<Workflow> workflow) {
+    nlohmann::json build_workflow_specification_json(const std::shared_ptr<Workflow>& workflow) {
         nlohmann::json json_specification;
 
         // Tasks
@@ -390,7 +390,7 @@ namespace wrench {
             auto file = item.second;
             nlohmann::json json_file;
             json_file["id"] = file->getID();
-            json_file["sizeInBytes"] = (long long)(file->getSize());
+            json_file["sizeInBytes"] = static_cast<long long>(file->getSize());
             json_specification["files"].push_back(json_file);
         }
 
@@ -402,7 +402,7 @@ namespace wrench {
      * @param workflow
      * @return
      */
-    nlohmann::json build_workflow_execution_json(std::shared_ptr<Workflow> workflow) {
+    nlohmann::json build_workflow_execution_json(const std::shared_ptr<Workflow>& workflow) {
         nlohmann::json json_execution;
 
         json_execution["makespanInSeconds"] = workflow->getCompletionDate() - workflow->getStartDate();
@@ -430,7 +430,7 @@ namespace wrench {
     /**
    * Documentation in .h file
    */
-    std::string WfCommonsWorkflowParser::createJSONStringFromWorkflow(std::shared_ptr<Workflow> workflow) {
+    std::string WfCommonsWorkflowParser::createJSONStringFromWorkflow(const std::shared_ptr<Workflow>& workflow) {
         nlohmann::json json_doc;
         json_doc["name"] = workflow->getName();
         json_doc["description"] = "Generated from a WRENCH simulator";
