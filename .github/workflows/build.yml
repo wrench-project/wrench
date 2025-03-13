@@ -126,7 +126,7 @@ jobs:
         run: |
           if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
             docker exec -w /home/wrench/wrench/build wrench lcov --ignore-errors mismatch --directory . --capture --output-file coverage.info;
-            docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+            docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info --ignore-errors unused,unused '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
             docker cp wrench:/home/wrench/wrench/build/coverage.info .;
             bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
           fi
