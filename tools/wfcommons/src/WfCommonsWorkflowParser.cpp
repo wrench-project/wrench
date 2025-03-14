@@ -135,6 +135,8 @@ namespace wrench {
                 } catch (nlohmann::detail::out_of_range &) {
                     if (show_warnings) std::cerr << "[WARNING]: Machine " + name + " does not define a speed\n";
                     mhz = -1.0;// unknown
+                } catch (nlohmann::detail::type_error &e) {
+                    throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): " + std::string(e.what()));
                 }
                 machines[name] = std::make_pair(num_cores, mhz);
             }
