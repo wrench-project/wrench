@@ -94,8 +94,7 @@ namespace wrench {
         nlohmann::json schema_version;
         try {
             schema_version = j.at("schemaVersion");
-        }
-        catch (std::out_of_range&) {
+        } catch (std::out_of_range&) {
             throw std::invalid_argument(
                 "WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'schema_version' key");
         }
@@ -208,8 +207,7 @@ namespace wrench {
             double avg_cpu = -1.0;
             try {
                 avg_cpu = task_exec.at("avgCPU");
-            }
-            catch (nlohmann::json::out_of_range&) {
+            } catch (nlohmann::json::out_of_range&) {
                 // do nothing
             } catch (nlohmann::detail::type_error& e) {
                 throw std::invalid_argument(
@@ -220,8 +218,7 @@ namespace wrench {
             double num_cores = -1.0;
             try {
                 num_cores = task_exec.at("coreCount");
-            }
-            catch (nlohmann::json::out_of_range&) {
+            } catch (nlohmann::json::out_of_range&) {
                 // do nothing
             } catch (nlohmann::detail::type_error& e) {
                 throw std::invalid_argument(
@@ -238,8 +235,7 @@ namespace wrench {
             double runtimeInSeconds;
             try {
                 runtimeInSeconds = task_exec.at("runtimeInSeconds");
-            }
-            catch (nlohmann::detail::type_error& e) {
+            } catch (nlohmann::detail::type_error& e) {
                 throw std::invalid_argument(
                     "WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid runtimeInSeconds value: " + std::string(
                         e.what()));
@@ -289,8 +285,18 @@ namespace wrench {
             max_num_cores = max_cores_per_task;
             // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
             if ((not enforce_num_cores) and task_exec.contains("coreCount")) {
-                min_num_cores = task_exec.at("coreCount");
-                max_num_cores = task_exec.at("coreCount");
+                try {
+                    min_num_cores = task_exec.at("coreCount");
+                } catch (nlohmann::detail::type_error& e) {
+                    throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid coreCount value: " + std::string(
+                        e.what()));
+                }
+                try {
+                    max_num_cores = task_exec.at("coreCount");
+                } catch (nlohmann::detail::type_error& e) {
+                    throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid coreCount value: " + std::string(
+                        e.what()));
+                }
             }
 
             // Deal with the flop amount
@@ -344,7 +350,7 @@ namespace wrench {
             task->setFlops(flop_amount);
             task->setMinNumCores(min_num_cores);
             task->setMaxNumCores(max_num_cores);
-            task->setMemoryRequirement(ram_in_bytes);
+            task->setMemoryRequirement(static_cast<sg_size_t>(ram_in_bytes));
 
             // Deal with the priority, if any
             if (task_exec.contains("priority")) {
