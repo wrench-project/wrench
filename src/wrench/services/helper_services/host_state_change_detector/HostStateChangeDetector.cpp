@@ -43,7 +43,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  * @param property_list: a property list
  *
  */
-wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
+wrench::HostStateChangeDetector::HostStateChangeDetector(const std::string& host_on_which_to_run,
                                                          const std::vector<simgrid::s4u::Host *>& hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off, bool notify_when_speed_change,
                                                          std::shared_ptr<S4U_Daemon> creator,

@@ -294,7 +294,7 @@ namespace wrench {
 
                     } else {//no internal storage
                         if (!children.empty()) {//recursive search
-                            shared_ptr<bool> answered = make_shared<bool>(false);
+                            auto answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, false, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
@@ -391,7 +391,7 @@ namespace wrench {
                         //extra compute call
 
                         if (!children.empty()) {//recursive search
-                            shared_ptr<bool> answered = make_shared<bool>(false);
+                            auto answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, true, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
@@ -690,7 +690,7 @@ namespace wrench {
         * @return the Child Nodes shared pointer, or nullptr if this node is a leaf
         */
         std::shared_ptr<Node> Node::getChild(unsigned int n) {
-            if (n >= 0 && n < children.size()) {
+            if (n < children.size()) {
                 return children[n];
             } else {
                 return nullptr;

@@ -458,7 +458,7 @@ namespace wrench {
     void S4U_CommPort::createCommPortPool() {
         S4U_CommPort::all_commports.reserve(S4U_CommPort::commport_pool_size);
         for (unsigned long i = 0; i < S4U_CommPort::commport_pool_size; i++) {
-            std::unique_ptr<S4U_CommPort> mb = std::make_unique<S4U_CommPort>();
+            auto mb = std::make_unique<S4U_CommPort>();
             S4U_CommPort::free_commports.push_back(mb.get());
             S4U_CommPort::all_commports.push_back(std::move(mb));
         }
