@@ -49,7 +49,7 @@ namespace wrench {
      * @param hostnames: the list of metered hosts, as hostnames
      * @param measurement_period: the measurement period
      */
-    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::vector<std::string> &hostnames,
+    EnergyMeterService::EnergyMeterService(const std::string& hostname, const std::vector<std::string> &hostnames,
                                            double measurement_period) : Service(hostname, "energy_meter") {
 
         if (hostnames.empty()) {

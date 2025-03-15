@@ -586,8 +586,7 @@ namespace wrench {
             if (send_failure_notifications) {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(batch_job->getJobID()),
-                        std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job)));
+                        std::make_shared<JobKilled>(compound_job));
             }
             this->running_jobs.erase(compound_job);
         }
@@ -617,8 +616,7 @@ namespace wrench {
             if (send_failure_notifications) {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(batch_job->getJobID()),
-                        std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job)));
+                        std::make_shared<JobKilled>(compound_job));
             }
             this->batch_queue.pop_front();
         }
@@ -1180,7 +1178,8 @@ namespace wrench {
             // Send a failure reply
             auto answer_message =
                     new ComputeServiceTerminateCompoundJobAnswerMessage(
-                            job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BatchComputeService>(), msg)),
+                            job, this->getSharedPtr<BatchComputeService>(), false,
+                            std::make_shared<NotAllowed>(this->getSharedPtr<BatchComputeService>(), msg),
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answer_message);

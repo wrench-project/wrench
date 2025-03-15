@@ -159,7 +159,7 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeService(
-            std::shared_ptr<CompoundJob> job,
+            const std::shared_ptr<CompoundJob>& job,
             const std::map<std::string, std::string> &service_specific_arguments) {
 
         if (HTCondorComputeService::isJobGridUniverse(job)) {
