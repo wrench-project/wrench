@@ -46,7 +46,7 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         // Create the execution controller that will just receive workflow execution events so that I don't have to
-        std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::make_shared<WorkloadTraceFileReplayerEventReceiver>(
+        auto event_receiver = std::make_shared<WorkloadTraceFileReplayerEventReceiver>(
                 this->hostname, job_manager);
 
         // Start the WorkloadTraceFileReplayerEventReceiver

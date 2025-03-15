@@ -1000,7 +1000,7 @@ namespace wrench {
             if (!p) {
                 p = "/";
             }
-            std::string mount_point = std::string(p);
+            auto mount_point = std::string(p);
             mount_points.push_back(mount_point);
         }
 

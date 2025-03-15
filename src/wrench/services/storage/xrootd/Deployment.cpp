@@ -103,7 +103,7 @@ namespace wrench {
             for (auto property: messagepayload_list_override) {//override XRootD default message payload with supplied properties for this node
                 payloads[property.first] = property.second;
             }
-            std::shared_ptr<Node> ret = make_shared<Node>(this, hostname, properties, payloads);
+            auto ret = make_shared<Node>(this, hostname, properties, payloads);
             ret->metavisor = this;
             nodes.push_back(ret);
             simulation->add(ret);
