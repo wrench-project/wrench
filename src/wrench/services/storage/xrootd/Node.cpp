@@ -704,19 +704,6 @@ namespace wrench {
             return supervisor;
         }
 
-        //        /**
-        //        * @brief A meta operation to determine if a file exists on this node
-        //        * @param file: the file to check for
-        //        * @return a shared pointer the file location if the file was found.  Nullptr if the file was not found or if this is not a storage server
-        //        */
-        //        std::shared_ptr<FileLocation> Node::hasFile(shared_ptr<DataFile> file){
-        //            if(internalStorage==nullptr or file==nullptr){
-        //                return nullptr;
-        //            }
-        //
-        //            return FileLocation::LOCATION(internalStorage);
-        //
-        //        }
         /**
         * @brief Check the cache for a file
         * @param file: The file to check the cache for
