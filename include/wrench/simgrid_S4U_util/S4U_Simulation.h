@@ -41,7 +41,7 @@ namespace wrench {
         static std::string getHostName();
         static bool hostExists(const std::string &hostname);
         static bool linkExists(const std::string &link_name);
-        static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
+        static std::vector<std::string> getRoute(const std::string &src_host, const std::string &dst_host);
         static unsigned int getHostNumCores(const std::string &hostname);
         static unsigned int getNumCores();
         static double getHostFlopRate(const std::string &hostname);
@@ -85,7 +85,7 @@ namespace wrench {
         static double getEnergyConsumedByHost(const std::string &hostname);
         //		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
         static void setPstate(const std::string &hostname, unsigned long pstate);
-        static int getNumberofPstates(const std::string &hostname);
+        static int getNumberOfPstates(const std::string &hostname);
         static unsigned long getCurrentPstate(const std::string &hostname);
         static double getMinPowerConsumption(const std::string &hostname);
         static double getMaxPowerConsumption(const std::string &hostname);

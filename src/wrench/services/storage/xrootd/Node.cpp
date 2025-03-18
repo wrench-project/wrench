@@ -294,7 +294,7 @@ namespace wrench {
 
                     } else {//no internal storage
                         if (!children.empty()) {//recursive search
-                            shared_ptr<bool> answered = make_shared<bool>(false);
+                            auto answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, false, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
@@ -391,7 +391,7 @@ namespace wrench {
                         //extra compute call
 
                         if (!children.empty()) {//recursive search
-                            shared_ptr<bool> answered = make_shared<bool>(false);
+                            auto answered = make_shared<bool>(false);
                             Alarm::createAndStartAlarm(this->simulation_, wrench::S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT), this->hostname, this->commport,
                                                        new FileNotFoundAlarm(msg->answer_commport, file, true, answered), "XROOTD_FileNotFoundAlarm");
                             if (reduced) {
@@ -690,7 +690,7 @@ namespace wrench {
         * @return the Child Nodes shared pointer, or nullptr if this node is a leaf
         */
         std::shared_ptr<Node> Node::getChild(unsigned int n) {
-            if (n >= 0 && n < children.size()) {
+            if (n < children.size()) {
                 return children[n];
             } else {
                 return nullptr;
@@ -704,19 +704,6 @@ namespace wrench {
             return supervisor;
         }
 
-        //        /**
-        //        * @brief A meta operation to determine if a file exists on this node
-        //        * @param file: the file to check for
-        //        * @return a shared pointer the file location if the file was found.  Nullptr if the file was not found or if this is not a storage server
-        //        */
-        //        std::shared_ptr<FileLocation> Node::hasFile(shared_ptr<DataFile> file){
-        //            if(internalStorage==nullptr or file==nullptr){
-        //                return nullptr;
-        //            }
-        //
-        //            return FileLocation::LOCATION(internalStorage);
-        //
-        //        }
         /**
         * @brief Check the cache for a file
         * @param file: The file to check the cache for

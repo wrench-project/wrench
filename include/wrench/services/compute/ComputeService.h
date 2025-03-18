@@ -19,8 +19,6 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/job/Job.h"
-#include "wrench/job/StandardJob.h"
-#include "wrench/job/PilotJob.h"
 #include "wrench/job/CompoundJob.h"
 
 namespace wrench {
@@ -43,7 +41,6 @@ namespace wrench {
         /***********************/
         /** \endcond          **/
         /***********************/
-
 
     public:
         /** @brief A convenient constant to mean "use all cores of a physical host" whenever a number of cores

@@ -343,7 +343,7 @@ namespace wrench {
 
         double original_submit_time_of_first_job = -1;
 
-        for (nlohmann::json::iterator it = jobs.begin(); it != jobs.end(); ++it) {
+        for (auto it = jobs.begin(); it != jobs.end(); ++it) {
             nlohmann::json json_job = it.value();
             unsigned id;
             unsigned long res;

@@ -12,6 +12,7 @@
 #include <wrench/services/storage/xrootd/Deployment.h>
 
 #include <utility>
+
 namespace wrench {
     namespace XRootD {
 
@@ -45,7 +46,7 @@ namespace wrench {
         }
 
         /**
-        * @brief Create the an XRootD Node that will be a supervisor
+        * @brief Create the XRootD Node that will be a supervisor
         *
         * @param hostname: the name of the host on which the service should run
         * @param node_property_list: The property list to use for the new Node, defaults to {}
@@ -102,7 +103,7 @@ namespace wrench {
             for (auto property: messagepayload_list_override) {//override XRootD default message payload with supplied properties for this node
                 payloads[property.first] = property.second;
             }
-            std::shared_ptr<Node> ret = make_shared<Node>(this, hostname, properties, payloads);
+            auto ret = make_shared<Node>(this, hostname, properties, payloads);
             ret->metavisor = this;
             nodes.push_back(ret);
             simulation->add(ret);
