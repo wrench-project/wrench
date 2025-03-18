@@ -121,7 +121,7 @@ namespace wrench {
 
         try {
             boost::breadth_first_visit(dag, src_vertex, Q, vis, colormap);
-        } catch (std::runtime_error &e) {
+        } catch (std::runtime_error &) {
             return true;
         }
         return false;

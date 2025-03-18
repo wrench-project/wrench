@@ -54,7 +54,7 @@ namespace wrench {
                     termination_cause,
                     this->getMessagePayloadValue(
                             ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &e) {
+        } catch (ExecutionException &) {
             this->shutting_down = false;
             throw;
         }
@@ -65,7 +65,7 @@ namespace wrench {
                     this->network_timeout,
                     "ComputeService::stop(): Received an");
         } catch (...) {
-            // If we don't get the ack we assum it's down anyway
+            // If we don't get the ack we assume it's down anyway
         }
 
         // Set the service state to down
@@ -195,8 +195,7 @@ namespace wrench {
       *
       */
     std::vector<std::string> ComputeService::getHosts(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_cores", simulate_it);
+        std::map<std::string, double> dict = this->getServiceResourceInformation("num_cores", simulate_it);
 
         std::vector<std::string> to_return;
         to_return.reserve(dict.size());
@@ -217,8 +216,7 @@ namespace wrench {
       *
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_cores", simulate_it);
+        std::map<std::string, double> dict = this->getServiceResourceInformation("num_cores", simulate_it);
 
         std::map<std::string, unsigned long> to_return;
 
@@ -237,8 +235,7 @@ namespace wrench {
       *
       */
     unsigned long ComputeService::getTotalNumCores(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_cores", simulate_it);
+        std::map<std::string, double> dict = this->getServiceResourceInformation("num_cores", simulate_it);
 
         unsigned long count = 0;
         for (auto const &x: dict) {
@@ -259,8 +256,7 @@ namespace wrench {
      *
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_idle_cores", simulate_it);
+        std::map<std::string, double> dict = this->getServiceResourceInformation("num_idle_cores", simulate_it);
 
         std::map<std::string, unsigned long> to_return;
 
@@ -279,8 +275,7 @@ namespace wrench {
      *
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("ram_availabilities", simulate_it);
+        std::map<std::string, double> dict = this->getServiceResourceInformation("ram_availabilities", simulate_it);
 
         std::map<std::string, double> to_return;
 
@@ -302,8 +297,7 @@ namespace wrench {
      *
      */
     unsigned long ComputeService::getTotalNumIdleCores(bool simulate_it) {
-        std::map<std::string, double> dict;
-        dict = this->getServiceResourceInformation("num_idle_cores", simulate_it);
+        std::map<std::string, double> dict = this->getServiceResourceInformation("num_idle_cores", simulate_it);
 
 
         unsigned long count = 0;

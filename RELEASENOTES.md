@@ -1,6 +1,10 @@
 WRENCH Release Notes
 ------
 
+### wrench 2.7-dev
+
+- Nothing here yet
+
 ### wrench 2.6
 
 - Implementation of a "backfilling depth" feature for EASY and convervative_bf batch scheduling algorithms
