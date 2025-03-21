@@ -7,8 +7,6 @@
  * (at your option) any later version.
  */
 
-#include "httplib.h"
-
 #include <string>
 #include <vector>
 #include <boost/program_options.hpp>
