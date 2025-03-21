@@ -2070,7 +2070,6 @@ namespace wrench {
                 file_specs.push_back(file_spec);
             }
             answer["files"] = file_specs;
-            std::cerr << answer["files"] << "\n";
 
             return answer;
         } catch (std::exception &e) {

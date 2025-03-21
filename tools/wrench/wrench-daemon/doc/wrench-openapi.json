@@ -4189,7 +4189,7 @@
                 }
               }
             },
-            "description": "task and file specifications"
+            "description": "task specifications"
           },
           "files": {
             "type": "array",
@@ -4207,7 +4207,7 @@
                 }
               }
             },
-            "description": "the names of the workflow's files"
+            "description": "file specifications"
           },
           "failure_cause": {
             "type": "string",

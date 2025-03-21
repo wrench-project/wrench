@@ -358,6 +358,9 @@ void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res
 */
 void WRENCHDaemon::run() {
 
+    // Set the log level to Warning
+    app.loglevel(crow::LogLevel::Warning);
+
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
     CROW_ROUTE(this->app, "/api/startSimulation").methods(crow::HTTPMethod::Post)
