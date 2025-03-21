@@ -32,7 +32,6 @@ include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR}/in
 
 # Add source to this project's executable.
 add_executable(wrench-daemon EXCLUDE_FROM_ALL
-        include/httplib.h
         src/main.cpp
         src/WRENCHDaemon.cpp
         include/WRENCHDaemon.h
