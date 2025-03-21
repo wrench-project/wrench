@@ -2052,12 +2052,12 @@ namespace wrench {
                 for (auto const &f: t->getInputFiles()) {
                     input_file_names.push_back(f->getID());
                 }
-                task_spec["input_files"] = input_file_names;
+                task_spec["input_file_names"] = input_file_names;
                 std::vector<std::string> output_file_names;
                 for (auto const &f: t->getOutputFiles()) {
                     output_file_names.push_back(f->getID());
                 }
-                task_spec["output_files"] = output_file_names;
+                task_spec["output_file_names"] = output_file_names;
                 task_specs.push_back(task_spec);
             }
             answer["tasks"] = task_specs;
