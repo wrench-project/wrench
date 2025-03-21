@@ -4174,10 +4174,22 @@
                   "type": "integer",
                   "format": "int64",
                   "description": "task memory requirement in bytes."
+                },
+                "input_file_names": {
+                  "type": "array",
+                  "items": {
+                    "type":"string"
+                  }
+                },
+                "output_file_names": {
+                  "type": "array",
+                  "items": {
+                    "type":"string"
+                  }
                 }
               }
             },
-            "description": "the names of the workflow's tasks"
+            "description": "task and file specifications"
           },
           "files": {
             "type": "array",
