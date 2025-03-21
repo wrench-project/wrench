@@ -50,16 +50,7 @@ public:
         }
     }
 
-    // static void allow_origin(Response &res) {
-    //     res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-    //     res.set_header("Access-Control-Allow-Headers", "Content-Type");
-    //     for (auto const &origin: allowed_origins) {
-    //         res.set_header("Access-Control-Allow-Origin", origin);
-    //     }
-    // }
-
 private:
-    // httplib::Server server;
     crow::SimpleApp app;
 
     static std::vector<std::string> allowed_origins;
@@ -76,7 +67,6 @@ private:
 
     static bool isPortTaken(int port);
 
-    // static void error_handling(const Request &req, Response &res);
 };
 
 #endif// WRENCH_DAEMON_H

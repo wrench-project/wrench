@@ -205,7 +205,6 @@ void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res
 
     if (!child_pid) {// The child process
         // Stop the server that was listening on the main WRENCH daemon port
-        // server.stop();
         app.stop();
 
         // Create a pipe for communication with my child (aka the grand-child)
@@ -354,15 +353,6 @@ void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res
     }
 }
 
-// /**
-// * @brief A generic error handler that simply prints some information
-// * @param req the HTTP request
-// * @param res the HTTP response
-// */
-// void WRENCHDaemon::error_handling(const Request &req, Response &res) {
-//     std::cerr << "[" << res.status << "]: " << req.path << " " << req.body << "\n";
-// }
-
 /**
 * @brief The WRENCH daemon's "main" method
 */
@@ -370,10 +360,6 @@ void WRENCHDaemon::run() {
 
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
-    // server.Post("/api/startSimulation", [this](const Request &req, Response &res) {
-    //     this->startSimulation(req, res);
-    // });
-
     CROW_ROUTE(this->app, "/api/startSimulation").methods(crow::HTTPMethod::Post)
         ([this](const crow::request& req){
             crow::response res;
@@ -381,27 +367,19 @@ void WRENCHDaemon::run() {
             return res;
         });
 
-    // Set some generic error handler
-    // server.set_error_handler([](const Request &req, Response &res) { WRENCHDaemon::error_handling(req, res); });
+    // TODO: Set some generic error handler
     // auto error_handler = [](crow::response& res) {
     //     res.code = 500;
     //     res.set_header("Content-Type", "text/plain");
     //     res.write("Internal Server Error");
     //     res.end();
     // };
-    // this->app.error_handler(error_handler);
-    // // TODO: this->app.exception_handler(error_handler);
+    // this->app....
 
     // Start the web server
     if (daemon_logging) {
         std::cerr << "WRENCH daemon listening on port " << port_number << "...\n";
     }
 
-    // while (true) {
-    //     // This is in a while loop because, on Linux, the main process seems to return
-    //     // from the listen() call below, not sure why... perhaps this while loop
-    //     // could be removed, but it likely doesn't hurt
-    //     server.listen("0.0.0.0", port_number);
-    // }
     this->app.port(port_number).run();
 }
