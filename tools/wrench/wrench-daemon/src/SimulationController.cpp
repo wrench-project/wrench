@@ -2048,6 +2048,16 @@ namespace wrench {
                 task_spec["min_num_cores"] = t->getMinNumCores();
                 task_spec["max_num_cores"] = t->getMaxNumCores();
                 task_spec["memory"] = t->getMemoryRequirement();
+                std::vector<std::string> input_file_names;
+                for (auto const &f: t->getInputFiles()) {
+                    input_file_names.push_back(f->getID());
+                }
+                task_spec["input_files"] = input_file_names;
+                std::vector<std::string> output_file_names;
+                for (auto const &f: t->getOutputFiles()) {
+                    output_file_names.push_back(f->getID());
+                }
+                task_spec["output_files"] = output_file_names;
                 task_specs.push_back(task_spec);
             }
             answer["tasks"] = task_specs;
