@@ -3,7 +3,8 @@ WRENCH Release Notes
 
 ### wrench 2.7-dev
 
-- Nothing here yet
+- Removed all usage of httplib in wrench-daemon
+- Minor code/documentation cleanups
 
 ### wrench 2.6
 
