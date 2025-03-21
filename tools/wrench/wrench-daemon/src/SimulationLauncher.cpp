@@ -7,11 +7,11 @@
  * (at your option) any later version.
  */
 
-#include "httplib.h"
 #include "SimulationLauncher.h"
 #include "SimulationController.h"
 
 #include <string>
+#include <fstream>
 #include <utility>
 
 #include <wrench.h>
