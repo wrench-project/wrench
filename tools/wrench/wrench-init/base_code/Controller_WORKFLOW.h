@@ -30,7 +30,7 @@ namespace wrench {
 
     protected:
         // Overridden method
-        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
+        void processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent>&) override;
 
     private:
         // main() method of the WMS
