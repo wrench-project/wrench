@@ -215,7 +215,7 @@ namespace wrench {
                         e.what()));
             }
 
-            double num_cores = -1.0;
+            unsigned long num_cores = 0;
             try {
                 num_cores = task_exec.at("coreCount");
             } catch (nlohmann::json::out_of_range&) {
@@ -225,7 +225,7 @@ namespace wrench {
                     "WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid coreCount value: " + std::string(
                         e.what()));
             }
-            if (num_cores <= 0) {
+            if (num_cores == 0) {
                 if (show_warnings) std::cerr << "[WARNING]: Task " << task->getID() <<
                     " specifies an invalid number of cores (" + std::to_string(num_cores) +
                     "): Assuming 1 core instead.\n";
@@ -240,30 +240,16 @@ namespace wrench {
                     "WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid runtimeInSeconds value: " + std::string(
                         e.what()));
             }
+
             // Scale runtime based on avgCPU unless disabled
             if (not ignore_avg_cpu) {
-                if ((num_cores < 0) and (avg_cpu < 0)) {
+                if (avg_cpu < 0) {
                     if (show_warnings)
                         std::cerr << "[WARNING]: Task " << task->getID() <<
-                            " does not specify a number of cores or an avgCPU: "
-                            "Assuming 1 core and avgCPU at 100%.\n";
-                    num_cores = 1.0;
+                            " does not specify an avgCPU: "
+                            "Assuming avgCPU at 100%.\n";
                     avg_cpu = 100.0;
-                }
-                else if (num_cores < 0) {
-                    if (show_warnings)
-                        std::cerr << "[WARNING]: Task " << task->getID() << " has avgCPU " << avg_cpu
-                            << "% but does not specify the number of cores:"
-                            << "Assuming " << std::ceil(avg_cpu / 100.0) << " cores\n";
-                    num_cores = std::ceil(avg_cpu / 100.0);
-                }
-                else if (avg_cpu < 0) {
-                    if (show_warnings)
-                        std::cerr << "[WARNING]: Task " + task->getID() + " does not specify avgCPU: "
-                            "Assuming 100%.\n";
-                    avg_cpu = 100.0 * num_cores;
-                }
-                else if (avg_cpu > 100 * num_cores) {
+                } else if (avg_cpu > 100.0 * num_cores) {
                     if (show_warnings) {
                         std::cerr << "[WARNING]: Task " << task->getID() << " specifies " << static_cast<unsigned long>(
                                 num_cores) << " cores and avgCPU " << avg_cpu << "%, "
@@ -271,8 +257,7 @@ namespace wrench {
                     }
                     avg_cpu = 100.0 * num_cores;
                 }
-            }
-            else {
+            } else {
                 avg_cpu = 100.0 * num_cores;
             }
 
@@ -285,18 +270,8 @@ namespace wrench {
             max_num_cores = max_cores_per_task;
             // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
             if ((not enforce_num_cores) and task_exec.contains("coreCount")) {
-                try {
-                    min_num_cores = task_exec.at("coreCount");
-                } catch (nlohmann::detail::type_error& e) {
-                    throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid coreCount value: " + std::string(
-                        e.what()));
-                }
-                try {
-                    max_num_cores = task_exec.at("coreCount");
-                } catch (nlohmann::detail::type_error& e) {
-                    throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid coreCount value: " + std::string(
-                        e.what()));
-                }
+                min_num_cores = num_cores;
+                max_num_cores = num_cores;
             }
 
             // Deal with the flop amount

@@ -44,7 +44,6 @@
  * @return 0 on success, non-zero otherwise
  */
 int main(int argc, char **argv) {
-
     /*
      * Create a WRENCH simulation object
      */

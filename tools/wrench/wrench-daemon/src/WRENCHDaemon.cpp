@@ -87,13 +87,15 @@ bool WRENCHDaemon::isPortTaken(int port) {
 * @param res the response object to update
 * @param port_number the port_number on which simulation client will need to connect
 */
-void setSimulationStartSuccessAnswer(Response &res, int port_number) {
+void setSimulationStartSuccessAnswer(crow::response &res, int port_number) {
     json answer;
     answer["wrench_api_request_success"] = true;
     answer["port_number"] = port_number;
 
     WRENCHDaemon::allow_origin(res);
-    res.set_content(answer.dump(), "application/json");
+    // res.set_content(answer.dump(), "application/json");
+    res.set_header("Content-Type", "application/json");
+    res.body = answer.dump();
 }
 
 /**
@@ -101,12 +103,14 @@ void setSimulationStartSuccessAnswer(Response &res, int port_number) {
 * @param res res the response object to update
 * @param failure_cause a human-readable error message
 */
-void setSimulationStartFailureAnswer(Response &res, const std::string &failure_cause) {
+void setSimulationStartFailureAnswer(crow::response &res, const std::string &failure_cause) {
     json answer;
     answer["wrench_api_request_success"] = false;
     answer["failure_cause"] = failure_cause;
     WRENCHDaemon::allow_origin(res);
-    res.set_content(answer.dump(), "application/json");
+    // res.set_content(answer.dump(), "application/json");
+    res.set_header("Content-Type", "application/json");
+    res.body = answer.dump();
 }
 
 /**
@@ -152,11 +156,11 @@ std::string readStringFromSharedMemorySegment(int shm_segment_id) {
 * @param res HTTP response
 *
 */
-void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
+void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res) {
     // Print some logging
     unsigned long max_line_length = 120;
     if (daemon_logging) {
-        std::cerr << req.path << " " << req.body.substr(0, max_line_length)
+        std::cerr << req.raw_url << " " << req.body.substr(0, max_line_length)
                   << (req.body.length() > max_line_length ? "..." : "") << std::endl;
     }
 
@@ -201,7 +205,7 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
 
     if (!child_pid) {// The child process
         // Stop the server that was listening on the main WRENCH daemon port
-        server.stop();
+        app.stop();
 
         // Create a pipe for communication with my child (aka the grand-child)
         int fd[2];
@@ -350,36 +354,35 @@ void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
 }
 
 /**
-* @brief A generic error handler that simply prints some information
-* @param req the HTTP request
-* @param res the HTTP response
-*/
-void WRENCHDaemon::error_handling(const Request &req, Response &res) {
-    std::cerr << "[" << res.status << "]: " << req.path << " " << req.body << "\n";
-}
-
-/**
 * @brief The WRENCH daemon's "main" method
 */
 void WRENCHDaemon::run() {
 
+    // Set the log level to Warning
+    app.loglevel(crow::LogLevel::Warning);
+
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
-    server.Post("/api/startSimulation", [this](const Request &req, Response &res) {
-        this->startSimulation(req, res);
-    });
+    CROW_ROUTE(this->app, "/api/startSimulation").methods(crow::HTTPMethod::Post)
+        ([this](const crow::request& req){
+            crow::response res;
+            this->startSimulation(req, res);
+            return res;
+        });
 
-    // Set some generic error handler
-    server.set_error_handler([](const Request &req, Response &res) { WRENCHDaemon::error_handling(req, res); });
+    // TODO: Set some generic error handler
+    // auto error_handler = [](crow::response& res) {
+    //     res.code = 500;
+    //     res.set_header("Content-Type", "text/plain");
+    //     res.write("Internal Server Error");
+    //     res.end();
+    // };
+    // this->app....
 
     // Start the web server
     if (daemon_logging) {
         std::cerr << "WRENCH daemon listening on port " << port_number << "...\n";
     }
-    while (true) {
-        // This is in a while loop because, on Linux, the main process seems to return
-        // from the listen() call below, not sure why... perhaps this while loop
-        // could be removed, but it likely doesn't hurt
-        server.listen("0.0.0.0", port_number);
-    }
+
+    this->app.port(port_number).run();
 }

@@ -80,5 +80,4 @@ echo ""
 
 cat $1"/tools/wrench/wrench-init/wrench-init.in"
 
-
-
+chmod +x $2"/wrench-init"
