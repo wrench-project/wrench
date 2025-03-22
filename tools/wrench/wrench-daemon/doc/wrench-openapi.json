@@ -3908,7 +3908,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowResponseWithTaskAndFileList"
+                  "$ref": "#/components/schemas/WorkflowResponseWithTaskAndFileSpecs"
                 }
               }
             }
@@ -4137,30 +4137,77 @@
           }
         }
       },
-      "WorkflowResponseWithTaskAndFileList": {
+      "WorkflowResponseWithTaskAndFileSpecs": {
         "type": "object",
         "properties": {
           "wrench_api_request_success": {
             "type": "boolean",
-            "description": "true if success, false if failure"
+            "description": "true if success, false if failure."
           },
           "workflow_name": {
             "type": "string",
-            "description": "the new workflow's name (if success)"
+            "description": "the new workflow's name (if success)."
           },
           "tasks": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "task name."
+                },
+                "flops": {
+                  "type": "number",
+                  "format": "double",
+                  "description": "task flops."
+                },
+                "min_num_cores": {
+                  "type": "number",
+                  "description": "task minimum number of cores."
+                },
+                "max_num_cores": {
+                  "type": "number",
+                  "description": "task maximum number of cores."
+                },
+                "memory": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "task memory requirement in bytes."
+                },
+                "input_file_names": {
+                  "type": "array",
+                  "items": {
+                    "type":"string"
+                  }
+                },
+                "output_file_names": {
+                  "type": "array",
+                  "items": {
+                    "type":"string"
+                  }
+                }
+              }
             },
-            "description": "the names of the workflow's tasks"
+            "description": "task specifications"
           },
           "files": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "file name."
+                },
+                "size": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "file size in bytes."
+                }
+              }
             },
-            "description": "the names of the workflow's files"
+            "description": "file specifications"
           },
           "failure_cause": {
             "type": "string",
@@ -4438,7 +4485,7 @@
         "properties": {
           "cores": {
             "type": "number",
-            "description": "the task's minimum/maximum number of cores."
+            "description": "a number of cores."
           },
           "wrench_api_request_success": {
             "type": "boolean",

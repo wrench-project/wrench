@@ -10,11 +10,7 @@
 #ifndef WRENCH_DAEMON_H
 #define WRENCH_DAEMON_H
 
-#include "httplib.h"
 #include "crow.h"
-
-using httplib::Request;
-using httplib::Response;
 
 #include <wrench-dev.h>
 #include <map>
@@ -50,16 +46,8 @@ public:
         }
     }
 
-    static void allow_origin(Response &res) {
-        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-        res.set_header("Access-Control-Allow-Headers", "Content-Type");
-        for (auto const &origin: allowed_origins) {
-            res.set_header("Access-Control-Allow-Origin", origin);
-        }
-    }
-
 private:
-    httplib::Server server;
+    crow::SimpleApp app;
 
     static std::vector<std::string> allowed_origins;
 
@@ -71,11 +59,10 @@ private:
     std::string allowed_origin;
     int sleep_us;
 
-    void startSimulation(const Request &req, Response &res);
+    void startSimulation(const crow::request &req, crow::response &res);
 
     static bool isPortTaken(int port);
 
-    static void error_handling(const Request &req, Response &res);
 };
 
 #endif// WRENCH_DAEMON_H

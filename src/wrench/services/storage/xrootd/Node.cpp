@@ -673,7 +673,6 @@ namespace wrench {
         * @return the "best" file server from within locations to use
         */
         std::shared_ptr<FileLocation> Node::selectBest(std::set<std::shared_ptr<FileLocation>> locations) {
-
             std::shared_ptr<FileLocation> best = *locations.begin();
             double bestLoad = best->getStorageService()->getLoad();
             for (const auto& location: locations) {
