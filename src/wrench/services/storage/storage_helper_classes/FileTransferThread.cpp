@@ -229,7 +229,6 @@ namespace wrench {
 
         } else if (((this->src_location) and (this->dst_location) and
                     (this->dst_location->getStorageService() == this->parent))) {
-
             /** Downloading a file from another storage service */
             try {
                 downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
@@ -469,8 +468,6 @@ namespace wrench {
     void FileTransferThread::copyFileLocally(const std::shared_ptr<DataFile> &f,
                                              const std::shared_ptr<FileLocation> &src_loc,
                                              const std::shared_ptr<FileLocation> &dst_loc) {
-
-
         if ((src_loc->getStorageService() == dst_loc->getStorageService()) and
             (src_loc->getDirectoryPath() == dst_loc->getDirectoryPath())) {
             WRENCH_INFO(
@@ -511,7 +508,6 @@ namespace wrench {
     void FileTransferThread::downloadFileFromStorageService(const std::shared_ptr<DataFile> &f,
                                                             const std::shared_ptr<FileLocation> &src_loc,
                                                             const std::shared_ptr<FileLocation> &dst_loc) {
-
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (f == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
