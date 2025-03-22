@@ -249,7 +249,7 @@ namespace wrench {
                             " does not specify an avgCPU: "
                             "Assuming avgCPU at 100%.\n";
                     avg_cpu = 100.0;
-                } else if (avg_cpu > 100 * num_cores) {
+                } else if (avg_cpu > 100.0 * num_cores) {
                     if (show_warnings) {
                         std::cerr << "[WARNING]: Task " << task->getID() << " specifies " << static_cast<unsigned long>(
                                 num_cores) << " cores and avgCPU " << avg_cpu << "%, "
