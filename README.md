@@ -38,8 +38,8 @@ And, one of the following:
 - **clang** - version 9.0 or higher
 
 WRENCH also comes with a [REST API](https://wrench-project.org/wrench/latest/restapi/index.html).  A
-[Python API](https://github.com/wrench-project/wrench-python-api), which
-builds on top of the REST API, is available in a separate repository.
+Python API, built
+on top of the REST API, is available in [a separate repository](https://github.com/wrench-project/wrench-python-api).
 
 ## Dependencies
 
