@@ -286,13 +286,13 @@ namespace wrench {
             // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
             if ((not enforce_num_cores) and task_exec.contains("coreCount")) {
                 try {
-                    min_num_cores = task_exec.at("coreCount");
+                    min_num_cores = num_cores;
                 } catch (nlohmann::detail::type_error& e) {
                     throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid coreCount value: " + std::string(
                         e.what()));
                 }
                 try {
-                    max_num_cores = task_exec.at("coreCount");
+                    max_num_cores = num_cores;
                 } catch (nlohmann::detail::type_error& e) {
                     throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid coreCount value: " + std::string(
                         e.what()));
