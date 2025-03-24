@@ -10,12 +10,14 @@ if (NOT ASIO_HEADER_FOUND)
 	message("-- ASIO: Could not find asio.hpp (warning: the asio library is needed to compile the wrench-daemon - sudo apt install libasio-dev)")
 endif()
 
+file(GLOB WRENCH_DAEMON_CPP_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/callback-map.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_crow_routes.py ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json ${CMAKE_CURRENT_SOURCE_DIR}/include/routes.h ${CMAKE_CURRENT_SOURCE_DIR}/include/callback-map.h
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+        DEPENDS ${WRENCH_DAEMON_CPP_FILES}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/doc/wrench-openapi.json
         COMMENT "Generating CROW routes"
         VERBATIM

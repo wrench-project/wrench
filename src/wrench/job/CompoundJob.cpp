@@ -34,8 +34,8 @@ namespace wrench {
      * @param job_manager: the Job Manager in charge of this job
      *
      */
-    CompoundJob::CompoundJob(std::string name, std::shared_ptr<JobManager> job_manager)
-        : Job(std::move(name), std::move(job_manager)),
+    CompoundJob::CompoundJob(const std::string& name, const std::shared_ptr<JobManager> &job_manager)
+        : Job((name),job_manager),
           state(CompoundJob::State::NOT_SUBMITTED), priority(0.0) {
         this->state_task_map[Action::State::NOT_READY] = {};
         this->state_task_map[Action::State::COMPLETED] = {};
@@ -56,7 +56,7 @@ namespace wrench {
      * @brief Get the state of the standard job
      * @return the state
      */
-    CompoundJob::State CompoundJob::getState() {
+    CompoundJob::State CompoundJob::getState() const {
         return this->state;
     }
 
@@ -64,7 +64,7 @@ namespace wrench {
      * @brief Get the state of the standard job
      * @return the state
      */
-    std::string CompoundJob::getStateAsString() {
+    std::string CompoundJob::getStateAsString() const {
         switch (this->state) {
             case NOT_SUBMITTED:
                 return "NOT SUBMITTED";
@@ -502,7 +502,7 @@ namespace wrench {
     /**
      * @brief Assert that the job has not been submitted
      */
-    void CompoundJob::assertJobNotSubmitted() {
+    void CompoundJob::assertJobNotSubmitted() const {
         if (this->state != CompoundJob::State::NOT_SUBMITTED) {
             throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob once it has been submitted");
         }
@@ -530,7 +530,7 @@ namespace wrench {
      * @param name: an action name
      * @return an action
      */
-    std::shared_ptr<Action> CompoundJob::getActionByName(const std::string &name) {
+    std::shared_ptr<Action> CompoundJob::getActionByName(const std::string &name) const {
         for (auto const &action: this->actions) {
             if (action->getName() == name) {
                 return action;
@@ -639,7 +639,7 @@ namespace wrench {
      * @brief Remove an action from the job
      * @param action: the action to remove
      */
-    void CompoundJob::removeAction(shared_ptr<Action> &action) {
+    void CompoundJob::removeAction(const shared_ptr<Action> &action) {
         assertJobNotSubmitted();
         this->state_task_map[action->getState()].erase(action);
         for (auto const &parent: action->parents) {
@@ -687,7 +687,7 @@ namespace wrench {
      * @brief Get the minimum required num cores to run the job
      * @return a number of cores
      */
-    unsigned long CompoundJob::getMinimumRequiredNumCores() {
+    unsigned long CompoundJob::getMinimumRequiredNumCores() const {
         unsigned long min_num_cores = 0;
         for (auto const &action: this->actions) {
             min_num_cores = (min_num_cores < action->getMinNumCores() ? action->getMinNumCores() : min_num_cores);
@@ -699,7 +699,7 @@ namespace wrench {
    * @brief Get the minimum required amount of memory to run the job
    * @return a number of bytes
    */
-    sg_size_t CompoundJob::getMinimumRequiredMemory() {
+    sg_size_t CompoundJob::getMinimumRequiredMemory() const {
         sg_size_t min_ram = 0;
         for (auto const &action: this->actions) {
             min_ram = (min_ram < action->getMinRAMFootprint() ? action->getMinRAMFootprint() : min_ram);

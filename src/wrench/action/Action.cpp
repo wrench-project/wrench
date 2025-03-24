@@ -284,7 +284,7 @@ namespace wrench {
      * @brief Get the action's children
      * @return a set of children
      */
-    std::set<std::shared_ptr<Action>> Action::getChildren() {
+    std::set<std::shared_ptr<Action>> Action::getChildren() const {
         std::set<std::shared_ptr<Action>> to_return;
         for (auto const &c: this->children) {
             to_return.insert(c->getSharedPtr());
@@ -296,7 +296,7 @@ namespace wrench {
      * @brief Get the action's parents
      * @return a set of parents
      */
-    std::set<std::shared_ptr<Action>> Action::getParents() {
+    std::set<std::shared_ptr<Action>> Action::getParents() const {
         std::set<std::shared_ptr<Action>> to_return;
         for (auto const &p: this->parents) {
             to_return.insert(p->getSharedPtr());
@@ -308,7 +308,7 @@ namespace wrench {
      * @brief Set the action's priority
      * @param p: a priority
      */
-    void Action::setPriority(double p) {
+    void Action::setPriority(const double p) {
         this->priority = p;
     }
 
