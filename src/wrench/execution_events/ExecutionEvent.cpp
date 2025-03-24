@@ -8,19 +8,15 @@
  * Workflow.getNextEvent() method.
  */
 
-
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include "wrench/managers/job_manager/JobManagerMessage.h"
-#include "wrench/managers/data_movement_manager/DataMovementManagerMessage.h"
-
+#include <wrench/managers/job_manager/JobManagerMessage.h>
+#include <wrench/managers/data_movement_manager/DataMovementManagerMessage.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/execution_controller/ExecutionControllerMessage.h>
-#include "wrench/services/storage/StorageServiceMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_execution_event, "Log category for Workflow Execution Event");
-
 
 namespace wrench {
 

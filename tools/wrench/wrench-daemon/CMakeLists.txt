@@ -1,9 +1,6 @@
-﻿
-set(CMAKE_CXX_STANDARD 17)
-
+﻿set(CMAKE_CXX_STANDARD 17)
 
 include_directories(include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
-
 
 find_file(ASIO_HEADER_FOUND asio.hpp QUIET)
 if (NOT ASIO_HEADER_FOUND)
@@ -23,14 +20,12 @@ add_custom_command(
         VERBATIM
 )
 
-
 # Add needed packages
 find_package(Boost REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
 include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench /opt/local/include)
-
 
 # Add source to this project's executable.
 add_executable(wrench-daemon EXCLUDE_FROM_ALL
@@ -52,7 +47,6 @@ add_executable(wrench-daemon EXCLUDE_FROM_ALL
 
 add_dependencies(wrench-daemon wrench)
 add_dependencies(wrench-daemon wrenchwfcommonsworkflowparser)
-
 
 # Add pthreads
 set(THREADS_PREFER_PTHREAD_FLAG ON)
