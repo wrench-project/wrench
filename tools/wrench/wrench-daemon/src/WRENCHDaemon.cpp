@@ -158,8 +158,8 @@ std::string readStringFromSharedMemorySegment(int shm_segment_id) {
 */
 void WRENCHDaemon::startSimulation(const crow::request &req, crow::response &res) {
     // Print some logging
-    unsigned long max_line_length = 120;
     if (daemon_logging) {
+        unsigned long max_line_length = 120;
         std::cerr << req.raw_url << " " << req.body.substr(0, max_line_length)
                   << (req.body.length() > max_line_length ? "..." : "") << std::endl;
     }
