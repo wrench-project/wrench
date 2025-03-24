@@ -521,8 +521,8 @@ namespace wrench {
         // By default, it will be 0 if it is not explicitly set in the platform file.
         // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
         // still be called.
-        for (const auto &hostname: this->getHostnameList()) {
-            this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(), hostname, getCurrentPstate(hostname));
+        for (const auto &hostname: Simulation::getHostnameList()) {
+            this->getOutput().addTimestampPstateSet(getCurrentSimulatedDate(), hostname, getCurrentPstate(hostname));
         }
 
         // Start all services (including execution controllers)
@@ -1505,7 +1505,7 @@ namespace wrench {
         //        }
 
         // Check that if --pagecache is passed, each host has a "/memory" disk
-        if (this->isPageCachingEnabled()) {
+        if (wrench::Simulation::isPageCachingEnabled()) {
             for (auto const &h: hostnames) {
                 bool has_memory_disk = false;
                 for (auto const &d: S4U_Simulation::get_host_or_vm_by_name(h)->get_disks()) {
