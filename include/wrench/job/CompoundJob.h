@@ -68,8 +68,8 @@ namespace wrench {
         std::shared_ptr<CompoundJob> getSharedPtr() { return this->shared_from_this(); }
 
         std::set<std::shared_ptr<Action>> getActions();
-        CompoundJob::State getState();
-        std::string getStateAsString();
+        CompoundJob::State getState() const;
+        std::string getStateAsString() const;
         void setPriority(double p) override;
 
         ~CompoundJob() = default;
@@ -150,9 +150,9 @@ namespace wrench {
                                                 unsigned long num_processes,
                                                 unsigned long num_cores_per_process);
 
-        std::shared_ptr<Action> getActionByName(const std::string &name);
+        std::shared_ptr<Action> getActionByName(const std::string &name) const;
 
-        void removeAction(std::shared_ptr<Action> &action);
+        void removeAction(const std::shared_ptr<Action> &action);
 
         void addActionDependency(const std::shared_ptr<Action> &parent, const std::shared_ptr<Action> &child);
 
@@ -168,9 +168,9 @@ namespace wrench {
         bool hasSuccessfullyCompleted();
         bool hasFailed();
 
-        unsigned long getMinimumRequiredNumCores();
+        unsigned long getMinimumRequiredNumCores() const;
 
-        sg_size_t getMinimumRequiredMemory();
+        sg_size_t getMinimumRequiredMemory() const;
 
 
         /***********************/
@@ -189,7 +189,7 @@ namespace wrench {
         friend class JobManager;
         friend class Action;
 
-        CompoundJob(std::string name, std::shared_ptr<JobManager> job_manager);
+        CompoundJob(const std::string& name, const std::shared_ptr<JobManager> &job_manager);
 
         bool isReady();
 
@@ -221,7 +221,7 @@ namespace wrench {
         //        std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
-        void assertJobNotSubmitted();
+        void assertJobNotSubmitted() const;
         void assertActionNameDoesNotAlreadyExist(const std::string &name);
 
         void addAction(const std::shared_ptr<Action> &action);

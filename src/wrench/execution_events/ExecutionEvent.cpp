@@ -58,12 +58,12 @@ namespace wrench {
 
         } else if (auto jmsjcm = std::dynamic_pointer_cast<JobManagerStandardJobCompletedMessage>(message)) {
             std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
-            jmsjcm->job->applyTaskUpdates(jmsjcm->necessary_state_changes, failure_count_increments);
+            StandardJob::applyTaskUpdates(jmsjcm->necessary_state_changes, failure_count_increments);
             return std::shared_ptr<StandardJobCompletedEvent>(
                     new StandardJobCompletedEvent(jmsjcm->job, jmsjcm->compute_service));
 
         } else if (auto jmsjfm = std::dynamic_pointer_cast<JobManagerStandardJobFailedMessage>(message)) {
-            jmsjfm->job->applyTaskUpdates(jmsjfm->necessary_state_changes, jmsjfm->necessary_failure_count_increments);
+            StandardJob::applyTaskUpdates(jmsjfm->necessary_state_changes, jmsjfm->necessary_failure_count_increments);
             return std::shared_ptr<StandardJobFailedEvent>(
                     new StandardJobFailedEvent(jmsjfm->job, jmsjfm->compute_service, jmsjfm->cause));
 
