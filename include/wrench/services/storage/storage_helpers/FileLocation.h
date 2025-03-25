@@ -60,9 +60,9 @@ namespace wrench {
         std::shared_ptr<StorageService> getServerStorageService();
 #endif
         std::string getDirectoryPath();
-        std::string getFilePath();
+        std::string getFilePath() const;
         [[nodiscard]] bool isScratch() const;
-        std::string toString();
+        std::string toString() const;
 
 
         /**
@@ -108,7 +108,7 @@ namespace wrench {
 //        friend class SimpleStorageServiceBufferized;
         friend class FileTransferThread;
 
-        std::string getADotFilePath();
+        std::string getADotFilePath() const;
         static long dot_file_sequence_number;
 
         /**
@@ -129,7 +129,7 @@ namespace wrench {
                                                                 const std::string &path,
                                                                 bool is_scratch);
 
-        simgrid::s4u::Disk *getDiskOrNull();
+        simgrid::s4u::Disk *getDiskOrNull() const;
 
         static void reclaimFileLocations();
 

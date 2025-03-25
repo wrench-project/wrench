@@ -486,7 +486,7 @@ namespace wrench {
      * @brief Get number of File Transfer Threads that are currently running or are pending
      * @return The number of threads
      */
-    unsigned long SimpleStorageServiceBufferized::countRunningFileTransferThreads() {
+    unsigned long SimpleStorageServiceBufferized::countRunningFileTransferThreads() const {
         return this->running_file_transfer_threads.size() + this->pending_file_transfer_threads.size();
     }
 

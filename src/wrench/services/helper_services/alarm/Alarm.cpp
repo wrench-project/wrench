@@ -51,7 +51,6 @@ namespace wrench {
         WRENCH_INFO("Alarm Service starting with alarm date = %.20f", this->date);
 
         double time_to_sleep = this->date - S4U_Simulation::getClock();
-
         if (time_to_sleep > 0) {
             S4U_Simulation::sleep(time_to_sleep);
         }
