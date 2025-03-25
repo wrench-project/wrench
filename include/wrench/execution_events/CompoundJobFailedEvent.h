@@ -29,7 +29,6 @@ namespace wrench {
      * @brief A "standard job has failed" ExecutionEvent
      */
     class CompoundJobFailedEvent : public ExecutionEvent {
-
     private:
         friend class ExecutionEvent;
 
