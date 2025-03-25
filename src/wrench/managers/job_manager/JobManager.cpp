@@ -1194,7 +1194,7 @@ namespace wrench {
      *
      * @return a CommPort
      */
-    S4U_CommPort *JobManager::getCreatorCommPort() {
+    S4U_CommPort *JobManager::getCreatorCommPort() const {
         return this->creator_commport;
     }
 

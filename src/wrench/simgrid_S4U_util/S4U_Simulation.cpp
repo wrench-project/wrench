@@ -137,12 +137,12 @@ namespace wrench {
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
-     * @param filename the path to a .xml XML platform description file or a .so/.dylib shared object platform file
+     * @param filepath the path to a .xml XML platform description file or a .so/.dylib shared object platform file
      *
      */
-    void S4U_Simulation::setupPlatformFromFile(const std::string &filename) {
+    void S4U_Simulation::setupPlatformFromFile(const std::string &filepath) {
         try {
-            this->engine->load_platform(filename);
+            this->engine->load_platform(filepath);
         } catch (simgrid::ParseError &e) {
             throw std::invalid_argument("Platform description file error: " + std::string(e.what()));
         } catch (std::invalid_argument &) {

@@ -61,8 +61,8 @@ namespace wrench {
 
         static double getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>> &tasks);
 
-        void addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dest, bool redundant_dependencies = false);
-        void removeControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dest);
+        void addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dst, bool redundant_dependencies = false);
+        void removeControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dst);
 
         static void updateReadiness(WorkflowTask *task);
 
@@ -70,8 +70,8 @@ namespace wrench {
 
         unsigned long getNumLevels() const;
 
-        double getStartDate();
-        double getCompletionDate();
+        double getStartDate() const;
+        double getCompletionDate() const;
 
         std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
         std::map<std::string, std::shared_ptr<DataFile>> getInputFileMap() const;

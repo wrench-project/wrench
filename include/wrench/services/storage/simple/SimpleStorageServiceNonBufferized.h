@@ -135,18 +135,18 @@ namespace wrench {
 
 
         bool processFileCopyRequest(
-                std::shared_ptr<FileLocation> &src,
-                std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src_location,
+                std::shared_ptr<FileLocation> &dst_location,
                 S4U_CommPort *answer_commport);
 
         bool processFileCopyRequestIAmTheSource(
-                std::shared_ptr<FileLocation> &src,
-                std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src_location,
+                std::shared_ptr<FileLocation> &dst_location,
                 S4U_CommPort *answer_commport);
 
         bool processFileCopyRequestIAmNotTheSource(
-                std::shared_ptr<FileLocation> &src,
-                std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src_location,
+                std::shared_ptr<FileLocation> &dst_location,
                 S4U_CommPort *answer_commport);
 
 

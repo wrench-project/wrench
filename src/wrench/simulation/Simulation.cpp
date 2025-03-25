@@ -560,7 +560,7 @@ namespace wrench {
      * @brief Check that the simulation is correctly instantiated by the user
      *
      */
-    void Simulation::checkSimulationSetup() {
+    void Simulation::checkSimulationSetup() const {
         // Check that the simulation is initialized
         if (not this->s4u_simulation->isInitialized()) {
             throw std::runtime_error("Simulation is not initialized");

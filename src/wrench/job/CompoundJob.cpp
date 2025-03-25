@@ -656,7 +656,7 @@ namespace wrench {
     /**
      * @brief Print the list of actions with their children and parents
      */
-    void CompoundJob::printActionDependencies() {
+    void CompoundJob::printActionDependencies() const {
         for (auto const &action: this->actions) {
             std::cerr << "* " << Action::getActionTypeAsString(action) << "-" << action->getName() << " (" << action->getStateAsString() << ")\n";
             if (not action->children.empty()) {
