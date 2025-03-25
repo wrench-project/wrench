@@ -135,7 +135,7 @@ namespace wrench {
      * @brief Get the VM's state
      * @return a state
      */
-    S4U_VirtualMachine::State S4U_VirtualMachine::getState() {
+    S4U_VirtualMachine::State S4U_VirtualMachine::getState() const {
         return this->state;
     }
 
@@ -143,7 +143,7 @@ namespace wrench {
      * @brief Get the VM's state as a string
      * @return a state as a string
      */
-    std::string S4U_VirtualMachine::getStateAsString() {
+    std::string S4U_VirtualMachine::getStateAsString() const {
         switch (this->state) {
         case State::DOWN:
             return "DOWN";
@@ -158,18 +158,18 @@ namespace wrench {
 
     /**
      * @brief Migrate the VM
-     * @param dest_pm_name: the name of the host to which to migrate the VM
+     * @param dst_pm_name: the name of the host to which to migrate the VM
      */
-    void S4U_VirtualMachine::migrate(const std::string& dest_pm_name) {
+    void S4U_VirtualMachine::migrate(const std::string& dst_pm_name) {
         std::string src_pm_hostname = this->vm->get_pm()->get_name();
-        simgrid::s4u::Host* dest_pm = simgrid::s4u::Host::by_name(dest_pm_name);
+        simgrid::s4u::Host* dest_pm = simgrid::s4u::Host::by_name(dst_pm_name);
 
         double mig_sta = simgrid::s4u::Engine::get_clock();
         sg_vm_migrate(this->vm, dest_pm);
         double mig_end = simgrid::s4u::Engine::get_clock();
-        this->pm_name = dest_pm_name;
+        this->pm_name = dst_pm_name;
         S4U_VirtualMachine::vm_to_pm_map[this->vm_name] = this->pm_name;
-        WRENCH_INFO("%s migrated to %s in %g s", src_pm_hostname.c_str(), dest_pm_name.c_str(), mig_end - mig_sta);
+        WRENCH_INFO("%s migrated to %s in %g s", src_pm_hostname.c_str(), dst_pm_name.c_str(), mig_end - mig_sta);
     }
 
     /**

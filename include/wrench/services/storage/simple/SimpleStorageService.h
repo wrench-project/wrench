@@ -99,8 +99,8 @@ namespace wrench {
 
         std::string getMountPoint() override;
         std::set<std::string> getMountPoints() override;
-        bool hasMultipleMountPoints();
-        bool hasMountPoint(const std::string &mp);
+        bool hasMultipleMountPoints() const;
+        bool hasMountPoint(const std::string &mp) const;
 
         sg_size_t getTotalSpace() override;
 
@@ -170,7 +170,7 @@ namespace wrench {
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
-        simgrid::s4u::Disk *getDiskForPathOrNull(const std::string &path);
+        simgrid::s4u::Disk *getDiskForPathOrNull(const std::string &path) const;
 
         /***********************/
         /** \endcond          **/
@@ -253,7 +253,7 @@ namespace wrench {
 
 //        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
-        std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location, std::shared_ptr<simgrid::fsmod::File> &opened_file);
+        std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location, std::shared_ptr<simgrid::fsmod::File> &opened_file) const;
         std::shared_ptr<FailureCause> validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes_to_write, std::shared_ptr<simgrid::fsmod::File> &opened_file);
         std::shared_ptr<FailureCause> validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location, std::shared_ptr<FileLocation> &dst_location,
                                                               std::shared_ptr<simgrid::fsmod::File> &src_opened_file, std::shared_ptr<simgrid::fsmod::File> &dst_opened_file);

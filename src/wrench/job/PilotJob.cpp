@@ -26,7 +26,7 @@ namespace wrench {
      * @brief Get the state of the pilot job
      * @return the state
      */
-    PilotJob::State PilotJob::getState() {
+    PilotJob::State PilotJob::getState() const {
         return this->state;
     }
 

@@ -198,7 +198,7 @@ namespace wrench {
         std::string scratch_space_mount_point;
         //        std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
-        std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries, bool simulate_it);
+        std::map<std::string, double> getServiceResourceInformation(const std::string &key, bool simulate_it);
     };
 
 

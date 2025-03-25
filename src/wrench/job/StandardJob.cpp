@@ -143,7 +143,7 @@ namespace wrench {
      * @brief Get the state of the standard job
      * @return the state
      */
-    StandardJob::State StandardJob::getState() {
+    StandardJob::State StandardJob::getState() const {
         return this->state;
     }
 

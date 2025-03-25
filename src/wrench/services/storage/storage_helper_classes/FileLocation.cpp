@@ -160,7 +160,7 @@ namespace wrench {
      *
      * @return A string
      */
-    std::string FileLocation::toString() {
+    std::string FileLocation::toString() const {
         if (this->is_scratch) {
             return "SCRATCH:" + this->file->getID();
         } else {
@@ -228,7 +228,7 @@ namespace wrench {
      * @brief Get the location's file path
      * @return a path
      */
-    std::string FileLocation::getFilePath() {
+    std::string FileLocation::getFilePath() const {
         if (this->is_scratch) {
             throw std::invalid_argument("FileLocation::getFilePath(): No path for a SCRATCH location");
         }
@@ -239,7 +239,7 @@ namespace wrench {
      * @brief Get a path to a dot-file for the location
      * @return a path
      */
-    std::string FileLocation::getADotFilePath() {
+    std::string FileLocation::getADotFilePath() const {
         if (this->is_scratch) {
             throw std::invalid_argument("FileLocation::getDotFilePath(): No path for a SCRATCH location");
         }
@@ -347,7 +347,7 @@ namespace wrench {
      * @brief Gets the simgrid disk associated to a location
      * @return a simgrid disk or nullpts if none
      */
-    simgrid::s4u::Disk *FileLocation::getDiskOrNull() {
+    simgrid::s4u::Disk *FileLocation::getDiskOrNull() const {
         if (this->is_scratch) {
             return nullptr;
         }
