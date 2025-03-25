@@ -87,7 +87,6 @@ namespace wrench {
 
             // Do a bulk-synchronous loop of 10 iterations
             for (unsigned long iter = 0; iter < 10; iter++) {
-
                 if (my_rank == 0) {
                     WRENCH_INFO("Iteration %lu", iter);
                 }
