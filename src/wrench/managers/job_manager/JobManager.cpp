@@ -575,7 +575,7 @@ namespace wrench {
         auto callback_commport = this->commport;
         std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
         cjob->addCustomAction(
-                "pilot_job_",
+                "pilot_job_" + job->getName() + "_action",
                 0, 0,
                 [callback_commport, job, compute_service](const std::shared_ptr<ActionExecutor> &executor) {
                     // Create a bare-metal compute service and start it
@@ -756,6 +756,7 @@ namespace wrench {
 
         job->getParentComputeService()->terminateJob(job->compound_job);
         job->state = PilotJob::State::TERMINATED;
+        this->num_running_pilot_jobs--;
     }
 
     /**
@@ -1020,28 +1021,6 @@ namespace wrench {
         job->getOriginCallbackCommPort()->dputMessage(
                 new ComputeServicePilotJobExpiredMessage(job, std::move(compute_service), 0.0));
     }
-
-    //    /**
-    //  * @brief Process a pilot job failing (whatever that means)
-    //  * @param job: the pilot job that failed
-    //  * @param compute_service: the compute service on which it was running
-    //  * @param cause: the failure cause
-    //  */
-    //    void JobManager::processPilotJobFailure(const std::shared_ptr<PilotJob> &job,
-    //                                            std::shared_ptr<ComputeService> compute_service,
-    //                                            std::shared_ptr<FailureCause> cause) {
-    //        // update job state
-    //        job->state = PilotJob::State::FAILED;
-    //        this->num_running_pilot_jobs--;
-    //
-    //        // Remove the job from the "dispatched" list and put it in the completed list
-    //        this->jobs_dispatched.erase(job->compound_job);
-    //
-    //        // Forward the notification to the source
-    //        WRENCH_INFO("Forwarding to %s", job->getOriginCallbackCommPort()->get_cname());
-    //        S4U_CommPort::dputMessage(job->getOriginCallbackCommPort(),
-    //                                 new ComputeServicePilotJobFailedMessage(job, std::move(compute_service), std::move(cause), 0.0));
-    //    }
 
     /**
      * @brief Create a Compound job

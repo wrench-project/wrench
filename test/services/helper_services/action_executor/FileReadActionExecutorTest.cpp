@@ -150,6 +150,7 @@ private:
 
         // coverage
         wrench::Action::getActionTypeAsString(file_read_action);
+        file_read_action->getNumBytesToRead();
         file_read_action->getFile();
         file_read_action->getFileLocations();
 

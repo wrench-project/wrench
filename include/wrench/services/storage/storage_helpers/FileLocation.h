@@ -14,7 +14,6 @@
 #include <iostream>
 #include <utility>
 #include <unordered_map>
-#include <simgrid/s4u.hpp>
 
 #include <wrench/data_file/DataFile.h>
 
