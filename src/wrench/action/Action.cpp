@@ -80,7 +80,7 @@ namespace wrench {
      * @param state: an action state
      * @return a string
      */
-    std::string Action::stateToString(Action::State state) {
+    std::string Action::stateToString(const Action::State state) {
         switch (state) {
             case Action::State::NOT_READY:
                 return "NOT READY";
@@ -120,7 +120,7 @@ namespace wrench {
      * @brief Sets the action's state to a new value
      * @param new_state: the new state
      */
-    void Action::setState(Action::State new_state) {
+    void Action::setState(const Action::State new_state) {
         auto old_state = this->execution_history.top().state;
         this->job.lock()->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
         //        std::cerr << "ACTION " << this->getName() << ": " << Action::stateToString(old_state) << "-->" << Action::stateToString(new_state) << "\n";
@@ -139,7 +139,7 @@ namespace wrench {
      * @brief Sets the action's start date
      * @param date: the date 
      */
-    void Action::setStartDate(double date) {
+    void Action::setStartDate(const double date) {
         this->execution_history.top().start_date = date;
     }
 
@@ -147,7 +147,7 @@ namespace wrench {
      * @brief Sets the action's end date
      * @param date: the date
      */
-    void Action::setEndDate(double date) {
+    void Action::setEndDate(const double date) {
         this->execution_history.top().end_date = date;
     }
 
@@ -212,7 +212,7 @@ namespace wrench {
      * @brief Create a new execution data structure (e.g., after a restart)
      * @param state: the action state
      */
-    void Action::newExecution(Action::State state) {
+    void Action::newExecution(const Action::State state) {
         Action::State old_state;
         if (!this->execution_history.empty()) {
             old_state = this->execution_history.top().state;

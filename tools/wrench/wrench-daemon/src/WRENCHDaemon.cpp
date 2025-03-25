@@ -137,12 +137,12 @@ void writeStringToSharedMemorySegment(int shm_segment_id, const std::string &con
 * @return string read
 */
 std::string readStringFromSharedMemorySegment(int shm_segment_id) {
-    auto shm_segment = (char *) shmat(shm_segment_id, nullptr, 0);
-    if ((long) shm_segment == -1) {
+    auto shm_segment = static_cast<char*>(shmat(shm_segment_id, nullptr, 0));
+    if (reinterpret_cast<long>(shm_segment) == -1) {
         perror("WARNING: shmat(): ");
         return "n/a";
     }
-    std::string to_return = std::string(shm_segment);
+    auto to_return = std::string(shm_segment);
     if (shmdt(shm_segment) == -1) {
         perror("WARNING: shmdt(): ");
     }

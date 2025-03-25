@@ -894,7 +894,7 @@ namespace wrench {
         }
         try {
             return host->get_pstate();
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberOfPstates():: Was not able to get the energy consumed by the host. "
                     "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
