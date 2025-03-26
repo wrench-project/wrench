@@ -649,6 +649,9 @@ namespace wrench {
     }
 
     void ServerlessComputeService::initiateImageCopyToComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image) {
+        // Add the image to the being_copied_images data structure for this host
+        _state_of_the_system->_being_copied_images[computeHost].insert(image);
+        
         // Initiate an asynchronous action that copies the image (identified by imageID)
         // from the head node storage service to the compute node's storage service.
         // This might involve creating and starting a dedicated ActionExecutor.
@@ -672,7 +675,9 @@ namespace wrench {
 
         auto custom_message = new ServerlessComputeServiceNodeCopyCompleteMessage(
             action,
-            image, 0);
+            image, 
+            computeHost,
+            0);
 
         auto action_executor = std::make_shared<ActionExecutor>(
             computeHost,
@@ -689,14 +694,26 @@ namespace wrench {
         WRENCH_INFO("Starting an action executor...");
         action_executor->start(action_executor, true, false);
 
-        WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID(), computeHost.c_str());
+        WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID().c_str(), computeHost.c_str());
     }
-    
+
     void ServerlessComputeService::initiateImageRemovalFromComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image) {
-        // Initiate an asynchronous action that removes the specified image from the compute node.
-        WRENCH_INFO("Initiating image removal for image [%s] from compute host [%s]", image->getID(), computeHost.c_str());
+        // Immediately remove the image from the copied_images data structure
+        _state_of_the_system->_copied_images[computeHost].erase(image);
+        
+        // Now remove the file from the storage service
+        auto storage_service = _state_of_the_system->_compute_storages[computeHost];
+        auto image_location = FileLocation::LOCATION(storage_service, image);
+        
+        try {
+            StorageService::removeFileAtLocation(image_location);
+            WRENCH_INFO("Removed image [%s] from compute host [%s]", image->getID().c_str(), computeHost.c_str());
+        } catch (const std::exception& e) {
+            WRENCH_WARN("Failed to remove image [%s] from compute host [%s]: %s", 
+                      image->getID().c_str(), computeHost.c_str(), e.what());
+        }
     }
 
 }; // namespace wrench
 
-    
+

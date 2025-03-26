@@ -19,16 +19,17 @@
 #include <wrench/services/compute/serverless/Invocation.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/data_file/DataFile.h>
- 
-namespace wrench {
- 
+
+namespace wrench
+{
+
     /***********************/
     /** \cond DEVELOPER    */
     /***********************/
 
-    class ServerlessStateOfTheSystem {
+    class ServerlessStateOfTheSystem
+    {
     public:
-    
         // getter methods
         // TODO: what does the scheduler need and what does it not?
         std::vector<std::string> getComputeHosts();
@@ -43,13 +44,16 @@ namespace wrench {
         std::shared_ptr<StorageService> getHeadStorageService();
         std::set<std::shared_ptr<DataFile>> getDownloadedImageFiles();
         sg_size_t getFreeSpaceOnHeadStorage();
+        std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
+        std::set<std::shared_ptr<DataFile>> getImagesCopiedToNode(const std::string &node);
+        bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);
+        ~ServerlessStateOfTheSystem();
 
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
 
     private:
-
         friend class ServerlessComputeService;
 
         explicit ServerlessStateOfTheSystem(std::vector<std::string> compute_hosts);
@@ -87,14 +91,14 @@ namespace wrench {
         std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
         sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shennanigans
 
-        ~ServerlessStateOfTheSystem();
+        std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _being_copied_images;
+        std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _copied_images;
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
- 
+
 } // namespace wrench
- 
+
 #endif // WRENCH_SERVERLESSSTATEOFTHESYSTEM_H
- 
