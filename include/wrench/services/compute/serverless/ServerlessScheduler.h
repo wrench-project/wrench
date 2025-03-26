@@ -22,9 +22,6 @@
  
  namespace wrench {
  
-     // Forward declaration for StateOfTheSystem; TODO: Implement this.
-     class ServerlessStateOfTheSystem;
- 
      /**
       * @brief Represents a decision for image management.
       *        This decision indicates which images should be removed and which should be downloaded/copied.
@@ -55,7 +52,7 @@
           * @param state The current system state snapshot.
           * @return ImageManagementDecision structure with images to delete and images to download/copy.
           */
-         virtual ImageManagementDecision manageImages(
+         virtual std::shared_ptr<ImageManagementDecision> manageImages(
              const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
              std::shared_ptr<ServerlessStateOfTheSystem> state
          ) = 0;
