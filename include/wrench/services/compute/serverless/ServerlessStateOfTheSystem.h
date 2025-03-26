@@ -7,6 +7,9 @@
  * (at your option) any later version.
  */
 
+#ifndef WRENCH_SERVERLESSSTATEOFTHESYSTEM_H
+#define WRENCH_SERVERLESSSTATEOFTHESYSTEM_H
+
 #include <vector>
 #include <map>
 #include <queue>
@@ -15,10 +18,7 @@
 #include <string>
 #include <wrench/services/compute/serverless/Invocation.h>
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/services/storage/DataFile.h>
-
-#ifndef WRENCH_SERVERLESSSTATEOFTHESYSTEM_H
-#define WRENCH_SERVERLESSSTATEOFTHESYSTEM_H
+#include <wrench/data_file/DataFile.h>
  
 namespace wrench {
  
@@ -88,7 +88,7 @@ namespace wrench {
         sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shennanigans
 
         ~ServerlessStateOfTheSystem();
-    }
+    };
 
     /***********************/
     /** \endcond           */
