@@ -26,7 +26,7 @@
  #include "wrench/services/storage/simple/SimpleStorageService.h"
  #include "wrench/simulation/Simulation.h"
 
- WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
+ WRENCH_LOG_CATEGORY(wrench_core_serverless_state_of_the_system, "Log category for Serverless State of the System");
  
  namespace wrench {
 
@@ -34,6 +34,11 @@
         _compute_hosts = std::move(compute_hosts);
         for (const auto& compute_host : _compute_hosts) {
             _available_cores[compute_host] = S4U_Simulation::getHostNumCores(compute_host);
+        }
+
+        for (const auto& compute_host : _compute_hosts) {
+            _being_copied_images[compute_host] = {};
+            _copied_images[compute_host] = {};
         }
     }
 
@@ -55,6 +60,31 @@
     std::shared_ptr<StorageService> ServerlessStateOfTheSystem::getHeadStorageService() { return _head_storage_service; }
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getDownloadedImageFiles() { return _downloaded_image_files; }
     sg_size_t ServerlessStateOfTheSystem::getFreeSpaceOnHeadStorage() { return _free_space_on_head_storage; }
+    
+    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(const std::string& node) {
+        if (_being_copied_images.find(node) != _being_copied_images.end()) {
+            return _being_copied_images[node];
+        }
+        return {};
+    }
+    
+    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesCopiedToNode(const std::string& node) {
+        if (_copied_images.find(node) != _copied_images.end()) {
+            return _copied_images[node];
+        }
+        return {};
+    }
+    
+    bool ServerlessStateOfTheSystem::isImageOnNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
+        // Check if the image has been copied to the node
+        if (_copied_images.find(node) != _copied_images.end()) {
+            if (_copied_images[node].find(image) != _copied_images[node].end()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
  }; // namespace wrench
  
