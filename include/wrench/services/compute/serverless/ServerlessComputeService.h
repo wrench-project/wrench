@@ -51,11 +51,11 @@ namespace wrench {
 
         friend class FunctionManager;
 
-        std::shared_ptr<Invocation> invokeFunction(std::shared_ptr<Function> function, 
+        std::shared_ptr<Invocation> invokeFunction(std::shared_ptr<Function> function,
                                                    std::shared_ptr<FunctionInput> input, 
                                                    S4U_CommPort *notify_commport);
 
-        bool registerFunction(std::shared_ptr<Function> function, 
+        bool registerFunction(const std::shared_ptr<Function>& function,
                               double time_limit_in_seconds, 
                               sg_size_t disk_space_limit_in_bytes, 
                               sg_size_t RAM_limit_in_bytes, 
@@ -95,6 +95,7 @@ namespace wrench {
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
         std::shared_ptr<wrench::ServerlessScheduler> _scheduler;
+        std::shared_ptr<wrench::ServerlessStateOfTheSystem> _state_of_the_system;
 
         void startHeadStorageService();
         void startComputeHostsServices();
