@@ -29,17 +29,21 @@ WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless
 
 namespace wrench {
     ServerlessComputeService::ServerlessComputeService(const std::string& hostname,
-                                                       std::vector<std::string> compute_hosts,
-                                                       std::string head_storage_service_mount_point,
-                                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                       WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
+                                                           std::vector<std::string> compute_hosts,
+                                                           std::string head_storage_service_mount_point,
+                                                           std::shared_ptr<ServerlessScheduler> scheduler,
+                                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
         ComputeService(hostname,
                        "ServerlessComputeService", "") {
 
-        auto _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
+        _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
             new ServerlessStateOfTheSystem(std::move(compute_hosts)));
 
-        _head_storage_service_mount_point = std::move(head_storage_service_mount_point);
+        _state_of_the_system->_head_storage_service_mount_point = std::move(head_storage_service_mount_point);
+
+        _scheduler = scheduler;
+        
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         // Set default and specified properties
