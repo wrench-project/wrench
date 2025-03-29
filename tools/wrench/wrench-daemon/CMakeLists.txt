@@ -1,6 +1,6 @@
 ﻿set(CMAKE_CXX_STANDARD 17)
 
-include_directories(include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
+include_directories(include/ ${SimGrid_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
 
 find_file(ASIO_HEADER_FOUND asio.hpp QUIET)
 if (NOT ASIO_HEADER_FOUND)
@@ -25,7 +25,7 @@ find_package(Boost REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
-include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench /opt/local/include)
+include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} /usr/local/include /opt/local/include /usr/local/include/wrench /opt/local/include)
 
 # Add source to this project's executable.
 add_executable(wrench-daemon EXCLUDE_FROM_ALL
@@ -59,6 +59,7 @@ if (ENABLE_BATSCHED)
             wrenchwfcommonsworkflowparser
             ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
             ${SimGrid_LIBRARY}
+            ${FSMOD_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             ${ZMQ_LIBRARY}
@@ -70,6 +71,7 @@ else()
             wrenchwfcommonsworkflowparser
             ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
             ${SimGrid_LIBRARY}
+            ${FSMOD_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             )
