@@ -396,6 +396,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask11getPriorityEv"><code class="docutils literal notranslate"><span class="pre">getPriority()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask19getReadInputEndDateEv"><code class="docutils literal notranslate"><span class="pre">getReadInputEndDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask21getReadInputStartDateEv"><code class="docutils literal notranslate"><span class="pre">getReadInputStartDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask12getReadyDateEv"><code class="docutils literal notranslate"><span class="pre">getReadyDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask12getSharedPtrEv"><code class="docutils literal notranslate"><span class="pre">getSharedPtr()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask12getStartDateEv"><code class="docutils literal notranslate"><span class="pre">getStartDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask8getStateEv"><code class="docutils literal notranslate"><span class="pre">getState()</span></code></a></li>
@@ -924,6 +925,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask12getReadyDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask12getReadyDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask12getReadyDateEv"></span><span id="wrench::WorkflowTask::getReadyDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a3c12441213bf188058c4320a0111ef39"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getReadyDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the task’s ready date (the last time it became ready after being not ready) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a date (-1 if task has not become ready yet) </p>
 </dd>
 </dl>
 </dd></dl>
