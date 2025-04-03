@@ -31,6 +31,14 @@ namespace wrench {
 
     std::shared_ptr<DataFile> RegisteredFunction::getFunctionImage() {
             return _function->getImage()->getFile();
-        }
+    }
+
+    std::shared_ptr<Function> RegisteredFunction::getFunction() {
+        return _function;
+    }
+    
+    double RegisteredFunction::getTimeLimit() {
+        return _time_limit;
+    }
 
 } // namespace wrench

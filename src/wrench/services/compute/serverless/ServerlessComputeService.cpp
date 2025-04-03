@@ -43,7 +43,7 @@ namespace wrench {
         _state_of_the_system->_head_storage_service_mount_point = std::move(head_storage_service_mount_point);
 
         _scheduler = scheduler;
-        
+
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
         // Set default and specified properties
