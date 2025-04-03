@@ -1,12 +1,21 @@
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Add schedulers to the project
+set(SCHEDULER_SOURCES
+        schedulers/random_scheduler/RandomServerlessScheduler.cpp
+        schedulers/random_scheduler/RandomServerlessScheduler.h
+        schedulers/workload_balancing_scheduler/WorkloadBalancingServerlessScheduler.cpp
+        schedulers/workload_balancing_scheduler/WorkloadBalancingServerlessScheduler.h)
+
+
 # Add source to this project's executable.
 add_executable(wrench-example-serverless
         EXCLUDE_FROM_ALL
         ServerlessExampleExecutionController.h
         ServerlessExampleExecutionController.cpp
-        ServerlessExample.cpp)
+        ServerlessExample.cpp
+        ${SCHEDULER_SOURCES})
 
 add_custom_target(
         wrench-example-serverless-platform-file
