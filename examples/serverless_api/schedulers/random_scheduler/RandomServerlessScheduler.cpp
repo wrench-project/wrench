@@ -1,4 +1,5 @@
 #include <wrench.h>
+
 #include "RandomServerlessScheduler.h"
 
 namespace wrench {
@@ -10,7 +11,7 @@ namespace wrench {
     // and then determine per-node which images need to be copied (if missing) or removed (a random extra image).
     std::shared_ptr<ImageManagementDecision> RandomServerlessScheduler::manageImages(
         const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-        std::shared_ptr<ServerlessStateOfTheSystem> state
+        const std::shared_ptr<ServerlessStateOfTheSystem>& state
     ) {
         auto decision = std::make_shared<ImageManagementDecision>();
         
@@ -38,7 +39,7 @@ namespace wrench {
             if (!candidates.empty()) {
                 // Pick a random candidate
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
-                std::string chosenNode = candidates[dist(rng)];
+                const std::string& chosenNode = candidates[dist(rng)];
                 // Decrement available core for chosen node
                 availableCores[chosenNode]--;
 
@@ -96,7 +97,7 @@ namespace wrench {
             
             if (!extras.empty()) {
                 std::uniform_int_distribution<size_t> dist(0, extras.size() - 1);
-                auto chosenExtra = extras[dist(rng)];
+                const auto& chosenExtra = extras[dist(rng)];
                 decision->imagesToRemove[node].push_back(chosenExtra);
             }
         }
@@ -107,7 +108,7 @@ namespace wrench {
     // Implementation of scheduleFunctions
     std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> RandomServerlessScheduler::scheduleFunctions(
         const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-        std::shared_ptr<ServerlessStateOfTheSystem> state
+        const std::shared_ptr<ServerlessStateOfTheSystem>& state
     ) {
         std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> schedulingDecisions;
         auto availableCores = state->getAvailableCores();
@@ -130,7 +131,7 @@ namespace wrench {
             if (!candidates.empty()) {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
                 std::string chosenNode = candidates[dist(rng)];
-                schedulingDecisions.push_back({inv, chosenNode});
+                schedulingDecisions.emplace_back(inv, chosenNode);
                 availableCores[chosenNode]--;
             } else {
                 // No suitable node with the image available; this invocation will be 
@@ -141,5 +142,6 @@ namespace wrench {
         return schedulingDecisions;
     }
 
-    RandomServerlessScheduler::~RandomServerlessScheduler() = default;
+    // RandomServerlessScheduler::~RandomServerlessScheduler() = default;
+
 } // namespace wrench
