@@ -32,7 +32,7 @@ namespace wrench
     public:
         // getter methods
         // TODO: what does the scheduler need and what does it not?
-        std::vector<std::string> getComputeHosts();
+        const std::vector<std::string>& getComputeHosts();
         std::map<std::string, unsigned long> getAvailableCores();
         std::queue<std::shared_ptr<Invocation>> getNewInvocations();
         std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> getAdmittedInvocations();
@@ -56,12 +56,12 @@ namespace wrench
     private:
         friend class ServerlessComputeService;
 
-        explicit ServerlessStateOfTheSystem(std::vector<std::string> compute_hosts);
+        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts);
 
         // map of Registered functions sorted by function name
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         // vector of compute host names
-        std::vector<std::string> _compute_hosts;
+        const std::vector<std::string>& _compute_hosts;
 
         // map of available cores on each compute host
         std::map<std::string, unsigned long> _available_cores;

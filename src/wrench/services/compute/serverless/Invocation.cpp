@@ -17,11 +17,12 @@ namespace wrench {
      * @param function_input The input for the function.
      * @param notify_commport The communication port for notifications.
      */
-    Invocation::Invocation(std::shared_ptr<RegisteredFunction> registered_function,
-                           std::shared_ptr<FunctionInput> function_input,
+    Invocation::Invocation(const std::shared_ptr<RegisteredFunction> &registered_function,
+                           const std::shared_ptr<FunctionInput> &function_input,
                            S4U_CommPort* notify_commport) : _registered_function(registered_function),
                                                             _function_input(function_input),
                                                             _done(false),
+                                                            _success(false),
                                                             _notify_commport(notify_commport)
     {
     }
@@ -58,13 +59,13 @@ namespace wrench {
      * @brief Gets the registered function.
      * @return A shared pointer to the registered function.
      */
-    std::shared_ptr<RegisteredFunction> Invocation::getRegisteredFunction() const { return _registered_function; }
+    const std::shared_ptr<RegisteredFunction>& Invocation::getRegisteredFunction() const { return _registered_function; }
 
     /**
      * @brief Gets the cause of failure.
      * @return A shared pointer to the failure cause.
      */
-    std::shared_ptr<FailureCause> Invocation::getFailureCause() const { 
+    const std::shared_ptr<FailureCause>& Invocation::getFailureCause() const {
         if (_done) {
             return _failure_cause;
         }

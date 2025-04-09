@@ -30,8 +30,8 @@
  
  namespace wrench {
 
-    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(std::vector<std::string> compute_hosts) {
-        _compute_hosts = std::move(compute_hosts);
+    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts) {
+        _compute_hosts = compute_hosts;
         for (const auto& compute_host : _compute_hosts) {
             _available_cores[compute_host] = S4U_Simulation::getHostNumCores(compute_host);
         }
@@ -42,13 +42,11 @@
         }
     }
 
-    ServerlessStateOfTheSystem::~ServerlessStateOfTheSystem() {
-        // Any necessary cleanup (if needed) goes here.
-    }
+    ServerlessStateOfTheSystem::~ServerlessStateOfTheSystem() = default;
 
     // getters
     // TODO: code commenting
-    std::vector<std::string> wrench::ServerlessStateOfTheSystem::getComputeHosts() { return _compute_hosts; }
+    const std::vector<std::string>& ServerlessStateOfTheSystem::getComputeHosts() { return _compute_hosts; }
     std::map<std::string, unsigned long> ServerlessStateOfTheSystem::getAvailableCores() { return _available_cores; }
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getNewInvocations() { return _newInvocations; }
     std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> ServerlessStateOfTheSystem::getAdmittedInvocations() { return _admittedInvocations; }
