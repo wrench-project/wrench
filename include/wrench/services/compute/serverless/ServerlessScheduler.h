@@ -9,16 +9,11 @@
 
  #ifndef WRENCH_SERVERLESSSCHEDULER_H
  #define WRENCH_SERVERLESSSCHEDULER_H
- 
- #include <wrench/managers/function_manager/Function.h>
- #include <wrench/managers/function_manager/FunctionManager.h>
- #include <wrench/managers/function_manager/RegisteredFunction.h>
+
  #include <wrench/services/compute/serverless/Invocation.h>
  #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
- #include <memory>
  #include <vector>
  #include <string>
- #include <utility>
  
  namespace wrench {
  
@@ -54,7 +49,7 @@
           */
          virtual std::shared_ptr<ImageManagementDecision> manageImages(
              const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-             std::shared_ptr<ServerlessStateOfTheSystem> state
+             const std::shared_ptr<ServerlessStateOfTheSystem>& state
          ) = 0;
  
          /**
@@ -68,7 +63,7 @@
           */
          virtual std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> scheduleFunctions(
              const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-             std::shared_ptr<ServerlessStateOfTheSystem> state
+             const std::shared_ptr<ServerlessStateOfTheSystem>& state
          ) = 0;
      };
  
