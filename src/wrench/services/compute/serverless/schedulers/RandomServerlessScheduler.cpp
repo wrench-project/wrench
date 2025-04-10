@@ -1,6 +1,6 @@
 #include <wrench.h>
 
-#include "RandomServerlessScheduler.h"
+#include <wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h>
 
 namespace wrench {
     // Constructor implementation
