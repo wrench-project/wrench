@@ -97,8 +97,8 @@ include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_
 
 
 # For MacOS's MacPorts
-set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
-include_directories(/opt/local/include)
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/local/lib)
+include_directories(/usr/local/include)
 
 # library header files
 set(HEADER_FILES
@@ -139,6 +139,8 @@ set(HEADER_FILES
         include/wrench/services/compute/serverless/Invocation.h
         include/wrench/services/compute/serverless/ServerlessScheduler.h
         include/wrench/services/compute/serverless/ServerlessStateOfTheSystem.h
+        include/wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h
+        include/wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h
         include/wrench/services/compute/cloud/CloudComputeService.h
         include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
@@ -349,6 +351,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.cpp
         src/wrench/services/compute/serverless/Invocation.cpp
         src/wrench/services/compute/serverless/ServerlessStateOfTheSystem.cpp
+        src/wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.cpp
+        src/wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
         include/wrench/services/compute/cloud/CloudComputeServiceMessage.h
