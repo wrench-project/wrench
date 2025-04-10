@@ -35,16 +35,17 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param num_actions: the number of actions
-     * @param compute_services: a set of compute services available to run actions
-     * @param storage_services: a set of storage services available to store data files
+     * @param compute_service
+     * @param storage_service
+     * @param compute_service: a set of compute services available to run actions
+     * @param storage_service: a set of storage services available to store data files
      * @param hostname: the name of the host on which to start the WMS
      */
-    ServerlessExampleExecutionController::ServerlessExampleExecutionController(std::shared_ptr<ServerlessComputeService> compute_service,
-                                                                               std::shared_ptr<SimpleStorageService> storage_service,
+    ServerlessExampleExecutionController::ServerlessExampleExecutionController(const std::shared_ptr<ServerlessComputeService>& compute_service,
+                                                                               const std::shared_ptr<SimpleStorageService>& storage_service,
                                                                                const std::string &hostname) : ExecutionController(hostname, "me"),
-                                                                                                              compute_service(std::move(compute_service)),
-                                                                                                              storage_service(std::move(storage_service)) {
+                                                                                                              compute_service(compute_service),
+                                                                                                              storage_service(storage_service) {
     }
 
     /**
@@ -59,17 +60,17 @@ namespace wrench {
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<FunctionInput>& input, const std::shared_ptr<StorageService>& service) -> std::string {
-            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            const auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             WRENCH_INFO("I AM USER CODE");
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
-        auto image_file = wrench::Simulation::addFile("input_file", 100 * MB);
-        auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
-        wrench::StorageService::createFileAtLocation(image_location);
-        wrench::StorageService::createFileAtLocation(code_location);
+        auto image_file = Simulation::addFile("input_file", 100 * MB);
+        auto source_code = Simulation::addFile("source_code", 10 * MB);
+        auto image_location = FileLocation::LOCATION(this->storage_service, image_file);
+        auto code_location = FileLocation::LOCATION(this->storage_service, source_code);
+        StorageService::createFileAtLocation(image_location);
+        StorageService::createFileAtLocation(code_location);
 
         auto function1 = function_manager->createFunction("Function 1", lambda, image_location, code_location);
 
