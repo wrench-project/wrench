@@ -2,7 +2,7 @@
  * WorkloadBalancingServerlessScheduler.cpp
  */
 
-#include "WorkloadBalancingServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
 
 namespace wrench {
     std::shared_ptr<ImageManagementDecision> WorkloadBalancingServerlessScheduler::manageImages(

@@ -35,7 +35,7 @@
 #include <wrench.h>
 
 #include "ServerlessExampleExecutionController.h"
-#include "schedulers/random_scheduler/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
 
 /**
  * @brief The Simulator's main function

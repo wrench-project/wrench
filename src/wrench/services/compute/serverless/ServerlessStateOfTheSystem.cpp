@@ -30,8 +30,10 @@
  
  namespace wrench {
 
-    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts) {
-        _compute_hosts = compute_hosts;
+    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts)
+        : _compute_hosts(compute_hosts),
+          _head_storage_service(nullptr),
+          _free_space_on_head_storage(0) {
         for (const auto& compute_host : _compute_hosts) {
             _available_cores[compute_host] = S4U_Simulation::getHostNumCores(compute_host);
         }
