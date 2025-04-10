@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -35,7 +35,7 @@ protected:
 
     ServerlessLoadBalancingSchedulerTest() {
         // Create a platform file
-        std::string xml = R"(<?xml version='1.0'?>
+        const std::string xml = R"(<?xml version='1.0'?>
 <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
 <platform version="4.1">
     <zone id="AS0" routing="Full">
@@ -98,7 +98,7 @@ protected:
 
 class MyFunctionInput : public wrench::FunctionInput {
 public:
-    MyFunctionInput(int x1, int x2) : x1_(x1), x2_(x2) {
+    MyFunctionInput(const int x1, const int x2) : x1_(x1), x2_(x2) {
     }
 
     int x1_;
@@ -130,7 +130,7 @@ private:
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
                                   const std::shared_ptr<wrench::StorageService>& service) -> std::string {
-            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            const auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             WRENCH_INFO("I AM USER CODE");
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
@@ -249,12 +249,12 @@ TEST_F(ServerlessLoadBalancingSchedulerTest, Basic) {
 
 void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
     int argc = 1;
-    auto argv = (char**)calloc(argc, sizeof(char*));
+    const auto argv = static_cast<char **>(calloc(argc, sizeof(char *)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
-    auto simulation = wrench::Simulation::createSimulation();
+    const auto simulation = wrench::Simulation::createSimulation();
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -273,18 +273,18 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
     simulation->instantiatePlatform(argv[1]);
 
     std::cerr << "Instantiating a SimpleStorageService on UserHost..." << std::endl;
-    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+    const auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate a serverless compute service */
     std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
     std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
-    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+    const auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
-    std::string user_host = "UserHost";
+    const std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessLoadBalancingSchedulerTestBasicController(this, user_host, serverless_provider, storage_service));
 

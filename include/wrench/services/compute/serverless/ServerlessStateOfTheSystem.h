@@ -61,7 +61,7 @@ namespace wrench
         // map of Registered functions sorted by function name
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         // vector of compute host names
-        const std::vector<std::string>& _compute_hosts;
+        std::vector<std::string> _compute_hosts;
 
         // map of available cores on each compute host
         std::map<std::string, unsigned long> _available_cores;

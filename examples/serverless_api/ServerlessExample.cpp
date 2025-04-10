@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     /*
      * Create a WRENCH simulation object
      */
-    auto simulation = wrench::Simulation::createSimulation();
+    const auto simulation = wrench::Simulation::createSimulation();
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -80,13 +80,13 @@ int main(int argc, char **argv) {
      * storage service is configured to use a buffer size of 50MB when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on UserHost..." << std::endl;
-    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+    const auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate a serverless compute service */
     std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
-    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+    const std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
+    const auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
             "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
