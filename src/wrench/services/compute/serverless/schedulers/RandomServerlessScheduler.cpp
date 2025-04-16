@@ -128,8 +128,6 @@ namespace wrench {
         for (const auto& inv : schedulableInvocations) {
 
             // check if inv has function input
-
-
             WRENCH_INFO("Function input for invocation: %p",
                 inv->_function_input.get());
             WRENCH_INFO("FUNCTION INVOCATION NAME: %s",

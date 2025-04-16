@@ -59,13 +59,9 @@ namespace wrench {
 
         // Register a function
         auto function_manager = this->createFunctionManager();
-        std::function lambda = [](const std::shared_ptr<FunctionInput>& input,
+        std::function lambda = [](std::shared_ptr<FunctionInput> input,
             const std::shared_ptr<StorageService>& service) -> std::string {
-        WRENCH_INFO("Lambda invoked, input pointer: %p", input.get());
         // If possible, log the type info (make sure the object is valid)
-        WRENCH_INFO("Input RTTI: %s", typeid(*input).name());
-
-        WRENCH_INFO("Lambda invoked, inpu");
 
         auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
         if (!real_input) {

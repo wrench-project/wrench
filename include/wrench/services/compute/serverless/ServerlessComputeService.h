@@ -53,7 +53,7 @@ namespace wrench {
         friend class FunctionManager;
 
         std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<Function>& function,
-                                                   const std::shared_ptr<FunctionInput>& input,
+                                                   std::shared_ptr<FunctionInput> input,
                                                    S4U_CommPort *notify_commport);
 
         bool registerFunction(const std::shared_ptr<Function>& function,
@@ -84,7 +84,7 @@ namespace wrench {
 
         void processFunctionInvocationRequest(S4U_CommPort *answer_commport, 
                                               const std::shared_ptr<Function>& function,
-                                              const std::shared_ptr<FunctionInput>& input,
+                                              const std::shared_ptr<FunctionInput> input,
                                               S4U_CommPort *notify_commport);
 
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action, const std::shared_ptr<DataFile>& image_file);
