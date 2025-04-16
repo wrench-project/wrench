@@ -45,7 +45,7 @@ namespace wrench {
          * @brief Gets the output of the function invocation.
          */
         std::shared_ptr<FunctionOutput> getOutput() const;
-        const std::shared_ptr<FunctionInput>& _function_input; // the input for the function
+        std::shared_ptr<FunctionInput> _function_input; // the input for the function
 
 
 

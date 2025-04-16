@@ -151,7 +151,7 @@ namespace wrench {
      * @return std::shared_ptr<Invocation> Pointer to the invocation created by the ServerlessComputeService
      */
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(
-        const std::shared_ptr<Function>& function, const std::shared_ptr<FunctionInput>& input, S4U_CommPort* notify_commport) {
+        const std::shared_ptr<Function>& function, const std::shared_ptr<FunctionInput> input, S4U_CommPort* notify_commport) {
         WRENCH_INFO("Serverless Provider received invoke function %s", function->getName().c_str());
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
@@ -189,22 +189,6 @@ namespace wrench {
         while (processNextMessage()) {
             admitInvocations();
             scheduleInvocations();
-            
-            if (!_state_of_the_system->_scheduledInvocations.empty()) {
-                auto frontInvocation = _state_of_the_system->_scheduledInvocations.front();
-                WRENCH_INFO("Before invocation, function name: %s",
-                            frontInvocation->_registered_function->getFunction()->getName().c_str());
-                WRENCH_INFO("Before invocation, function input pointer: %p",
-                            frontInvocation->_function_input.get());
-                if (frontInvocation->_function_input) {
-                    WRENCH_INFO("BEUHRUHR");
-                    WRENCH_INFO("Before invocation, input pointer: %p, RTTI: %s",
-                                frontInvocation->_function_input.get(),
-                                typeid(*frontInvocation->_function_input).name());
-                } else {
-                    WRENCH_INFO("Before invocation, function input pointer is null!");
-                }
-            }
             dispatchInvocations();
         }
         return 0;
@@ -332,7 +316,7 @@ namespace wrench {
      */
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort* answer_commport,
                                                                     const std::shared_ptr<Function>& function,
-                                                                    const std::shared_ptr<FunctionInput>& input,
+                                                                    const std::shared_ptr<FunctionInput> input,
                                                                     S4U_CommPort* notify_commport) {
         if (_state_of_the_system->_registeredFunctions.find(function->getName()) == _state_of_the_system->_registeredFunctions.end()) {
             // Not found
@@ -343,7 +327,6 @@ namespace wrench {
         else {
             const auto invocation = std::make_shared<Invocation>(_state_of_the_system->_registeredFunctions.at(function->getName()), input,
                                                                  notify_commport);
-            WRENCH_INFO("Before invocation, at processing invocation requerst input pointer: %p, RTTI: %s", input.get(), typeid(*input).name());
 
             _state_of_the_system->_newInvocations.push(invocation);
             // TODO: return some sort of function invocation object?
@@ -419,7 +402,6 @@ namespace wrench {
             auto code_file = function->_code->getFile();
             StorageService::copyFile(invocation->_registered_function->_function->_code,
                 wrench::FileLocation::LOCATION(invocation->_tmp_storage_service, code_file));
-            WRENCH_INFO("Before invocation, input pointer: %p, RTTI: %s", invocation->_function_input.get(), typeid(*invocation->_function_input).name());
 
             WRENCH_INFO("Going to invoke user's lambda function");
 
@@ -553,7 +535,6 @@ namespace wrench {
         // and are available right now. This is an arbitrary non-backfilling choice, that can later
         // be revisited (e.g., creating a property that allows the user to pick one of several
         // strategies).
-
         while (!_state_of_the_system->_newInvocations.empty()) {
             WRENCH_INFO("Admitting an invocation...");
             auto invocation = _state_of_the_system->_newInvocations.front();
@@ -643,17 +624,8 @@ namespace wrench {
         std::vector<std::shared_ptr<Invocation>> schedulableInvocations_vector;
         while (!_state_of_the_system->_schedulableInvocations.empty()) {
             auto invocation = _state_of_the_system->_schedulableInvocations.front();
-            WRENCH_INFO("FSDFDDDSunction input for invocation: %p, RTTI: %s",
-                invocation->_function_input.get(),
-                typeid(*invocation->_function_input).name());
             schedulableInvocations_vector.push_back(invocation);
             _state_of_the_system->_schedulableInvocations.pop();
-        }
-
-        for (const auto& invocation : schedulableInvocations_vector) {
-            WRENCH_INFO("Function list input for invocation: %p, RTTI: %s",
-                        invocation->_function_input.get(),
-                        typeid(*invocation->_function_input).name());
         }
 
         const auto imageDecision = _scheduler->manageImages(schedulableInvocations_vector, _state_of_the_system);
@@ -665,7 +637,6 @@ namespace wrench {
                 initiateImageCopyToComputeHost(computeHost, image);
             }
         }
-    
         // Similarly, trigger removal actions for images that are present but not needed.
         // for (const auto& nodeEntry : imageDecision->imagesToRemove) {
         //     const std::string& computeHost = nodeEntry.first;
@@ -674,12 +645,6 @@ namespace wrench {
         //     }
         // }
 
-        for (const auto& invocation : schedulableInvocations_vector) {
-            WRENCH_INFO("Function list input for invocation after manage: %p, RTTI: %s",
-                        invocation->_function_input.get(),
-                        typeid(*invocation->_function_input).name());
-        }
-        
         WRENCH_INFO("Scheduling %zu invocations", schedulableInvocations_vector.size());
         // Get scheduling decisions for all currently schedulable invocations.
         const auto schedulingDecisions = _scheduler->scheduleFunctions(schedulableInvocations_vector, _state_of_the_system);
@@ -694,18 +659,12 @@ namespace wrench {
             const auto target_host = decision.second;
             _state_of_the_system->_scheduling_decisions[invocation] = target_host;
             _state_of_the_system->_scheduledInvocations.push(invocation);
-            WRENCH_INFO("Function input for invocation after: %p, RTTI: %s",
-                        invocation->_function_input.get(),
-                        typeid(*invocation->_function_input).name());
             scheduledSet.insert(invocation);
         }
         
         // Reinsert unscheduled invocations back into the schedulable queue.
         for (const auto& invocation : schedulableInvocations_vector) {
             if (scheduledSet.find(invocation) == scheduledSet.end()) {
-                WRENCH_INFO("Function input for invocation reinsert: %p, RTTI: %s",
-                    invocation->_function_input.get(),
-                    typeid(*invocation->_function_input).name());
                 _state_of_the_system->_schedulableInvocations.push(invocation);
             }
         }
