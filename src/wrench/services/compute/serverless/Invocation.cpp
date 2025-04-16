@@ -9,6 +9,11 @@
 
 #include "wrench/services/compute/serverless/Invocation.h"
 
+// terminal output
+#include "wrench/logging/TerminalOutput.h"
+WRENCH_LOG_CATEGORY(Invocations, "Log category for Serverless invocations");
+
+
 namespace wrench {
 
     /**
@@ -25,6 +30,8 @@ namespace wrench {
                                                             _success(false),
                                                             _notify_commport(notify_commport)
     {
+        WRENCH_INFO("input is %p, RTTI: %s", function_input.get(), typeid(*function_input).name());
+        WRENCH_INFO("Invocation created for function %s", registered_function->getFunction()->getName().c_str());
     }
 
     /**

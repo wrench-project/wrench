@@ -47,6 +47,8 @@ namespace wrench
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
         std::set<std::shared_ptr<DataFile>> getImagesCopiedToNode(const std::string &node);
         bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);
+        bool isImageBeingCopiedToNode(const std::string& node, const std::shared_ptr<DataFile>& image);
+
         ~ServerlessStateOfTheSystem();
 
         /***********************/

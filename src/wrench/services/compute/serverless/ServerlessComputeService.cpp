@@ -189,6 +189,22 @@ namespace wrench {
         while (processNextMessage()) {
             admitInvocations();
             scheduleInvocations();
+            
+            if (!_state_of_the_system->_scheduledInvocations.empty()) {
+                auto frontInvocation = _state_of_the_system->_scheduledInvocations.front();
+                WRENCH_INFO("Before invocation, function name: %s",
+                            frontInvocation->_registered_function->getFunction()->getName().c_str());
+                WRENCH_INFO("Before invocation, function input pointer: %p",
+                            frontInvocation->_function_input.get());
+                if (frontInvocation->_function_input) {
+                    WRENCH_INFO("BEUHRUHR");
+                    WRENCH_INFO("Before invocation, input pointer: %p, RTTI: %s",
+                                frontInvocation->_function_input.get(),
+                                typeid(*frontInvocation->_function_input).name());
+                } else {
+                    WRENCH_INFO("Before invocation, function input pointer is null!");
+                }
+            }
             dispatchInvocations();
         }
         return 0;
@@ -253,6 +269,12 @@ namespace wrench {
         else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
             // Do the main loop again to schedule the invocation?
+            // log
+            WRENCH_INFO("ServerlessComputeService::processNextMessage(): Image file %s was copied to %s",
+                        scsncc_msg->_image_file->getID().c_str(), scsncc_msg->_compute_host.c_str());
+
+            _state_of_the_system->_being_copied_images[scsncc_msg->_compute_host].erase(scsncc_msg->_image_file);
+            _state_of_the_system->_copied_images[scsncc_msg->_compute_host].insert(scsncc_msg->_image_file);
             return true;
         }
         else {
@@ -321,6 +343,8 @@ namespace wrench {
         else {
             const auto invocation = std::make_shared<Invocation>(_state_of_the_system->_registeredFunctions.at(function->getName()), input,
                                                                  notify_commport);
+            WRENCH_INFO("Before invocation, at processing invocation requerst input pointer: %p, RTTI: %s", input.get(), typeid(*input).name());
+
             _state_of_the_system->_newInvocations.push(invocation);
             // TODO: return some sort of function invocation object?
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
@@ -395,6 +419,9 @@ namespace wrench {
             auto code_file = function->_code->getFile();
             StorageService::copyFile(invocation->_registered_function->_function->_code,
                 wrench::FileLocation::LOCATION(invocation->_tmp_storage_service, code_file));
+            WRENCH_INFO("Before invocation, input pointer: %p, RTTI: %s", invocation->_function_input.get(), typeid(*invocation->_function_input).name());
+
+            WRENCH_INFO("Going to invoke user's lambda function");
 
             // Invoke the user's lambda function
             function->_lambda(invocation->_function_input, invocation->_tmp_storage_service);
@@ -429,14 +456,12 @@ namespace wrench {
             nullptr);
 
         action_executor->setSimulation(this->simulation_);
-        WRENCH_INFO("Starting an action executor...");
+        WRENCH_INFO("Starting an action executor for dispatching invocation...");
         action_executor->start(action_executor, true, false);
 
         _state_of_the_system->_runningInvocations.push(invocation);
         WRENCH_INFO("Function [%s] invoked",
                     invocation->_registered_function->_function->getName().c_str());
-        // invocation_to_place->output = whatever
-        // invocation_to_place->_registered_function->_function->run_lambda()
     }
 
     /**
@@ -605,7 +630,7 @@ namespace wrench {
             nullptr);
 
         action_executor->setSimulation(this->simulation_);
-        WRENCH_INFO("Starting an action executor...");
+        WRENCH_INFO("Starting an action executor for downloading from remote...");
         action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
     }
 
@@ -614,16 +639,25 @@ namespace wrench {
      * 
      */
     void ServerlessComputeService::scheduleInvocations() {
-        // Collect all invocations that are now schedulable (i.e. their image is on the head node)
-        std::vector<std::shared_ptr<Invocation>> schedulableInvocations;
+        // Drain the schedulable invocations queue into a vector.
+        std::vector<std::shared_ptr<Invocation>> schedulableInvocations_vector;
         while (!_state_of_the_system->_schedulableInvocations.empty()) {
             auto invocation = _state_of_the_system->_schedulableInvocations.front();
+            WRENCH_INFO("FSDFDDDSunction input for invocation: %p, RTTI: %s",
+                invocation->_function_input.get(),
+                typeid(*invocation->_function_input).name());
+            schedulableInvocations_vector.push_back(invocation);
             _state_of_the_system->_schedulableInvocations.pop();
-            schedulableInvocations.push_back(invocation);
         }
-    
-        const auto imageDecision = _scheduler->manageImages(schedulableInvocations, _state_of_the_system);
-    
+
+        for (const auto& invocation : schedulableInvocations_vector) {
+            WRENCH_INFO("Function list input for invocation: %p, RTTI: %s",
+                        invocation->_function_input.get(),
+                        typeid(*invocation->_function_input).name());
+        }
+
+        const auto imageDecision = _scheduler->manageImages(schedulableInvocations_vector, _state_of_the_system);
+        
         // For each compute node, initiate image copy (from head node) for any required images that are missing.
         for (const auto& nodeEntry : imageDecision->imagesToCopy) {
             const std::string& computeHost = nodeEntry.first;
@@ -633,22 +667,47 @@ namespace wrench {
         }
     
         // Similarly, trigger removal actions for images that are present but not needed.
-        for (const auto& nodeEntry : imageDecision->imagesToRemove) {
-            const std::string& computeHost = nodeEntry.first;
-            for (const auto& image : nodeEntry.second) {
-                initiateImageRemovalFromComputeHost(computeHost, image);
-            }
+        // for (const auto& nodeEntry : imageDecision->imagesToRemove) {
+        //     const std::string& computeHost = nodeEntry.first;
+        //     for (const auto& image : nodeEntry.second) {
+        //         initiateImageRemovalFromComputeHost(computeHost, image);
+        //     }
+        // }
+
+        for (const auto& invocation : schedulableInvocations_vector) {
+            WRENCH_INFO("Function list input for invocation after manage: %p, RTTI: %s",
+                        invocation->_function_input.get(),
+                        typeid(*invocation->_function_input).name());
         }
-    
-        // use the scheduler to assign invocations to compute nodes.
-        const auto schedulingDecisions = _scheduler->scheduleFunctions(schedulableInvocations, _state_of_the_system);
+        
+        WRENCH_INFO("Scheduling %zu invocations", schedulableInvocations_vector.size());
+        // Get scheduling decisions for all currently schedulable invocations.
+        const auto schedulingDecisions = _scheduler->scheduleFunctions(schedulableInvocations_vector, _state_of_the_system);
+        
+        WRENCH_INFO("Scheduling decisions: %zu", schedulingDecisions.size());
+        // Prepare a set (or similar) of scheduled invocations.
+        std::unordered_set<std::shared_ptr<Invocation>> scheduledSet;
+        
+        // For each scheduling decision, record the decision and enqueue for dispatch.
         for (const auto& decision : schedulingDecisions) {
             auto invocation = decision.first;
             const auto target_host = decision.second;
-            // Record the scheduling decision.
             _state_of_the_system->_scheduling_decisions[invocation] = target_host;
-            // Enqueue the invocation for dispatch.
             _state_of_the_system->_scheduledInvocations.push(invocation);
+            WRENCH_INFO("Function input for invocation after: %p, RTTI: %s",
+                        invocation->_function_input.get(),
+                        typeid(*invocation->_function_input).name());
+            scheduledSet.insert(invocation);
+        }
+        
+        // Reinsert unscheduled invocations back into the schedulable queue.
+        for (const auto& invocation : schedulableInvocations_vector) {
+            if (scheduledSet.find(invocation) == scheduledSet.end()) {
+                WRENCH_INFO("Function input for invocation reinsert: %p, RTTI: %s",
+                    invocation->_function_input.get(),
+                    typeid(*invocation->_function_input).name());
+                _state_of_the_system->_schedulableInvocations.push(invocation);
+            }
         }
     }
 
@@ -695,7 +754,7 @@ namespace wrench {
             nullptr);
 
         action_executor->setSimulation(this->simulation_);
-        WRENCH_INFO("Starting an action executor...");
+        WRENCH_INFO("Starting an action executor for copying image...");
         action_executor->start(action_executor, true, false);
 
         WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID().c_str(), computeHost.c_str());
