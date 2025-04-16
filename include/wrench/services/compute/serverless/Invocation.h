@@ -45,6 +45,7 @@ namespace wrench {
          * @brief Gets the output of the function invocation.
          */
         std::shared_ptr<FunctionOutput> getOutput() const;
+        const std::shared_ptr<FunctionInput>& _function_input; // the input for the function
 
 
 
@@ -53,7 +54,6 @@ namespace wrench {
         friend class ServerlessComputeService;
 
         const std::shared_ptr<RegisteredFunction>& _registered_function; // the registered function to be invoked
-        const std::shared_ptr<FunctionInput>& _function_input; // the input for the function
         bool _done; // whether the invocation is done
         bool _success; // whether the invocation was successful
         std::shared_ptr<FailureCause> _failure_cause; // the cause of failure

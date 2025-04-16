@@ -59,11 +59,23 @@ namespace wrench {
 
         // Register a function
         auto function_manager = this->createFunctionManager();
-        std::function lambda = [](const std::shared_ptr<FunctionInput>& input, const std::shared_ptr<StorageService>& service) -> std::string {
-            const auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            WRENCH_INFO("I AM USER CODE");
-            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+        std::function lambda = [](const std::shared_ptr<FunctionInput>& input,
+            const std::shared_ptr<StorageService>& service) -> std::string {
+        WRENCH_INFO("Lambda invoked, input pointer: %p", input.get());
+        // If possible, log the type info (make sure the object is valid)
+        WRENCH_INFO("Input RTTI: %s", typeid(*input).name());
+
+        WRENCH_INFO("Lambda invoked, inpu");
+
+        auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+        if (!real_input) {
+        WRENCH_INFO("Invalid FunctionInput type: expected MyFunctionInput");
+        return "Error: invalid input type";
+        }
+        WRENCH_INFO("I AM USER CODE");
+        return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
+
 
         auto image_file = Simulation::addFile("input_file", 100 * MB);
         auto source_code = Simulation::addFile("source_code", 10 * MB);
@@ -91,6 +103,7 @@ namespace wrench {
         // Try to invoke a function that is not registered yet
         WRENCH_INFO("Invoking a non-registered function");
         auto input = std::make_shared<MyFunctionInput>(1,2);
+        WRENCH_INFO("Created FunctionInput of type: %s", typeid(*input).name());
 
         try {
             function_manager->invokeFunction(function2, this->compute_service, input);
@@ -104,7 +117,7 @@ namespace wrench {
 
         std::vector<std::shared_ptr<Invocation>> invocations;
 
-        for (unsigned char i = 0; i < 200; i++) {
+        for (unsigned char i = 0; i < 1; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
             WRENCH_INFO("Function 1 invoked");
