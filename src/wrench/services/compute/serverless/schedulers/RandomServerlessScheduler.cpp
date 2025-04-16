@@ -1,6 +1,11 @@
 #include <wrench.h>
 
 #include <wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h>
+#include <wrench/logging/TerminalOutput.h>
+
+
+WRENCH_LOG_CATEGORY(wrench_test_random_scheduler, "Log category for random serverless scheduler");
+
 
 namespace wrench {
     // Constructor implementation
@@ -71,19 +76,20 @@ namespace wrench {
                 reqIDs = requiredImages[node];
             }
             
-            // Check each required image - use isImageOnNode instead of accessing the storage directly
+            // In manageImages, while iterating over each required image for a node:
             for (const auto& reqID : reqIDs) {
-                // Find the corresponding DataFile pointer from requiredDataFiles
                 for (const auto& df : requiredDataFiles[node]) {
                     if (df->getID() == reqID) {
-                        // Check if the image is already on the node
-                        if (!state->isImageOnNode(node, df)) {
+                        // Schedule copying only if the image isn't on the node and isn't already being copied.
+                        if (!state->isImageOnNode(node, df) && 
+                            !state->isImageBeingCopiedToNode(node, df)) {
                             decision->imagesToCopy[node].push_back(df);
                         }
-                        break;
+                        break;  // Exit inner loop upon finding the corresponding DataFile.
                     }
                 }
             }
+
 
             // For removing images, get the images already copied to the node
             std::set<std::shared_ptr<DataFile>> currentFiles = state->getImagesCopiedToNode(node);
@@ -112,9 +118,22 @@ namespace wrench {
     ) {
         std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> schedulingDecisions;
         auto availableCores = state->getAvailableCores();
+        // log the availble cores
+        WRENCH_INFO("Available cores: ");
+        for (const auto& entry : availableCores) {
+            WRENCH_INFO("Node: %s, Cores: %lu", entry.first.c_str(), entry.second);
+        }
 
         // For each invocation, build a list of candidate nodes and pick one at random
         for (const auto& inv : schedulableInvocations) {
+
+            // check if inv has function input
+
+
+            WRENCH_INFO("Function input for invocation: %p",
+                inv->_function_input.get());
+            WRENCH_INFO("FUNCTION INVOCATION NAME: %s",
+                inv->getRegisteredFunction()->getFunction()->getName().c_str());
             // Get the image for this invocation
             auto imageFile = inv->getRegisteredFunction()->getFunctionImage();
             
@@ -122,6 +141,8 @@ namespace wrench {
             for (const auto& entry : availableCores) {
                 if (entry.second > 0) {
                     // Only consider nodes that have the image already copied
+                    // log
+                    WRENCH_INFO("Checking node %s for image %s", entry.first.c_str(), imageFile->getID().c_str());
                     if (state->isImageOnNode(entry.first, imageFile)) {
                         candidates.push_back(entry.first);
                     }
@@ -132,10 +153,15 @@ namespace wrench {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
                 std::string chosenNode = candidates[dist(rng)];
                 schedulingDecisions.emplace_back(inv, chosenNode);
+                WRENCH_INFO("Function input for choosen invocation: %p",
+                    inv->_function_input.get());
                 availableCores[chosenNode]--;
             } else {
                 // No suitable node with the image available; this invocation will be 
                 // scheduled in a future iteration after image copying completes
+                WRENCH_INFO("No suitable node available for invocation [%s] with image [%s]",
+                            inv->getRegisteredFunction()->getFunction()->getName().c_str(),
+                            imageFile->getID().c_str());
             }
         }
         

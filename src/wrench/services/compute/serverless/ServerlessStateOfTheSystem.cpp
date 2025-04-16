@@ -68,6 +68,17 @@
         return {};
     }
     
+    bool ServerlessStateOfTheSystem::isImageBeingCopiedToNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
+        // Check if the image has been copied to the node
+        if (_being_copied_images.find(node) != _being_copied_images.end()) {
+            if (_being_copied_images[node].find(image) != _being_copied_images[node].end()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesCopiedToNode(const std::string& node) {
         if (_copied_images.find(node) != _copied_images.end()) {
             return _copied_images[node];

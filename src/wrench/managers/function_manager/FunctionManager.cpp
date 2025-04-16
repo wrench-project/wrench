@@ -111,6 +111,8 @@ namespace wrench {
                                                                 std::shared_ptr<FunctionInput> function_invocation_args) {
         WRENCH_INFO("Function [%s] invoked with compute service [%s]", function->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the notify commport
+        WRENCH_INFO("Before invocation, input pointer: %p, RTTI: %s", function_invocation_args.get(), typeid(*function_invocation_args).name());
+
         return sl_compute_service->invokeFunction(function, function_invocation_args, this->commport);
     }
 
