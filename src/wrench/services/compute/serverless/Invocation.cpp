@@ -30,7 +30,6 @@ namespace wrench {
                                                             _success(false),
                                                             _notify_commport(notify_commport)
     {
-        WRENCH_INFO("input is %p, RTTI: %s", function_input.get(), typeid(*function_input).name());
         WRENCH_INFO("Invocation created for function %s", registered_function->getFunction()->getName().c_str());
     }
 

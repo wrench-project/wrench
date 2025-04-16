@@ -64,7 +64,7 @@ namespace wrench {
      * @return std::shared_ptr<Function> a shared pointer to the Function object created
      */
     std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
-                                                                     const std::function<std::string(const std::shared_ptr<FunctionInput>&, const std::shared_ptr<StorageService>&)>& lambda,
+                                                                     const std::function<std::string(std::shared_ptr<FunctionInput>, const std::shared_ptr<StorageService>&)>& lambda,
                                                                      const std::shared_ptr<FileLocation>& image,
                                                                      const std::shared_ptr<FileLocation>& code) {
                                                                         
@@ -106,12 +106,11 @@ namespace wrench {
      * @param function_invocation_args arguments to pass to the function
      * @return std::shared_ptr<Invocation> a shared pointer to the Invocation object created by the ServerlessComputeService
      */
-    std::shared_ptr<Invocation> FunctionManager::invokeFunction(std::shared_ptr<Function> function,
+    std::shared_ptr<Invocation> FunctionManager::invokeFunction(const std::shared_ptr<Function> &function,
                                                                 const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
                                                                 std::shared_ptr<FunctionInput> function_invocation_args) {
         WRENCH_INFO("Function [%s] invoked with compute service [%s]", function->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the notify commport
-        WRENCH_INFO("Before invocation, input pointer: %p, RTTI: %s", function_invocation_args.get(), typeid(*function_invocation_args).name());
 
         return sl_compute_service->invokeFunction(function, function_invocation_args, this->commport);
     }
