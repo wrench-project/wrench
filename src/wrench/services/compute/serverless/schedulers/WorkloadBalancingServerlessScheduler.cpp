@@ -5,43 +5,42 @@
 #include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
 
 namespace wrench {
-    std::shared_ptr<ImageManagementDecision> WorkloadBalancingServerlessScheduler::manageImages(
-        const std::vector<std::shared_ptr<Invocation> > &schedulableInvocations,
-        const std::shared_ptr<ServerlessStateOfTheSystem> &state
+    std::shared_ptr<ImageManagementDecision>
+    WorkloadBalancingServerlessScheduler::manageImages(
+        const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
+        const std::shared_ptr<ServerlessStateOfTheSystem>& state
     ) {
-        // Create the decision object
         auto decision = std::make_shared<ImageManagementDecision>();
-
-        // Calculate workloads and create allocation plan
+    
         calculateFunctionWorkloads(schedulableInvocations);
         createAllocationPlan(state);
-
-        // For each node in our allocation plan
-        for (const auto &[node, function_allocation]: allocation_plan) {
+    
+        for (const auto& [node, function_allocation] : allocation_plan) {
             std::set<std::string> required_function_names;
-
-            // Get the required functions for this node according to our plan
-            for (const auto &[function_name, core_count]: function_allocation) {
+    
+            // figure out which functions we need here
+            for (const auto& [function_name, core_count] : function_allocation) {
                 if (core_count > 0) {
                     required_function_names.insert(function_name);
                 }
             }
-
-            // Determine which images we need to copy to this node
-            for (const auto &function_name: required_function_names) {
+    
+            // only copy each image if it's neither already on the node nor currently being copied
+            for (const auto& function_name : required_function_names) {
                 auto image = function_images[function_name];
-                if (!state->isImageOnNode(node, image)) {
+                if (!state->isImageOnNode(node, image)
+                    && !state->isImageBeingCopiedToNode(node, image)) {
                     decision->imagesToCopy[node].push_back(image);
                 }
             }
-
-            // Assuming infinite storage
+    
+            // we still assume infinite storage, so no removals
             decision->imagesToRemove[node] = {};
         }
-
+    
         return decision;
     }
-
+    
     std::vector<std::pair<std::shared_ptr<Invocation>, std::string> >
     WorkloadBalancingServerlessScheduler::scheduleFunctions(
         const std::vector<std::shared_ptr<Invocation> > &schedulableInvocations,
