@@ -32,7 +32,7 @@ namespace wrench
     public:
         // getter methods
         // TODO: what does the scheduler need and what does it not?
-        std::vector<std::string> getComputeHosts();
+        const std::vector<std::string>& getComputeHosts();
         std::map<std::string, unsigned long> getAvailableCores();
         std::queue<std::shared_ptr<Invocation>> getNewInvocations();
         std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> getAdmittedInvocations();
@@ -47,6 +47,8 @@ namespace wrench
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
         std::set<std::shared_ptr<DataFile>> getImagesCopiedToNode(const std::string &node);
         bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);
+        bool isImageBeingCopiedToNode(const std::string& node, const std::shared_ptr<DataFile>& image);
+
         ~ServerlessStateOfTheSystem();
 
         /***********************/
@@ -56,7 +58,7 @@ namespace wrench
     private:
         friend class ServerlessComputeService;
 
-        explicit ServerlessStateOfTheSystem(std::vector<std::string> compute_hosts);
+        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts);
 
         // map of Registered functions sorted by function name
         std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;

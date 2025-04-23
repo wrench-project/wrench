@@ -37,10 +37,10 @@ namespace wrench {
 
     public:
 
-        ServerlessComputeService(const std::string &hostname,
-                                 std::vector<std::string> compute_hosts,
-                                 std::string head_node_storage_mount_point,
-                                 std::shared_ptr<ServerlessScheduler> scheduler,
+        ServerlessComputeService(const std::string& hostname,
+                                 const std::vector<std::string>& compute_hosts,
+                                 const std::string& head_node_storage_mount_point,
+                                 const std::shared_ptr<ServerlessScheduler> &scheduler,
                                  WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                  WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
@@ -52,8 +52,8 @@ namespace wrench {
 
         friend class FunctionManager;
 
-        std::shared_ptr<Invocation> invokeFunction(std::shared_ptr<Function> function,
-                                                   std::shared_ptr<FunctionInput> input, 
+        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<Function>& function,
+                                                   std::shared_ptr<FunctionInput> input,
                                                    S4U_CommPort *notify_commport);
 
         bool registerFunction(const std::shared_ptr<Function>& function,
@@ -75,15 +75,16 @@ namespace wrench {
                                   override;
 
         void processFunctionRegistrationRequest(S4U_CommPort *answer_commport, 
-                                                std::shared_ptr<Function> function, double time_limit, 
+                                                const std::shared_ptr<Function>& function,
+                                                double time_limit,
                                                 sg_size_t disk_space_limit_in_bytes, 
                                                 sg_size_t ram_limit_in_bytes, 
                                                 sg_size_t ingress_in_bytes, 
                                                 sg_size_t egress_in_bytes);
 
         void processFunctionInvocationRequest(S4U_CommPort *answer_commport, 
-                                              std::shared_ptr<Function> function, 
-                                              std::shared_ptr<FunctionInput> input, 
+                                              const std::shared_ptr<Function>& function,
+                                              const std::shared_ptr<FunctionInput> input,
                                               S4U_CommPort *notify_commport);
 
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action, const std::shared_ptr<DataFile>& image_file);
@@ -95,15 +96,15 @@ namespace wrench {
         bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
-        std::shared_ptr<wrench::ServerlessScheduler> _scheduler;
-        std::shared_ptr<wrench::ServerlessStateOfTheSystem> _state_of_the_system;
+        std::shared_ptr<ServerlessScheduler> _scheduler;
+        std::shared_ptr<ServerlessStateOfTheSystem> _state_of_the_system;
 
         void startHeadStorageService();
         void startComputeHostsServices();
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
         void dispatchFunctionInvocation(const std::shared_ptr<Invocation>& invocation);
-        void initiateImageCopyToComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image);
-        void initiateImageRemovalFromComputeHost(const std::string& computeHost, std::shared_ptr<DataFile> image);
+        void initiateImageCopyToComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
+        void initiateImageRemovalFromComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
 
         std::shared_ptr<StorageService> startInvocationStorageService(const std::shared_ptr<Invocation>& invocation);
 
@@ -136,7 +137,7 @@ namespace wrench {
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
         std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
-        sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shennanigans
+        sg_size_t _free_space_on_head_storage{}; // We keep track of it ourselves to avoid concurrency shennanigans
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}

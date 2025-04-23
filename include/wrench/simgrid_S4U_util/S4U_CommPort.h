@@ -52,7 +52,7 @@ namespace wrench {
          * @brief Synchronously receive a message from a commport_name
          *
          * @param error_prefix: any string you wish to prefix the error message with
-         * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
+         * @return the message, in a unique_ptr of the type specified.  Otherwise, throws a runtime_error
          *
          */
         template<class TMessageType>
