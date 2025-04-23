@@ -737,5 +737,3 @@ namespace wrench {
     }
 
 }; // namespace wrench
-
-

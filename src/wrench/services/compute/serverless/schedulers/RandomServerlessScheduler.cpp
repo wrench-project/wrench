@@ -3,9 +3,7 @@
 #include <wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h>
 #include <wrench/logging/TerminalOutput.h>
 
-
 WRENCH_LOG_CATEGORY(wrench_test_random_scheduler, "Log category for random serverless scheduler");
-
 
 namespace wrench {
     // Constructor implementation

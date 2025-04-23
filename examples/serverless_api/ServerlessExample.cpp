@@ -36,6 +36,8 @@
 
 #include "ServerlessExampleExecutionController.h"
 #include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
 
 /**
  * @brief The Simulator's main function
@@ -87,7 +89,7 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
     const std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     const auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-            "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+            "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(), {}, {}));
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
