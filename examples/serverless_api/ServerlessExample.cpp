@@ -60,10 +60,37 @@ int main(int argc, char **argv) {
     simulation->init(&argc, argv);
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
-    if (argc != 2) {
+    if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <xml platform file> [--log=custom_controller.threshold=info]" << std::endl;
         exit(1);
     }
+
+    std::string scheduler_type = "random";
+    unsigned int num_invocations = 20;
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg(argv[i]);
+        if (arg.rfind("--scheduler=", 0) == 0) {
+            scheduler_type = arg.substr(12);
+            cout << "Scheduler type: " << scheduler_type << endl;
+        }
+        else if (arg.rfind("--invocations=", 0) == 0) {
+            num_invocations = std::stoul(arg.substr(14));
+        }
+    }
+    
+    std::shared_ptr<wrench::ServerlessScheduler> sched;
+    if (scheduler_type == "random") {
+        sched = std::make_shared<wrench::RandomServerlessScheduler>();
+    } else if (scheduler_type == "fcfs") {
+        sched = std::make_shared<wrench::FCFSServerlessScheduler>();
+    } else if (scheduler_type == "balance") {
+        sched = std::make_shared<wrench::WorkloadBalancingServerlessScheduler>();
+    } else {
+        std::cerr << "Unknown scheduler: " << scheduler_type << "\n";
+        return 1;
+    }
+
 
     /* Reading and parsing the platform description file, written in XML following the SimGrid-defined DTD,
      * to instantiate the simulated platform */
@@ -89,12 +116,12 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
     const std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     const auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-            "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(), {}, {}));
+            "ServerlessHeadNode", batch_nodes, "/", sched, {}, {}));
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
     auto wms = simulation->add(
-            new wrench::ServerlessExampleExecutionController(serverless_provider, storage_service, "UserHost"));
+            new wrench::ServerlessExampleExecutionController(serverless_provider, storage_service, "UserHost", num_invocations));
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
