@@ -15,7 +15,6 @@
 #include <wrench/managers/function_manager/Function.h>
 #include <wrench/managers/function_manager/RegisteredFunction.h>
 #include <wrench/managers/function_manager/FunctionOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/failure_causes/FailureCause.h>
 
 namespace wrench {
@@ -33,19 +32,20 @@ namespace wrench {
          * @param function_input The input for the function.
          * @param notify_commport The communication port for notifications.
          */
-        Invocation(std::shared_ptr<RegisteredFunction> registered_function,
-                   std::shared_ptr<FunctionInput> function_input,
+        Invocation(const std::shared_ptr<RegisteredFunction> &registered_function,
+                   const std::shared_ptr<FunctionInput> &function_input,
                    S4U_CommPort* notify_commport);
 
 
         bool isDone() const;
         bool isSuccess() const;
-        std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;
-        std::shared_ptr<FailureCause> getFailureCause() const;
+        const std::shared_ptr<RegisteredFunction>& getRegisteredFunction() const;
+        const std::shared_ptr<FailureCause>& getFailureCause() const;
         /**
          * @brief Gets the output of the function invocation.
          */
         std::shared_ptr<FunctionOutput> getOutput() const;
+        std::shared_ptr<FunctionInput> _function_input; // the input for the function
 
 
 
@@ -53,8 +53,7 @@ namespace wrench {
         friend class FunctionManager;
         friend class ServerlessComputeService;
 
-        std::shared_ptr<RegisteredFunction> _registered_function; // the registered function to be invoked
-        std::shared_ptr<FunctionInput> _function_input; // the input for the function
+        const std::shared_ptr<RegisteredFunction>& _registered_function; // the registered function to be invoked
         bool _done; // whether the invocation is done
         bool _success; // whether the invocation was successful
         std::shared_ptr<FailureCause> _failure_cause; // the cause of failure

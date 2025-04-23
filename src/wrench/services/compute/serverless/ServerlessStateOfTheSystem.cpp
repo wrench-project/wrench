@@ -30,8 +30,10 @@
  
  namespace wrench {
 
-    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(std::vector<std::string> compute_hosts) {
-        _compute_hosts = std::move(compute_hosts);
+    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts)
+        : _compute_hosts(compute_hosts),
+          _head_storage_service(nullptr),
+          _free_space_on_head_storage(0) {
         for (const auto& compute_host : _compute_hosts) {
             _available_cores[compute_host] = S4U_Simulation::getHostNumCores(compute_host);
         }
@@ -42,13 +44,11 @@
         }
     }
 
-    ServerlessStateOfTheSystem::~ServerlessStateOfTheSystem() {
-        // Any necessary cleanup (if needed) goes here.
-    }
+    ServerlessStateOfTheSystem::~ServerlessStateOfTheSystem() = default;
 
     // getters
     // TODO: code commenting
-    std::vector<std::string> wrench::ServerlessStateOfTheSystem::getComputeHosts() { return _compute_hosts; }
+    const std::vector<std::string>& ServerlessStateOfTheSystem::getComputeHosts() { return _compute_hosts; }
     std::map<std::string, unsigned long> ServerlessStateOfTheSystem::getAvailableCores() { return _available_cores; }
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getNewInvocations() { return _newInvocations; }
     std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> ServerlessStateOfTheSystem::getAdmittedInvocations() { return _admittedInvocations; }
@@ -68,6 +68,17 @@
         return {};
     }
     
+    bool ServerlessStateOfTheSystem::isImageBeingCopiedToNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
+        // Check if the image has been copied to the node
+        if (_being_copied_images.find(node) != _being_copied_images.end()) {
+            if (_being_copied_images[node].find(image) != _being_copied_images[node].end()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesCopiedToNode(const std::string& node) {
         if (_copied_images.find(node) != _copied_images.end()) {
             return _copied_images[node];

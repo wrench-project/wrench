@@ -35,16 +35,17 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param num_actions: the number of actions
-     * @param compute_services: a set of compute services available to run actions
-     * @param storage_services: a set of storage services available to store data files
+     * @param compute_service
+     * @param storage_service
+     * @param compute_service: a set of compute services available to run actions
+     * @param storage_service: a set of storage services available to store data files
      * @param hostname: the name of the host on which to start the WMS
      */
-    ServerlessExampleExecutionController::ServerlessExampleExecutionController(std::shared_ptr<ServerlessComputeService> compute_service,
-                                                                               std::shared_ptr<SimpleStorageService> storage_service,
-                                                                               const std::string &hostname) : ExecutionController(hostname, "me"),
-                                                                                                              compute_service(std::move(compute_service)),
-                                                                                                              storage_service(std::move(storage_service)) {
+    ServerlessExampleExecutionController::ServerlessExampleExecutionController(const std::shared_ptr<ServerlessComputeService>& compute_service,
+                                                                               const std::shared_ptr<SimpleStorageService>& storage_service,
+                                                                               const std::string &hostname, const int numInvocations) : ExecutionController(hostname, "me"),
+                                                                                                              compute_service(compute_service),
+                                                                                                              storage_service(storage_service), numInvocations(numInvocations) {
     }
 
     /**
@@ -58,38 +59,69 @@ namespace wrench {
 
         // Register a function
         auto function_manager = this->createFunctionManager();
-        std::function lambda = [](const std::shared_ptr<FunctionInput>& input, const std::shared_ptr<StorageService>& service) -> std::string {
+        std::function lambda_1 = [](std::shared_ptr<FunctionInput> input,
+            const std::shared_ptr<StorageService>& service) -> std::string {
+        // If possible, log the type info (make sure the object is valid)
+
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            WRENCH_INFO("I AM USER CODE");
+            if (!real_input) {
+            WRENCH_INFO("Invalid FunctionInput type: expected MyFunctionInput");
+            return "Error: invalid input type";
+            }
+            WRENCH_INFO("I AM USER CODE FOR FUNCTION 1");
+            Simulation::sleep(5);
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
-        auto image_file = wrench::Simulation::addFile("input_file", 100 * MB);
-        auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
-        wrench::StorageService::createFileAtLocation(image_location);
-        wrench::StorageService::createFileAtLocation(code_location);
+        std::function lambda_2 = [](std::shared_ptr<FunctionInput> input,
+            const std::shared_ptr<StorageService>& service) -> std::string {
+            // If possible, log the type info (make sure the object is valid)
 
-        auto function1 = function_manager->createFunction("Function 1", lambda, image_location, code_location);
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            if (!real_input) {
+                WRENCH_INFO("Invalid FunctionInput type: expected MyFunctionInput");
+                return "Error: invalid input type";
+            }
+            WRENCH_INFO("I AM USER CODE FOR FUNCTION 2");
+            Simulation::sleep(50);
+            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+        };
+
+
+        auto image_file_1 = Simulation::addFile("input_file_1", 100 * MB);
+        auto source_code_1 = Simulation::addFile("source_code_1", 10 * MB);
+        auto image_location_1 = FileLocation::LOCATION(this->storage_service, image_file_1);
+        auto code_location_1 = FileLocation::LOCATION(this->storage_service, source_code_1);
+        StorageService::createFileAtLocation(image_location_1);
+        StorageService::createFileAtLocation(code_location_1);
+
+        auto image_file_2 = Simulation::addFile("input_file_2", 1000 * MB);
+        auto source_code_2 = Simulation::addFile("source_code_2", 100 * MB);
+        auto image_location_2 = FileLocation::LOCATION(this->storage_service, image_file_2);
+        auto code_location_2 = FileLocation::LOCATION(this->storage_service, source_code_2);
+        StorageService::createFileAtLocation(image_location_2);
+        StorageService::createFileAtLocation(code_location_2);
+
+        auto function1 = function_manager->createFunction("Function 1", lambda_1, image_location_1, code_location_1);
 
         WRENCH_INFO("Registering function 1");
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        function_manager->registerFunction(function1, this->compute_service, 1, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 1 registered");
 
         // Try to register the same function name
         WRENCH_INFO("Trying to register function 1 again");
         try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+            function_manager->registerFunction(function1, this->compute_service, 1, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         } catch (ExecutionException& expected) {
             WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
 
         }
 
-        auto function2 = function_manager->createFunction("Function 2", lambda, image_location, code_location);
+        auto function2 = function_manager->createFunction("Function 2", lambda_2, image_location_2, code_location_2);
         // Try to invoke a function that is not registered yet
         WRENCH_INFO("Invoking a non-registered function");
         auto input = std::make_shared<MyFunctionInput>(1,2);
+        WRENCH_INFO("Created FunctionInput of type: %s", typeid(*input).name());
 
         try {
             function_manager->invokeFunction(function2, this->compute_service, input);
@@ -98,15 +130,18 @@ namespace wrench {
         }
 
         WRENCH_INFO("Registering function 2");
-        function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        function_manager->registerFunction(function2, this->compute_service, 50, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 2 registered");
 
         std::vector<std::shared_ptr<Invocation>> invocations;
 
-        for (unsigned char i = 0; i < 200; i++) {
+        for (unsigned int i = 0; i < numInvocations; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
             WRENCH_INFO("Function 1 invoked");
+            WRENCH_INFO("Invoking function 2");
+            invocations.push_back(function_manager->invokeFunction(function2, this->compute_service, input));
+            WRENCH_INFO("Function 2 invoked");
             // wrench::Simulation::sleep(1);
         }
 
@@ -155,7 +190,7 @@ namespace wrench {
         // function_manager->invokeFunction(function1, this->compute_service, input);
         // WRENCH_INFO("Function 1 invoked");
 
-        wrench::Simulation::sleep(1000000);
+        // wrench::Simulation::sleep(1000000);
         // WRENCH_INFO("Execution complete");
 
         // function_manager->invokeFunction(function2, this->compute_service, input);

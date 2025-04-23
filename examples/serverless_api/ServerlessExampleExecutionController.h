@@ -25,16 +25,16 @@ namespace wrench {
     public:
         // Constructor
         ServerlessExampleExecutionController(
-                std::shared_ptr<ServerlessComputeService> compute_service,
-                std::shared_ptr<SimpleStorageService> storage_service,
-                const std::string &hostname);
+                const std::shared_ptr<ServerlessComputeService>& compute_service,
+                const std::shared_ptr<SimpleStorageService>& storage_service,
+                const std::string &hostname, const int numInvocations = 1);
 
     protected:
 
     private:
         // main() method of the WMS
         int main() override;
-
+        int numInvocations;
         const std::shared_ptr<ServerlessComputeService> compute_service;
         const std::shared_ptr<SimpleStorageService> storage_service;
     };

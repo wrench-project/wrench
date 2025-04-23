@@ -46,6 +46,8 @@ namespace wrench {
                            sg_size_t egress_in_bytes);
 
         std::shared_ptr<DataFile> getFunctionImage();
+        std::shared_ptr<Function> getFunction();
+        double getTimeLimit();
 
     private:
         friend class FunctionManager;
