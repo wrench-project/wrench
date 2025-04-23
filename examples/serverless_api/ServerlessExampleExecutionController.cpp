@@ -43,9 +43,9 @@ namespace wrench {
      */
     ServerlessExampleExecutionController::ServerlessExampleExecutionController(const std::shared_ptr<ServerlessComputeService>& compute_service,
                                                                                const std::shared_ptr<SimpleStorageService>& storage_service,
-                                                                               const std::string &hostname) : ExecutionController(hostname, "me"),
+                                                                               const std::string &hostname, const int numInvocations) : ExecutionController(hostname, "me"),
                                                                                                               compute_service(compute_service),
-                                                                                                              storage_service(storage_service) {
+                                                                                                              storage_service(storage_service), numInvocations(numInvocations) {
     }
 
     /**
@@ -105,13 +105,13 @@ namespace wrench {
         auto function1 = function_manager->createFunction("Function 1", lambda_1, image_location_1, code_location_1);
 
         WRENCH_INFO("Registering function 1");
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        function_manager->registerFunction(function1, this->compute_service, 1, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 1 registered");
 
         // Try to register the same function name
         WRENCH_INFO("Trying to register function 1 again");
         try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+            function_manager->registerFunction(function1, this->compute_service, 1, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         } catch (ExecutionException& expected) {
             WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
 
@@ -130,12 +130,12 @@ namespace wrench {
         }
 
         WRENCH_INFO("Registering function 2");
-        function_manager->registerFunction(function2, this->compute_service, 100, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        function_manager->registerFunction(function2, this->compute_service, 50, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 2 registered");
 
         std::vector<std::shared_ptr<Invocation>> invocations;
 
-        for (unsigned int i = 0; i < 250; i++) {
+        for (unsigned int i = 0; i < numInvocations; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
             WRENCH_INFO("Function 1 invoked");
@@ -190,7 +190,7 @@ namespace wrench {
         // function_manager->invokeFunction(function1, this->compute_service, input);
         // WRENCH_INFO("Function 1 invoked");
 
-        wrench::Simulation::sleep(1000000);
+        // wrench::Simulation::sleep(1000000);
         // WRENCH_INFO("Execution complete");
 
         // function_manager->invokeFunction(function2, this->compute_service, input);
