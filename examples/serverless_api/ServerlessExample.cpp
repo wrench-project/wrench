@@ -39,6 +39,90 @@
 #include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
 
+namespace sg4 = simgrid::s4u;
+
+class PlatformCreator {
+
+public:
+    explicit PlatformCreator(unsigned int num_hosts) : num_hosts(num_hosts) {}
+
+    void operator()() const {
+        create_platform(num_hosts);
+    }
+
+private:
+    unsigned int num_hosts;
+
+    void create_platform(unsigned int num_hosts) const {
+        // Create the top-level zone
+        auto zone = sg4::create_full_zone("AS0");
+        // Create the WMSHost host with its disk
+        auto wms_host = zone->create_host("UserHost", "10Gf");
+        wms_host->set_core_count(1);
+        auto wms_host_disk = wms_host->create_disk("hard_drive",
+                                                   "100MBps",
+                                                   "100MBps");
+        wms_host_disk->set_property("size", "5000GiB");
+        wms_host_disk->set_property("mount", "/");
+
+        // Create the ServerlessHeadNode host with its disk
+        auto head_node = zone->create_host("ServerlessHeadNode", "10Gf");
+        head_node->set_core_count(1);
+        auto head_node_disk = head_node->create_disk("hard_drive",
+                                                   "100MBps",
+                                                   "100MBps");
+        head_node_disk->set_property("size", "5000GiB");
+        head_node_disk->set_property("mount", "/");
+
+        // Create the Compute Nodes
+        std::vector<sg4::Host *> compute_nodes;
+        for (unsigned int i=0; i < num_hosts; i++) {
+            // Create a ComputeNode
+            auto compute_node = zone->create_host("ServerlessComputeNode" + std::to_string(i+1), "1Gf");
+            compute_node->set_core_count(10);
+            compute_node->set_property("ram", "64GB");
+            auto compute_node_disk = compute_node->create_disk("hard_drive",
+                                                   "100MBps",
+                                                   "100MBps");
+            compute_node_disk->set_property("size", "5000GiB");
+            compute_node_disk->set_property("mount", "/");
+            compute_nodes.push_back(compute_node);
+        }
+
+        // Create three network links and routes
+        auto wide_area_link = zone->create_link("wide_area_link", "10MBps")->set_latency("20us");
+        // auto loopback_WMSHost = zone->create_link("loopback_WMSHost", "1000EBps")->set_latency("0us");
+        // auto loopback_ComputeHost = zone->create_link("loopback_ComputeHost", "1000EBps")->set_latency("0us");
+        {
+            sg4::LinkInRoute network_link_in_route{wide_area_link};
+            zone->add_route(wms_host,
+                            head_node,
+                            {network_link_in_route});
+        }
+
+        for (unsigned int i=0; i < num_hosts; i++) {
+            auto local_link = zone->create_link("local_link_" + std::to_string(i+1),
+                    "100MBps")->set_latency("2us");
+            {
+                sg4::LinkInRoute network_link_in_route{local_link};
+                zone->add_route(head_node,
+                                compute_nodes[i],
+                                {network_link_in_route});
+            }
+            {
+                sg4::LinkInRoute network_link_in_route_1{wide_area_link};
+                sg4::LinkInRoute network_link_in_route_2{local_link};
+                zone->add_route(wms_host,
+                                compute_nodes[i],
+                                {network_link_in_route_1, network_link_in_route_2});
+            }
+        }
+
+
+        zone->seal();
+    }
+};
+
 /**
  * @brief The Simulator's main function
  *
@@ -61,7 +145,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <xml platform file> [--log=custom_controller.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <# compute hosts> [--log=custom_controller.threshold=info]" << std::endl;
         exit(1);
     }
 
@@ -95,8 +179,9 @@ int main(int argc, char **argv) {
     /* Reading and parsing the platform description file, written in XML following the SimGrid-defined DTD,
      * to instantiate the simulated platform */
     std::cerr << "Instantiating simulated platform..." << std::endl;
-    simulation->instantiatePlatform(argv[1]);
-
+    // simulation->instantiatePlatform(argv[1]);
+    PlatformCreator platform_creator(atoi(argv[1]));
+    simulation->instantiatePlatform(platform_creator);
 
     /* Instantiate a storage service, and add it to the simulation.
      * A wrench::StorageService is an abstraction of a service on
@@ -114,9 +199,14 @@ int main(int argc, char **argv) {
 
     /* Instantiate a serverless compute service */
     std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
-    const std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
+    // const std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
+    std::vector<std::string> compute_nodes;
+    for (unsigned int i=0; i < atoi(argv[1]); i++) {
+        std::string compute_node_name = "ServerlessComputeNode" + std::to_string(i+1);
+        compute_nodes.push_back(compute_node_name);
+    }
     const auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-            "ServerlessHeadNode", batch_nodes, "/", sched, {}, {}));
+            "ServerlessHeadNode", compute_nodes, "/", sched, {}, {}));
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
@@ -131,7 +221,7 @@ int main(int argc, char **argv) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return 1;
     }
-    std::cerr << "Simulation done!" << std::endl;
+    std::cerr << "Simulated execution time: " << wrench::Simulation::getCurrentSimulatedDate() << std::endl;
 
     return 0;
 }
