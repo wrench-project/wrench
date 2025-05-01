@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
-PLATFORM="/home/vince/github/wrench-serverless/build/examples/serverless_api/four_hosts.xml"
 LOGOPTS="--wrench-full-log"
 
+# sweep over host‐counts and invocation‐counts independently
 for sched in random fcfs balance; do
-  for inv in 1 10 20 50 100 250; do
-    OUTDIR=results/${sched}_${inv}
-    mkdir -p "$OUTDIR"
-    echo "Running $sched with $inv invocations..."
-    /home/vince/github/wrench-serverless/build/examples/serverless_api/wrench-example-serverless $PLATFORM \
-        --scheduler=$sched \
-        --invocations=$inv \
-        $LOGOPTS \
-      > $OUTDIR/stdout.log 2>&1
+  for hosts in 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32; do
+    OUTDIR=results/${sched}_${hosts}
+      mkdir -p "$OUTDIR"
+      echo "Running $sched with $hosts hosts..."
+      ../../build/examples/serverless_api/wrench-example-serverless \
+          $hosts \
+          --scheduler=$sched \
+          --invocations=500 \
+          $LOGOPTS \
+        > $OUTDIR/stdout.log 2>&1
   done
 done

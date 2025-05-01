@@ -21,8 +21,8 @@ for root, dirs, files in os.walk(RESULTS_DIR):
     # Parse scheduler and invocation count from path: e.g. "random_100"
     rel = os.path.relpath(root, RESULTS_DIR)
     try:
-        scheduler, invs_str = rel.split('_')
-        invs = int(invs_str)
+        scheduler, host_str = rel.split('_')
+        host = int(host_str)
     except ValueError:
         continue
 
@@ -38,13 +38,13 @@ for root, dirs, files in os.walk(RESULTS_DIR):
     if max_time > 0:
         records.append({
             'scheduler': scheduler,
-            'invocations': invs,
+            'hosts': host,
             'sim_time_s': max_time
         })
 
 # Build DataFrame
 df = pd.DataFrame.from_records(records)
-df = df.sort_values(['scheduler','invocations'])
+df = df.sort_values(['scheduler','hosts'])
 # Print to console
 print("\nAggregated Simulation End Times:\n")
 print(df.to_string(index=False))
@@ -53,4 +53,3 @@ print(df.to_string(index=False))
 output_csv = 'aggregated_results.csv'
 df.to_csv(output_csv, index=False)
 print(f"\nSaved aggregated results to {output_csv}")
-
