@@ -19,8 +19,6 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/job/Job.h"
-#include "wrench/job/StandardJob.h"
-#include "wrench/job/PilotJob.h"
 #include "wrench/job/CompoundJob.h"
 
 namespace wrench {
@@ -43,7 +41,6 @@ namespace wrench {
         /***********************/
         /** \endcond          **/
         /***********************/
-
 
     public:
         /** @brief A convenient constant to mean "use all cores of a physical host" whenever a number of cores
@@ -120,9 +117,9 @@ namespace wrench {
 
         std::map<std::string, double> getCoreFlopRate(bool simulate_it = false);
 
-        double getTotalScratchSpaceSize() const;
+        sg_size_t getTotalScratchSpaceSize() const;
 
-        double getFreeScratchSpaceSize() const;
+        sg_size_t getFreeScratchSpaceSize() const;
 
 
         /***********************/
@@ -201,7 +198,7 @@ namespace wrench {
         std::string scratch_space_mount_point;
         //        std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
-        std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries, bool simulate_it);
+        std::map<std::string, double> getServiceResourceInformation(const std::string &key, bool simulate_it);
     };
 
 

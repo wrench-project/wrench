@@ -32,7 +32,6 @@ WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service,
                     "Log category for Simple Storage Service");
 
 namespace wrench {
-
     /**
      * @brief Factory method to create SimpleStorageService instances
      *
@@ -42,7 +41,7 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @return a pointer to a simple storage service
      */
-    SimpleStorageService *SimpleStorageService::createSimpleStorageService(const std::string &hostname,
+    SimpleStorageService* SimpleStorageService::createSimpleStorageService(const std::string& hostname,
                                                                            const std::set<std::string>& mount_points,
                                                                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) {
@@ -86,15 +85,18 @@ namespace wrench {
         bool bufferized = false;// By default, non-bufferized
 
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
-            sg_size_t buffer_size = UnitParser::parse_size(property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
-            bufferized = buffer_size >= 1;// more than one byte means bufferized
-        } else {
-            property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE] = "0B";// enforce a zero buffersize
+            sg_size_t buffer_size = UnitParser::parse_size(
+                property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE]);
+            bufferized = buffer_size >= 1; // more than one byte means bufferized
+        }
+        else {
+            property_list[wrench::SimpleStorageServiceProperty::BUFFER_SIZE] = "0B"; // enforce a zero buffersize
         }
 
         if (Simulation::isLinkShutdownSimulationEnabled() and (not bufferized)) {
-            throw std::runtime_error("SimpleStorageService::createSimpleStorageService(): Cannot use non-bufferized (i.e., buffer size == 0) "
-                                     "storage services and also simulate link shutdowns. This feature is not implemented yet.");
+            throw std::runtime_error(
+                "SimpleStorageService::createSimpleStorageService(): Cannot use non-bufferized (i.e., buffer size == 0) "
+                "storage services and also simulate link shutdowns. This feature is not implemented yet.");
         }
 
         if (bufferized) {
@@ -179,7 +181,7 @@ namespace wrench {
         }
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
-                SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+            SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
     }
 
 
@@ -190,8 +192,8 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileDeleteRequest(
-            const std::shared_ptr<FileLocation> &location,
-            S4U_CommPort *answer_commport) {
+        const std::shared_ptr<FileLocation>& location,
+        S4U_CommPort* answer_commport) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
         std::string mount_point;
@@ -201,23 +203,25 @@ namespace wrench {
             if (not this->isScratch()) {
                 failure_cause = std::make_shared<FileNotFound>(location);
             } // otherwise, we don't care, perhaps it was taken care of elsewhere...
-        } else {
+        }
+        else {
             try {
                 this->file_system->unlink_file(location->getFilePath());
-            } catch (simgrid::Exception &e) {
+            }
+            catch (simgrid::Exception& e) {
                 std::string error_msg = "Cannot delete a file that's open for reading/writing";
-               failure_cause = std::make_shared<NotAllowed>(this->getSharedPtr<SimpleStorageService>(), error_msg);
+                failure_cause = std::make_shared<NotAllowed>(this->getSharedPtr<SimpleStorageService>(), error_msg);
             }
         }
 
         answer_commport->dputMessage(
-                new StorageServiceFileDeleteAnswerMessage(
-                        location->getFile(),
-                        this->getSharedPtr<SimpleStorageService>(),
-                        (failure_cause == nullptr),
-                        failure_cause,
-                        this->getMessagePayloadValue(
-                                SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
+            new StorageServiceFileDeleteAnswerMessage(
+                location->getFile(),
+                this->getSharedPtr<SimpleStorageService>(),
+                (failure_cause == nullptr),
+                failure_cause,
+                this->getMessagePayloadValue(
+                    SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
         return true;
     }
 
@@ -229,20 +233,21 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileLookupRequest(
-            const std::shared_ptr<FileLocation> &location,
-            S4U_CommPort *answer_commport) {
-
+        const std::shared_ptr<FileLocation>& location,
+        S4U_CommPort* answer_commport) {
         bool file_found = this->file_system->file_exists(location->getFilePath());
 
         try {
             // Synchronous so that it won't be overtaken by an MQ message
             answer_commport->putMessage(
-                    new StorageServiceFileLookupAnswerMessage(
-                            location->getFile(),
-                            file_found,
-                            this->getMessagePayloadValue(
-                                    SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &ignore) {} // Oh, well
+                new StorageServiceFileLookupAnswerMessage(
+                    location->getFile(),
+                    file_found,
+                    this->getMessagePayloadValue(
+                        SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+        }
+        catch (ExecutionException& ignore) {
+        } // Oh, well
 
         return true;
     }
@@ -254,7 +259,7 @@ namespace wrench {
     sg_size_t SimpleStorageService::getTotalSpace() {
         sg_size_t capacity = 0;
         auto partitions = this->file_system->get_partitions();
-        for (auto const &p: partitions) {
+        for (auto const& p : partitions) {
             capacity += p->get_size();
         }
         return capacity;
@@ -268,7 +273,7 @@ namespace wrench {
     sg_size_t SimpleStorageService::getTotalFreeSpaceZeroTime() {
         sg_size_t free_space = 0;
         auto partitions = this->file_system->get_partitions();
-        for (auto const &p: partitions) {
+        for (auto const& p : partitions) {
             free_space += p->get_free_space();
         }
         return free_space;
@@ -282,7 +287,7 @@ namespace wrench {
     unsigned long SimpleStorageService::getTotalFilesZeroTime() {
         unsigned long num_files = 0;
         auto partitions = this->file_system->get_partitions();
-        for (auto const &p: partitions) {
+        for (auto const& p : partitions) {
             num_files += p->get_num_files();
         }
         return num_files;
@@ -292,7 +297,7 @@ namespace wrench {
      * @brief Determine whether the storage service has multiple mount points
      * @return true if multiple mount points, false otherwise
      */
-    bool SimpleStorageService::hasMultipleMountPoints() {
+    bool SimpleStorageService::hasMultipleMountPoints() const {
         return (this->file_system->get_partitions().size() > 1);
     }
 
@@ -304,8 +309,10 @@ namespace wrench {
     std::string SimpleStorageService::getBaseRootPath() {
         auto partitions = this->file_system->get_partitions();
         if (partitions.size() > 1) {
-            throw std::runtime_error("SimpleStorageService::getBaseRootPath(): storage service has multiple mount points, and thus no single getRootPath");
-        } else {
+            throw std::runtime_error(
+                "SimpleStorageService::getBaseRootPath(): storage service has multiple mount points, and thus no single getRootPath");
+        }
+        else {
             return (*partitions.begin())->get_name() + "/";
         }
     }
@@ -317,7 +324,7 @@ namespace wrench {
      */
     std::set<std::string> SimpleStorageService::getMountPoints() {
         std::set<std::string> to_return;
-        for (auto const &fs: this->file_system->get_partitions()) {
+        for (auto const& fs : this->file_system->get_partitions()) {
             to_return.insert(fs->get_name());
         }
         return to_return;
@@ -329,8 +336,10 @@ namespace wrench {
      */
     std::string SimpleStorageService::getMountPoint() {
         if (this->file_system->get_partitions().size() > 1) {
-            throw std::invalid_argument("SimpleStorageService::getMountPoint(): Storage service has multiple mount points");
-        } else {
+            throw std::invalid_argument(
+                "SimpleStorageService::getMountPoint(): Storage service has multiple mount points");
+        }
+        else {
             return this->file_system->get_partitions().at(0)->get_name();
         }
     }
@@ -341,7 +350,7 @@ namespace wrench {
     *
     * @return true whether the service has that mount point
     */
-    bool SimpleStorageService::hasMountPoint(const std::string &mp) {
+    bool SimpleStorageService::hasMountPoint(const std::string& mp) const {
         return (this->file_system->partition_by_name_or_null(mp) != nullptr);
     }
 
@@ -351,27 +360,28 @@ namespace wrench {
      * @param path: the path at which free space is requested
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFreeSpaceRequest(S4U_CommPort *answer_commport, const std::string &path) {
-
+    bool SimpleStorageService::processFreeSpaceRequest(S4U_CommPort* answer_commport, const std::string& path) {
         // TODO: Remove the sanitize
         sg_size_t free_space = 0;
         if (not path.empty()) {
             auto sanitized_path = FileLocation::sanitizePath(path);
             try {
                 free_space = this->file_system->get_free_space_at_path(path);
-            } catch (simgrid::Exception &ignore) {
             }
-        } else {
-            for (auto const &part: this->file_system->get_partitions()) {
+            catch (simgrid::Exception& ignore) {
+            }
+        }
+        else {
+            for (auto const& part : this->file_system->get_partitions()) {
                 free_space += part->get_free_space();
             }
         }
 
         answer_commport->dputMessage(
-                new StorageServiceFreeSpaceAnswerMessage(
-                        free_space,
-                        this->getMessagePayloadValue(
-                                SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
+            new StorageServiceFreeSpaceAnswerMessage(
+                free_space,
+                this->getMessagePayloadValue(
+                    SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
         return true;
     }
 
@@ -380,12 +390,14 @@ namespace wrench {
      * @param ack_commport: the commport to which the ack should be sent
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processStopDaemonRequest(S4U_CommPort *ack_commport) {
+    bool SimpleStorageService::processStopDaemonRequest(S4U_CommPort* ack_commport) {
         try {
             ack_commport->putMessage(
-                    new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                            SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &ignore) {}
+                new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                    SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+        }
+        catch (ExecutionException& ignore) {
+        }
         return false;
     }
 
@@ -408,7 +420,7 @@ namespace wrench {
      * @return the file's last write date, or -1 if the file is not found or if the path is invalid
      *
      */
-    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path) {
+    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<DataFile>& file, const std::string& path) {
         if (!file) {
             throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid nullptr argument");
         }
@@ -418,7 +430,8 @@ namespace wrench {
             double date = fd->stat()->last_modification_date;
             fd->close();
             return date;
-        } catch (simgrid::Exception &e) {
+        }
+        catch (simgrid::Exception& e) {
             return -1.0;
         }
     }
@@ -429,7 +442,7 @@ namespace wrench {
      * @param location: a location
      * @return true if the file is present, false otherwise
      */
-    bool SimpleStorageService::hasFile(const std::shared_ptr<FileLocation> &location) {
+    bool SimpleStorageService::hasFile(const std::shared_ptr<FileLocation>& location) {
         return this->file_system->file_exists(location->getFilePath());
     }
 
@@ -437,10 +450,11 @@ namespace wrench {
      * @brief Remove a directory and all files at the storage service (in zero simulated time)
      * @param path a path
      */
-    void SimpleStorageService::removeDirectory(const std::string &path) {
+    void SimpleStorageService::removeDirectory(const std::string& path) {
         if (not this->file_system->directory_exists(path)) {
             return;
-        } else {
+        }
+        else {
             this->file_system->unlink_directory(path);
         }
     }
@@ -449,11 +463,12 @@ namespace wrench {
      * @brief Remove a file at the storage service (in zero simulated time)
      * @param location: a location
      */
-    void SimpleStorageService::removeFile(const std::shared_ptr<FileLocation> &location) {
+    void SimpleStorageService::removeFile(const std::shared_ptr<FileLocation>& location) {
         std::string full_path = location->getFilePath();
         if (not this->file_system->file_exists(full_path)) {
             return;
-        } else {
+        }
+        else {
             this->file_system->unlink_file(full_path);
         }
     }
@@ -462,16 +477,17 @@ namespace wrench {
      * @brief Create a file at the storage service (in zero simulated time)
      * @param location: a location
      */
-    void SimpleStorageService::createFile(const std::shared_ptr<FileLocation> &location) {
+    void SimpleStorageService::createFile(const std::shared_ptr<FileLocation>& location) {
         std::string full_path = location->getFilePath();
 
         try {
             this->file_system->create_file(full_path, location->getFile()->getSize());
-        } catch (sgfs::FileAlreadyExistsException &e) {
+        }
+        catch (sgfs::FileAlreadyExistsException& e) {
             return; // nothing to do
-        } catch (sgfs::NotEnoughSpaceException &e) {
+        } catch (sgfs::NotEnoughSpaceException& e) {
             throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(
-                    location->getFile(), location->getStorageService()));
+                location->getFile(), location->getStorageService()));
         }
     }
 
@@ -481,7 +497,7 @@ namespace wrench {
      * @param location:  a location
      * @return a date in seconds, or -1 if the file is not found
      */
-    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+    double SimpleStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation>& location) {
         if (location == nullptr) {
             throw std::invalid_argument("SimpleStorageService::getFileLastWriteDate(): Invalid nullptr argument");
         }
@@ -492,7 +508,8 @@ namespace wrench {
             double date = fd->stat()->last_modification_date;
             fd->close();
             return date;
-        } catch (simgrid::Exception &e) {
+        }
+        catch (simgrid::Exception& e) {
             return -1.0;
         }
     }
@@ -502,7 +519,7 @@ namespace wrench {
      * @param path: a path
      * @return a disk, or nullptr if path is invalid
      */
-    simgrid::s4u::Disk *SimpleStorageService::getDiskForPathOrNull(const string &path) {
+    simgrid::s4u::Disk* SimpleStorageService::getDiskForPathOrNull(const string& path) const {
         auto partition = this->file_system->get_partition_for_path_or_null(path);
         if (!partition) {
             return nullptr;
@@ -516,9 +533,9 @@ namespace wrench {
      * @param opened_file: an opened file (if success)
      * @return a FailureCause or nullptr if success
      */
-    std::shared_ptr<FailureCause> SimpleStorageService::validateFileReadRequest(const std::shared_ptr<FileLocation> &location,
-                                                                                std::shared_ptr<simgrid::fsmod::File> &opened_file) {
-
+    std::shared_ptr<FailureCause> SimpleStorageService::validateFileReadRequest(
+        const std::shared_ptr<FileLocation>& location,
+        std::shared_ptr<simgrid::fsmod::File>& opened_file) const {
         auto partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
         if ((not partition) or (not this->file_system->directory_exists(location->getDirectoryPath()))) {
             return std::make_shared<InvalidDirectoryPath>(location);
@@ -537,10 +554,10 @@ namespace wrench {
      * @param opened_file: an opened file (if success)
      * @return a FailureCause or nullptr if success
      */
-    std::shared_ptr<FailureCause> SimpleStorageService::validateFileWriteRequest(const std::shared_ptr<FileLocation> &location,
-                                                                                 sg_size_t num_bytes_to_write,
-                                                                                 std::shared_ptr<simgrid::fsmod::File> &opened_file) {
-
+    std::shared_ptr<FailureCause> SimpleStorageService::validateFileWriteRequest(
+        const std::shared_ptr<FileLocation>& location,
+        sg_size_t num_bytes_to_write,
+        std::shared_ptr<simgrid::fsmod::File>& opened_file) {
         auto file = location->getFile();
 
         // Is the partition valid?
@@ -551,20 +568,25 @@ namespace wrench {
 
         bool file_already_there = this->file_system->file_exists(location->getFilePath());
         try {
-            if (not file_already_there) { // Open dot file
+            if (not file_already_there) {
+                // Open dot file
                 if (num_bytes_to_write < location->getFile()->getSize()) {
-                    std::string err_msg = "Cannot write fewer number of bytes than the file size if the file isn't already present";
+                    std::string err_msg =
+                        "Cannot write fewer number of bytes than the file size if the file isn't already present";
                     return std::make_shared<NotAllowed>(this->getSharedPtr<Service>(), err_msg);
                 }
                 std::string dot_file_path = location->getADotFilePath();
                 this->file_system->create_file(dot_file_path, location->getFile()->getSize());
                 opened_file = this->file_system->open(dot_file_path, "r+");
                 opened_file->seek(0, SEEK_SET);
-            } else { // Open the file
+            }
+            else {
+                // Open the file
                 opened_file = this->file_system->open(location->getFilePath(), "r+");
                 opened_file->seek(0, SEEK_SET);
             }
-        } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
+        }
+        catch (simgrid::fsmod::NotEnoughSpaceException& e) {
             return std::make_shared<StorageServiceNotEnoughSpace>(
                 file,
                 this->getSharedPtr<SimpleStorageService>());
@@ -580,10 +602,11 @@ namespace wrench {
      * @param dst_opened_file: a dst opened file (if success)
      * @return A FailureCause or nullptr if success
      */
-    std::shared_ptr<FailureCause> SimpleStorageService::validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location,
-                                                                                std::shared_ptr<FileLocation> &dst_location,
-                                                                                std::shared_ptr<simgrid::fsmod::File> &src_opened_file,
-                                                                                std::shared_ptr<simgrid::fsmod::File> &dst_opened_file) {
+    std::shared_ptr<FailureCause> SimpleStorageService::validateFileCopyRequest(
+        const std::shared_ptr<FileLocation>& src_location,
+        std::shared_ptr<FileLocation>& dst_location,
+        std::shared_ptr<simgrid::fsmod::File>& src_opened_file,
+        std::shared_ptr<simgrid::fsmod::File>& dst_opened_file) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto file = src_location->getFile();
 
@@ -610,16 +633,20 @@ namespace wrench {
         // Open destination file (as it may fail)
         try {
             bool dst_file_already_there = dst_file_system->file_exists(dst_location->getFilePath());
-            if (not dst_file_already_there) { // Open dot file
+            if (not dst_file_already_there) {
+                // Open dot file
                 std::string dot_file_path = dst_location->getADotFilePath();
                 dst_file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
                 dst_opened_file = dst_file_system->open(dot_file_path, "r+");
                 dst_opened_file->seek(0, SEEK_SET);
-            } else { // Open the file
+            }
+            else {
+                // Open the file
                 dst_opened_file = dst_file_system->open(dst_location->getFilePath(), "r+");
                 dst_opened_file->seek(0, SEEK_SET);
             }
-        } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
+        }
+        catch (simgrid::fsmod::NotEnoughSpaceException& e) {
             return std::make_shared<StorageServiceNotEnoughSpace>(file, this->getSharedPtr<SimpleStorageService>());
         }
 
@@ -628,5 +655,4 @@ namespace wrench {
 
         return nullptr;
     }
-
-}// namespace wrench
+} // namespace wrench

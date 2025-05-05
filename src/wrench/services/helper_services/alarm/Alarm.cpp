@@ -51,7 +51,6 @@ namespace wrench {
         WRENCH_INFO("Alarm Service starting with alarm date = %.20f", this->date);
 
         double time_to_sleep = this->date - S4U_Simulation::getClock();
-
         if (time_to_sleep > 0) {
             S4U_Simulation::sleep(time_to_sleep);
         }
@@ -84,7 +83,7 @@ namespace wrench {
     Alarm::createAndStartAlarm(Simulation *simulation, double date, const std::string& hostname,
                                S4U_CommPort *reply_commport,
                                SimulationMessage *msg, const std::string& suffix) {
-        std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
+        auto alarm_ptr = std::shared_ptr<Alarm>(
                 new Alarm(date, hostname, reply_commport, msg, suffix));
         alarm_ptr->simulation_ = simulation;
         alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart

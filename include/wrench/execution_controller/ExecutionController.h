@@ -56,7 +56,7 @@ namespace wrench {
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
         std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::map<std::string, double> &measurement_periods);
-        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period);
+        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::vector<std::string> &link_names, double measurement_period);
 
 
         std::shared_ptr<ExecutionEvent> waitForNextEvent();

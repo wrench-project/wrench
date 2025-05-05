@@ -195,7 +195,7 @@ namespace wrench {
         // Create the s4u_actor
 
         try {
-            this->s4u_actor = simgrid::s4u::Actor::create(this->process_name,
+            this->s4u_actor = simgrid::s4u::Engine::get_instance()->add_actor(this->process_name,
                                                           this->host,
                                                           S4U_DaemonActor(this));
         } catch (simgrid::Exception &) {

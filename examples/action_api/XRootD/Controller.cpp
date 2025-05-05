@@ -75,7 +75,6 @@ namespace wrench {
      *
      */
     int Controller::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         WRENCH_INFO("Controller starting");

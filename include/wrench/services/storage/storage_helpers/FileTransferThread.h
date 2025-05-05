@@ -65,7 +65,7 @@ namespace wrench {
                            sg_size_t num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
                            std::shared_ptr<simgrid::fsmod::File> src_opened_file,
-                           std::shared_ptr<FileLocation> dsg_location,
+                           std::shared_ptr<FileLocation> dst_location,
                            std::shared_ptr<simgrid::fsmod::File> dst_opened_file,
                            S4U_CommPort *answer_commport_if_read,
                            S4U_CommPort *answer_commport_if_write,

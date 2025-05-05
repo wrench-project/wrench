@@ -137,12 +137,12 @@ namespace wrench {
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
-     * @param filename the path to a .xml XML platform description file or a .so/.dylib shared object platform file
+     * @param filepath the path to a .xml XML platform description file or a .so/.dylib shared object platform file
      *
      */
-    void S4U_Simulation::setupPlatformFromFile(const std::string &filename) {
+    void S4U_Simulation::setupPlatformFromFile(const std::string &filepath) {
         try {
-            this->engine->load_platform(filename);
+            this->engine->load_platform(filepath);
         } catch (simgrid::ParseError &e) {
             throw std::invalid_argument("Platform description file error: " + std::string(e.what()));
         } catch (std::invalid_argument &) {
@@ -730,7 +730,7 @@ namespace wrench {
                 }
                 try {
                     capacity_value = UnitParser::parse_size(capacity_string);
-                } catch (std::invalid_argument &e) {
+                } catch (std::invalid_argument &) {
                     throw std::invalid_argument(
                             "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) +
                             "'has invalid memory_manager_service capacity specification '" + tag + ":" +
@@ -855,7 +855,7 @@ namespace wrench {
         }
         try {
             host->set_pstate(pstate);
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
                     "Make sure the energy is plugin is enabled (--wrench-energy-simulation) and "
@@ -868,7 +868,7 @@ namespace wrench {
 * @param hostname: the host name
 * @return The number of power states available for the host (as specified in the platform xml description file)
 */
-    int S4U_Simulation::getNumberofPstates(const std::string &hostname) {
+    int S4U_Simulation::getNumberOfPstates(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -894,9 +894,9 @@ namespace wrench {
         }
         try {
             return host->get_pstate();
-        } catch (std::exception &e) {
+        } catch (std::exception &) {
             throw std::runtime_error(
-                    "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
+                    "S4U_Simulation::getNumberOfPstates():: Was not able to get the energy consumed by the host. "
                     "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
         }
     }
@@ -907,7 +907,7 @@ namespace wrench {
     * @return The power consumption for this host if idle (as specified in the platform xml description file)
     */
     double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        const auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -955,7 +955,7 @@ namespace wrench {
 
         std::vector<int> list = {};
         try {
-            int num_pstates = getNumberofPstates(hostname);
+            int num_pstates = getNumberOfPstates(hostname);
             for (int i = 0; i < num_pstates; i++) {
                 list.push_back(i);
             }
@@ -1000,7 +1000,7 @@ namespace wrench {
             if (!p) {
                 p = "/";
             }
-            std::string mount_point = std::string(p);
+            auto mount_point = std::string(p);
             mount_points.push_back(mount_point);
         }
 
@@ -1045,7 +1045,7 @@ namespace wrench {
  * @param dst_host: dst hostname
  * @return a vector of link names
  */
-    std::vector<std::string> S4U_Simulation::getRoute(std::string &src_host, std::string &dst_host) {
+    std::vector<std::string> S4U_Simulation::getRoute(const std::string &src_host, const std::string &dst_host) {
         simgrid::s4u::Host *src, *dst;
         try {
             src = S4U_Simulation::get_host_or_vm_by_name(src_host);
@@ -1153,7 +1153,7 @@ namespace wrench {
             }
         }
         // Create the disk
-        auto disk = host->create_disk(disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec);
+        auto disk = host->add_disk(disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec);
         // Add the required disk properties
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
