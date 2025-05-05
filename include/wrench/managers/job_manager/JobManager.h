@@ -107,7 +107,7 @@ namespace wrench {
 
         void terminateJob(const std::shared_ptr<PilotJob> &job);
 
-        S4U_CommPort *getCreatorCommPort();
+        S4U_CommPort *getCreatorCommPort() const;
 
         unsigned long getNumRunningPilotJobs() const;
 

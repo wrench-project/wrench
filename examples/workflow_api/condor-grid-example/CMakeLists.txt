@@ -31,6 +31,7 @@ if (ENABLE_BATSCHED)
     target_link_libraries(wrench-example-condor-grid-universe
             wrench
             ${SimGrid_LIBRARY}
+	    ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             ${ZMQ_LIBRARY}
             )
@@ -38,6 +39,7 @@ else()
     target_link_libraries(wrench-example-condor-grid-universe
             wrench
             ${SimGrid_LIBRARY}
+	    ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             )
 endif()

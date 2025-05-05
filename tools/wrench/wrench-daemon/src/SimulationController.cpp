@@ -2040,17 +2040,36 @@ namespace wrench {
 
             answer["workflow_name"] = wf->getName();
 
-            std::vector<std::string> task_names;
+            std::vector<json> task_specs;
             for (const auto &t: wf->getTasks()) {
-                task_names.push_back(t->getID());
+                json task_spec;
+                task_spec["name"] = t->getID();
+                task_spec["flops"] = t->getFlops();
+                task_spec["min_num_cores"] = t->getMinNumCores();
+                task_spec["max_num_cores"] = t->getMaxNumCores();
+                task_spec["memory"] = t->getMemoryRequirement();
+                std::vector<std::string> input_file_names;
+                for (auto const &f: t->getInputFiles()) {
+                    input_file_names.push_back(f->getID());
+                }
+                task_spec["input_file_names"] = input_file_names;
+                std::vector<std::string> output_file_names;
+                for (auto const &f: t->getOutputFiles()) {
+                    output_file_names.push_back(f->getID());
+                }
+                task_spec["output_file_names"] = output_file_names;
+                task_specs.push_back(task_spec);
             }
-            answer["tasks"] = task_names;
+            answer["tasks"] = task_specs;
 
-            std::vector<std::string> file_names;
+            std::vector<json> file_specs;
             for (const auto &t: wf->getFileMap()) {
-                file_names.push_back(t.second->getID());
+                json file_spec;
+                file_spec["name"] = t.second->getID();
+                file_spec["size"] = t.second->getSize();
+                file_specs.push_back(file_spec);
             }
-            answer["files"] = file_names;
+            answer["files"] = file_specs;
 
             return answer;
         } catch (std::exception &e) {

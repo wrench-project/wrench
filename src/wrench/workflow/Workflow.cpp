@@ -677,7 +677,7 @@ namespace wrench {
      * @return a date in seconds (or a negative value
      *        If the workflow has not completed)
      */
-    double Workflow::getCompletionDate() {
+    double Workflow::getCompletionDate() const {
         double completion_date = -1.0;
         for (auto const &task: this->tasks) {
             if (task.second->getState() != WorkflowTask::State::COMPLETED) {
@@ -695,7 +695,7 @@ namespace wrench {
      * @return a date in seconds (or a negative value
      *        if no workflow task has successfully completed)
      */
-    double Workflow::getStartDate() {
+    double Workflow::getStartDate() const {
         double start_date = -1.0;
         for (auto const &task: this->tasks) {
             if (task.second->getState() == WorkflowTask::State::COMPLETED) {

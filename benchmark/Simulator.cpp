@@ -10,7 +10,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(stress_test_simulator, "Log category for Stress Tes
 using namespace wrench;
 
 void setupSimulationPlatform(const shared_ptr<Simulation> &simulation, unsigned long num_cs, unsigned long num_ss) {
-
     // Create the platform file
     std::string xml = "<?xml version='1.0'?>\n";
     xml += "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">\n";
@@ -73,7 +72,6 @@ void setupSimulationPlatform(const shared_ptr<Simulation> &simulation, unsigned 
 }
 
 int main(int argc, char **argv) {
-
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);

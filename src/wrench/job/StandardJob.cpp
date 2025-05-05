@@ -143,7 +143,7 @@ namespace wrench {
      * @brief Get the state of the standard job
      * @return the state
      */
-    StandardJob::State StandardJob::getState() {
+    StandardJob::State StandardJob::getState() const {
         return this->state;
     }
 
@@ -788,8 +788,8 @@ namespace wrench {
  * @param state_changes: state changes
  * @param failure_count_increments: set of tasks whose failure counts should be incremented by one
  */
-    void StandardJob::applyTaskUpdates(map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
-                                       set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {
+    void StandardJob::applyTaskUpdates(const map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                       const set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {
         // Update task states
         for (auto &state_update: state_changes) {
             std::shared_ptr<WorkflowTask> task = state_update.first;

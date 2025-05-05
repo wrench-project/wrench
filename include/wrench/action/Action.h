@@ -60,9 +60,9 @@ namespace wrench {
         double getEndDate() const;
         std::shared_ptr<FailureCause> getFailureCause() const;
 
-        std::set<std::shared_ptr<Action>> getChildren();
+        std::set<std::shared_ptr<Action>> getChildren() const;
 
-        std::set<std::shared_ptr<Action>> getParents();
+        std::set<std::shared_ptr<Action>> getParents() const;
 
         virtual unsigned long getMinNumCores() const;
         virtual unsigned long getMaxNumCores() const;

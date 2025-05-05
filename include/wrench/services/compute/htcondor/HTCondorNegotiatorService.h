@@ -53,7 +53,7 @@ namespace wrench {
                             std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &rhs);
         };
 
-        std::shared_ptr<ComputeService> pickTargetComputeService(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_arguments);
+        std::shared_ptr<ComputeService> pickTargetComputeService(const std::shared_ptr<CompoundJob>& job, const std::map<std::string, std::string> &service_specific_arguments);
         std::shared_ptr<ComputeService> pickTargetComputeServiceGridUniverse(const std::shared_ptr<CompoundJob> &job, std::map<std::string, std::string> service_specific_arguments);
         std::shared_ptr<ComputeService> pickTargetComputeServiceNonGridUniverse(const std::shared_ptr<CompoundJob> &job, const std::map<std::string, std::string> &service_specific_arguments);
 

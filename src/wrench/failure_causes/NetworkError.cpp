@@ -43,7 +43,7 @@ namespace wrench {
      * @brief Returns whether the network error occurred while receiving
      * @return true or false
      */
-    bool NetworkError::whileReceiving() {
+    bool NetworkError::whileReceiving() const {
         return (this->operation_type == NetworkError::RECEIVING);
     }
 
@@ -51,7 +51,7 @@ namespace wrench {
      * @brief Returns whether the network error occurred while sending
      * @return true or false
      */
-    bool NetworkError::whileSending() {
+    bool NetworkError::whileSending() const {
         return (this->operation_type == NetworkError::SENDING);
     }
 
@@ -59,7 +59,7 @@ namespace wrench {
      * @brief Returns whether the network error was a timeout
      * @return true or false
      */
-    bool NetworkError::isTimeout() {
+    bool NetworkError::isTimeout() const {
         return (this->error_type == NetworkError::TIMEOUT);
     }
 

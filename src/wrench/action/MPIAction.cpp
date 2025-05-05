@@ -35,7 +35,7 @@ namespace wrench {
     MPIAction::MPIAction(const std::string &name,
                          unsigned long num_processes,
                          unsigned long num_cores_per_process,
-                         std::function<void(const std::shared_ptr<ExecutionController> &controller)> lambda_mpi) : Action(name, "mpi_"), num_processes(num_processes), num_cores_per_process(num_cores_per_process), lambda_mpi(lambda_mpi) {
+                         const std::function<void(const std::shared_ptr<ExecutionController> &controller)>& lambda_mpi) : Action(name, "mpi_"), num_processes(num_processes), num_cores_per_process(num_cores_per_process), lambda_mpi(lambda_mpi) {
         S4U_Simulation::enableSMPI();
     }
 

@@ -10,11 +10,7 @@
 #ifndef SIMULATION_DAEMON_H
 #define SIMULATION_DAEMON_H
 
-#include "httplib.h"
 #include "crow.h"
-
-using httplib::Request;
-using httplib::Response;
 
 #include <wrench-dev.h>
 #include <map>

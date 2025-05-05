@@ -56,7 +56,7 @@ namespace wrench {
             //            virtual void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
             void deleteFile(const std::shared_ptr<DataFile> &file);
             void removeFileLocation(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
-            unsigned int size();
+            unsigned int size() const;
             /***********************/
             /** \endcond          */
             /***********************/
@@ -73,7 +73,7 @@ namespace wrench {
             /***********************/
 
             std::shared_ptr<Node> root_supervisor = nullptr;
-            std::shared_ptr<Node> createStorageServer(const std::string &hostname, const std::string &mount_point, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE storage_messagepayload_list, WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list = {});
+            std::shared_ptr<Node> createStorageServer(const std::string &hostname, const std::string &mount_point, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE storage_messagepayload_list, const WRENCH_PROPERTY_COLLECTION_TYPE& node_property_list = {}, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& node_messagepayload_list = {});
             std::shared_ptr<Node> createSupervisor(const std::string &hostname, WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list = {});
 
             friend Node;
