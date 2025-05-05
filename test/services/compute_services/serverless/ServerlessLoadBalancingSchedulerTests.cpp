@@ -263,22 +263,16 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
      * details about available command-line arguments. */
     simulation->init(&argc, argv);
 
-    /* Parsing of the command-line arguments for this WRENCH simulation */
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <xml platform file> [--log=custom_controller.threshold=info]" <<
-            std::endl;
-        exit(1);
-    }
 
-    std::cerr << "Instantiating simulated platform..." << std::endl;
-    simulation->instantiatePlatform(argv[1]);
+    // std::cerr << "Instantiating simulated platform..." << std::endl;
+    simulation->instantiatePlatform(this->platform_file_path);
 
-    std::cerr << "Instantiating a SimpleStorageService on UserHost..." << std::endl;
+    // std::cerr << "Instantiating a SimpleStorageService on UserHost..." << std::endl;
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
     /* Instantiate a serverless compute service */
-    std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
+    // std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
     std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
@@ -290,9 +284,9 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
         new ServerlessLoadBalancingSchedulerTestBasicController(this, user_host, serverless_provider, storage_service));
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
-    std::cerr << "Launching the Simulation..." << std::endl;
+    // std::cerr << "Launching the Simulation..." << std::endl;
     simulation->launch();
-    std::cerr << "Simulation done!" << std::endl;
+    // std::cerr << "Simulation done!" << std::endl;
 
     double end_date = wrench::Simulation::getCurrentSimulatedDate();
     // ASSERT_DOUBLE_EQ(end_date, 120.0);
