@@ -603,7 +603,7 @@ namespace wrench
         if (host.empty())
         {
             WRENCH_INFO("No host on this service can accommodate this VM at this time");
-            std::string empty = std::string();
+            auto empty = std::string();
             msg_to_send_back =
                 new CloudComputeServiceCreateVMAnswerMessage(
                     false,

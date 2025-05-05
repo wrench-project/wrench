@@ -424,7 +424,7 @@ namespace wrench {
      *        simulation output if record_as_time_stamp is set to true
      *        
      * @param link_name: the link's name
-     * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
+     * @param record_as_time_stamp: whether to record a SimulationTimestampLinkUsage object
      * @return current bandwidth usage in Bps
      */
     double Simulation::getLinkUsage(const std::string &link_name, bool record_as_time_stamp) {
@@ -521,8 +521,8 @@ namespace wrench {
         // By default, it will be 0 if it is not explicitly set in the platform file.
         // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
         // still be called.
-        for (const auto &hostname: this->getHostnameList()) {
-            this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(), hostname, getCurrentPstate(hostname));
+        for (const auto &hostname: Simulation::getHostnameList()) {
+            this->getOutput().addTimestampPstateSet(getCurrentSimulatedDate(), hostname, getCurrentPstate(hostname));
         }
 
         // Start all services (including execution controllers)
@@ -560,7 +560,7 @@ namespace wrench {
      * @brief Check that the simulation is correctly instantiated by the user
      *
      */
-    void Simulation::checkSimulationSetup() {
+    void Simulation::checkSimulationSetup() const {
         // Check that the simulation is initialized
         if (not this->s4u_simulation->isInitialized()) {
             throw std::runtime_error("Simulation is not initialized");
@@ -775,7 +775,7 @@ namespace wrench {
     /**
      * @brief Method to create a new disk in the platform, which can be handy
      * @param hostname: the name of the host to which the disk should be attached
-     * @param disk_id: the nae of the disk
+     * @param disk_id: the name of the disk
      * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
      * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
      * @param capacity_in_bytes: the disk's capacity in bytes
@@ -1238,7 +1238,7 @@ namespace wrench {
     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
     *          simulation output if can_record is set to true
     * @param hostnames: the list of hostnames
-    * @param record_as_time_stamps: whether or not to record a SimulationTimestampEnergyConsumption object for each host when this method is called
+    * @param record_as_time_stamps: whether to record a SimulationTimestampEnergyConsumption object for each host when this method is called
     * @return current energy consumption in joules for each host, as a map indexed by hostnames
     */
     std::map<std::string, double>
@@ -1270,7 +1270,7 @@ namespace wrench {
      * @return The number of power states available for the host (as specified in the platform xml description file)
      */
     int Simulation::getNumberOfPstates(const std::string &hostname) {
-        return S4U_Simulation::getNumberofPstates(hostname);
+        return S4U_Simulation::getNumberOfPstates(hostname);
     }
 
     /**
@@ -1505,7 +1505,7 @@ namespace wrench {
         //        }
 
         // Check that if --pagecache is passed, each host has a "/memory" disk
-        if (this->isPageCachingEnabled()) {
+        if (wrench::Simulation::isPageCachingEnabled()) {
             for (auto const &h: hostnames) {
                 bool has_memory_disk = false;
                 for (auto const &d: S4U_Simulation::get_host_or_vm_by_name(h)->get_disks()) {

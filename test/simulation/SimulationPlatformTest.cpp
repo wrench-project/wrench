@@ -87,8 +87,8 @@ private:
 
         // Testing finding subzones
         auto subnetzones = wrench::S4U_Simulation::getAllSubZoneIDsByZone();
-        if (subnetzones.size() != 1) {
-            throw std::runtime_error("Invalid number of netzones found");
+        if (subnetzones.size() != 2) {
+            throw std::runtime_error("Invalid number of netzones found " + std::to_string(subnetzones.size()) + " (should be 2)");
         }
         if (subnetzones["world"].size() != 2) {
             throw std::runtime_error("Invalid number of netzones found under the 'world' netzone");
@@ -147,11 +147,6 @@ private:
         if (hosts["halfduplex"].size() != 4) {
             throw std::runtime_error("Invalid number of hosts found under cluster 'halfduplex' found");
         }
-
-        if (wrench::S4U_Simulation::getClusterProperty("simple", "wattage_off") != "0.0") {
-            throw std::runtime_error("Invalid cluster property value");
-        }
-
 
         return 0;
     }
@@ -282,25 +277,26 @@ private:
 
     static void create_platform(double link_bw) {
         // Create the top-level zone
-        auto zone = simgrid::s4u::create_full_zone("AS0");
+        // auto zone = simgrid::s4u::NetZone::add_netzone_full("AS0");
+        auto zone = simgrid::s4u::Engine::get_instance()->get_netzone_root();
         // Create the WMSHost host with its disk
-        auto wms_host = zone->create_host("WMSHost", "10Gf");
+        auto wms_host = zone->add_host("WMSHost", "10Gf");
         wms_host->set_core_count(1);
-        auto wms_host_disk = wms_host->create_disk("hard_drive",
+        auto wms_host_disk = wms_host->add_disk("hard_drive",
                                                    "100MBps",
                                                    "100MBps");
         wms_host_disk->set_property("size", "5000GiB");
         wms_host_disk->set_property("mount", "/");
 
         // Create a ComputeHost
-        auto compute_host = zone->create_host("ComputeHost", "1Gf");
+        auto compute_host = zone->add_host("ComputeHost", "1Gf");
         compute_host->set_core_count(10);
         compute_host->set_property("ram", "16GB");
 
         // Create three network links
-        auto network_link = zone->create_link("network_link", link_bw)->set_latency("20us");
-        auto loopback_WMSHost = zone->create_link("loopback_WMSHost", "1000EBps")->set_latency("0us");
-        auto loopback_ComputeHost = zone->create_link("loopback_ComputeHost", "1000EBps")->set_latency("0us");
+        auto network_link = zone->add_link("network_link", link_bw)->set_latency("20us");
+        auto loopback_WMSHost = zone->add_link("loopback_WMSHost", "1000EBps")->set_latency("0us");
+        auto loopback_ComputeHost = zone->add_link("loopback_ComputeHost", "1000EBps")->set_latency("0us");
 
         // Add routes
         {

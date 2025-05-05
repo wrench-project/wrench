@@ -40,13 +40,13 @@ namespace wrench {
             SUSPENDED
         };
 
-        S4U_VirtualMachine(const std::string &vm_hostname,
+        S4U_VirtualMachine(const std::string &vm_name,
                            unsigned long num_cores,
                            sg_size_t ram_memory,
                            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list);
 
-        void start(std::string &pm_name);
+        void start(const std::string &pm_name);
 
         void suspend();
 
@@ -57,19 +57,19 @@ namespace wrench {
         void migrate(const std::string &dst_pm_name);
 
         std::string getPhysicalHostname();
-        unsigned long getNumCores();
-        sg_size_t getMemory();
+        unsigned long getNumCores() const;
+        sg_size_t getMemory() const;
         WRENCH_PROPERTY_COLLECTION_TYPE getPropertyList();
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE getMessagePayloadList();
 
-        State getState();
-        std::string getStateAsString();
+        State getState() const;
+        std::string getStateAsString() const;
 
 
     private:
         State state;
         std::string vm_name;
-        simgrid::s4u::VirtualMachine *vm;
+        simgrid::s4u::VirtualMachine *vm = nullptr;
         unsigned long num_cores;
         sg_size_t ram_memory;
         std::string pm_name;

@@ -27,7 +27,7 @@ namespace wrench {
      * @param hostname: the name of the host that has turned on
      */
     HostHasTurnedOnMessage::HostHasTurnedOnMessage(const std::string& hostname) : HostStateChangeDetectorMessage() {
-        this->hostname = std::move(hostname);
+        this->hostname = hostname;
     }
 
     /**
@@ -36,7 +36,7 @@ namespace wrench {
      * @param hostname: the name of the host that has turned off
      */
     HostHasTurnedOffMessage::HostHasTurnedOffMessage(const std::string& hostname) : HostStateChangeDetectorMessage() {
-        this->hostname = std::move(hostname);
+        this->hostname = hostname;
     }
 
     /**

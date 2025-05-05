@@ -12,6 +12,7 @@
 #include <wrench/services/storage/xrootd/Deployment.h>
 
 #include <utility>
+
 namespace wrench {
     namespace XRootD {
 
@@ -45,7 +46,7 @@ namespace wrench {
         }
 
         /**
-        * @brief Create the an XRootD Node that will be a supervisor
+        * @brief Create the XRootD Node that will be a supervisor
         *
         * @param hostname: the name of the host on which the service should run
         * @param node_property_list: The property list to use for the new Node, defaults to {}
@@ -78,9 +79,9 @@ namespace wrench {
                 const std::string &mount_point,
                 WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,
                 WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE storage_messagepayload_list,
-                WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
-                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list) {
-            std::shared_ptr<Node> ret = createNode(hostname, std::move(node_property_list), std::move(node_messagepayload_list));
+                const WRENCH_PROPERTY_COLLECTION_TYPE& node_property_list,
+                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& node_messagepayload_list) {
+            std::shared_ptr<Node> ret = createNode(hostname, node_property_list, node_messagepayload_list);
             ret->makeFileServer({mount_point}, std::move(storage_property_list), std::move(storage_messagepayload_list));
             simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
@@ -102,7 +103,7 @@ namespace wrench {
             for (auto property: messagepayload_list_override) {//override XRootD default message payload with supplied properties for this node
                 payloads[property.first] = property.second;
             }
-            std::shared_ptr<Node> ret = make_shared<Node>(this, hostname, properties, payloads);
+            auto ret = make_shared<Node>(this, hostname, properties, payloads);
             ret->metavisor = this;
             nodes.push_back(ret);
             simulation->add(ret);
@@ -122,7 +123,7 @@ namespace wrench {
         *
         * @return the number of nodes in the federation
         */
-        unsigned int Deployment::size() {
+        unsigned int Deployment::size() const {
             return nodes.size();
         }
 

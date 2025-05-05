@@ -29,7 +29,7 @@ namespace wrench {
      * @param location: the read location
      * @param num_bytes: the number of bytes to read
      */
-    FileReaderThread::FileReaderThread(std::string hostname,
+    FileReaderThread::FileReaderThread(const std::string& hostname,
                                        S4U_CommPort *creator_commport,
                                        std::shared_ptr<FileLocation> location,
                                        sg_size_t num_bytes) : Service(hostname, "file_reader_thread") {
