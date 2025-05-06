@@ -13,6 +13,7 @@
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
+#include "wrench/failure_causes/OperationTimeout.h"
 #include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
@@ -28,6 +29,8 @@ public:
 
     void do_FunctionRegistrationTest_test();
     void do_FunctionInvocationTest_test();
+    void do_FunctionTimeoutTest_test();
+    void do_FunctionErrorTest_test();
 
 protected:
     ~ServerlessBasicTest() override {
@@ -342,6 +345,222 @@ void ServerlessBasicTest::do_FunctionInvocationTest_test() {
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessBasicTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  FUNCTION TIMEOUT TEST                                           **/
+/**********************************************************************/
+
+class ServerlessBasicTestFunctionTimeoutController : public wrench::ExecutionController {
+public:
+    ServerlessBasicTestFunctionTimeoutController(ServerlessBasicTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessBasicTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        // Register a function
+        auto function_manager = this->createFunctionManager();
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(50);
+            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+        };
+
+        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
+        auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
+        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
+        wrench::StorageService::createFileAtLocation(image_location);
+        wrench::StorageService::createFileAtLocation(code_location);
+
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location, code_location);
+
+        // Invoking a non-registered function
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation
+        {
+            auto invocation = function_manager->invokeFunction(function1, this->compute_service, input);
+
+            function_manager->wait_one(invocation);
+
+            if (!invocation->isDone()) {
+                throw std::runtime_error("Invocation should be done by now");
+            }
+
+            if (invocation->isSuccess()) {
+                throw std::runtime_error("Invocation should NOT have succeeded");
+            }
+            if (not invocation->getFailureCause()) {
+                throw std::runtime_error("There should be a failure cause");
+            }
+            if (not std::dynamic_pointer_cast<wrench::OperationTimeout>(invocation->getFailureCause())) {
+                throw std::runtime_error("Unexpected failure cause: " + invocation->getFailureCause()->toString());
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessBasicTest, FunctionTimeout) {
+    DO_TEST_WITH_FORK(do_FunctionTimeoutTest_test);
+}
+
+void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessBasicTestFunctionTimeoutController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  FUNCTION ERROR TEST                                             **/
+/**********************************************************************/
+
+class ServerlessBasicTestFunctionErrorController : public wrench::ExecutionController {
+public:
+    ServerlessBasicTestFunctionErrorController(ServerlessBasicTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessBasicTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+    std::shared_ptr<wrench::DataFile> data_file;
+
+    int main() override {
+
+        // Create a datafile that's nowhere
+        this->data_file = wrench::Simulation::addFile("data_file", 100 * MB);
+        // Register a function
+        auto function_manager = this->createFunctionManager();
+        std::function lambda = [this](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(1);
+            // Will fail
+            wrench::StorageService::readFileAtLocation(
+                wrench::FileLocation::LOCATION(this->storage_service, this->data_file));
+            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+        };
+
+        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
+        auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
+        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
+        wrench::StorageService::createFileAtLocation(image_location);
+        wrench::StorageService::createFileAtLocation(code_location);
+
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location, code_location);
+
+        // Invoking a non-registered function
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation
+        {
+            auto invocation = function_manager->invokeFunction(function1, this->compute_service, input);
+
+            function_manager->wait_one(invocation);
+
+            if (!invocation->isDone()) {
+                throw std::runtime_error("Invocation should be done by now");
+            }
+
+            if (invocation->isSuccess()) {
+                throw std::runtime_error("Invocation should NOT have succeeded");
+            }
+            if (not invocation->getFailureCause()) {
+                throw std::runtime_error("There should be a failure cause");
+            }
+            if (not std::dynamic_pointer_cast<wrench::FileNotFound>(invocation->getFailureCause())) {
+                throw std::runtime_error("Unexpected failure cause: " + invocation->getFailureCause()->toString());
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessBasicTest, FunctionError) {
+    DO_TEST_WITH_FORK(do_FunctionErrorTest_test);
+}
+
+void ServerlessBasicTest::do_FunctionErrorTest_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessBasicTestFunctionErrorController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 

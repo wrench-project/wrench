@@ -9,7 +9,6 @@
 
 #include "wrench/services/compute/serverless/Invocation.h"
 
-// terminal output
 #include "wrench/logging/TerminalOutput.h"
 WRENCH_LOG_CATEGORY(Invocations, "Log category for Serverless invocations");
 
@@ -17,10 +16,10 @@ WRENCH_LOG_CATEGORY(Invocations, "Log category for Serverless invocations");
 namespace wrench {
 
     /**
-     * @brief Constructor for Invocation.
-     * @param registered_function The registered function to be invoked.
-     * @param function_input The input for the function.
-     * @param notify_commport The communication port for notifications.
+     * @brief Constructor
+     * @param registered_function The registered function to be invoked
+     * @param function_input The input for the function
+     * @param notify_commport The commport to notify upon completion/failure
      */
     Invocation::Invocation(const std::shared_ptr<RegisteredFunction> &registered_function,
                            const std::shared_ptr<FunctionInput> &function_input,

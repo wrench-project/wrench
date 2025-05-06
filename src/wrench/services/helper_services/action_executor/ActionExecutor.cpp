@@ -16,11 +16,12 @@
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
+#include "wrench/failure_causes/OperationTimeout.h"
+
 WRENCH_LOG_CATEGORY(wrench_core_action_executor, "Log category for  Action Executor");
 
 
 namespace wrench {
-
     /**
      * @brief Constructor
      *
@@ -35,16 +36,16 @@ namespace wrench {
      * @param action_execution_service: the parent action execution service (nullptr if none)
      */
     ActionExecutor::ActionExecutor(
-            const std::string& hostname,
-            unsigned long num_cores,
-            sg_size_t ram_footprint,
-            double thread_creation_overhead,
-            bool simulate_computation_as_sleep,
-            S4U_CommPort *callback_commport,
-            SimulationMessage *custom_callback_msg,
-            const std::shared_ptr<Action> &action,
-            const std::shared_ptr<ActionExecutionService> &action_execution_service) : ExecutionController(hostname, "action_executor") {
-
+        const std::string& hostname,
+        unsigned long num_cores,
+        sg_size_t ram_footprint,
+        double thread_creation_overhead,
+        bool simulate_computation_as_sleep,
+        S4U_CommPort* callback_commport,
+        SimulationMessage* custom_callback_msg,
+        const std::shared_ptr<Action>& action,
+        const std::shared_ptr<ActionExecutionService>& action_execution_service) : ExecutionController(
+        hostname, "action_executor") {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (action == nullptr) {
             throw std::invalid_argument("ActionExecutor::ActionExecutor(): action cannot be nullptr");
@@ -83,6 +84,14 @@ namespace wrench {
         return this->simulation_compute_as_sleep;
     }
 
+    /**
+     * @brief Set the action timeout
+     * @param timeout A timeout in seconds
+     */
+    void ActionExecutor::setActionTimeout(const double timeout) {
+        this->action_timeout = timeout;
+    }
+
 
     /**
      * @brief Returns the executor's action
@@ -99,16 +108,17 @@ namespace wrench {
      */
     void ActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
         WRENCH_DEBUG(
-                "In on_exit.cleanup(): ActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_purpose = %d)",
-                this->getName().c_str(), has_returned_from_main, return_value,
-                this->killed_on_purpose);
+            "In on_exit.cleanup(): ActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_purpose = %d)",
+            this->getName().c_str(), has_returned_from_main, return_value,
+            this->killed_on_purpose);
 
         // Handle brutal failure or termination
         if (not has_returned_from_main and this->action->getState() == Action::State::STARTED) {
             this->action->setEndDate(Simulation::getCurrentSimulatedDate());
             if (this->killed_on_purpose) {
                 this->action->setState(Action::State::KILLED);
-            } else {
+            }
+            else {
                 this->action->setState(Action::State::FAILED);
                 // If no failure cause was set, then it's a host failure
                 if (not this->action->getFailureCause()) {
@@ -119,6 +129,54 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Helper method to execute an action
+     */
+    void ActionExecutor::execute_action() {
+        if (this->action_timeout <= 0) {
+            this->action->execute(this->getSharedPtr<ActionExecutor>());
+        }
+        else {
+            this->execute_action_with_timeout();
+        }
+    }
+
+    /**
+    * @brief Helper method to execute an action with a timeout
+    */
+    void ActionExecutor::execute_action_with_timeout() {
+        // Create and start an actor to execute the task, while catching a failure if any
+        std::shared_ptr<FailureCause> failure_cause = nullptr;
+        auto action_executor_with_timeout = std::make_shared<ActionExecutorActorWithTimeout>(
+            this->hostname,
+            this->num_cores,
+            this->ram_footprint,
+            this->thread_creation_overhead,
+            this->simulation_compute_as_sleep,
+            this->callback_commport,
+            this->custom_callback_message,
+            this->action,
+            this->action_execution_service,
+            this->action_timeout,
+            &failure_cause);
+
+        action_executor_with_timeout->setSimulation(this->simulation_);
+        action_executor_with_timeout->start(action_executor_with_timeout, true, false);
+        auto now = simgrid::s4u::Engine::get_clock();
+        action_executor_with_timeout->s4u_actor->join(this->action_timeout);
+
+        // Did we have a timeout?
+        auto elapsed = simgrid::s4u::Engine::get_clock() - now;
+        if (elapsed >= this->action_timeout) {
+            action_executor_with_timeout->kill(false);
+            throw ExecutionException(std::make_shared<OperationTimeout>());
+        }
+
+        // Did we have a failure?
+        if (failure_cause) {
+            throw ExecutionException(failure_cause);
+        }
+    }
 
     /**
      * @brief Main method of the action executor
@@ -127,39 +185,37 @@ namespace wrench {
      *
      */
     int ActionExecutor::main() {
-        S4U_Simulation::computeZeroFlop();// to block in case pstate speed is 0
-
-        // If no action, just hang forever until oyu get killed (HACK!)
-        //        if (action == nullptr) {
-        //            std::cerr << "ACTION EXECUTOR SUSPENDING ITSELF\n";
-        //            simgrid::s4u::this_actor::suspend();
-        //            return 0;
-        //        }
+        S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("New Action Executor started to do action %s", this->action->getName().c_str());
         this->action->setStartDate(S4U_Simulation::getClock());
         this->action->setState(Action::State::STARTED);
         try {
-            this->action->execute(this->getSharedPtr<ActionExecutor>());
+            execute_action();
             this->action->terminate(this->getSharedPtr<ActionExecutor>());
             this->action->setState(Action::State::COMPLETED);
-        } catch (ExecutionException &e) {
+        }
+        catch (ExecutionException& e) {
             this->action->setState(Action::State::FAILED);
             this->action->setFailureCause(e.getCause());
         }
-        for (auto const &child: this->action->getChildren()) {
+        for (auto const& child : this->action->getChildren()) {
             child->updateState();
         }
         this->action->setEndDate(S4U_Simulation::getClock());
 
         WRENCH_INFO("Action executor for action %s terminating and action has %s",
                     this->action->getName().c_str(),
-                    (this->action->getState() == Action::State::COMPLETED ? "succeeded" : ("failed (" + this->action->getFailureCause()->toString() + ")").c_str()));
+                    (this->action->getState() == Action::State::COMPLETED ? "succeeded" : ("failed (" + this->action->
+                        getFailureCause()->toString() + ")").c_str()));
         try {
             this->callback_commport->putMessage(
-                (this->custom_callback_message) ? this->custom_callback_message : new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>()));
-        } catch (ExecutionException &e) {
+                (this->custom_callback_message)
+                    ? this->custom_callback_message
+                    : new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>()));
+        }
+        catch (ExecutionException& e) {
             WRENCH_INFO("Action executor can't report back due to network error.. oh well!");
         }
         return 0;
@@ -205,4 +261,15 @@ namespace wrench {
     std::shared_ptr<ActionExecutionService> ActionExecutor::getActionExecutionService() const {
         return this->action_execution_service;
     }
-}// namespace wrench
+
+
+    int ActionExecutorActorWithTimeout::main() {
+        try {
+            this->action->execute(this->getSharedPtr<ActionExecutor>());
+        }
+        catch (ExecutionException& e) {
+            *(this->failure_cause) = e.getCause();
+        }
+        return 0;
+    }
+} // namespace wrench
