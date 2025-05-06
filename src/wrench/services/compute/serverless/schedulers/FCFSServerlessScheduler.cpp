@@ -25,7 +25,7 @@ namespace wrench {
 
         // For each invocation, assign it to the first compute node with an available core
         for (const auto& invocation : schedulableInvocations) {
-            auto imageFile = invocation->getRegisteredFunction()->getFunctionImage();
+            auto imageFile = invocation->getRegisteredFunction()->getFunctionImage()->getFile();
             std::string imageID = imageFile->getID();
 
             for (auto& entry : availableCores) {
@@ -116,21 +116,16 @@ namespace wrench {
         for (const auto& inv : schedulableInvocations) {
 
             // check if inv has function input
-            WRENCH_INFO("Function input for invocation: %p",
-                inv->_function_input.get());
             WRENCH_INFO("FUNCTION INVOCATION NAME: %s",
                 inv->getRegisteredFunction()->getFunction()->getName().c_str());
             // Get the image for this invocation
-            auto imageFile = inv->getRegisteredFunction()->getFunctionImage();
+            auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
 
             for (auto& entry : availableCores) {
                 const std::string& chosenNode = entry.first;
                 // Checking if the node has available cores and if the image is on the node
                 if (availableCores[chosenNode] > 0 && state->isImageOnNode(chosenNode, imageFile)) {
                     schedulingDecisions.emplace_back(inv, chosenNode);
-
-                    WRENCH_INFO("Function input for choosen invocation: %p",
-                        inv->_function_input.get());
                     availableCores[chosenNode]--;
 
                     // Move to next invocation

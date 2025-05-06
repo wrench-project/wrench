@@ -37,18 +37,23 @@ And, one of the following:
 - **g++** - version 7.5 or higher
 - **clang** - version 9.0 or higher
 
+WRENCH also comes with a [REST API](https://wrench-project.org/wrench/latest/restapi/index.html).  A
+Python API, built
+on top of the REST API, is available in [a separate repository](https://github.com/wrench-project/wrench-python-api).
+
 ## Dependencies
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/) - version 3.36
-- [SimGrid File System Module](https://github.com/simgrid/file-system-module) - version 0.2 or higher
+- [SimGrid](https://framagit.org/simgrid/simgrid/) - version 4.0
+- [SimGrid File System Module](https://github.com/simgrid/file-system-module) - version 0.3 or higher
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.11.0 or higher 
 
 ### Optional Dependencies
 
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
+- [Swagger-codegen](https://github.com/swagger-api/swagger-codegen) - version 3.0 or higher (only required for generating documentation)
 - [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html) - version 4.5 or higher along with the following Python packages: `pip3 install sphinx-rtd-theme breathe recommonmark`  (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) - version 1.4 - useful for expanded batch-scheduled resource simulation capabilities
 - [Asio](https://github.com/chriskohlhoff/asio/) - necessary only for building `wrench-daemon`

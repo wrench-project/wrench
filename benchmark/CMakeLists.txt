@@ -1,4 +1,3 @@
-
 set(CMAKE_CXX_STANDARD 17)
 
 # Add source to this project's executable.
@@ -21,6 +20,7 @@ if (ENABLE_BATSCHED)
     target_link_libraries(wrench-stress-test
             wrench
             ${SimGrid_LIBRARY}
+            ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             ${ZMQ_LIBRARY}
             )
@@ -28,6 +28,7 @@ else()
     target_link_libraries(wrench-stress-test
             wrench
             ${SimGrid_LIBRARY}
+            ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             )
 endif()

@@ -91,7 +91,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void Controller::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void Controller::processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent> &event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */

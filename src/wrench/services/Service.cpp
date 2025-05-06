@@ -388,7 +388,7 @@ namespace wrench {
     * @brief Returns true if the service is UP, false otherwise
     * @return true or false
     */
-    bool Service::isUp() {
+    bool Service::isUp() const {
         return (this->state == Service::UP);
     }
 

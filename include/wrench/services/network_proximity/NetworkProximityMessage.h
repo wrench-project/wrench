@@ -131,7 +131,7 @@ namespace wrench {
      */
     class CoordinateLookupAnswerMessage : public NetworkProximityMessage {
     public:
-        CoordinateLookupAnswerMessage(std::string requested_host, bool success, std::pair<double, double> xy_coordinate,
+        CoordinateLookupAnswerMessage(std::string requested_host, bool success, const std::pair<double, double>& xy_coordinate,
                                       double timestamp, sg_size_t payload);
 
         /** @brief The name of the host whose coordinates were requested  */

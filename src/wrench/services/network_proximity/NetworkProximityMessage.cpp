@@ -147,7 +147,7 @@ namespace wrench {
      */
     CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(std::string requested_host,
                                                                  bool success,
-                                                                 std::pair<double, double> xy_coordinate,
+                                                                 const std::pair<double, double>& xy_coordinate,
                                                                  double timestamp,
                                                                  sg_size_t payload) : NetworkProximityMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS

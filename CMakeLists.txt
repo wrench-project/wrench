@@ -77,7 +77,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
-set(WRENCH_VERSION_MINOR "6")
+set(WRENCH_VERSION_MINOR "7")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -528,6 +528,8 @@ set(TEST_FILES
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceResourceInformationTest.cpp
         test/services/compute_services/serverless/ServerlessLoadBalancingSchedulerTests.cpp
+        test/services/compute_services/serverless/ServerlessBasicTests.cpp
+        test/services/compute_services/serverless/ServerlessTimingTests.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
         test/services/storage_services/XRootDStorageService/XRootDStorageServiceBasicFunctionalTest.cpp
