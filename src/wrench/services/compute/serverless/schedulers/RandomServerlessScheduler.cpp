@@ -28,7 +28,7 @@ namespace wrench {
 
         // For each invocation, randomly assign it to a compute node that has an available core
         for (const auto& inv : schedulableInvocations) {
-            auto imageFile = inv->getRegisteredFunction()->getFunctionImage();
+            auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
             std::string imageID = imageFile->getID();
 
             // Build list of nodes with available cores
@@ -116,7 +116,7 @@ namespace wrench {
     ) {
         std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> schedulingDecisions;
         auto availableCores = state->getAvailableCores();
-        // log the availble cores
+        // log the available cores
         // WRENCH_INFO("Available cores: ");
         // for (const auto& entry : availableCores) {
         //     WRENCH_INFO("Node: %s, Cores: %lu", entry.first.c_str(), entry.second);
@@ -131,7 +131,7 @@ namespace wrench {
             // WRENCH_INFO("FUNCTION INVOCATION NAME: %s",
             //     inv->getRegisteredFunction()->getFunction()->getName().c_str());
             // Get the image for this invocation
-            auto imageFile = inv->getRegisteredFunction()->getFunctionImage();
+            auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
             
             std::vector<std::string> candidates;
             for (const auto& entry : availableCores) {

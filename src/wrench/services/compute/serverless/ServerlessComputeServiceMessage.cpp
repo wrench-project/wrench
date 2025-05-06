@@ -66,16 +66,16 @@ namespace wrench
      * @brief Constructor
      *
      * @param success: whether the registration was successful or not
-     * @param function: the function that was either registered on success or not on failure
+     * @param registered_function: the registered function (or nullptr on failure)
      * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionRegisterAnswerMessage::ServerlessComputeServiceFunctionRegisterAnswerMessage(
         bool success,
-        std::shared_ptr<Function> function,
+        std::shared_ptr<RegisteredFunction> registered_function,
         std::shared_ptr<FailureCause> failure_cause,
         sg_size_t payload)
-        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), failure_cause(std::move(failure_cause)) {}
+        : ServerlessComputeServiceMessage(payload), success(success), registered_function(std::move(registered_function)), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor

@@ -56,7 +56,7 @@ namespace wrench {
                                                    std::shared_ptr<FunctionInput> input,
                                                    S4U_CommPort *notify_commport);
 
-        bool registerFunction(const std::shared_ptr<Function>& function,
+        std::shared_ptr<RegisteredFunction> registerFunction(const std::shared_ptr<Function>& function,
                               double time_limit_in_seconds, 
                               sg_size_t disk_space_limit_in_bytes, 
                               sg_size_t RAM_limit_in_bytes, 

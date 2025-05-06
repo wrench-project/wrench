@@ -113,10 +113,10 @@ namespace wrench {
      * @param RAM_limit_in_bytes the RAM limit for the function
      * @param ingress_in_bytes the ingress data limit
      * @param egress_in_bytes the egress data limit
-     * @return true if the function was registered successfully
+     * @return A RegisteredFunction object
      * @throw ExecutionException if the function registration fails
      */
-    bool ServerlessComputeService::registerFunction(const std::shared_ptr<Function>& function, double time_limit_in_seconds,
+    std::shared_ptr<RegisteredFunction> ServerlessComputeService::registerFunction(const std::shared_ptr<Function>& function, double time_limit_in_seconds,
                                                     sg_size_t disk_space_limit_in_bytes, sg_size_t RAM_limit_in_bytes,
                                                     sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes) {
         WRENCH_INFO("Serverless Provider Registered function %s", function->getName().c_str());
@@ -139,7 +139,7 @@ namespace wrench {
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
-        return true;
+        return msg->registered_function;
     }
 
     /**
@@ -284,24 +284,29 @@ namespace wrench {
                                                                       sg_size_t ram_limit_in_bytes,
                                                                       sg_size_t ingress_in_bytes,
                                                                       sg_size_t egress_in_bytes) {
-        if (_state_of_the_system->_registeredFunctions.find(function->getName()) != _state_of_the_system->_registeredFunctions.end()) {
+        auto registered_function_it = _state_of_the_system->_registeredFunctions.find(function->getName());
+        if (registered_function_it != _state_of_the_system->_registeredFunctions.end()) {
             // TODO: Create failure case for duplicate function?
             std::string msg = "Duplicate Function";
             const auto answerMessage =
                 new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-                    false, function,
+                    false, registered_function_it->second,
                     std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(), msg), 0);
             answer_commport->dputMessage(answerMessage);
         }
         else {
-            _state_of_the_system->_registeredFunctions[function->getName()] = std::make_shared<RegisteredFunction>(
+            auto registered_function = std::make_shared<RegisteredFunction>(
                 function,
                 time_limit,
                 disk_space_limit_in_bytes,
                 ram_limit_in_bytes,
                 ingress_in_bytes,
                 egress_in_bytes);
-            const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(true, function, nullptr, 0);
+
+            _state_of_the_system->_registeredFunctions[function->getName()] = registered_function;
+
+            const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
+                true, registered_function, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
         }
     }
