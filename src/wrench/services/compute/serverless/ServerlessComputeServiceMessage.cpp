@@ -82,7 +82,8 @@ namespace wrench
      *
      * @param answer_commport: commport to which the answer message should be sent
      * @param function: the function to invoke
-     * @param function_invocation_args: input/arguments passed to the function
+     * @param function_input: input arguments passed to the function
+     * @param notify_commport: commport to notify
      * @param payload: message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationRequestMessage::ServerlessComputeServiceFunctionInvocationRequestMessage(
