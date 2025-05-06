@@ -261,7 +261,7 @@ namespace wrench {
     void FunctionManager::processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation, 
                                                             bool success, 
                                                             std::shared_ptr<FailureCause> failure_cause) {
-        WRENCH_INFO("Some Invocation Complete");
+        WRENCH_INFO("Some invocation has completed");
         invocation->_done = true;
         invocation->_success = success;
         invocation->_failure_cause = failure_cause;
