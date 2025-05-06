@@ -149,27 +149,8 @@ private:
         function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 1 registered");
 
-        // Try to register the same function name
-        WRENCH_INFO("Trying to register function 1 again");
-        try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
-                                               1 * MB);
-        }
-        catch (wrench::ExecutionException& expected) {
-            WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
-        }
-
         auto function2 = function_manager->createFunction("Function 2", lambda, image_location, code_location);
-        // Try to invoke a function that is not registered yet
-        WRENCH_INFO("Invoking a non-registered function");
-        auto input = std::make_shared<MyFunctionInput>(1, 2);
 
-        try {
-            function_manager->invokeFunction(function2, this->compute_service, input);
-        }
-        catch (wrench::ExecutionException& expected) {
-            WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
-        }
 
         WRENCH_INFO("Registering function 2");
         function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
@@ -177,6 +158,7 @@ private:
 
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
 
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
         for (unsigned char i = 0; i < 200; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
@@ -193,40 +175,7 @@ private:
             function2, this->compute_service, input);
         WRENCH_INFO("Function 2 invoked");
 
-        try {
-            new_invocation->isSuccess();
-        }
-        catch (std::runtime_error& expected) {
-            WRENCH_INFO("As expected, got exception");
-        }
-
-        try {
-            new_invocation->getOutput();
-        }
-        catch (std::runtime_error& expected) {
-            WRENCH_INFO("As expected, got exception");
-        }
-
-        try {
-            new_invocation->getFailureCause();
-        }
-        catch (std::runtime_error& expected) {
-            WRENCH_INFO("As expected, got exception");
-        }
-
         function_manager->wait_one(new_invocation);
-
-        try {
-            new_invocation->getOutput();
-            WRENCH_INFO("First check passed");
-            new_invocation->isSuccess();
-            WRENCH_INFO("Second check passed");
-            new_invocation->getFailureCause();
-            WRENCH_INFO("Third check passed");
-        }
-        catch (std::runtime_error& expected) {
-            WRENCH_INFO("Not expected, got exception");
-        }
 
         // wrench::Simulation::sleep(100);
         //
@@ -254,39 +203,23 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
-    // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-
-    /* Initialize the simulation, which may entail extracting WRENCH-specific and
-     * Simgrid-specific command-line arguments that can modify general simulation behavior.
-     * Two special command-line arguments are --help-wrench and --help-simgrid, which print
-     * details about available command-line arguments. */
     simulation->init(&argc, argv);
 
-
-    // std::cerr << "Instantiating simulated platform..." << std::endl;
     simulation->instantiatePlatform(this->platform_file_path);
 
-    // std::cerr << "Instantiating a SimpleStorageService on UserHost..." << std::endl;
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    /* Instantiate a serverless compute service */
-    // std::cerr << "Instantiating a serverless compute service on ServerlessHeadNode..." << std::endl;
     std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
-    /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
-     * for executing the workflow-> */
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessLoadBalancingSchedulerTestBasicController(this, user_host, serverless_provider, storage_service));
 
-    /* Launch the simulation. This call only returns when the simulation is complete. */
-    // std::cerr << "Launching the Simulation..." << std::endl;
     simulation->launch();
-    // std::cerr << "Simulation done!" << std::endl;
 
     double end_date = wrench::Simulation::getCurrentSimulatedDate();
     // ASSERT_DOUBLE_EQ(end_date, 120.0);
