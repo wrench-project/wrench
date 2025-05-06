@@ -123,6 +123,8 @@ namespace wrench {
 
         int getBottomLevel() const;
 
+        double getReadyDate() const;
+
         double getStartDate() const;
 
         double getEndDate() const;
@@ -292,6 +294,8 @@ namespace wrench {
         State visible_state;           // To be exposed to developer level
         State upcoming_visible_state;  // A visible state that will become active once a WMS has process a previously sent workflow execution event
         InternalState internal_state;  // Not to be exposed to developer level
+
+        double ready_date; // The date at which the task's VISIBLE state became READY (-1 if not)
 
         Workflow *workflow;// Containing workflow
 

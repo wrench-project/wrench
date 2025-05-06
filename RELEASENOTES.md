@@ -1,14 +1,20 @@
 WRENCH Release Notes
 ------
 
-### wrench 2.6-dev
+### wrench 2.7-dev
 
-- Implementation of a "backfilling depth" feature for EASY and convervative_bf batch scheduling algorithms
+- Removed all usage of httplib in wrench-daemon (which now uses only CrowCPP)
+- Minor code/documentation cleanups
+
+### wrench 2.6
+
+- Implementation of a "backfilling depth" feature for EASY and conservative_bf batch scheduling algorithms
+- Upgrade to SimGrid v4.0 and FSMod v0.3
+- Minor code/documentation cleanups
 
 ### wrench 2.5
 
 - Implementation of the EASY batch scheduling algorithm in BatchComputeService 
-
 - New command-line argument for the wrench-daemon to specify the number of commports
 
 ### wrench 2.4
@@ -22,7 +28,7 @@ WRENCH Release Notes
 
 ### wrench 2.3
 
-(Sepember 10, 2024) this release includes **minor enhancements and upgrades**. More specifically:
+(September 10, 2024) this release includes **minor enhancements and upgrades**. More specifically:
 
 - More full-feature REST API that gives access to the Action API in addition to the Workflow API
 - Upgrade to SimGrid v3.36, which comes with several bug fixes

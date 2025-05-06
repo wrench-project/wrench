@@ -19,7 +19,6 @@
 #include <boost/core/demangle.hpp>
 #include <simgrid/s4u.hpp>
 #include <wrench/simulation/SimulationMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
 
 namespace wrench {
 
@@ -83,7 +82,7 @@ namespace wrench {
          * @param error_prefix: any string you wish to prefix the error message with
          * @param timeout:  a timeout value in seconds (<0 means never timeout)
          *
-         * @return the message, in a unique_ptr of the type specified.  Otherwise throws a runtime_error
+         * @return the message, in a unique_ptr of the type specified.  Otherwise, throws a runtime_error
          *
          */
         template<class TMessageType>
@@ -131,7 +130,7 @@ namespace wrench {
         }
 
         void reset();
-        void putMessage(SimulationMessage *m);
+        void putMessage(SimulationMessage *msg);
         void dputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> iputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> igetMessage();
@@ -179,8 +178,8 @@ namespace wrench {
         friend class S4U_Daemon;
         friend class S4U_PendingCommunication;
         friend class SimpleStorageServiceNonBufferized;
-        SimulationMessage *msg_mb;
-        SimulationMessage *msg_mq;
+        SimulationMessage *msg_mb = nullptr;
+        SimulationMessage *msg_mq = nullptr;
 
         simgrid::s4u::Mailbox *s4u_mb;
         simgrid::s4u::MessageQueue *s4u_mq;

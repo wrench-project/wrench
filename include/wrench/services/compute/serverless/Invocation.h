@@ -39,13 +39,12 @@ namespace wrench {
 
         bool isDone() const;
         bool isSuccess() const;
-        const std::shared_ptr<RegisteredFunction>& getRegisteredFunction() const;
-        const std::shared_ptr<FailureCause>& getFailureCause() const;
+        [[nodiscard]] std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;
+        [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         /**
          * @brief Gets the output of the function invocation.
          */
-        std::shared_ptr<FunctionOutput> getOutput() const;
-        std::shared_ptr<FunctionInput> _function_input; // the input for the function
+        [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
 
 
 
@@ -54,6 +53,7 @@ namespace wrench {
         friend class ServerlessComputeService;
 
         const std::shared_ptr<RegisteredFunction>& _registered_function; // the registered function to be invoked
+        std::shared_ptr<FunctionInput> _function_input; // the input for the function
         bool _done; // whether the invocation is done
         bool _success; // whether the invocation was successful
         std::shared_ptr<FailureCause> _failure_cause; // the cause of failure

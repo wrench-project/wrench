@@ -85,7 +85,7 @@ namespace wrench {
      * @return true if the function was registered successfully
      * @throw ExecutionException if the function registration fails
      */
-    bool FunctionManager::registerFunction(const std::shared_ptr<Function> function,
+    std::shared_ptr<RegisteredFunction> FunctionManager::registerFunction(const std::shared_ptr<Function> function,
                                            const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
                                            int time_limit_in_seconds,
                                            long disk_space_limit_in_bytes,

@@ -29,8 +29,8 @@ namespace wrench {
         : _function(function), _time_limit(time_limit_in_seconds), _disk_space(disk_space_limit_in_bytes), 
         _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
 
-    std::shared_ptr<DataFile> RegisteredFunction::getFunctionImage() {
-            return _function->getImage()->getFile();
+    std::shared_ptr<FileLocation> RegisteredFunction::getFunctionImage() {
+            return _function->getImage();
     }
 
     std::shared_ptr<Function> RegisteredFunction::getFunction() {

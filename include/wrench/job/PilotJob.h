@@ -46,7 +46,7 @@ namespace wrench {
 
         std::shared_ptr<BareMetalComputeService> getComputeService();
 
-        PilotJob::State getState();
+        PilotJob::State getState() const;
 
         /***********************/
         /** \cond INTERNAL     */

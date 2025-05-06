@@ -51,7 +51,7 @@ namespace wrench {
                                                         const std::shared_ptr<FileLocation>& image,
                                                         const std::shared_ptr<FileLocation>& code);
 
-        bool registerFunction(std::shared_ptr<Function> function,
+        std::shared_ptr<RegisteredFunction> registerFunction(std::shared_ptr<Function> function,
                               const std::shared_ptr<ServerlessComputeService>& compute_service,
                               int time_limit_in_seconds,
                               long disk_space_limit_in_bytes,
