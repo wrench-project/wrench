@@ -15,26 +15,25 @@
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
 
-
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 
-WRENCH_LOG_CATEGORY(serverless_load_balancing_scheduler_tests,
-                    "Log category for ServerlessLoadBalancingSchedulerTest tests");
+WRENCH_LOG_CATEGORY(serverless_timing_tests,
+                    "Log category for ServerlessTimingTests tests");
 
-class ServerlessLoadBalancingSchedulerTest : public ::testing::Test {
+class ServerlessTimingTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
 
-    void do_Basic_test();
+    void do_FunctionInvocationTest_test();
 
 protected:
-    ~ServerlessLoadBalancingSchedulerTest() {
+    ~ServerlessTimingTest() override {
         wrench::Simulation::removeAllFiles();
     }
 
-    ServerlessLoadBalancingSchedulerTest() {
+    ServerlessTimingTest() {
         // Create a platform file
         std::string xml = R"(<?xml version='1.0'?>
 <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
@@ -64,23 +63,15 @@ protected:
                 <prop id="mount" value="/"/>
             </disk>
         </host>
-        <host id="ServerlessComputeNode2" speed="50Gf" core="10">
-            <prop id="ram" value="64GB" />
-            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
-                <prop id="size" value="5000GiB"/>
-                <prop id="mount" value="/"/>
-            </disk>
-        </host>
 
         <!-- A network link that connects both hosts -->
-        <link id="network_link" bandwidth="10MBps" latency="20us"/>
+        <link id="wide_area" bandwidth="20MBps" latency="20us"/>
+        <link id="local_area" bandwidth="100Gbps" latency="1ns"/>
 
         <!-- Network routes -->
-        <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="network_link"/></route>
-        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="network_link"/></route>
-        <route src="UserHost" dst="ServerlessComputeNode2"> <link_ctn id="network_link"/></route>
-        <route src="ServerlessHeadNode" dst="ServerlessComputeNode1"> <link_ctn id="network_link"/></route>
-        <route src="ServerlessHeadNode" dst="ServerlessComputeNode2"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="wide_area"/></route>
+        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
+        <route src="ServerlessHeadNode" dst="ServerlessComputeNode1">  <link_ctn id="local_area"/></route>
 
     </zone>
 </platform>)";
@@ -94,7 +85,7 @@ protected:
 };
 
 /**********************************************************************/
-/**  BASIC TEST                                                      **/
+/**  HELPER CLASSES                                                  **/
 /**********************************************************************/
 
 class MyFunctionInput : public wrench::FunctionInput {
@@ -106,13 +97,18 @@ public:
     int x2_;
 };
 
-class ServerlessLoadBalancingSchedulerTestBasicController : public wrench::ExecutionController {
+
+/**********************************************************************/
+/**  FUNCTION INVOCATION TEST                                       **/
+/**********************************************************************/
+
+class ServerlessTimingTestFunctionInvocationController : public wrench::ExecutionController {
 public:
-    ServerlessLoadBalancingSchedulerTestBasicController(ServerlessLoadBalancingSchedulerTest* test,
-                                                        const std::string& hostname,
-                                                        const std::shared_ptr<wrench::ServerlessComputeService>
-                                                        & compute_service,
-                                                        const std::shared_ptr<wrench::StorageService>& storage_service) :
+    ServerlessTimingTestFunctionInvocationController(ServerlessTimingTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -120,19 +116,17 @@ public:
     }
 
 private:
-    ServerlessLoadBalancingSchedulerTest* test;
+    ServerlessTimingTest* test;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service;
     std::shared_ptr<wrench::StorageService> storage_service;
 
     int main() override {
-        WRENCH_INFO("ServerlessExampleExecutionController started");
-
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
                                   const std::shared_ptr<wrench::StorageService>& service) -> std::string {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            WRENCH_INFO("I AM USER CODE");
+            wrench::Simulation::sleep(5);
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
@@ -142,66 +136,41 @@ private:
         auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
         wrench::StorageService::createFileAtLocation(image_location);
         wrench::StorageService::createFileAtLocation(code_location);
-
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location, code_location);
-
-        WRENCH_INFO("Registering function 1");
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
-        WRENCH_INFO("Function 1 registered");
-
-        auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image_location, code_location);
-
-
-        WRENCH_INFO("Registering function 2");
-        function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
-        WRENCH_INFO("Function 2 registered");
-
-        std::vector<std::shared_ptr<wrench::Invocation>> invocations;
-
+        auto function = wrench::FunctionManager::createFunction("Function", lambda, image_location, code_location);
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        for (unsigned char i = 0; i < 200; i++) {
-            WRENCH_INFO("Invoking function 1");
-            invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
-            WRENCH_INFO("Function 1 invoked");
-            // wrench::Simulation::sleep(1);
+        function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation
+        {
+            auto now = wrench::Simulation::getCurrentSimulatedDate();
+            auto invocation = function_manager->invokeFunction(function, this->compute_service, input);
+            function_manager->wait_one(invocation);
+            auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
+            double remote_download = 5.4;  // estimated (bottleneck = wide area)
+            double local_copy = 1; // estimated (bottleneck = disk)
+            double local_image_read = 1; // estimated (bottleneck = disk)
+            double remote_clone = 1.08; // estimate (bottleneck = wide area)
+            double compute = 5; // extimate (bottleneck = sleep)
+            double expected_elased = remote_download + local_copy + local_image_read +  remote_clone + compute;
+
+            if (fabs(elapsed - expected_elased) > 0.05) {
+                throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elased) + ")");
+            }
         }
-
-        WRENCH_INFO("Waiting for all invocations to complete");
-        function_manager->wait_all(invocations);
-        WRENCH_INFO("All invocations completed");
-
-        WRENCH_INFO("Invoking function 2");
-        std::shared_ptr<wrench::Invocation> new_invocation = function_manager->invokeFunction(
-            function2, this->compute_service, input);
-        WRENCH_INFO("Function 2 invoked");
-
-        function_manager->wait_one(new_invocation);
-
-        // wrench::Simulation::sleep(100);
-        //
-        // WRENCH_INFO("Invoking function 1 AGAIN");
-        // function_manager->invokeFunction(function1, this->compute_service, input);
-        // WRENCH_INFO("Function 1 invoked");
-
-        wrench::Simulation::sleep(1000000);
-        // WRENCH_INFO("Execution complete");
-
-        // function_manager->invokeFunction(function2, this->compute_service, input);
-        // function_manager->invokeFunction(function1, this->compute_service, input);
 
         return 0;
     }
 };
 
-TEST_F(ServerlessLoadBalancingSchedulerTest, Basic) {
-    DO_TEST_WITH_FORK(do_Basic_test);
+TEST_F(ServerlessTimingTest, FunctionInvocation) {
+    DO_TEST_WITH_FORK(do_FunctionInvocationTest_test);
 }
 
-void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
+void ServerlessTimingTest::do_FunctionInvocationTest_test() {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -209,21 +178,17 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
     simulation->instantiatePlatform(this->platform_file_path);
 
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
-        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
+    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessLoadBalancingSchedulerTestBasicController(this, user_host, serverless_provider, storage_service));
+        new ServerlessTimingTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
-
-    double end_date = wrench::Simulation::getCurrentSimulatedDate();
-    // ASSERT_DOUBLE_EQ(end_date, 120.0);
-    // ASSERT_TRUE(end_date > 119.0 and end_date < 121.0);
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
