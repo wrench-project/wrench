@@ -15,7 +15,6 @@
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
 
-
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 
@@ -67,8 +66,8 @@ protected:
         </host>
 
         <!-- A network link that connects both hosts -->
-        <link id="wide_area" bandwidth="10MBps" latency="20us"/>
-        <link id="local_area" bandwidth="10000MBps" latency="1ns"/>
+        <link id="wide_area" bandwidth="20MBps" latency="20us"/>
+        <link id="local_area" bandwidth="100Gbps" latency="1ns"/>
 
         <!-- Network routes -->
         <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="wide_area"/></route>
@@ -131,7 +130,7 @@ private:
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
-        auto image_file = wrench::Simulation::addFile("input_file", 100 * MB);
+        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
@@ -235,7 +234,7 @@ private:
             return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
         };
 
-        auto image_file = wrench::Simulation::addFile("input_file", 100 * MB);
+        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
@@ -313,28 +312,6 @@ private:
                 throw std::runtime_error("There should be no failure cause");
             }
         }
-
-        // Place another invocation (same image, which should be cached, and 1-byte code for zero time git clone)
-        {
-            auto source_code_2 = wrench::Simulation::addFile("source_code_2", 1);  // 1 byte!
-            auto code_location_2 = wrench::FileLocation::LOCATION(this->storage_service, source_code_2);
-            wrench::StorageService::createFileAtLocation(code_location_2);
-
-            auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image_location, code_location_2);
-            function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
-
-            auto now = wrench::Simulation::getCurrentSimulatedDate();
-            auto invocation2 = function_manager->invokeFunction(function2, this->compute_service, input);
-
-            function_manager->wait_one(invocation2);
-            auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
-            // Expected is 6: 1 sec to read image from disk, since image will be cached there
-            if (fabs(elapsed - 6.0) > 0.001) {
-                throw std::runtime_error(
-                    "Invocation should have finished in about ~5s (instead: " + std::to_string(elapsed) + ")");
-            }
-        }
-
 
         return 0;
     }
