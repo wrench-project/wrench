@@ -58,12 +58,12 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionRegisterAnswerMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success, std::shared_ptr<Function> function, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success, std::shared_ptr<RegisteredFunction> registered_function, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
 
-        /** @brief Whether the registration was successtul */
+        /** @brief Whether the registration was successful */
         bool success;
-        /** @brief The function that was either registered on success or not on failure */
-        std::shared_ptr<Function> function;
+        /** @brief The registered function on success or nullptr on failure */
+        std::shared_ptr<RegisteredFunction> registered_function;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
     };
