@@ -150,11 +150,29 @@ private:
             double local_copy = 1; // estimated (bottleneck = disk)
             double local_image_read = 1; // estimated (bottleneck = disk)
             double remote_clone = 1.08; // estimate (bottleneck = wide area)
-            double compute = 5; // extimate (bottleneck = sleep)
-            double expected_elased = remote_download + local_copy + local_image_read +  remote_clone + compute;
+            double compute = 5; // estimate (bottleneck = sleep)
+            double expected_elapsed = remote_download + local_copy + local_image_read +  remote_clone + compute;
 
-            if (fabs(elapsed - expected_elased) > 0.05) {
-                throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elased) + ")");
+            if (fabs(elapsed - expected_elapsed) > 0.05) {
+                throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
+            }
+        }
+
+        // Place another invocation (which saves on some stuff)
+        {
+            auto now = wrench::Simulation::getCurrentSimulatedDate();
+            auto invocation = function_manager->invokeFunction(function, this->compute_service, input);
+            function_manager->wait_one(invocation);
+            auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
+            double remote_download = 0;  // cached
+            double local_copy = 0; // cached
+            double local_image_read = 1; // estimated (bottleneck = disk)
+            double remote_clone = 1.08; // estimate (bottleneck = wide area)
+            double compute = 5; // extimate (bottleneck = sleep)
+            double expected_elapsed = remote_download + local_copy + local_image_read +  remote_clone + compute;
+
+            if (fabs(elapsed - expected_elapsed) > 0.05) {
+                throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
             }
         }
 
