@@ -34,6 +34,7 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
             {ServerlessComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}
         };
+        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list_;
 
     public:
 
@@ -41,8 +42,8 @@ namespace wrench {
                                  const std::vector<std::string>& compute_hosts,
                                  const std::string& head_node_storage_mount_point,
                                  const std::shared_ptr<ServerlessScheduler> &scheduler,
-                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                 WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                 const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
+                                 const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
@@ -53,7 +54,7 @@ namespace wrench {
         friend class FunctionManager;
 
         std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<Function>& function,
-                                                   std::shared_ptr<FunctionInput> input,
+                                                   const std::shared_ptr<FunctionInput>& input,
                                                    S4U_CommPort *notify_commport);
 
         std::shared_ptr<RegisteredFunction> registerFunction(const std::shared_ptr<Function>& function,
@@ -84,7 +85,7 @@ namespace wrench {
 
         void processFunctionInvocationRequest(S4U_CommPort *answer_commport, 
                                               const std::shared_ptr<Function>& function,
-                                              const std::shared_ptr<FunctionInput> input,
+                                              const std::shared_ptr<FunctionInput>& input,
                                               S4U_CommPort *notify_commport);
 
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action, const std::shared_ptr<DataFile>& image_file);
