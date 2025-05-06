@@ -31,7 +31,7 @@ namespace wrench {
     class FileReaderThread : public Service {
 
     public:
-        FileReaderThread(std::string hostname, S4U_CommPort *creator_commport,
+        FileReaderThread(const std::string& hostname, S4U_CommPort *creator_commport,
                          std::shared_ptr<FileLocation> location,
                          sg_size_t num_bytes);
 

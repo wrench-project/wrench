@@ -80,7 +80,7 @@ namespace wrench {
      * @param state: an action state
      * @return a string
      */
-    std::string Action::stateToString(Action::State state) {
+    std::string Action::stateToString(const Action::State state) {
         switch (state) {
             case Action::State::NOT_READY:
                 return "NOT READY";
@@ -120,7 +120,7 @@ namespace wrench {
      * @brief Sets the action's state to a new value
      * @param new_state: the new state
      */
-    void Action::setState(Action::State new_state) {
+    void Action::setState(const Action::State new_state) {
         auto old_state = this->execution_history.top().state;
         if (not this->job.expired()) {
             this->job.lock()->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
@@ -141,7 +141,7 @@ namespace wrench {
      * @brief Sets the action's start date
      * @param date: the date 
      */
-    void Action::setStartDate(double date) {
+    void Action::setStartDate(const double date) {
         this->execution_history.top().start_date = date;
     }
 
@@ -149,7 +149,7 @@ namespace wrench {
      * @brief Sets the action's end date
      * @param date: the date
      */
-    void Action::setEndDate(double date) {
+    void Action::setEndDate(const double date) {
         this->execution_history.top().end_date = date;
     }
 
@@ -214,7 +214,7 @@ namespace wrench {
      * @brief Create a new execution data structure (e.g., after a restart)
      * @param state: the action state
      */
-    void Action::newExecution(Action::State state) {
+    void Action::newExecution(const Action::State state) {
         Action::State old_state;
         if (!this->execution_history.empty()) {
             old_state = this->execution_history.top().state;
@@ -286,7 +286,7 @@ namespace wrench {
      * @brief Get the action's children
      * @return a set of children
      */
-    std::set<std::shared_ptr<Action>> Action::getChildren() {
+    std::set<std::shared_ptr<Action>> Action::getChildren() const {
         std::set<std::shared_ptr<Action>> to_return;
         for (auto const &c: this->children) {
             to_return.insert(c->getSharedPtr());
@@ -298,7 +298,7 @@ namespace wrench {
      * @brief Get the action's parents
      * @return a set of parents
      */
-    std::set<std::shared_ptr<Action>> Action::getParents() {
+    std::set<std::shared_ptr<Action>> Action::getParents() const {
         std::set<std::shared_ptr<Action>> to_return;
         for (auto const &p: this->parents) {
             to_return.insert(p->getSharedPtr());
@@ -310,7 +310,7 @@ namespace wrench {
      * @brief Set the action's priority
      * @param p: a priority
      */
-    void Action::setPriority(double p) {
+    void Action::setPriority(const double p) {
         this->priority = p;
     }
 

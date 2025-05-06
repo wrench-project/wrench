@@ -164,7 +164,7 @@ namespace wrench {
         try {
             // Wait for one activity to complete
             finished_recv = pending_receives.wait_any_for(timeout);
-        } catch (simgrid::TimeoutException &e) {
+        } catch (simgrid::TimeoutException &) {
             //            WRENCH_DEBUG("Got A TimeoutException");
             pending_receives.erase(this->mq_comm);
             pending_receives.erase(this->mb_comm);
@@ -175,7 +175,7 @@ namespace wrench {
             this->mq_comm = nullptr;
             this->mb_comm_posted = false;
             throw ExecutionException(std::make_shared<NetworkError>(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->name, ""));
-        } catch (simgrid::Exception &e) {
+        } catch (simgrid::Exception &) {
             //            WRENCH_DEBUG("Got A simgrid::Exception");
             auto failed_recv = pending_receives.get_failed_activity();
             if (failed_recv == this->mb_comm) {
@@ -251,7 +251,7 @@ namespace wrench {
             } catch (simgrid::NetworkFailureException &e) {
                 throw ExecutionException(std::make_shared<NetworkError>(
                         NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mb->get_name(), msg->getName()));
-            } catch (simgrid::TimeoutException &e) {
+            } catch (simgrid::TimeoutException &) {
                 // Can happen if the other side is doing a timeout.... I think
                 throw ExecutionException(std::make_shared<NetworkError>(
                         NetworkError::SENDING, NetworkError::TIMEOUT, this->s4u_mb->get_name(), msg->getName()));
@@ -259,7 +259,7 @@ namespace wrench {
         } else {
             try {
                 this->s4u_mq->put(msg);
-            } catch (simgrid::TimeoutException &e) {
+            } catch (simgrid::TimeoutException &) {
                 // Can happen if the other side is doing a timeout.... I think
                 throw ExecutionException(std::make_shared<NetworkError>(
                         NetworkError::SENDING, NetworkError::TIMEOUT, this->s4u_mq->get_name(), msg->getName()));
@@ -325,7 +325,7 @@ namespace wrench {
             simgrid::s4u::CommPtr comm_ptr;
             try {
                 comm_ptr = this->s4u_mb->put_async(msg, (uint64_t) msg->payload);
-            } catch (simgrid::NetworkFailureException &e) {
+            } catch (simgrid::NetworkFailureException &) {
                 throw ExecutionException(std::make_shared<NetworkError>(
                         NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mb->get_name(), msg->getName()));
             }
@@ -337,7 +337,7 @@ namespace wrench {
             simgrid::s4u::MessPtr mess_ptr;
             try {
                 mess_ptr = this->s4u_mq->put_async(msg);
-            } catch (simgrid::NetworkFailureException &e) {
+            } catch (simgrid::NetworkFailureException &) {
                 throw ExecutionException(std::make_shared<NetworkError>(
                         NetworkError::SENDING, NetworkError::FAILURE, this->s4u_mq->get_name(), msg->getName()));
             }
@@ -369,7 +369,7 @@ namespace wrench {
         try {
             auto comm_ptr = this->s4u_mb->get_async<void>(reinterpret_cast<void**>(&(pending_communication->simulation_message)));
             pending_communication->comm_ptr = comm_ptr;
-        } catch (simgrid::NetworkFailureException &e) {
+        } catch (simgrid::NetworkFailureException &) {
             throw ExecutionException(std::make_shared<NetworkError>(
                     NetworkError::RECEIVING, NetworkError::FAILURE, this->s4u_mb->get_name(), ""));
         }
@@ -458,7 +458,7 @@ namespace wrench {
     void S4U_CommPort::createCommPortPool() {
         S4U_CommPort::all_commports.reserve(S4U_CommPort::commport_pool_size);
         for (unsigned long i = 0; i < S4U_CommPort::commport_pool_size; i++) {
-            std::unique_ptr<S4U_CommPort> mb = std::make_unique<S4U_CommPort>();
+            auto mb = std::make_unique<S4U_CommPort>();
             S4U_CommPort::free_commports.push_back(mb.get());
             S4U_CommPort::all_commports.push_back(std::move(mb));
         }

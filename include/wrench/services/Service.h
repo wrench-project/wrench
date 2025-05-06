@@ -51,7 +51,7 @@ namespace wrench {
         std::string getHostname();
         std::string getPhysicalHostname();
 
-        bool isUp();
+        bool isUp() const;
 
         std::string getPropertyValueAsString(WRENCH_PROPERTY_TYPE);
         double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
@@ -111,13 +111,13 @@ namespace wrench {
         void setProperty(WRENCH_PROPERTY_TYPE, const std::string &);
 
         void setProperties(const WRENCH_PROPERTY_COLLECTION_TYPE &default_property_values,
-                           const WRENCH_PROPERTY_COLLECTION_TYPE &overriden_property_values);
+                           const WRENCH_PROPERTY_COLLECTION_TYPE &overridden_property_values);
 
         // MessagePayload stuff
         void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, sg_size_t);
 
         void setMessagePayloads(const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &default_messagepayload_values,
-                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &overriden_messagepayload_values);
+                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &overridden_messagepayload_values);
 
         void serviceSanityCheck();
 

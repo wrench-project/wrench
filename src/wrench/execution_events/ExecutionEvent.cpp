@@ -8,19 +8,15 @@
  * Workflow.getNextEvent() method.
  */
 
-
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include "wrench/managers/job_manager/JobManagerMessage.h"
-#include "wrench/managers/data_movement_manager/DataMovementManagerMessage.h"
-
+#include <wrench/managers/job_manager/JobManagerMessage.h>
+#include <wrench/managers/data_movement_manager/DataMovementManagerMessage.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/execution_controller/ExecutionControllerMessage.h>
-#include "wrench/services/storage/StorageServiceMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_execution_event, "Log category for Workflow Execution Event");
-
 
 namespace wrench {
 
@@ -58,12 +54,12 @@ namespace wrench {
 
         } else if (auto jmsjcm = std::dynamic_pointer_cast<JobManagerStandardJobCompletedMessage>(message)) {
             std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
-            jmsjcm->job->applyTaskUpdates(jmsjcm->necessary_state_changes, failure_count_increments);
+            StandardJob::applyTaskUpdates(jmsjcm->necessary_state_changes, failure_count_increments);
             return std::shared_ptr<StandardJobCompletedEvent>(
                     new StandardJobCompletedEvent(jmsjcm->job, jmsjcm->compute_service));
 
         } else if (auto jmsjfm = std::dynamic_pointer_cast<JobManagerStandardJobFailedMessage>(message)) {
-            jmsjfm->job->applyTaskUpdates(jmsjfm->necessary_state_changes, jmsjfm->necessary_failure_count_increments);
+            StandardJob::applyTaskUpdates(jmsjfm->necessary_state_changes, jmsjfm->necessary_failure_count_increments);
             return std::shared_ptr<StandardJobFailedEvent>(
                     new StandardJobFailedEvent(jmsjfm->job, jmsjfm->compute_service, jmsjfm->cause));
 

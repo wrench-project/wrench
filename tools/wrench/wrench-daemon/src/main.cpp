@@ -7,8 +7,6 @@
  * (at your option) any later version.
  */
 
-#include "httplib.h"
-
 #include <string>
 #include <vector>
 #include <boost/program_options.hpp>
@@ -27,8 +25,8 @@ namespace po = boost::program_options;
  */
 int main(int argc, char **argv) {
     // Generic lambda to check if a numeric argument is in some range
-    auto in = [](const auto &min, const auto &max, char const *const opt_name) {
-        return [opt_name, min, max](const auto &v) {
+    auto in = [](const unsigned long &min, const unsigned long &max, char const *const opt_name) {
+        return [opt_name, min, max](const unsigned long &v) {
             if (v < min || v > max) {
                 throw po::validation_error(po::validation_error::invalid_option_value,
                                            opt_name, std::to_string(v));

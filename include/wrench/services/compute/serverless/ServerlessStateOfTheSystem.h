@@ -43,7 +43,7 @@ namespace wrench
         std::unordered_map<std::string, std::shared_ptr<StorageService>> getComputeStorages();
         std::shared_ptr<StorageService> getHeadStorageService();
         std::set<std::shared_ptr<DataFile>> getDownloadedImageFiles();
-        sg_size_t getFreeSpaceOnHeadStorage();
+        sg_size_t getFreeSpaceOnHeadStorage() const;
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
         std::set<std::shared_ptr<DataFile>> getImagesCopiedToNode(const std::string &node);
         bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);

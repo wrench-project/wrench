@@ -76,8 +76,8 @@ namespace wrench {
                     invocations.pop_back();
 
                     // Make sure the image is on this node
-                    auto image = inv->getRegisteredFunction()->getFunctionImage();
-                    if (state->isImageOnNode(node, image)) {
+                    auto image_file = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
+                    if (state->isImageOnNode(node, image_file)) {
                         schedulingDecisions.emplace_back(inv, node);
                         availableCores[node]--;
                         scheduled++;
@@ -101,7 +101,7 @@ namespace wrench {
             std::string function_name = inv->getRegisteredFunction()->getFunction()->getName();
 
             // Store image file
-            function_images[function_name] = inv->getRegisteredFunction()->getFunctionImage();
+            function_images[function_name] = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
 
             // Get time limit (we use this as runtime)
             const double time_limit = inv->getRegisteredFunction()->getTimeLimit();

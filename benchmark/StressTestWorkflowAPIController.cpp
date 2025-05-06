@@ -43,9 +43,7 @@ namespace wrench {
         WRENCH_INFO("%zu tasks to run", tasks_to_do.size());
 
         while ((not tasks_to_do.empty()) or (not tasks_pending.empty())) {
-
             while ((!tasks_to_do.empty()) and (tasks_pending.size() < max_num_pending_tasks)) {
-
                 WRENCH_INFO("Looking at scheduling another task");
                 shared_ptr<WorkflowTask> to_submit = *(tasks_to_do.begin());
                 tasks_to_do.erase(to_submit);

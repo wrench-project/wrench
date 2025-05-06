@@ -118,7 +118,6 @@ private:
             }
         }
 
-
         zone->seal();
     }
 };

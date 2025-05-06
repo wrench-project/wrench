@@ -694,13 +694,13 @@ namespace wrench {
         }
 
         // Now run the copy(ies) between the source(s) and the destination(s)
-        auto copy_idx = 0;
+        unsigned long int copy_idx = 0;
         auto total_parts = src_parts.size();// = dst_parts.size()
 
         auto tmp_commport = S4U_CommPort::getTemporaryCommPort();
 
         while (copy_idx < total_parts) {
-            WRENCH_DEBUG("CSS::copyFileIamDestination(): Running StorageService::copyFile for part %i", copy_idx);
+            WRENCH_DEBUG("CSS::copyFileIamDestination(): Running StorageService::copyFile for part %lu", copy_idx);
             WRENCH_DEBUG("CSS::copyFileIamDestination(): SRC= %s - size %llu at %s on  %s%s",
                          src_parts[copy_idx]->getFile()->getID().c_str(),
                          src_parts[copy_idx]->getFile()->getSize(),
@@ -755,7 +755,7 @@ namespace wrench {
         WRENCH_INFO("CSS::copyFileIamDestination(): Copy/ies started");
 
         // Wait for all replies
-        auto rcv = 0;
+        unsigned long int rcv = 0;
         while (rcv < total_parts) {
             auto msg = tmp_commport->getMessage<StorageServiceFileCopyAnswerMessage>();
             rcv += 1;
