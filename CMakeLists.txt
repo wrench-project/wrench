@@ -235,6 +235,7 @@ set(HEADER_FILES
         include/wrench/failure_causes/InvalidDirectoryPath.h
         include/wrench/failure_causes/JobKilled.h
         include/wrench/failure_causes/JobTimeout.h
+        include/wrench/failure_causes/OperationTimeout.h
         include/wrench/failure_causes/NetworkError.h
         include/wrench/failure_causes/NotAllowed.h
         include/wrench/failure_causes/NotEnoughResources.h
@@ -437,6 +438,7 @@ set(SOURCE_FILES
         src/wrench/failure_causes/InvalidDirectoryPath.cpp
         src/wrench/failure_causes/JobKilled.cpp
         src/wrench/failure_causes/JobTimeout.cpp
+        src/wrench/failure_causes/OperationTimeout.cpp
         src/wrench/failure_causes/NetworkError.cpp
         src/wrench/failure_causes/NotAllowed.cpp
         src/wrench/failure_causes/NotEnoughResources.cpp
@@ -506,6 +508,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/action_executor/ComputeActionExecutorTest.cpp
         test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
+        test/services/helper_services/action_executor/ActionTimeoutExecutorTest.cpp
         test/services/helper_services/action_executor/FileReadActionExecutorTest.cpp
         test/services/helper_services/action_executor/CustomActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileDeleteActionExecutorTest.cpp

@@ -33,7 +33,8 @@ namespace wrench {
                                                        const std::string& head_node_storage_mount_point,
                                                        const std::shared_ptr<ServerlessScheduler>& scheduler,
                                                        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                                                       const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) :
+                                                       const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
+                                                       messagepayload_list) :
         ComputeService(hostname,
                        "ServerlessComputeService", ""), property_list_(property_list) {
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
@@ -245,9 +246,13 @@ namespace wrench {
             const auto host = _scheduling_decisions[invocation];
             _scheduling_decisions.erase(invocation);
             _available_cores[host]++;
+
+            bool success = scsiec_msg->_action->getState() == Action::State::COMPLETED;
+            std::shared_ptr<FailureCause> failure_cause = scsiec_msg->_action->getFailureCause();
             scsiec_msg->_invocation->_notify_commport->dputMessage(
-                new ServerlessComputeServiceFunctionInvocationCompleteMessage(true,
-                                                                              scsiec_msg->_invocation, nullptr, 0));
+                new ServerlessComputeServiceFunctionInvocationCompleteMessage(success,
+                                                                              scsiec_msg->_invocation,
+                                                                              failure_cause, 0));
             return true;
         }
         else if (const auto scsncc_msg = std::dynamic_pointer_cast<
@@ -445,6 +450,8 @@ namespace wrench {
             custom_message,
             action,
             nullptr);
+
+        action_executor->setActionTimeout(invocation->getRegisteredFunction()->getTimeLimit());
 
         action_executor->setSimulation(this->simulation_);
         WRENCH_INFO("Starting an action executor for dispatching invocation...");
