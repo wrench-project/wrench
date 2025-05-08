@@ -81,15 +81,15 @@ namespace wrench
      * @brief Constructor
      *
      * @param answer_commport: commport to which the answer message should be sent
-     * @param function: the function to invoke
+     * @param registered_function: the (registered) function to invoke
      * @param function_input: input arguments passed to the function
      * @param notify_commport: commport to notify
      * @param payload: message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationRequestMessage::ServerlessComputeServiceFunctionInvocationRequestMessage(
         S4U_CommPort *answer_commport,
-        std::shared_ptr<Function> function,
-        std::shared_ptr<FunctionInput> function_input,
+        const std::shared_ptr<RegisteredFunction>& registered_function,
+        const std::shared_ptr<FunctionInput>& function_input,
         S4U_CommPort *notify_commport,
         sg_size_t payload)
         : ServerlessComputeServiceMessage(payload)
@@ -102,7 +102,7 @@ namespace wrench
         }
 #endif
         this->answer_commport = answer_commport;
-        this->function = std::move(function);
+        this->registered_function = registered_function;
         this->function_input = function_input;
         this->notify_commport = notify_commport;
     }

@@ -37,8 +37,8 @@ namespace wrench {
                    S4U_CommPort* notify_commport);
 
 
-        bool isDone() const;
-        bool isSuccess() const;
+        [[nodiscard]] bool isDone() const;
+        [[nodiscard]] bool hasSucceeded() const;
         [[nodiscard]] std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         /**

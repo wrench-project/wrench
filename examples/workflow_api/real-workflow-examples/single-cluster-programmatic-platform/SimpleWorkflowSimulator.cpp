@@ -39,7 +39,7 @@ private:
     unsigned long num_compute_hosts;
 
     void create_platform() const {
-        // Create the top-level zone
+        // Get the top-level zone
         auto zone = simgrid::s4u::Engine::get_instance()->get_netzone_root();
 
         // Create the WMSHost host with its disk

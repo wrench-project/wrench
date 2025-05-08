@@ -53,7 +53,7 @@ namespace wrench {
      * @brief Checks if the invocation was successful.
      * @return True if the invocation was successful, false otherwise.
      */
-    bool Invocation::isSuccess() const { 
+    bool Invocation::hasSucceeded() const { 
         if (_done) {
             return _success;
         }

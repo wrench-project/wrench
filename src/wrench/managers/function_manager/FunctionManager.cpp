@@ -58,13 +58,13 @@ namespace wrench {
      * @brief Creates a shared pointer to a Function object and returns it
      * 
      * @param name the name of the function
-     * @param lambda 
+     * @param lambda the code of the function
      * @param image the location of image to execute the function on
      * @param code the location of the code to execute
      * @return std::shared_ptr<Function> a shared pointer to the Function object created
      */
     std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
-                                                                     const std::function<std::string(std::shared_ptr<FunctionInput>, const std::shared_ptr<StorageService>&)>& lambda,
+                                                                     const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput>&, const std::shared_ptr<StorageService>&)>& lambda,
                                                                      const std::shared_ptr<FileLocation>& image,
                                                                      const std::shared_ptr<FileLocation>& code) {
                                                                         
@@ -101,18 +101,18 @@ namespace wrench {
     /**
      * @brief Invokes a function on a ServerlessComputeService
      * 
-     * @param function the function to invoke
+     * @param registered_function the (registered) function to invoke
      * @param sl_compute_service the ServerlessComputeService to invoke the function on
-     * @param function_invocation_args arguments to pass to the function
-     * @return std::shared_ptr<Invocation> a shared pointer to the Invocation object created by the ServerlessComputeService
+     * @param function_input the input (object) to the function
+     * @return std::shared_ptr<Invocation> an Invocation object created by the ServerlessComputeService
      */
-    std::shared_ptr<Invocation> FunctionManager::invokeFunction(const std::shared_ptr<Function> &function,
+    std::shared_ptr<Invocation> FunctionManager::invokeFunction(const std::shared_ptr<RegisteredFunction> &registered_function,
                                                                 const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
-                                                                std::shared_ptr<FunctionInput> function_invocation_args) {
-        WRENCH_INFO("Function [%s] invoked with compute service [%s]", function->getName().c_str(), sl_compute_service->getName().c_str());
+                                                                const std::shared_ptr<FunctionInput>& function_input) {
+        WRENCH_INFO("Function [%s] invoked with compute service [%s]", registered_function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the notify commport
 
-        return sl_compute_service->invokeFunction(function, function_invocation_args, this->commport);
+        return sl_compute_service->invokeFunction(registered_function, function_input, this->commport);
     }
 
     /**

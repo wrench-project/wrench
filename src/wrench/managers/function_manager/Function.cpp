@@ -19,7 +19,7 @@ namespace wrench {
      * @param code The file location of the function's code.
      */
     Function::Function(const std::string &name,
-                       const std::function<std::string(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
+                       const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
                        const std::shared_ptr<FileLocation> &image,
                        const std::shared_ptr<FileLocation> &code)
         : _name(name), _lambda(lambda), _image(image), _code(code) {}
@@ -36,9 +36,9 @@ namespace wrench {
      * @brief Executes the function with the provided input and storage service.
      * @param input The input string for the function.
      * @param storage_service A shared pointer to a StorageService instance.
-     * @return The result of the function execution.
+     * @return The output of the function execution.
      */
-    std::string Function::execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const {
+    std::shared_ptr<FunctionOutput> Function::execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const {
         return _lambda(input, storage_service);
     }
 

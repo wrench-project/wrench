@@ -106,6 +106,13 @@ public:
     int x2_;
 };
 
+class MyFunctionOutput : public wrench::FunctionOutput {
+public:
+    MyFunctionOutput(const std::string& msg) : msg_(msg) {
+    }
+    std::string msg_;
+};
+
 class ServerlessLoadBalancingSchedulerTestBasicController : public wrench::ExecutionController {
 public:
     ServerlessLoadBalancingSchedulerTestBasicController(ServerlessLoadBalancingSchedulerTest* test,
@@ -130,10 +137,10 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            WRENCH_INFO("I AM USER CODE");
-            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+            WRENCH_INFO("I am in user code!");
+            return std::make_shared<MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -146,14 +153,13 @@ private:
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location, code_location);
 
         WRENCH_INFO("Registering function 1");
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 1 registered");
 
         auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image_location, code_location);
-
-
+        
         WRENCH_INFO("Registering function 2");
-        function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function2 = function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 2 registered");
 
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
@@ -161,7 +167,7 @@ private:
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         for (unsigned char i = 0; i < 200; i++) {
             WRENCH_INFO("Invoking function 1");
-            invocations.push_back(function_manager->invokeFunction(function1, this->compute_service, input));
+            invocations.push_back(function_manager->invokeFunction(registered_function1, this->compute_service, input));
             WRENCH_INFO("Function 1 invoked");
             // wrench::Simulation::sleep(1);
         }
@@ -172,22 +178,11 @@ private:
 
         WRENCH_INFO("Invoking function 2");
         std::shared_ptr<wrench::Invocation> new_invocation = function_manager->invokeFunction(
-            function2, this->compute_service, input);
+            registered_function2, this->compute_service, input);
         WRENCH_INFO("Function 2 invoked");
 
         function_manager->wait_one(new_invocation);
 
-        // wrench::Simulation::sleep(100);
-        //
-        // WRENCH_INFO("Invoking function 1 AGAIN");
-        // function_manager->invokeFunction(function1, this->compute_service, input);
-        // WRENCH_INFO("Function 1 invoked");
-
-        wrench::Simulation::sleep(1000000);
-        // WRENCH_INFO("Execution complete");
-
-        // function_manager->invokeFunction(function2, this->compute_service, input);
-        // function_manager->invokeFunction(function1, this->compute_service, input);
 
         return 0;
     }
@@ -198,10 +193,10 @@ TEST_F(ServerlessLoadBalancingSchedulerTest, Basic) {
 }
 
 void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
-    int argc = 1;
+    int argc = 2;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);

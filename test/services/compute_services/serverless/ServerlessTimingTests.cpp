@@ -97,6 +97,13 @@ public:
     int x2_;
 };
 
+class MyFunctionOutput : public wrench::FunctionOutput {
+public:
+    MyFunctionOutput(const std::string& msg) : msg_(msg) {
+    }
+
+    std::string msg_;
+};
 
 /**********************************************************************/
 /**  FUNCTION INVOCATION TEST                                       **/
@@ -124,10 +131,10 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(5);
-            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+            return std::make_shared<MyFunctionOutput>("Processed!");
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -138,12 +145,12 @@ private:
         wrench::StorageService::createFileAtLocation(code_location);
         auto function = wrench::FunctionManager::createFunction("Function", lambda, image_location, code_location);
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {
             auto now = wrench::Simulation::getCurrentSimulatedDate();
-            auto invocation = function_manager->invokeFunction(function, this->compute_service, input);
+            auto invocation = function_manager->invokeFunction(registered_function, this->compute_service, input);
             function_manager->wait_one(invocation);
             auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
             double remote_download = 5.4;  // estimated (bottleneck = wide area)
@@ -161,7 +168,7 @@ private:
         // Place another invocation (which saves on some stuff)
         {
             auto now = wrench::Simulation::getCurrentSimulatedDate();
-            auto invocation = function_manager->invokeFunction(function, this->compute_service, input);
+            auto invocation = function_manager->invokeFunction(registered_function, this->compute_service, input);
             function_manager->wait_one(invocation);
             auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
             double remote_download = 0;  // cached
