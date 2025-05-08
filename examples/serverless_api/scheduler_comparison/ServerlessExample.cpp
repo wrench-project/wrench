@@ -54,8 +54,8 @@ private:
     unsigned int num_hosts;
 
     void create_platform(unsigned int num_hosts) const {
-        // Create the top-level zone
-        auto zone = sg4::create_full_zone("AS0");
+        // Get the top-level zone
+        auto zone = simgrid::s4u::Engine::get_instance()->get_netzone_root();
         // Create the WMSHost host with its disk
         auto wms_host = zone->create_host("UserHost", "10Gf");
         wms_host->set_core_count(1);

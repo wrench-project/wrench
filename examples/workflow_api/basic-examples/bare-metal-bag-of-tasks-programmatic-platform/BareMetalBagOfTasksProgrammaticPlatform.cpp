@@ -61,7 +61,7 @@ private:
     double link_bw;
 
     void create_platform() const {
-        // Create the top-level zone
+        // Get the top-level zone
         auto zone = simgrid::s4u::Engine::get_instance()->get_netzone_root();
         // Create the WMSHost host with its disk
         auto wms_host = zone->add_host("WMSHost", "10Gf");

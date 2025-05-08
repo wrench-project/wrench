@@ -16,6 +16,7 @@
 #include "FailureCause.h"
 
 namespace wrench {
+    class RegisteredFunction;
 
     class Function;
 
@@ -33,7 +34,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        FunctionNotFound(std::shared_ptr<Function> function);
+        FunctionNotFound(std::shared_ptr<RegisteredFunction> registered_function);
 
         /***********************/
         /** \endcond           */
@@ -42,7 +43,7 @@ namespace wrench {
         std::string toString() override;
 
     private:
-        std::shared_ptr<Function> _function;
+        std::shared_ptr<RegisteredFunction> _registered_function;
     };
 
     /***********************/
