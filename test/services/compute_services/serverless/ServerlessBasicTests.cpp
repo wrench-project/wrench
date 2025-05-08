@@ -101,6 +101,14 @@ public:
     int x2_;
 };
 
+class MyFunctionOutput : public wrench::FunctionOutput {
+public:
+    MyFunctionOutput(const std::string& msg) : msg_(msg) {
+    }
+
+    std::string msg_;
+};
+
 
 /**********************************************************************/
 /**  FUNCTION REGISTRATION TEST                                      **/
@@ -128,9 +136,9 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+                                  const std::shared_ptr<wrench::StorageService>& storage_service) -> std::shared_ptr<wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+            return std::make_shared<MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -231,10 +239,10 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(5);
-            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+            return std::make_shared<MyFunctionOutput>("DONE");
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -248,20 +256,11 @@ private:
 
         // Invoking a non-registered function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-
-        try {
-            function_manager->invokeFunction(function1, this->compute_service, input);
-            throw std::runtime_error("Unregistered function invocation should have failed");
-        }
-        catch (wrench::ExecutionException& expected) {
-            WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
-        }
-
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {
-            auto invocation = function_manager->invokeFunction(function1, this->compute_service, input);
+            auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
 
 
             auto registered_function = invocation->getRegisteredFunction();
@@ -279,7 +278,7 @@ private:
                 throw std::runtime_error("Invocation should not be done, it hasn't been started!");
             }
             try {
-                auto ignore = invocation->isSuccess();
+                auto ignore = invocation->hasSucceeded();
                 throw std::runtime_error("Shouldn't be able to call isSuccess() on an invocation that's not done yet");
             }
             catch (std::runtime_error& expected) {
@@ -308,11 +307,16 @@ private:
             if (!invocation->isDone()) {
                 throw std::runtime_error("Invocation should be done by now");
             }
-            if (!invocation->isSuccess()) {
+            if (!invocation->hasSucceeded()) {
                 throw std::runtime_error("Invocation should have succeeded");
             }
             if (invocation->getFailureCause()) {
                 throw std::runtime_error("There should be no failure cause");
+            }
+
+            auto output = std::dynamic_pointer_cast<MyFunctionOutput>(invocation->getOutput());
+            if (output->msg_ != "DONE") {
+                throw std::runtime_error("Invocation output should be string \"DONE\"");
             }
         }
 
@@ -380,10 +384,10 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(50);
-            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+            return std::make_shared<MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -397,11 +401,11 @@ private:
 
         // Invoking a non-registered function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {
-            auto invocation = function_manager->invokeFunction(function1, this->compute_service, input);
+            auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
 
             function_manager->wait_one(invocation);
 
@@ -409,7 +413,7 @@ private:
                 throw std::runtime_error("Invocation should be done by now");
             }
 
-            if (invocation->isSuccess()) {
+            if (invocation->hasSucceeded()) {
                 throw std::runtime_error("Invocation should NOT have succeeded");
             }
             if (not invocation->getFailureCause()) {
@@ -489,13 +493,13 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [this](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::string {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(1);
             // Will fail
             wrench::StorageService::readFileAtLocation(
                 wrench::FileLocation::LOCATION(this->storage_service, this->data_file));
-            return "Processed: " + std::to_string(real_input->x1_ + real_input->x2_);
+            return std::make_shared<MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -509,11 +513,11 @@ private:
 
         // Invoking a non-registered function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 =  function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {
-            auto invocation = function_manager->invokeFunction(function1, this->compute_service, input);
+            auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
 
             function_manager->wait_one(invocation);
 
@@ -521,7 +525,7 @@ private:
                 throw std::runtime_error("Invocation should be done by now");
             }
 
-            if (invocation->isSuccess()) {
+            if (invocation->hasSucceeded()) {
                 throw std::runtime_error("Invocation should NOT have succeeded");
             }
             if (not invocation->getFailureCause()) {

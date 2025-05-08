@@ -145,19 +145,19 @@ namespace wrench {
     /**
      * @brief Invoke a function in the serverless compute service
      *
-     * @param function the function to invoke
+     * @param registered_function the (registered) function to invoke
      * @param input the input to the function
      * @param notify_commport the ExecutionController commport to notify
      * @return std::shared_ptr<Invocation> Pointer to the invocation created by the ServerlessComputeService
      */
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(
-        const std::shared_ptr<Function>& function, const std::shared_ptr<FunctionInput>& input,
+        const std::shared_ptr<RegisteredFunction>& registered_function, const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
-        WRENCH_INFO("Serverless Provider received invoke function %s", function->getName().c_str());
+        WRENCH_INFO("Serverless Provider received invoke function %s", registered_function->getFunction()->getName().c_str());
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
-                                                                         function, input,
+                                                                         registered_function, input,
                                                                          notify_commport, 0));
 
         // Block here for return, if non-blocking then function manager has to check up on it? or send a message
@@ -231,7 +231,7 @@ namespace wrench {
         }
         else if (const auto scsfir_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
-            processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->function,
+            processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->registered_function,
                                              scsfir_msg->function_input, scsfir_msg->notify_commport);
             return true;
         }
@@ -289,56 +289,43 @@ namespace wrench {
                                                                       sg_size_t ram_limit_in_bytes,
                                                                       sg_size_t ingress_in_bytes,
                                                                       sg_size_t egress_in_bytes) {
-        auto registered_function_it = _state_of_the_system->_registeredFunctions.find(function->getName());
-        if (registered_function_it != _state_of_the_system->_registeredFunctions.end()) {
-            // TODO: Create failure case for duplicate function?
-            std::string msg = "Duplicate Function";
-            const auto answerMessage =
-                new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-                    false, registered_function_it->second,
-                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(), msg), 0);
-            answer_commport->dputMessage(answerMessage);
-        }
-        else {
-            auto registered_function = std::make_shared<RegisteredFunction>(
-                function,
-                time_limit,
-                disk_space_limit_in_bytes,
-                ram_limit_in_bytes,
-                ingress_in_bytes,
-                egress_in_bytes);
+        auto registered_function = std::make_shared<RegisteredFunction>(
+            function,
+            time_limit,
+            disk_space_limit_in_bytes,
+            ram_limit_in_bytes,
+            ingress_in_bytes,
+            egress_in_bytes);
 
-            _state_of_the_system->_registeredFunctions[function->getName()] = registered_function;
+        _state_of_the_system->_registeredFunctions.insert(registered_function);
 
-            const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-                true, registered_function, nullptr, 0);
-            answer_commport->dputMessage(answerMessage);
-        }
+        const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
+            true, registered_function, nullptr, 0);
+        answer_commport->dputMessage(answerMessage);
     }
 
     /**
      * @brief Processes a "function invocation request" message
      *
      * @param answer_commport the FunctionManager commport to answer to
-     * @param function the function to invoke
+     * @param registered_function the (registered) function to invoke
      * @param input the input to the function
      * @param notify_commport the ExecutionController commport to notify
      */
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort* answer_commport,
-                                                                    const std::shared_ptr<Function>& function,
+                                                                    const std::shared_ptr<RegisteredFunction>&
+                                                                    registered_function,
                                                                     const std::shared_ptr<FunctionInput>& input,
                                                                     S4U_CommPort* notify_commport) {
-        if (_state_of_the_system->_registeredFunctions.find(function->getName()) == _state_of_the_system->
+        if (_state_of_the_system->_registeredFunctions.find(registered_function) == _state_of_the_system->
             _registeredFunctions.end()) {
             // Not found
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                false, nullptr, std::make_shared<FunctionNotFound>(function), 0);
+                false, nullptr, std::make_shared<FunctionNotFound>(registered_function), 0);
             answer_commport->dputMessage(answerMessage);
         }
         else {
-            const auto invocation = std::make_shared<Invocation>(
-                _state_of_the_system->_registeredFunctions.at(function->getName()), input,
-                notify_commport);
+            const auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
 
             _state_of_the_system->_newInvocations.push(invocation);
             // TODO: return some sort of function invocation object?

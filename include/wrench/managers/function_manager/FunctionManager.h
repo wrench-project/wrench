@@ -46,7 +46,7 @@ namespace wrench {
         void kill();
 
         static std::shared_ptr<Function> createFunction(const std::string& name,
-                                                        const std::function<std::string(std::shared_ptr<FunctionInput>,
+                                                        const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput>&,
                                                         const std::shared_ptr<StorageService>&)>& lambda,
                                                         const std::shared_ptr<FileLocation>& image,
                                                         const std::shared_ptr<FileLocation>& code);
@@ -59,9 +59,9 @@ namespace wrench {
                               long ingress_in_bytes,
                               long egress_in_bytes);
 
-        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<Function> &function,
+        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction> &registered_function,
                                                     const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
-                                                    std::shared_ptr<FunctionInput> function_invocation_args);
+                                                    const std::shared_ptr<FunctionInput>& function_invocation_args);
 
         bool isDone(std::shared_ptr<Invocation> invocation);
         void wait_one(std::shared_ptr<Invocation> invocation);

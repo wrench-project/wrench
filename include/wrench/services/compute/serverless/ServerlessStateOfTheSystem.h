@@ -36,14 +36,14 @@ namespace wrench
         std::map<std::string, unsigned long> getAvailableCores();
         std::queue<std::shared_ptr<Invocation>> getNewInvocations();
         std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> getAdmittedInvocations();
-        std::queue<std::shared_ptr<Invocation>> getScheduableInvocations();
+        std::queue<std::shared_ptr<Invocation>> getSchedulableInvocations();
         std::queue<std::shared_ptr<Invocation>> getScheduledInvocations();
         std::queue<std::shared_ptr<Invocation>> getRunningInvocations();
         std::queue<std::shared_ptr<Invocation>> getFinishedInvocations();
         std::unordered_map<std::string, std::shared_ptr<StorageService>> getComputeStorages();
         std::shared_ptr<StorageService> getHeadStorageService();
         std::set<std::shared_ptr<DataFile>> getDownloadedImageFiles();
-        sg_size_t getFreeSpaceOnHeadStorage() const;
+        [[nodiscard]] sg_size_t getFreeSpaceOnHeadStorage() const;
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
         std::set<std::shared_ptr<DataFile>> getImagesCopiedToNode(const std::string &node);
         bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);
@@ -61,7 +61,9 @@ namespace wrench
         explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts);
 
         // map of Registered functions sorted by function name
-        std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
+        // std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
+        // set of Registered functions
+        std::set<std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         // vector of compute host names
         std::vector<std::string> _compute_hosts;
 
