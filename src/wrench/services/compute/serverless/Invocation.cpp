@@ -29,7 +29,7 @@ namespace wrench {
                                                             _success(false),
                                                             _notify_commport(notify_commport)
     {
-        WRENCH_INFO("Invocation created for function %s", registered_function->getFunction()->getName().c_str());
+        WRENCH_INFO("Invocation created for function %s", _registered_function->getFunction()->getName().c_str());
     }
 
     /**

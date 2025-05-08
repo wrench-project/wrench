@@ -153,7 +153,9 @@ namespace wrench {
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(
         const std::shared_ptr<RegisteredFunction>& registered_function, const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
-        WRENCH_INFO("Serverless Provider received invoke function %s", registered_function->getFunction()->getName().c_str());
+
+        std::cerr << "IN INVOKE FUNCTION\n";
+        WRENCH_INFO("Serverless provider received a function invocation for function %s", registered_function->getFunction()->getName().c_str());
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
@@ -168,6 +170,8 @@ namespace wrench {
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
+        std::cerr << "IN INVOKE FUNCTION: RETURNING INVOCATION " << msg->invocation << " TO USER\n";
+        std::cerr << "IN INVOKE FUNCTION: AND REG =  " << msg->invocation->_registered_function << " TO USER\n";
         return msg->invocation;
     }
 
@@ -317,21 +321,25 @@ namespace wrench {
                                                                     registered_function,
                                                                     const std::shared_ptr<FunctionInput>& input,
                                                                     S4U_CommPort* notify_commport) {
-        if (_state_of_the_system->_registeredFunctions.find(registered_function) == _state_of_the_system->
-            _registeredFunctions.end()) {
+        if (_state_of_the_system->_registeredFunctions.find(registered_function) ==
+            _state_of_the_system->_registeredFunctions.end()) {
             // Not found
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 false, nullptr, std::make_shared<FunctionNotFound>(registered_function), 0);
             answer_commport->dputMessage(answerMessage);
         }
         else {
+            std::cerr << "CALLING INVOCATION CONSTRUCTOR\n";
             const auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
+            std::cerr << "CREATED INVOCATION " << invocation << "\n";
+            std::cerr << "WITH INVOCATION: REG: " << invocation->_registered_function << "\n";
 
             _state_of_the_system->_newInvocations.push(invocation);
-            // TODO: return some sort of function invocation object?
+            std::cerr << "RETURNING INVOCATION TO THE USER\n";
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 true, invocation, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
+            std::cerr << "MOVING BACK TO MY MAIN LOOP\n";
         }
     }
 
@@ -545,6 +553,10 @@ namespace wrench {
         while (!_state_of_the_system->_newInvocations.empty()) {
             WRENCH_INFO("Admitting an invocation...");
             auto invocation = _state_of_the_system->_newInvocations.front();
+            std::cerr << "INVOCATION ---> " << invocation << "\n";
+            std::cerr << "INVOCATION->REG: ---> " << invocation->_registered_function << "\n";
+            std::cerr << "---> " << invocation->_registered_function->_function << "\n";
+            std::cerr << "---> " << invocation->_registered_function->_function->_image << "\n";
             const auto image = invocation->_registered_function->_function->_image;
 
             // If the image file is already downloaded, make the invocation schedulable immediately

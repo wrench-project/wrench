@@ -126,7 +126,7 @@ namespace wrench {
         std::discrete_distribution<> dist(10, 80);
 
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
-        for (int i = 0; i < num_invocations_; ++i) {
+        for (unsigned long i = 0; i < num_invocations_; ++i) {
             auto inv = function_manager->invokeFunction(registered_function, compute_service,
                                                       std::make_shared<MyFunctionInput>(i, dist(gen)));
             invocations.push_back(inv);
