@@ -152,7 +152,6 @@ namespace wrench {
         const std::shared_ptr<RegisteredFunction>& registered_function, const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
 
-        std::cerr << "IN INVOKE FUNCTION\n";
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
@@ -167,8 +166,6 @@ namespace wrench {
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
-        std::cerr << "IN INVOKE FUNCTION: RETURNING INVOCATION " << msg->invocation << " TO USER\n";
-        std::cerr << "IN INVOKE FUNCTION: AND REG =  " << msg->invocation->_registered_function << " TO USER\n";
         return msg->invocation;
     }
 
@@ -189,13 +186,6 @@ namespace wrench {
         startComputeHostsServices();
 
         while (processNextMessage()) {
-            if (!_state_of_the_system->_newInvocations.empty()) {
-                std::cerr << "WTF2 INV: " << _state_of_the_system->_newInvocations.front() << "\n";
-                std::cerr << "WTF2 INV->REG: " << _state_of_the_system->_newInvocations.front()->_registered_function << "\n";
-            } else {
-                std::cerr << "WTF2: EMPTY\n";
-            }
-
             admitInvocations();
             scheduleInvocations();
             dispatchInvocations();
@@ -241,8 +231,6 @@ namespace wrench {
             ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
             processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->registered_function,
                                              scsfir_msg->function_input, scsfir_msg->notify_commport);
-            std::cerr << "WTF1 INV: " << _state_of_the_system->_newInvocations.front() << "\n";
-            std::cerr << "WTF1 INV->REG: " << _state_of_the_system->_newInvocations.front()->_registered_function << "\n";
             return true;
         }
         else if (const auto scsdc_msg = std::dynamic_pointer_cast<
@@ -335,19 +323,11 @@ namespace wrench {
             answer_commport->dputMessage(answerMessage);
         }
         else {
-            std::cerr << "CALLING INVOCATION CONSTRUCTOR\n";
             auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
-            std::cerr << "CREATED INVOCATION " << invocation << "\n";
-            std::cerr << "WITH INVOCATION: REG: " << invocation->_registered_function << "\n";
-
             _state_of_the_system->_newInvocations.push(invocation);
-            std::cerr << "RETURNING INVOCATION TO THE USER\n";
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 true, invocation, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
-            std::cerr << "MOVING BACK TO MY MAIN LOOP BUT BEFORE\n";
-            std::cerr << "CREATED INVOCATION " << invocation << "\n";
-            std::cerr << "WITH INVOCATION: REG: " << invocation->_registered_function << "\n";
         }
     }
 
@@ -423,7 +403,7 @@ namespace wrench {
             WRENCH_INFO("Going to invoke user's lambda function");
 
             // Invoke the user's lambda function
-            function->_lambda(invocation->_function_input, invocation->_tmp_storage_service);
+            invocation->_function_output = function->_lambda(invocation->_function_input, invocation->_tmp_storage_service);
 
             // Clean up
             invocation->_tmp_storage_service->stop();
@@ -559,18 +539,10 @@ namespace wrench {
         // be revisited (e.g., creating a property that allows the user to pick one of several
         // strategies).
         while (!_state_of_the_system->_newInvocations.empty()) {
-            std::cerr << "WTF3: " << _state_of_the_system->_newInvocations.front()->_registered_function << "\n";
 
             WRENCH_INFO("Admitting an invocation...");
             auto invocation = _state_of_the_system->_newInvocations.front();
-            std::cerr << "INVOCATION ---> " << invocation << "\n";
-            std::cerr << "INVOCATION->REG: ---> " << invocation->_registered_function << "\n";
-            std::cerr << "-FURTHER.... --> " << invocation->_registered_function->_function << "\n";
-            std::cerr << "-FURTHER...FURTHER.... --> " << invocation->_registered_function->_function->_image << "\n";
             const auto image = invocation->_registered_function->_function->_image;
-            std::cerr << "FOOX\n";
-
-            std::cerr << "FFO1\n";
 
             // If the image file is already downloaded, make the invocation schedulable immediately
             if (_state_of_the_system->_downloaded_image_files.find(image->getFile()) != _state_of_the_system->
@@ -579,7 +551,6 @@ namespace wrench {
                 _state_of_the_system->_schedulableInvocations.push(invocation);
                 continue;
             }
-            std::cerr << "FFO2\n";
 
             // If the image file is being downloaded, make the invocation admitted
             if (_state_of_the_system->_being_downloaded_image_files.find(image->getFile()) != _state_of_the_system->
@@ -588,7 +559,6 @@ namespace wrench {
                 _state_of_the_system->_admittedInvocations[image->getFile()].push(invocation);
                 continue;
             }
-            std::cerr << "FFO3\n";
 
             // Otherwise, if there is enough space on the head node storage service to store it,
             // then launch the downloaded and admit the invocation
@@ -602,12 +572,10 @@ namespace wrench {
                 _state_of_the_system->_admittedInvocations[image->getFile()].push(invocation);
                 continue;
             }
-            std::cerr << "FFO4\n";
 
             // If we're here, we couldn't admit invocations, and so we stop
             break;
         }
-        std::cerr << "DONE WITH METHOD\n";
     }
 
     /**

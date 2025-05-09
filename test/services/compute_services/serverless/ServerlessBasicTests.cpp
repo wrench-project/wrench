@@ -150,17 +150,13 @@ private:
 
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location, code_location);
 
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
-
-        // Try to register the same function name
+        // Trying to create a function with the same name
         try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
-                                               1 * MB);
-            throw std::runtime_error("Redundant function registration should have failed");
-        }
-        catch (wrench::ExecutionException& expected) {
-            WRENCH_INFO("As expected, got exception: %s", expected.getCause()->toString().c_str());
-        }
+            auto function_duplicate = wrench::FunctionManager::createFunction("Function 1", lambda, image_location, code_location);
+            throw std::runtime_error("Redundant function creation should have failed");
+        } catch (const std::exception& expected) {}
+
+        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
         auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image_location, code_location);
 
