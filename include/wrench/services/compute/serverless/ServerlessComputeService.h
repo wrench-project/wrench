@@ -84,8 +84,8 @@ namespace wrench {
                                                 sg_size_t egress_in_bytes);
 
         void processFunctionInvocationRequest(S4U_CommPort *answer_commport, 
-                                              const std::shared_ptr<RegisteredFunction>& registered_function,
-                                              const std::shared_ptr<FunctionInput>& input,
+                                              const std::shared_ptr<RegisteredFunction> registered_function,
+                                              const std::shared_ptr<FunctionInput> input,
                                               S4U_CommPort *notify_commport);
 
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action, const std::shared_ptr<DataFile>& image_file);
