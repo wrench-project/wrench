@@ -168,7 +168,6 @@ private:
         for (unsigned char i = 0; i < 200; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(registered_function1, this->compute_service, input));
-            std::cerr << "HERE IN THE TEST\n";
             WRENCH_INFO("Function 1 invoked");
             // wrench::Simulation::sleep(1);
         }
@@ -194,10 +193,10 @@ TEST_F(ServerlessLoadBalancingSchedulerTest, Basic) {
 }
 
 void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
