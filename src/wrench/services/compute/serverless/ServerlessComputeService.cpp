@@ -155,7 +155,6 @@ namespace wrench {
         S4U_CommPort* notify_commport) {
 
         std::cerr << "IN INVOKE FUNCTION\n";
-        WRENCH_INFO("Serverless provider received a function invocation for function %s", registered_function->getFunction()->getName().c_str());
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
@@ -192,6 +191,10 @@ namespace wrench {
         startComputeHostsServices();
 
         while (processNextMessage()) {
+            if (!_state_of_the_system->_newInvocations.empty()) {
+                std::cerr << "WTF2: " << _state_of_the_system->_newInvocations.front()->_registered_function << "\n";
+            }
+
             admitInvocations();
             scheduleInvocations();
             dispatchInvocations();
@@ -237,6 +240,7 @@ namespace wrench {
             ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
             processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->registered_function,
                                              scsfir_msg->function_input, scsfir_msg->notify_commport);
+            std::cerr << "WTF1: " << _state_of_the_system->_newInvocations.front()->_registered_function << "\n";
             return true;
         }
         else if (const auto scsdc_msg = std::dynamic_pointer_cast<
@@ -317,9 +321,9 @@ namespace wrench {
      * @param notify_commport the ExecutionController commport to notify
      */
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort* answer_commport,
-                                                                    const std::shared_ptr<RegisteredFunction>&
+                                                                    const std::shared_ptr<RegisteredFunction>
                                                                     registered_function,
-                                                                    const std::shared_ptr<FunctionInput>& input,
+                                                                    const std::shared_ptr<FunctionInput> input,
                                                                     S4U_CommPort* notify_commport) {
         if (_state_of_the_system->_registeredFunctions.find(registered_function) ==
             _state_of_the_system->_registeredFunctions.end()) {
@@ -551,6 +555,8 @@ namespace wrench {
         // be revisited (e.g., creating a property that allows the user to pick one of several
         // strategies).
         while (!_state_of_the_system->_newInvocations.empty()) {
+            std::cerr << "WTF3: " << _state_of_the_system->_newInvocations.front()->_registered_function << "\n";
+
             WRENCH_INFO("Admitting an invocation...");
             auto invocation = _state_of_the_system->_newInvocations.front();
             std::cerr << "INVOCATION ---> " << invocation << "\n";
