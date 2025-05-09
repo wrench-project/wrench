@@ -36,11 +36,6 @@ namespace wrench {
                    const std::shared_ptr<FunctionInput> &function_input,
                    S4U_CommPort* notify_commport);
 
-        ~Invocation() {
-            std::cerr << "DESTROYING INVOCATION " << this << "\n";
-        }
-
-
         [[nodiscard]] bool isDone() const;
         [[nodiscard]] bool hasSucceeded() const;
         [[nodiscard]] std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;

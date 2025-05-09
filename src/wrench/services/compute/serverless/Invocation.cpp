@@ -47,7 +47,9 @@ namespace wrench {
      * @brief Checks if the invocation is done.
      * @return True if the invocation is done, false otherwise.
      */
-    bool Invocation::isDone() const { return _done; }
+    bool Invocation::isDone() const {
+        return _done;
+    }
 
     /**
      * @brief Checks if the invocation was successful.
@@ -64,7 +66,9 @@ namespace wrench {
      * @brief Gets the registered function.
      * @return A shared pointer to the registered function.
      */
-    std::shared_ptr<RegisteredFunction> Invocation::getRegisteredFunction() const { return _registered_function; }
+    std::shared_ptr<RegisteredFunction> Invocation::getRegisteredFunction() const {
+        return _registered_function;
+    }
 
     /**
      * @brief Gets the cause of failure.
