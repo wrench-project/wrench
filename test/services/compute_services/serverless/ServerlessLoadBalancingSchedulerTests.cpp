@@ -168,6 +168,7 @@ private:
         for (unsigned char i = 0; i < 200; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(registered_function1, this->compute_service, input));
+            std::cerr << "HERE IN THE TEST\n";
             WRENCH_INFO("Function 1 invoked");
             // wrench::Simulation::sleep(1);
         }
