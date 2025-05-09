@@ -45,6 +45,10 @@ namespace wrench {
                            sg_size_t ingress_in_bytes, 
                            sg_size_t egress_in_bytes);
 
+        ~RegisteredFunction() {
+            std::cerr << "DESTROYING REGISTERED FUNCTION " << this << "\n";
+        }
+
         std::shared_ptr<FileLocation> getFunctionImage();
         std::shared_ptr<Function> getFunction();
         double getTimeLimit();
