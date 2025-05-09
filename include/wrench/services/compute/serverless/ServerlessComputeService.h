@@ -138,7 +138,7 @@ namespace wrench {
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
         std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
-        sg_size_t _free_space_on_head_storage{}; // We keep track of it ourselves to avoid concurrency shennanigans
+        sg_size_t _free_space_on_head_storage{}; // We keep track of it ourselves to avoid concurrency shenanigans
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}
