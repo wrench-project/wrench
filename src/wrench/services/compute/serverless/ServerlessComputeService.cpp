@@ -312,8 +312,8 @@ namespace wrench {
      */
     void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort* answer_commport,
                                                                     const std::shared_ptr<RegisteredFunction>
-                                                                    registered_function,
-                                                                    const std::shared_ptr<FunctionInput> input,
+                                                                    & registered_function,
+                                                                    const std::shared_ptr<FunctionInput>& input,
                                                                     S4U_CommPort* notify_commport) {
         if (_state_of_the_system->_registeredFunctions.find(registered_function) ==
             _state_of_the_system->_registeredFunctions.end()) {

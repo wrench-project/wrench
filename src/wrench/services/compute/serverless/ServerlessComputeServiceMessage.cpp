@@ -18,7 +18,7 @@ namespace wrench
      * @brief Constructor for ServerlessComputeServiceMessage
      * @param payload: message size in bytes
      */
-    ServerlessComputeServiceMessage::ServerlessComputeServiceMessage(sg_size_t payload)
+    ServerlessComputeServiceMessage::ServerlessComputeServiceMessage(const sg_size_t payload)
         : ComputeServiceMessage(payload)
     {
     }
@@ -38,12 +38,12 @@ namespace wrench
     ServerlessComputeServiceFunctionRegisterRequestMessage::ServerlessComputeServiceFunctionRegisterRequestMessage(
         S4U_CommPort *answer_commport,
         std::shared_ptr<Function> function,
-        double time_limit,
-        sg_size_t disk_space_limit_in_bytes,
-        sg_size_t ram_limit_in_bytes,
-        sg_size_t ingress_in_bytes,
-        sg_size_t egress_in_bytes,
-        sg_size_t payload)
+        const double time_limit,
+        const sg_size_t disk_space_limit_in_bytes,
+        const sg_size_t ram_limit_in_bytes,
+        const sg_size_t ingress_in_bytes,
+        const sg_size_t egress_in_bytes,
+        const sg_size_t payload)
         : ServerlessComputeServiceMessage(payload)
     {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
