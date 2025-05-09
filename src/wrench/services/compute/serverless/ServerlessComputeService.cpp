@@ -37,9 +37,7 @@ namespace wrench {
                                                        messagepayload_list) :
         ComputeService(hostname,
                        "ServerlessComputeService", ""), property_list_(property_list) {
-        _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
-            new ServerlessStateOfTheSystem(compute_hosts));
-
+        _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(new ServerlessStateOfTheSystem(compute_hosts));
         _state_of_the_system->_head_storage_service_mount_point = head_node_storage_mount_point;
 
         _scheduler = scheduler;
@@ -119,7 +117,7 @@ namespace wrench {
         const std::shared_ptr<Function>& function, const double time_limit_in_seconds,
         const sg_size_t disk_space_limit_in_bytes, const sg_size_t RAM_limit_in_bytes,
         const sg_size_t ingress_in_bytes, const sg_size_t egress_in_bytes) {
-        WRENCH_INFO("Serverless Provider Registered function %s", function->getName().c_str());
+        // WRENCH_INFO("Serverless Provider Registered function %s", function->getName().c_str());
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
@@ -338,13 +336,13 @@ namespace wrench {
         }
         else {
             std::cerr << "CALLING INVOCATION CONSTRUCTOR\n";
-            const auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
+            auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
             std::cerr << "CREATED INVOCATION " << invocation << "\n";
             std::cerr << "WITH INVOCATION: REG: " << invocation->_registered_function << "\n";
 
             _state_of_the_system->_newInvocations.push(invocation);
             std::cerr << "RETURNING INVOCATION TO THE USER\n";
-            const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 true, invocation, nullptr, 0);
             answer_commport->dputMessage(answerMessage);
             std::cerr << "MOVING BACK TO MY MAIN LOOP BUT BEFORE\n";
