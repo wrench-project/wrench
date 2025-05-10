@@ -94,19 +94,13 @@ namespace wrench {
         auto image_file_location = FileLocation::LOCATION(storage_service, image_file);
         StorageService::createFileAtLocation(image_file_location);
 
-        // Create a 10MB source code file on the storage service (e.g., some GitHub repo to clone for the function code)
-        auto code_repo = Simulation::addFile("code_repo", 250 * MB);
-        auto code_repo_location = FileLocation::LOCATION(storage_service, code_repo);
-        StorageService::createFileAtLocation(code_repo_location);
-
         // Create the function object
-        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image_file_location,
-                                                         code_repo_location);
+        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image_file_location);
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 
         // Define limits for the function execution
-        double time_limit = 300.0;
+        double time_limit = 60.0;
         sg_size_t disk_space_limit_in_bytes = 500 * MB;
         sg_size_t RAM_limit_in_bytes = 200 * MB;
         sg_size_t ingress_in_bytes = 30 * MB;
@@ -137,7 +131,7 @@ namespace wrench {
             auto inv = function_manager->invokeFunction(registered_function, compute_service,
                                                         std::make_shared<MyFunctionInput>(i, sleep_time));
             invocations.push_back(inv);
-            wrench::Simulation::sleep(10);
+            wrench::Simulation::sleep(1);
         }
 
         // Waiting for them all to finish
