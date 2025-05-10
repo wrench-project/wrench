@@ -365,7 +365,6 @@ namespace wrench {
 
     /**
      * @brief Dispatches scheduled function invocations to compute hosts
-     *
      */
     void ServerlessComputeService::dispatchInvocations() {
         while (!_state_of_the_system->_scheduledInvocations.empty()) {
@@ -374,15 +373,16 @@ namespace wrench {
                         invocation_to_place->_registered_function->_function->getName().c_str());
             _state_of_the_system->_scheduledInvocations.pop();
 
-            dispatchFunctionInvocation(invocation_to_place);
+            dispatchInvocation(invocation_to_place);
         }
     }
 
     /**
+     * @brief Helper method to dispatch an invocation
      *
-     * @param invocation : invocation to dispatch
+     * @param invocation  invocation to dispatch
      */
-    void ServerlessComputeService::dispatchFunctionInvocation(const std::shared_ptr<Invocation>& invocation) {
+    void ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation) {
         auto target_host = _state_of_the_system->_scheduling_decisions[invocation];
 
         auto ss = startInvocationStorageService(invocation);

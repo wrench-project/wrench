@@ -103,7 +103,7 @@ namespace wrench {
         void startHeadStorageService();
         void startComputeHostsServices();
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
-        void dispatchFunctionInvocation(const std::shared_ptr<Invocation>& invocation);
+        void dispatchInvocation(const std::shared_ptr<Invocation>& invocation);
         void initiateImageCopyToComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
         void initiateImageRemovalFromComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
 
