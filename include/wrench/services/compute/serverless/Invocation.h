@@ -40,12 +40,10 @@ namespace wrench {
         [[nodiscard]] bool hasSucceeded() const;
         [[nodiscard]] std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
-        /**
-         * @brief Gets the output of the function invocation.
-         */
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
-
-
+        [[nodiscard]] double getSubmitDate() const;
+        [[nodiscard]] double getStartDate() const;
+        [[nodiscard]] double getFinishDate() const;
 
     private:
         friend class FunctionManager;
@@ -64,6 +62,10 @@ namespace wrench {
         // TODO: that merely holds a pointer to a client-side "Invocation" object
         std::shared_ptr<FileLocation> _tmp_file;
         std::shared_ptr<StorageService> _tmp_storage_service;
+
+        double _submit_date = -1.0;
+        double _start_date = -1.0;
+        double _finish_date = -1.0;
 
     };
 }

@@ -30,15 +30,14 @@
 WRENCH_LOG_CATEGORY(wrench_core_function_manager, "Log category for Function Manager");
 
 namespace wrench {
-
-
     /**
      * @brief Constructor
      *
      * @param hostname: the name of host on which the job manager will run
      * @param creator_commport: the commport of the manager's creator
      */
-    FunctionManager::FunctionManager(const std::string& hostname, S4U_CommPort *creator_commport) : Service(hostname, "function_manager") {
+    FunctionManager::FunctionManager(const std::string& hostname, S4U_CommPort* creator_commport) : Service(
+        hostname, "function_manager") {
         this->creator_commport = creator_commport;
     }
 
@@ -48,15 +47,27 @@ namespace wrench {
     }
 
     /**
-     * @brief Destructor, which kills the daemon (and clears all the jobs)
+     * @brief Kill the function manager
      */
-    FunctionManager::~FunctionManager() {
-    	// Any necessary cleanup (if needed) goes here.
-	}
+    void FunctionManager::kill() {
+        this->killActor();
+        _registered_functions.clear();
+        while (!_functions_to_invoke.empty()) {
+            _functions_to_invoke.pop();
+        }
+        _pending_invocations.clear();
+        _finished_invocations.clear();
+        _invocations_being_waited_for.clear();
+    }
+
+    /**
+     * @brief Destructor
+     */
+    FunctionManager::~FunctionManager() = default;
 
     /**
      * @brief Creates a shared pointer to a Function object and returns it
-     * 
+     *
      * @param name the name of the function
      * @param lambda the code of the function
      * @param image the location of image to execute the function on
@@ -64,17 +75,18 @@ namespace wrench {
      * @return std::shared_ptr<Function> a shared pointer to the Function object created
      */
     std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
-                                                                     const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput>&, const std::shared_ptr<StorageService>&)>& lambda,
-                                                                     const std::shared_ptr<FileLocation>& image,
-                                                                     const std::shared_ptr<FileLocation>& code) {
-                                                                        
+                                                              const std::function<std::shared_ptr<FunctionOutput>(
+                                                                  const std::shared_ptr<FunctionInput>&,
+                                                                  const std::shared_ptr<StorageService>&)>& lambda,
+                                                              const std::shared_ptr<FileLocation>& image,
+                                                              const std::shared_ptr<FileLocation>& code) {
         // Create the notion of a function
         return std::make_shared<Function>(name, lambda, image, code);
     }
 
     /**
      * @brief Registers a function with the ServerlessComputeService
-     * 
+     *
      * @param function the function to register
      * @param sl_compute_service the ServerlessComputeService to register the function on
      * @param time_limit_in_seconds the time limit for the function execution
@@ -86,30 +98,34 @@ namespace wrench {
      * @throw ExecutionException if the function registration fails
      */
     std::shared_ptr<RegisteredFunction> FunctionManager::registerFunction(const std::shared_ptr<Function> function,
-                                           const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
-                                           int time_limit_in_seconds,
-                                           long disk_space_limit_in_bytes,
-                                           long RAM_limit_in_bytes,
-                                           long ingress_in_bytes,
-                                           long egress_in_bytes) {
-
-        WRENCH_INFO("Function [%s] registered with compute service [%s]", function->getName().c_str(), sl_compute_service->getName().c_str());
+                                                                          const std::shared_ptr<
+                                                                              ServerlessComputeService>&
+                                                                          sl_compute_service,
+                                                                          double time_limit_in_seconds,
+                                                                          sg_size_t disk_space_limit_in_bytes,
+                                                                          sg_size_t RAM_limit_in_bytes,
+                                                                          sg_size_t ingress_in_bytes,
+                                                                          sg_size_t egress_in_bytes) {
+        WRENCH_INFO("Function [%s] registered with compute service [%s]", function->getName().c_str(),
+                    sl_compute_service->getName().c_str());
         // Logic to register the function with the serverless compute service
-        return sl_compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
+        return sl_compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes,
+                                                    RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
     }
 
     /**
      * @brief Invokes a function on a ServerlessComputeService
-     * 
+     *
      * @param registered_function the (registered) function to invoke
      * @param sl_compute_service the ServerlessComputeService to invoke the function on
      * @param function_input the input (object) to the function
      * @return std::shared_ptr<Invocation> an Invocation object created by the ServerlessComputeService
      */
-    std::shared_ptr<Invocation> FunctionManager::invokeFunction(const std::shared_ptr<RegisteredFunction> &registered_function,
-                                                                const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
-                                                                const std::shared_ptr<FunctionInput>& function_input) {
-        WRENCH_INFO("Function [%s] invoked with compute service [%s]", registered_function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
+    std::shared_ptr<Invocation> FunctionManager::invokeFunction(
+        const std::shared_ptr<RegisteredFunction>& registered_function,
+        const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
+        const std::shared_ptr<FunctionInput>& function_input) {
+        // WRENCH_INFO("Function [%s] invoked with compute service [%s]", registered_function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the notify commport
 
         return sl_compute_service->invokeFunction(registered_function, function_input, this->commport);
@@ -117,7 +133,7 @@ namespace wrench {
 
     /**
      * @brief State finding method to check if an invocation is done
-     * 
+     *
      * @param invocation the invocation to check
      * @return true if the invocation is done
      * @return false if the invocation is not done
@@ -131,18 +147,17 @@ namespace wrench {
 
     /**
      * @brief Waits for a single invocation to finish
-     * 
+     *
      * @param invocation the invocation to wait for
      */
     void FunctionManager::wait_one(std::shared_ptr<Invocation> invocation) {
-        
         WRENCH_INFO("FunctionManager::wait_one(): Waiting for invocation to finish");
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
         this->commport->putMessage(
             new FunctionManagerWaitOneMessage(
-                answer_commport, 
+                answer_commport,
                 invocation
             ));
 
@@ -151,22 +166,21 @@ namespace wrench {
             // this->network_timeout, // commented out for unlimited timeout time
             "FunctionManager::wait_one(): Received an");
 
-        WRENCH_INFO("FunctionManager::wait_one(): Received a wakeup message");
+        // WRENCH_INFO("FunctionManager::wait_one(): Received a wakeup message");
     }
 
     /**
      * @brief Waits for a list of invocations to finish
-     * 
+     *
      */
-    void FunctionManager::wait_all(std::vector<std::shared_ptr<Invocation>> invocations) {
-        
-        WRENCH_INFO("FunctionManager::wait_all(): Waiting for list of invocations to finish");
+    void FunctionManager::wait_all(const std::vector<std::shared_ptr<Invocation>>& invocations) {
+        // WRENCH_INFO("FunctionManager::wait_all(): Waiting for list of invocations to finish");
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
         this->commport->putMessage(
             new FunctionManagerWaitAllMessage(
-                answer_commport, 
+                answer_commport,
                 invocations
             ));
 
@@ -174,8 +188,8 @@ namespace wrench {
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
             // this->network_timeout, // commented out for unlimited timeout time
             "FunctionManager::wait_one(): Received an");
-        
-        WRENCH_INFO("FunctionManager::wait_all(): Received a wakeup message");
+
+        // WRENCH_INFO("FunctionManager::wait_all(): Received a wakeup message");
     }
 
     // /**
@@ -194,7 +208,7 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         WRENCH_INFO("New Function Manager starting (%s)", this->commport->get_cname());
-        
+
         while (processNextMessage()) {
             // TODO: Do something
             processInvocationsBeingWaitedFor();
@@ -205,7 +219,7 @@ namespace wrench {
 
     /**
      * @brief Processes the next message in the commport
-     * 
+     *
      * @return true when the FunctionManager daemon should continue processing messages
      * @return false when the FunctionManager daemon should die
      */
@@ -216,9 +230,10 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
         try {
             message = this->commport->getMessage();
-        } catch (ExecutionException &e) {
+        }
+        catch (ExecutionException& e) {
             WRENCH_INFO(
-                    "Got a network error while getting some message... ignoring");
+                "Got a network error while getting some message... ignoring");
             return true;
         }
 
@@ -233,7 +248,8 @@ namespace wrench {
             // TODO: Die...
             return false;
         }
-        else if (auto scsfic_msg = std::dynamic_pointer_cast<ServerlessComputeServiceFunctionInvocationCompleteMessage>(message)) {
+        else if (auto scsfic_msg = std::dynamic_pointer_cast<
+            ServerlessComputeServiceFunctionInvocationCompleteMessage>(message)) {
             processFunctionInvocationComplete(scsfic_msg->invocation, scsfic_msg->success, scsfic_msg->failure_cause);
             return true;
         }
@@ -256,12 +272,11 @@ namespace wrench {
 
     /**
      * @brief TODO
-     * 
+     *
      */
-    void FunctionManager::processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation, 
-                                                            bool success, 
-                                                            std::shared_ptr<FailureCause> failure_cause) {
-        WRENCH_INFO("Some invocation has completed");
+    void FunctionManager::processFunctionInvocationComplete(const std::shared_ptr<Invocation>& invocation,
+                                                            bool success,
+                                                            const std::shared_ptr<FailureCause>& failure_cause) {
         invocation->_done = true;
         invocation->_success = success;
         invocation->_failure_cause = failure_cause;
@@ -271,35 +286,36 @@ namespace wrench {
 
     /**
      * @brief Processes a "wait one" message
-     * 
+     *
      * @param invocation the invocation being waited for
      * @param answer_commport the answer commport to send the wakeup message to when the invocation is finished
      */
-    void FunctionManager::processWaitOne(std::shared_ptr<Invocation> invocation, S4U_CommPort* answer_commport) {
+    void FunctionManager::processWaitOne(const std::shared_ptr<Invocation>& invocation, S4U_CommPort* answer_commport) {
         WRENCH_INFO("Processing a wait_one message");
-        _invocations_being_waited_for.push_back(std::make_pair(invocation, answer_commport));
+        _invocations_being_waited_for.emplace_back(invocation, answer_commport);
     }
 
     /**
      * @brief Processes a "wait many" message
-     * 
+     *
      * @param invocations the invocations being waited for
      * @param answer_commport the answer commport to send the wakeup message to when the invocations are finished
      */
-    void FunctionManager::processWaitAll(std::vector<std::shared_ptr<Invocation>> invocations, S4U_CommPort* answer_commport) {
+    void FunctionManager::processWaitAll(const std::vector<std::shared_ptr<Invocation>>& invocations,
+                                         S4U_CommPort* answer_commport) {
         WRENCH_INFO("Processing a wait_many message");
-        for (auto invocation : invocations) {
-            _invocations_being_waited_for.push_back(std::make_pair(invocation, answer_commport));
+        for (const auto& invocation : invocations) {
+            _invocations_being_waited_for.emplace_back(invocation, answer_commport);
         }
     }
 
     /**
      * @brief Iterates through the list of invocations being waited for and checks if they are finished
-     * 
+     *
      * TODO: There has to be a better way to do this than storing the answer commport in every single invocation LOL
      */
     void FunctionManager::processInvocationsBeingWaitedFor() {
-        WRENCH_INFO("Processing invocations being waited for");
+        // WRENCH_INFO("Processing invocations being waited for");
         // iterate through the list of invocations being waited for
         if (_invocations_being_waited_for.empty()) {
             return;
@@ -313,10 +329,10 @@ namespace wrench {
                     it->second->putMessage(new FunctionManagerWakeupMessage());
                 }
                 it = _invocations_being_waited_for.erase(it);
-            } else {
-                it++;
+            }
+            else {
+                ++it;
             }
         }
     }
-
-}// namespace wrench
+} // namespace wrench

@@ -241,12 +241,17 @@ namespace wrench {
         else if (const auto scsiec_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             const auto invocation = scsiec_msg->_invocation;
+            invocation->_finish_date = Simulation::getCurrentSimulatedDate();
             const auto host = _scheduling_decisions[invocation];
             _scheduling_decisions.erase(invocation);
             _available_cores[host]++;
 
             bool success = scsiec_msg->_action->getState() == Action::State::COMPLETED;
             std::shared_ptr<FailureCause> failure_cause = scsiec_msg->_action->getFailureCause();
+
+            WRENCH_INFO("A function invocation has finished [%s]",
+               (failure_cause ? "FAILURE" : "SUCCESS"));
+
             scsiec_msg->_invocation->_notify_commport->dputMessage(
                 new ServerlessComputeServiceFunctionInvocationCompleteMessage(success,
                                                                               scsiec_msg->_invocation,
@@ -324,6 +329,7 @@ namespace wrench {
         }
         else {
             auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
+            invocation->_submit_date = Simulation::getCurrentSimulatedDate();
             _state_of_the_system->_newInvocations.push(invocation);
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 true, invocation, nullptr, 0);
@@ -386,7 +392,8 @@ namespace wrench {
 
         const std::function lambda_execute = [invocation, target_host, this](
             const std::shared_ptr<ActionExecutor>& action_executor) {
-            WRENCH_INFO("In the function invocation lambda execute!!");
+
+            // WRENCH_INFO("In the function invocation lambda execute!!");
             const auto function = invocation->_registered_function->_function;
             const auto image_file = function->_image->getFile();
             const auto local_image_path = wrench::FileLocation::LOCATION(
@@ -400,8 +407,7 @@ namespace wrench {
             StorageService::copyFile(invocation->_registered_function->_function->_code,
                                      wrench::FileLocation::LOCATION(invocation->_tmp_storage_service, code_file));
 
-            WRENCH_INFO("Going to invoke user's lambda function");
-
+            WRENCH_DEBUG("Going to invoke user's lambda function");
             // Invoke the user's lambda function
             invocation->_function_output = function->_lambda(invocation->_function_input, invocation->_tmp_storage_service);
 
@@ -410,7 +416,7 @@ namespace wrench {
             invocation->_tmp_storage_service = nullptr; // Should free up all memory...
             StorageService::removeFileAtLocation(invocation->_tmp_file);
 
-            WRENCH_INFO("Done with the lambda execute!!");
+            // WRENCH_INFO("Done with the lambda execute!!");
         };
 
         // Create the action and run it in an action executor
@@ -437,12 +443,13 @@ namespace wrench {
         action_executor->setActionTimeout(invocation->getRegisteredFunction()->getTimeLimit());
 
         action_executor->setSimulation(this->simulation_);
-        WRENCH_INFO("Starting an action executor for dispatching invocation...");
+        // WRENCH_INFO("Starting an action executor for dispatching invocation...");
+        invocation->_start_date = Simulation::getCurrentSimulatedDate();
         action_executor->start(action_executor, true, false);
 
+
         _state_of_the_system->_runningInvocations.push(invocation);
-        WRENCH_INFO("Function [%s] invoked",
-                    invocation->_registered_function->_function->getName().c_str());
+        // WRENCH_INFO("Function [%s] invoked", invocation->_registered_function->_function->getName().c_str());
     }
 
     /**
@@ -477,7 +484,7 @@ namespace wrench {
         seq++;
         const auto host = _state_of_the_system->_scheduling_decisions[invocation];
 
-        WRENCH_INFO("Starting a new storage service for an invocation...");
+        // WRENCH_INFO("Starting a new storage service for an invocation...");
         // Reserve space on the storage service
         const auto tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[host],
                                                              Simulation::addFile(
@@ -540,7 +547,7 @@ namespace wrench {
         // strategies).
         while (!_state_of_the_system->_newInvocations.empty()) {
 
-            WRENCH_INFO("Admitting an invocation...");
+            // WRENCH_INFO("Admitting an invocation...");
             auto invocation = _state_of_the_system->_newInvocations.front();
             const auto image = invocation->_registered_function->_function->_image;
 
@@ -588,7 +595,7 @@ namespace wrench {
         // to demonstrate its use)
         const std::function lambda_execute = [invocation, this
             ](const std::shared_ptr<ActionExecutor>& action_executor) {
-            WRENCH_INFO("In the lambda execute!!");
+            // WRENCH_INFO("In the lambda execute!!");
             const auto src_location = invocation->_registered_function->_function->_image;
             const auto dst_location = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
                                                              src_location->getFile());
@@ -619,7 +626,7 @@ namespace wrench {
             nullptr);
 
         action_executor->setSimulation(this->simulation_);
-        WRENCH_INFO("Starting an action executor for downloading from remote...");
+        // WRENCH_INFO("Starting an action executor for downloading from remote...");
         action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
     }
 
@@ -653,12 +660,12 @@ namespace wrench {
         //     }
         // }
 
-        WRENCH_INFO("Scheduling %zu invocations", schedulableInvocations_vector.size());
+        // WRENCH_INFO("Scheduling %zu invocations", schedulableInvocations_vector.size());
         // Get scheduling decisions for all currently schedulable invocations.
         const auto schedulingDecisions = _scheduler->scheduleFunctions(schedulableInvocations_vector,
                                                                        _state_of_the_system);
 
-        WRENCH_INFO("Scheduling decisions: %zu", schedulingDecisions.size());
+        // WRENCH_INFO("Scheduling decisions: %zu", schedulingDecisions.size());
         // Prepare a set (or similar) of scheduled invocations.
         std::unordered_set<std::shared_ptr<Invocation>> scheduledSet;
 
@@ -692,14 +699,14 @@ namespace wrench {
 
         const std::function lambda_execute = [computeHost, image, this](
             const std::shared_ptr<ActionExecutor>& action_executor) {
-            WRENCH_INFO("In the image copy lambda execute!!");
+            // WRENCH_INFO("In the image copy lambda execute!!");
 
             // Copy the image file from the head host to the current host's storage service
             auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service, image);
             auto local_image_path = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[computeHost],
                                                                    image);
             StorageService::copyFile(head_host_image_path, local_image_path);
-            WRENCH_INFO("Done with the lambda execute!!");
+            // WRENCH_INFO("Done with the lambda execute!!");
         };
 
         // Create the action and run it in an action executor
@@ -726,11 +733,11 @@ namespace wrench {
             nullptr);
 
         action_executor->setSimulation(this->simulation_);
-        WRENCH_INFO("Starting an action executor for copying image...");
+        // WRENCH_INFO("Starting an action executor for copying image...");
         action_executor->start(action_executor, true, false);
 
-        WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID().c_str(),
-                    computeHost.c_str());
+        // WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID().c_str(),
+        //             computeHost.c_str());
     }
 
     void ServerlessComputeService::initiateImageRemovalFromComputeHost(const std::string& computeHost,

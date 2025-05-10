@@ -27,7 +27,7 @@ namespace wrench {
         ServerlessExampleExecutionController(
                 const std::shared_ptr<ServerlessComputeService>& compute_service,
                 const std::shared_ptr<SimpleStorageService>& storage_service,
-                const std::string &hostname, const int num_invocations = 1);
+                const std::string &hostname, unsigned long num_invocations = 1);
 
     protected:
 
