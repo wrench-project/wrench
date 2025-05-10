@@ -53,11 +53,11 @@ namespace wrench {
 
         std::shared_ptr<RegisteredFunction> registerFunction(std::shared_ptr<Function> function,
                               const std::shared_ptr<ServerlessComputeService>& compute_service,
-                              int time_limit_in_seconds,
-                              long disk_space_limit_in_bytes,
-                              long RAM_limit_in_bytes,
-                              long ingress_in_bytes,
-                              long egress_in_bytes);
+                              double time_limit_in_seconds,
+                              sg_size_t disk_space_limit_in_bytes,
+                              sg_size_t RAM_limit_in_bytes,
+                              sg_size_t ingress_in_bytes,
+                              sg_size_t egress_in_bytes);
 
         std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction> &registered_function,
                                                     const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
@@ -65,7 +65,7 @@ namespace wrench {
 
         bool isDone(std::shared_ptr<Invocation> invocation);
         void wait_one(std::shared_ptr<Invocation> invocation);
-        void wait_all(std::vector<std::shared_ptr<Invocation>> invocations);
+        void wait_all(const std::vector<std::shared_ptr<Invocation>>& invocations);
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -86,13 +86,11 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processFunctionInvocationComplete(std::shared_ptr<Invocation> invocation, bool success, std::shared_ptr<FailureCause> failure_cause);
+        void processFunctionInvocationComplete(const std::shared_ptr<Invocation>& invocation, bool success, const std::shared_ptr<FailureCause>& failure_cause);
 
-        void processFunctionInvocationFailure();
+        void processWaitOne(const std::shared_ptr<Invocation>& invocation, S4U_CommPort* answer_commport);
 
-        void processWaitOne(std::shared_ptr<Invocation> invocation, S4U_CommPort* answer_commport);
-
-        void processWaitAll(std::vector<std::shared_ptr<Invocation>> invocations, S4U_CommPort* answer_commport);
+        void processWaitAll(const std::vector<std::shared_ptr<Invocation>>& invocations, S4U_CommPort* answer_commport);
 
         void processInvocationsBeingWaitedFor();
 

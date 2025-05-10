@@ -29,7 +29,7 @@ namespace wrench {
                                                             _success(false),
                                                             _notify_commport(notify_commport)
     {
-        WRENCH_INFO("Invocation created for function %s", _registered_function->getFunction()->getName().c_str());
+        // WRENCH_INFO("Invocation created for function %s", _registered_function->getFunction()->getName().c_str());
     }
 
     /**
@@ -41,6 +41,30 @@ namespace wrench {
             return _function_output; 
         }
         throw std::runtime_error("Invocation::get_output(): Invocation is not done yet");
+    }
+
+    /**
+     * @brief Get the invocation's submit date
+     * @return A simulated date (or -1.0 if not submitted)
+     */
+    double Invocation::getSubmitDate() const {
+        return _submit_date;
+    }
+
+    /**
+    * @brief Get the invocation's start date
+    * @return A simulated date (or -1.0 if not submitted)
+    */
+    double Invocation::getStartDate() const {
+        return _start_date;
+    }
+
+    /**
+    * @brief Get the invocation's finish date
+    * @return A simulated date (or -1.0 if not submitted)
+    */
+    double Invocation::getFinishDate() const {
+        return _finish_date;
     }
 
     /**

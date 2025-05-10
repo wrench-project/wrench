@@ -107,17 +107,14 @@ namespace wrench {
     ) {
         std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> schedulingDecisions;
         auto availableCores = state->getAvailableCores();
-        // log the availble cores
-        WRENCH_INFO("Available cores: ");
-        for (const auto& entry : availableCores) {
-            WRENCH_INFO("Node: %s, Cores: %lu", entry.first.c_str(), entry.second);
-        }
+        // log the available cores
+        // WRENCH_INFO("Available cores: ");
+        // for (const auto& entry : availableCores) {
+        //     WRENCH_INFO("Node: %s, Cores: %lu", entry.first.c_str(), entry.second);
+        // }
 
         for (const auto& inv : schedulableInvocations) {
 
-            // check if inv has function input
-            WRENCH_INFO("FUNCTION INVOCATION NAME: %s",
-                inv->getRegisteredFunction()->getFunction()->getName().c_str());
             // Get the image for this invocation
             auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
 
@@ -134,9 +131,9 @@ namespace wrench {
                 } else {
                     // No suitable node with the image available; this invocation will be
                     // scheduled in a future iteration after image copying completes
-                    WRENCH_INFO("No suitable node available for invocation [%s] with image [%s]",
-                                inv->getRegisteredFunction()->getFunction()->getName().c_str(),
-                                imageFile->getID().c_str());
+                    // WRENCH_INFO("No suitable node available for invocation [%s] with image [%s]",
+                    //             inv->getRegisteredFunction()->getFunction()->getName().c_str(),
+                    //             imageFile->getID().c_str());
                 }
             }
         }
