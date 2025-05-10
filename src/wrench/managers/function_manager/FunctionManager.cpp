@@ -71,17 +71,15 @@ namespace wrench {
      * @param name the name of the function
      * @param lambda the code of the function
      * @param image the location of image to execute the function on
-     * @param code the location of the code to execute
      * @return std::shared_ptr<Function> a shared pointer to the Function object created
      */
     std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
                                                               const std::function<std::shared_ptr<FunctionOutput>(
-                                                                  const std::shared_ptr<FunctionInput>&,
-                                                                  const std::shared_ptr<StorageService>&)>& lambda,
-                                                              const std::shared_ptr<FileLocation>& image,
-                                                              const std::shared_ptr<FileLocation>& code) {
+                                                              const std::shared_ptr<FunctionInput>&,
+                                                              const std::shared_ptr<StorageService>&)>& lambda,
+                                                              const std::shared_ptr<FileLocation>& image) {
         // Create the notion of a function
-        return std::make_shared<Function>(name, lambda, image, code);
+        return std::make_shared<Function>(name, lambda, image);
     }
 
     /**

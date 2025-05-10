@@ -30,23 +30,16 @@ namespace wrench {
      */
     class Function {
     public:
-        /**
-         * @brief 
-         * @param name 
-         * @param lambda 
-         * @param image 
-         * @param code 
-         */
+
         Function(const std::string &name,
                  const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
-                 const std::shared_ptr<FileLocation> &image,
-                 const std::shared_ptr<FileLocation> &code);
+                 const std::shared_ptr<FileLocation> &image);
 
         [[nodiscard]] std::string getName() const;
 
         [[nodiscard]] std::shared_ptr<FileLocation> getImage() const;
 
-        std::shared_ptr<FunctionOutput> execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const;
+        [[nodiscard]] std::shared_ptr<FunctionOutput> execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const;
 
     private:
         friend class FunctionManager;
@@ -55,7 +48,6 @@ namespace wrench {
         std::string _name; // the name of the function
         std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> _lambda; // the function logic
         std::shared_ptr<FileLocation> _image; // the file location of the function's container image
-        std::shared_ptr<FileLocation> _code; // the file location of the function's code
     };
     
     /***********************/

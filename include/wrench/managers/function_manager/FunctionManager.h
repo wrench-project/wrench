@@ -48,8 +48,7 @@ namespace wrench {
         static std::shared_ptr<Function> createFunction(const std::string& name,
                                                         const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput>&,
                                                         const std::shared_ptr<StorageService>&)>& lambda,
-                                                        const std::shared_ptr<FileLocation>& image,
-                                                        const std::shared_ptr<FileLocation>& code);
+                                                        const std::shared_ptr<FileLocation>& image);
 
         std::shared_ptr<RegisteredFunction> registerFunction(std::shared_ptr<Function> function,
                               const std::shared_ptr<ServerlessComputeService>& compute_service,

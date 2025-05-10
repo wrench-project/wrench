@@ -402,11 +402,6 @@ namespace wrench {
             // Simulate the reading of the image from disk into ram to spin up the container
             StorageService::readFileAtLocation(local_image_path);
 
-            // Simulate the git-clone by copying from the remote location to the tmp storage service
-            auto code_file = function->_code->getFile();
-            StorageService::copyFile(invocation->_registered_function->_function->_code,
-                                     wrench::FileLocation::LOCATION(invocation->_tmp_storage_service, code_file));
-
             WRENCH_DEBUG("Going to invoke user's lambda function");
             // Invoke the user's lambda function
             invocation->_function_output = function->_lambda(invocation->_function_input, invocation->_tmp_storage_service);

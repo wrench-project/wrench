@@ -16,13 +16,11 @@ namespace wrench {
      * @param name The name of the function.
      * @param lambda The function logic implemented as a lambda.
      * @param image The file location of the function's container image.
-     * @param code The file location of the function's code.
      */
     Function::Function(const std::string &name,
                        const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
-                       const std::shared_ptr<FileLocation> &image,
-                       const std::shared_ptr<FileLocation> &code)
-        : _name(name), _lambda(lambda), _image(image), _code(code) {}
+                       const std::shared_ptr<FileLocation> &image)
+        : _name(name), _lambda(lambda), _image(image) {}
 
     /**
      * @brief Gets the name of the function.
