@@ -142,8 +142,7 @@ private:
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
         wrench::StorageService::createFileAtLocation(image_location);
-        wrench::StorageService::createFileAtLocation(code_location);
-        auto function = wrench::FunctionManager::createFunction("Function", lambda, image_location, code_location);
+        auto function = wrench::FunctionManager::createFunction("Function", lambda, image_location);
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
