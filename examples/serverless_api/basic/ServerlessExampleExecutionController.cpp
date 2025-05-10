@@ -17,22 +17,22 @@
 
 #include "ServerlessExampleExecutionController.h"
 
-#define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for ServerlessExampleExecutionController");
 
 namespace wrench {
-
     /**
-     *  A simple class to implement the notion of what a function takes in as input.
+     *  A class that implements the notion of what a function takes in as input.
      *  This is purely logical, in that no data size is associated with this object. For instance,
      *  this class could contain pointers to file locations, and the actual code of the function
      *  would then read/write these files.  In this simple example, the function input is an id and a sleep time.
      */
-    class MyFunctionInput: public FunctionInput {
+    class MyFunctionInput final : public FunctionInput {
     public:
-        MyFunctionInput(int id, int sleep_time) : id_(id), sleep_time_(sleep_time) {}
+        MyFunctionInput(const int id, const int sleep_time) : id_(id), sleep_time_(sleep_time) {
+        }
+
         int id_;
         int sleep_time_;
     };
@@ -40,47 +40,50 @@ namespace wrench {
     /**
      *  Similarly, a class that implements the notion of a function's output.
      */
-    class MyFunctionOutput: public FunctionOutput {
+    class MyFunctionOutput final : public FunctionOutput {
     public:
-        MyFunctionOutput(std::string msg) : msg_(msg) {}
+        explicit MyFunctionOutput(const std::string& msg) : msg_(msg) {
+        }
+
         std::string msg_;
     };
-    
+
 
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param compute_service
-     * @param storage_service
-     * @param compute_service: a set of compute services available to run actions
-     * @param storage_service: a set of storage services available to store data files
+     * @param compute_service: the serverless compute service to use
+     * @param storage_service: the storage service on which files can be stored
      * @param hostname: the name of the host on which to start the WMS
      * @param num_invocations: the number of invocations to place
      */
-    ServerlessExampleExecutionController::ServerlessExampleExecutionController(const std::shared_ptr<ServerlessComputeService>& compute_service,
-                                                                               const std::shared_ptr<SimpleStorageService>& storage_service,
-                                                                               const std::string &hostname, const int num_invocations) : ExecutionController(hostname, "me"),
-                                                                                                              compute_service(compute_service),
-                                                                                                              storage_service(storage_service),
-                                                                                                              num_invocations_(num_invocations) {
+    ServerlessExampleExecutionController::ServerlessExampleExecutionController(
+        const std::shared_ptr<ServerlessComputeService>& compute_service,
+        const std::shared_ptr<SimpleStorageService>& storage_service,
+        const std::string& hostname, const unsigned long num_invocations) : ExecutionController(hostname, "me"),
+                                                                  compute_service(compute_service),
+                                                                  storage_service(storage_service),
+                                                                  num_invocations_(num_invocations) {
     }
 
     /**
      * @brief main method of the ServerlessExampleExecutionController daemon
      *
      * @return 0 on completion
-     *
      */
     int ServerlessExampleExecutionController::main() {
         WRENCH_INFO("ServerlessExampleExecutionController starting");
 
-        // Create a function manager
+        // Start a function manager
         auto function_manager = this->createFunctionManager();
 
         WRENCH_INFO("Creating a function");
 
-        // Create the code for a function
-        auto function_code = [](std::shared_ptr<FunctionInput> input, const std::shared_ptr<StorageService>& my_storage_service) -> std::shared_ptr<FunctionOutput> {
+        // Create the code for a function. This function sleeps for a number of seconds specified in its
+        // input object, and returns an output object that contains a string message.
+        auto function_code = [](const std::shared_ptr<FunctionInput>& input,
+                                const std::shared_ptr<StorageService>& my_storage_service) -> std::shared_ptr<
+            FunctionOutput> {
             auto my_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             Simulation::sleep(my_input->sleep_time_);
             return std::make_shared<MyFunctionOutput>("Function " + std::to_string(my_input->id_) + " completed");
@@ -97,60 +100,67 @@ namespace wrench {
         StorageService::createFileAtLocation(code_repo_location);
 
         // Create the function object
-        auto function = function_manager->createFunction("my_function", function_code, image_file_location, code_repo_location);
+        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image_file_location,
+                                                         code_repo_location);
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 
         // Define limits for the function execution
-        double time_limit = 60.0;
-        sg_size_t disk_space_limit_in_bytes = 100 * MB;
+        double time_limit = 300.0;
+        sg_size_t disk_space_limit_in_bytes = 500 * MB;
         sg_size_t RAM_limit_in_bytes = 200 * MB;
         sg_size_t ingress_in_bytes = 30 * MB;
         sg_size_t egress_in_bytes = 40 * MB;
 
         // Register the function to the serverless compute service, via the function manager
         auto registered_function = function_manager->registerFunction(function, compute_service,
-                                         time_limit,
-                                         disk_space_limit_in_bytes,
-                                         RAM_limit_in_bytes,
-                                         ingress_in_bytes,
-                                         egress_in_bytes);
+                                                                      time_limit,
+                                                                      disk_space_limit_in_bytes,
+                                                                      RAM_limit_in_bytes,
+                                                                      ingress_in_bytes,
+                                                                      egress_in_bytes);
 
-        WRENCH_INFO("Placing %lu invocations", num_invocations_);
+        WRENCH_INFO("Placing %lu function invocations", num_invocations_);
 
         // Creating a random distribution for the sleep time... note that
         // although the specified time limit (when registering the function)
         // was 60 seconds, here we could have function invocations that go over
         // that time limit, meaning that some invocations will fail.
         std::mt19937 gen{42};
-        std::discrete_distribution<> dist(10, 80);
+        std::uniform_int_distribution<> dist(10, 90);
 
+        // Placing all invocations
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
         for (unsigned long i = 0; i < num_invocations_; ++i) {
+            double sleep_time = dist(gen);
+            WRENCH_INFO("Invoking a function that will sleep for %lf seconds", sleep_time);
             auto inv = function_manager->invokeFunction(registered_function, compute_service,
-                                                      std::make_shared<MyFunctionInput>(i, dist(gen)));
+                                                        std::make_shared<MyFunctionInput>(i, sleep_time));
             invocations.push_back(inv);
-            wrench::Simulation::sleep(1);
+            wrench::Simulation::sleep(10);
         }
 
-        WRENCH_INFO("Waiting for all %zu invocations...", invocations.size());
+        // Waiting for them all to finish
+        WRENCH_INFO("Waiting for all %zu invocations to be done...", invocations.size());
         function_manager->wait_all(invocations);
 
-        WRENCH_INFO("All invocations have completed");
+        // Printing some information
+        WRENCH_INFO("All invocations have completed:");
         unsigned long num_succeeded = 0;
         unsigned long num_failed = 0;
-        for (auto const &invocation : invocations) {
-          if (invocation->hasSucceeded()) {
-            num_succeeded++;
-          } else {
-              num_failed++;
-          }
+        for (unsigned long i = 0; i < invocations.size(); ++i) {
+            const auto& invocation = invocations[i];
+            bool succeeded = invocation->hasSucceeded();
+            double submit_date = invocation->getSubmitDate();
+            double start_date = invocation->getStartDate();
+            double finish_date = invocation->getFinishDate();
+            WRENCH_INFO("  - Invocation #%lu: [%s] submitted: %.2lf  started: %.2lf  finished: %.2lf",
+                i, (succeeded ? "SUCCEEDED" : "FAILED"), submit_date, start_date, finish_date);
+            if (not succeeded) {
+                WRENCH_INFO("       (%s)", invocation->getFailureCause()->toString().c_str());
+            }
         }
-        WRENCH_INFO("%lu invocation have succeeded, and %lu have failed",  num_succeeded, num_failed);
 
         return 0;
     }
-
-
-
-}// namespace wrench
+} // namespace wrench
