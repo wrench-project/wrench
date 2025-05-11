@@ -13,6 +13,7 @@
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
+#include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
@@ -138,9 +139,7 @@ private:
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        auto code_location = wrench::FileLocation::LOCATION(this->storage_service, source_code);
         wrench::StorageService::createFileAtLocation(image_location);
         auto function = wrench::FunctionManager::createFunction("Function", lambda, image_location);
         auto input = std::make_shared<MyFunctionInput>(1, 2);
@@ -159,7 +158,7 @@ private:
             double expected_elapsed = remote_download + copy_to_compute_node + local_image_read  + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
-                throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
+                throw std::runtime_error("1) Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
             }
         }
 
@@ -170,13 +169,13 @@ private:
             function_manager->wait_one(invocation);
             auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
             double remote_download = 0;  // cached
-            double local_copy = 0; // cached
-            double local_image_read = 1; // estimated (bottleneck = disk)
+            double local_copy = 0; // ALREADY ON DISK!
+            double local_image_read = 0; // ALREADY IN RAM!
             double compute = 5; // extimate (bottleneck = sleep)
             double expected_elapsed = remote_download + local_copy + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
-                throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
+                throw std::runtime_error("2) Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
             }
         }
 
@@ -204,7 +203,7 @@ void ServerlessTimingTest::do_FunctionInvocationTest_test() {
 
     std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::FCFSServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(

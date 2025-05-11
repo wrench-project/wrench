@@ -37,6 +37,7 @@ namespace wrench {
                                                        messagepayload_list) :
         ComputeService(hostname,
                        "ServerlessComputeService", ""), property_list_(property_list) {
+
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(new ServerlessStateOfTheSystem(compute_hosts));
         _state_of_the_system->_head_storage_service_mount_point = head_node_storage_mount_point;
 
@@ -242,8 +243,8 @@ namespace wrench {
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             const auto invocation = scsiec_msg->_invocation;
             invocation->_finish_date = Simulation::getCurrentSimulatedDate();
-            const auto host = _scheduling_decisions[invocation];
-            _scheduling_decisions.erase(invocation);
+            const auto host = _state_of_the_system->_scheduling_decisions[invocation];
+            _state_of_the_system->_scheduling_decisions.erase(invocation);
             _state_of_the_system->_available_cores[host]++;
 
             bool success = scsiec_msg->_action->getState() == Action::State::COMPLETED;
@@ -390,6 +391,7 @@ namespace wrench {
      * @param invocation invocation to dispatch
      */
     void ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation) {
+
         auto target_host = _state_of_the_system->_scheduling_decisions[invocation];
 
         auto ss = startInvocationStorageService(invocation);

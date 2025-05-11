@@ -45,6 +45,7 @@ namespace wrench {
         // For each compute node, determine the images to copy or load
         for (const auto& node : compute_nodes) {
             for (const auto& image_file : required_images[node]) {
+
                 if (!state->isImageOnNode(node, image_file) &&
                     !state->isImageBeingCopiedToNode(node, image_file)) {
                     decision->imagesToCopyToComputeNode[node].push_back(image_file);
@@ -83,7 +84,6 @@ namespace wrench {
                 }
             }
         }
-
         return decisions;
     }
 
