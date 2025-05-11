@@ -143,6 +143,10 @@ namespace wrench
     ServerlessComputeServiceInvocationExecutionCompleteMessage::ServerlessComputeServiceInvocationExecutionCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<Invocation> invocation, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _invocation(std::move(invocation)) {}
 
-        ServerlessComputeServiceNodeCopyCompleteMessage::ServerlessComputeServiceNodeCopyCompleteMessage(
+    ServerlessComputeServiceNodeCopyCompleteMessage::ServerlessComputeServiceNodeCopyCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::string compute_host, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image_file(std::move(image_file)), _compute_host(std::move(compute_host)) {}
+
+    ServerlessComputeServiceNodeLoadCompleteMessage::ServerlessComputeServiceNodeLoadCompleteMessage(
+        std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::string compute_host, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image_file(std::move(image_file)), _compute_host(std::move(compute_host)) {}
+
 } // namespace wrench

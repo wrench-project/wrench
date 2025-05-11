@@ -102,12 +102,13 @@ namespace wrench {
 
         void startHeadStorageService();
         void startComputeHostsServices();
-        void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
-        void dispatchInvocation(const std::shared_ptr<Invocation>& invocation);
-        void initiateImageCopyToComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
-        void initiateImageRemovalFromComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
-
         std::shared_ptr<StorageService> startInvocationStorageService(const std::shared_ptr<Invocation>& invocation);
+
+        void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
+        void initiateImageCopyToComputeHost(const std::string& compute_host, const std::shared_ptr<DataFile>& image);
+        void initiateImageLoadAtComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
+
+        void dispatchInvocation(const std::shared_ptr<Invocation>& invocation);
 
 
         // map of Registered functions sorted by function name
@@ -115,7 +116,6 @@ namespace wrench {
         // vector of compute host names
         std::vector<std::string> _compute_hosts;
 
-        std::map<std::string, unsigned long> _available_cores;
         std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
 
         // queue of function invocations waiting to be processed
@@ -137,7 +137,7 @@ namespace wrench {
         std::unordered_map<std::string, std::shared_ptr<StorageService>> _compute_storages;
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
-        std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
+        // std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
         sg_size_t _free_space_on_head_storage{}; // We keep track of it ourselves to avoid concurrency shenanigans
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
