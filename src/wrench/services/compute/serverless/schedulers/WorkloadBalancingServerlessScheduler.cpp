@@ -30,12 +30,9 @@ namespace wrench {
                 auto image = function_images[function_name];
                 if (!state->isImageOnNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
-                    decision->imagesToCopy[node].push_back(image);
+                    decision->imagesToCopyToComputeNode[node].push_back(image);
                 }
             }
-    
-            // we still assume infinite storage, so no removals
-            decision->imagesToRemove[node] = {};
         }
     
         return decision;

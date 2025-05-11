@@ -153,11 +153,10 @@ private:
             function_manager->wait_one(invocation);
             auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
             double remote_download = 5.4;  // estimated (bottleneck = wide area)
-            double local_copy = 1; // estimated (bottleneck = disk)
+            double copy_to_compute_node = 1; // estimated (bottleneck = disk)
             double local_image_read = 1; // estimated (bottleneck = disk)
-            double remote_clone = 1.08; // estimate (bottleneck = wide area)
             double compute = 5; // estimate (bottleneck = sleep)
-            double expected_elapsed = remote_download + local_copy + local_image_read +  remote_clone + compute;
+            double expected_elapsed = remote_download + copy_to_compute_node + local_image_read  + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
                 throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
@@ -173,9 +172,8 @@ private:
             double remote_download = 0;  // cached
             double local_copy = 0; // cached
             double local_image_read = 1; // estimated (bottleneck = disk)
-            double remote_clone = 1.08; // estimate (bottleneck = wide area)
             double compute = 5; // extimate (bottleneck = sleep)
-            double expected_elapsed = remote_download + local_copy + local_image_read +  remote_clone + compute;
+            double expected_elapsed = remote_download + local_copy + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
                 throw std::runtime_error("Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");

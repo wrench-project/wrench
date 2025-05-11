@@ -18,12 +18,13 @@
  namespace wrench {
  
      /**
-      * @brief Represents a decision for image management.
-      *        This decision indicates which images should be removed and which should be downloaded/copied.
+      * @brief A data structure that stores all decisions for image management:
+      *        - Which images should be copied from the head node to compute nodes' disks
+      *        - Which images should be loaded into compute node's RAMs
       */
      struct ImageManagementDecision {
-        std::map<std::string, std::vector<std::shared_ptr<DataFile>>> imagesToCopy;
-        std::map<std::string, std::vector<std::shared_ptr<DataFile>>> imagesToRemove;
+        std::map<std::string, std::vector<std::shared_ptr<DataFile>>> imagesToCopyToComputeNode;
+         std::map<std::string, std::vector<std::shared_ptr<DataFile>>> imagesToLoadIntoRAMAtComputeNode;
     };
  
      /**

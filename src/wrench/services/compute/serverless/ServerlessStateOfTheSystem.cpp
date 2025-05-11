@@ -35,11 +35,13 @@ namespace wrench {
           _free_space_on_head_storage(0) {
         for (const auto& compute_host : _compute_hosts) {
             _available_cores[compute_host] = S4U_Simulation::getHostNumCores(compute_host);
+            _available_ram[compute_host] = S4U_Simulation::getHostMemoryCapacity(compute_host);
         }
 
         for (const auto& compute_host : _compute_hosts) {
             _being_copied_images[compute_host] = {};
-            _copied_images[compute_host] = {};
+            // _copied_images[compute_host] = {};
+            // _loaded_images[compute_host] = {};
         }
     }
 
@@ -80,13 +82,11 @@ namespace wrench {
         return _head_storage_service;
     }
 
-    std::set<std::shared_ptr<DataFile>>
-    ServerlessStateOfTheSystem::getDownloadedImageFiles() { return _downloaded_image_files; }
+    sg_size_t ServerlessStateOfTheSystem::getFreeSpaceOnHeadStorage() const {
+        return _free_space_on_head_storage;
+    }
 
-    sg_size_t ServerlessStateOfTheSystem::getFreeSpaceOnHeadStorage() const { return _free_space_on_head_storage; }
-
-    std::set<std::shared_ptr<DataFile>>
-    ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(const std::string& node) {
+    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(const std::string& node) {
         if (_being_copied_images.find(node) != _being_copied_images.end()) {
             return _being_copied_images[node];
         }
@@ -105,21 +105,30 @@ namespace wrench {
         return false;
     }
 
-    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesCopiedToNode(const std::string& node) {
-        if (_copied_images.find(node) != _copied_images.end()) {
-            return _copied_images[node];
+    bool ServerlessStateOfTheSystem::isImageOnNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
+        return _compute_storages[node]->hasFile(image);
+    }
+
+    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingLoadedAtNode(const std::string& node) {
+        if (_being_loaded_images.find(node) != _being_loaded_images.end()) {
+            return _being_loaded_images[node];
         }
         return {};
     }
 
-    bool ServerlessStateOfTheSystem::isImageOnNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
+    bool ServerlessStateOfTheSystem::isImageBeingLoadedAtNode(const std::string& node,
+                                                        const std::shared_ptr<DataFile>& image) {
         // Check if the image has been copied to the node
-        if (_copied_images.find(node) != _copied_images.end()) {
-            if (_copied_images[node].find(image) != _copied_images[node].end()) {
+        if (_being_loaded_images.find(node) != _being_loaded_images.end()) {
+            if (_being_loaded_images[node].find(image) != _being_loaded_images[node].end()) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
+        return _compute_memories[node]->hasFile(image);
     }
 }; // namespace wrench
