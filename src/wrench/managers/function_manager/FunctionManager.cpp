@@ -149,7 +149,7 @@ namespace wrench {
      * @param invocation the invocation to wait for
      */
     void FunctionManager::wait_one(std::shared_ptr<Invocation> invocation) {
-        WRENCH_INFO("FunctionManager::wait_one(): Waiting for invocation to finish");
+        // WRENCH_INFO("FunctionManager::wait_one(): Waiting for invocation to finish");
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
