@@ -42,12 +42,15 @@ namespace wrench
         std::queue<std::shared_ptr<Invocation>> getFinishedInvocations();
         std::unordered_map<std::string, std::shared_ptr<StorageService>> getComputeStorages();
         std::shared_ptr<StorageService> getHeadStorageService();
-        std::set<std::shared_ptr<DataFile>> getDownloadedImageFiles();
         [[nodiscard]] sg_size_t getFreeSpaceOnHeadStorage() const;
+
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
-        std::set<std::shared_ptr<DataFile>> getImagesCopiedToNode(const std::string &node);
         bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);
         bool isImageBeingCopiedToNode(const std::string& node, const std::shared_ptr<DataFile>& image);
+
+        std::set<std::shared_ptr<DataFile>> getImagesBeingLoadedAtNode(const std::string &node);
+        bool isImageInRAMAtNode(const std::string &node, const std::shared_ptr<DataFile> &image);
+        bool isImageBeingLoadedAtNode(const std::string &node, const std::shared_ptr<DataFile> &image);
 
         ~ServerlessStateOfTheSystem();
 
@@ -69,6 +72,9 @@ namespace wrench
 
         // map of available cores on each compute host
         std::map<std::string, unsigned long> _available_cores;
+        // map of available RAM on each compute host
+        std::map<std::string, sg_size_t> _available_ram;
+
         // map of scheduling decisions for each invocation
         std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
 
@@ -90,13 +96,16 @@ namespace wrench
         std::string _head_storage_service_mount_point;
         // std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
         std::unordered_map<std::string, std::shared_ptr<StorageService>> _compute_storages;
+        std::unordered_map<std::string, std::shared_ptr<StorageService>> _compute_memories;
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
-        std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
-        sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shennanigans
+        // std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
+        sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shenanigans
 
         std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _being_copied_images;
-        std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _copied_images;
+        // std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _copied_images;
+        std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _being_loaded_images;
+        // std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _loaded_images;
     };
 
     /***********************/

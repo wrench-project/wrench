@@ -42,7 +42,7 @@ namespace wrench {
      */
     class MyFunctionOutput final : public FunctionOutput {
     public:
-        explicit MyFunctionOutput(const std::string& msg) : msg_(msg) {
+        explicit MyFunctionOutput(std::string  msg) : msg_(std::move(msg)) {
         }
 
         std::string msg_;

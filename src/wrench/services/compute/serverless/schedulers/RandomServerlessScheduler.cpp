@@ -81,28 +81,11 @@ namespace wrench {
                         // Schedule copying only if the image isn't on the node and isn't already being copied.
                         if (!state->isImageOnNode(node, df) && 
                             !state->isImageBeingCopiedToNode(node, df)) {
-                            decision->imagesToCopy[node].push_back(df);
+                            decision->imagesToCopyToComputeNode[node].push_back(df);
                         }
                         break;  // Exit inner loop upon finding the corresponding DataFile.
                     }
                 }
-            }
-
-
-            // For removing images, get the images already copied to the node
-            std::set<std::shared_ptr<DataFile>> currentFiles = state->getImagesCopiedToNode(node);
-            std::vector<std::shared_ptr<DataFile>> extras;
-            
-            for (const auto& df : currentFiles) {
-                if (reqIDs.find(df->getID()) == reqIDs.end()) {
-                    extras.push_back(df);
-                }
-            }
-            
-            if (!extras.empty()) {
-                std::uniform_int_distribution<size_t> dist(0, extras.size() - 1);
-                const auto& chosenExtra = extras[dist(rng)];
-                decision->imagesToRemove[node].push_back(chosenExtra);
             }
         }
 
