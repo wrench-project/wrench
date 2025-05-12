@@ -109,36 +109,7 @@ namespace wrench {
         void initiateImageLoadAtComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
 
         void dispatchInvocation(const std::shared_ptr<Invocation>& invocation);
-
-
-        // map of Registered functions sorted by function name
-        std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
-        // vector of compute host names
-        std::vector<std::string> _compute_hosts;
-
-        // std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
-
-        // queue of function invocations waiting to be processed
-        std::queue<std::shared_ptr<Invocation>> _newInvocations;
-        // queues of function invocations whose images are being downloaded
-        std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admittedInvocations;
-        // queue of function invocations whose images have been downloaded
-        std::queue<std::shared_ptr<Invocation>> _schedulableInvocations;
-        // queue of function invocations whose are scheduled on a host and whose
-        // images are being copied there
-        std::queue<std::shared_ptr<Invocation>> _scheduledInvocations;
-        // queue of function invocations currently running
-        std::queue<std::shared_ptr<Invocation>> _runningInvocations;
-        // queue of function invocations that have finished executing
-        std::queue<std::shared_ptr<Invocation>> _finishedInvocations;
-
-        std::string _head_storage_service_mount_point;
-        // std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
-        // std::unordered_map<std::string, std::shared_ptr<StorageService>> _compute_storages;
-        std::shared_ptr<StorageService> _head_storage_service;
-        std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
-        // std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
-        sg_size_t _free_space_on_head_storage{}; // We keep track of it ourselves to avoid concurrency shenanigans
+        
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}
