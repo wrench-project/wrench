@@ -515,48 +515,59 @@ namespace wrench {
     }
 
      /**
-         * @brief Reserve space at the storage service (basically, add bytes to a hidden un-evictable file in zero time)
-         * @param location: a location
-         * @return true if success, false otherwise
-         */
-        bool SimpleStorageService::reserveSpace(std::shared_ptr<FileLocation> &location) {
-            std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            if (not partition) {
-                throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
-            }
-            std::string reservation_file_path = partition->get_name() + "/.reserved_space";
-            if (not this->file_system->file_exists(reservation_file_path)) {
-                this->file_system->create_file(reservation_file_path, 0);
-                this->file_system->make_file_evictable(reservation_file_path, true);
-            }
-            auto reservation_file = this->file_system->open(reservation_file_path, "a");
-//            reservation_file->seek(SEEK_END);
-            bool success = true;
-            try {
-                reservation_file->write(location->getFile()->getSize(), false);
-            } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
-                success = false;
-            }
-            reservation_file->close();
-            return success;
+     * @brief Reserve space at the storage service (basically, add bytes to a hidden un-evictable file in zero time)
+     * @param location: a location
+     * @return true if success, false otherwise
+     */
+    bool SimpleStorageService::reserveSpace(std::shared_ptr<FileLocation> &location) {
+        std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
+        if (not partition) {
+            throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
         }
-
-        /**
-         * @brief Un-reserve space at the storage service (basically, remove bytes to a hidden un-evictable file in zero time)
-         * @param location: a location
-         */
-        void SimpleStorageService::unreserveSpace(std::shared_ptr<FileLocation> &location) {
-
-            std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            if (not partition) {
-                throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
-            }
-            std::string reservation_file_path = partition->get_name() + "/.reserved_space";
-            if (not this->file_system->file_exists(reservation_file_path)) {
-                throw std::runtime_error("StorageService::unreserveSpace(): .reserved_space file not found - internal error");
-            }
-            this->file_system->truncate_file(reservation_file_path, location->getFile()->getSize());
+        std::string reservation_file_path = partition->get_name() + "/.reserved_space";
+        if (not this->file_system->file_exists(reservation_file_path)) {
+            this->file_system->create_file(reservation_file_path, 0);
+            this->file_system->make_file_evictable(reservation_file_path, true);
         }
+        auto reservation_file = this->file_system->open(reservation_file_path, "a");
+        // reservation_file->seek(SEEK_END);
+        bool success = true;
+        try {
+            reservation_file->write(location->getFile()->getSize(), false);
+        } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
+            success = false;
+        }
+        reservation_file->close();
+        return success;
+    }
+
+    /**
+     * @brief Un-reserve space at the storage service (basically, remove bytes to a hidden un-evictable file in zero time)
+     * @param location: a location
+     */
+    void SimpleStorageService::unreserveSpace(std::shared_ptr<FileLocation> &location) {
+
+        std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
+        if (not partition) {
+            throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
+        }
+        std::string reservation_file_path = partition->get_name() + "/.reserved_space";
+        if (not this->file_system->file_exists(reservation_file_path)) {
+            throw std::runtime_error("StorageService::unreserveSpace(): .reserved_space file not found - internal error");
+        }
+        this->file_system->truncate_file(reservation_file_path, location->getFile()->getSize());
+    }
+
+    /**
+     * @brief A method to open a file, which really doesn't do anything besides making the
+     *        file unevictable, in case the storage service implements caching. Calling
+     *        close() on the returned file will decrement the file's refcount, thus possibly
+     *        making it evictable again.
+     * @param location: the file's location
+     */
+    std::shared_ptr<simgrid::fsmod::File> SimpleStorageService::openFile(const std::shared_ptr<FileLocation> &location) {
+        return this->file_system->open(location->getFilePath(), "r");
+    }
 
     /**
      * @brief Gets the disk that stores a path

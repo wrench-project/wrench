@@ -109,7 +109,7 @@ namespace wrench {
         unsigned long getTotalFilesZeroTime() override;
 
         std::string getBaseRootPath() override;
-        
+
         bool reserveSpace(std::shared_ptr<FileLocation> &location) override;
         void unreserveSpace(std::shared_ptr<FileLocation> &location) override;
 
@@ -213,6 +213,8 @@ namespace wrench {
     private:
         friend class Simulation;
         friend class ServerlessComputeService;
+
+        std::shared_ptr<simgrid::fsmod::File> openFile(const std::shared_ptr<FileLocation> &location);
 
         void validateProperties();
 
