@@ -40,8 +40,6 @@ namespace wrench {
 
         for (const auto& compute_host : _compute_hosts) {
             _being_copied_images[compute_host] = {};
-            // _copied_images[compute_host] = {};
-            // _loaded_images[compute_host] = {};
         }
     }
 
