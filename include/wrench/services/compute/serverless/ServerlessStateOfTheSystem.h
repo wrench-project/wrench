@@ -80,13 +80,12 @@ namespace wrench
         // map of scheduling decisions for each invocation
         std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
 
-        // TODO: change all of these to vectors instead of queues
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _new_invocations;
         // queues of function invocations whose images are being downloaded
         std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
         // queue of function invocations whose images have been downloaded
-        std::queue<std::shared_ptr<Invocation>> _schedulable_invocations;
+        std::deque<std::shared_ptr<Invocation>> _schedulable_invocations;
         // queue of function invocations whose are scheduled on a host and whose
         // images are being copied there
         std::queue<std::shared_ptr<Invocation>> _scheduled_invocations;
