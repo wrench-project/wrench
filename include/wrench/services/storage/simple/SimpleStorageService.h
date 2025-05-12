@@ -109,62 +109,9 @@ namespace wrench {
         unsigned long getTotalFilesZeroTime() override;
 
         std::string getBaseRootPath() override;
-
-        /**
-         * @brief Reserve space at the storage service (basically, add bytes to a hidden un-evictable file in zero time)
-         * @param location: a location
-         * @return true if success, false otherwise
-         */
-        bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
-            std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            if (not partition) {
-                throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
-            }
-            std::string reservation_file_path = partition->get_name() + "/.reserved_space";
-            if (not this->file_system->file_exists(reservation_file_path)) {
-                this->file_system->create_file(reservation_file_path, 0);
-                this->file_system->make_file_evictable(reservation_file_path, true);
-            }
-            auto reservation_file = this->file_system->open(reservation_file_path, "a");
-//            reservation_file->seek(SEEK_END);
-            bool success = true;
-            try {
-                reservation_file->write(location->getFile()->getSize(), false);
-            } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
-                success = false;
-            }
-            reservation_file->close();
-            return success;
-        }
-
-        /**
-         * @brief Un-reserve space at the storage service (basically, remove bytes to a hidden un-evictable file in zero time)
-         * @param location: a location
-         */
-        void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
-
-            std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            if (not partition) {
-                throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
-            }
-            std::string reservation_file_path = partition->get_name() + "/.reserved_space";
-            if (not this->file_system->file_exists(reservation_file_path)) {
-                throw std::runtime_error("StorageService::unreserveSpace(): .reserved_space file not found - internal error");
-            }
-            this->file_system->truncate_file(reservation_file_path, location->getFile()->getSize());
-        }
-
-//        /**
-//        * @brief Get the mount point that stores a path
-//        * @param path: path
-//        *
-//        * @return a mount point
-//        */
-//        std::string getPathMountPoint(const std::string &path) {
-//            std::string mount_point, path_at_mount_point;
-//            this->splitPath(path, mount_point, path_at_mount_point);
-//            return mount_point;
-//        }
+        
+        bool reserveSpace(std::shared_ptr<FileLocation> &location) override;
+        void unreserveSpace(std::shared_ptr<FileLocation> &location) override;
 
         void createFile(const std::shared_ptr<FileLocation> &location) override;
 
