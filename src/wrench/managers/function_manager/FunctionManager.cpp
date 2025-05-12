@@ -90,12 +90,12 @@ namespace wrench {
      * @param time_limit_in_seconds the time limit for the function execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
      * @param RAM_limit_in_bytes the RAM limit for the function
-     * @param ingress_in_bytes the ingress data limit
-     * @param egress_in_bytes the egress data limit
+     * @param ingress_in_bytes the ingress data limit (this is currently ignored and not implemented)
+     * @param egress_in_bytes the egress data limit (this is currently ignored and not implemented)
      * @return true if the function was registered successfully
      * @throw ExecutionException if the function registration fails
      */
-    std::shared_ptr<RegisteredFunction> FunctionManager::registerFunction(const std::shared_ptr<Function> function,
+    std::shared_ptr<RegisteredFunction> FunctionManager::registerFunction(const std::shared_ptr<Function>& function,
                                                                           const std::shared_ptr<
                                                                               ServerlessComputeService>&
                                                                           sl_compute_service,
@@ -136,7 +136,7 @@ namespace wrench {
      * @return true if the invocation is done
      * @return false if the invocation is not done
      */
-    bool FunctionManager::isDone(std::shared_ptr<Invocation> invocation) {
+    bool FunctionManager::isDone(const std::shared_ptr<Invocation>& invocation) {
         if (_finished_invocations.find(invocation) != _finished_invocations.end()) {
             return true;
         }
@@ -148,7 +148,7 @@ namespace wrench {
      *
      * @param invocation the invocation to wait for
      */
-    void FunctionManager::wait_one(std::shared_ptr<Invocation> invocation) {
+    void FunctionManager::wait_one(const std::shared_ptr<Invocation>& invocation) {
         // WRENCH_INFO("FunctionManager::wait_one(): Waiting for invocation to finish");
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 

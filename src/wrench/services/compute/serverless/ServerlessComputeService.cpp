@@ -229,6 +229,8 @@ namespace wrench {
      * @return 0 on termination
      */
     int ServerlessComputeService::main() {
+
+        S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
@@ -488,7 +490,7 @@ namespace wrench {
             target_host,
             1,
             0,
-            0,
+            this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD),
             false,
             this->commport,
             custom_message,
@@ -497,11 +499,12 @@ namespace wrench {
 
         action_executor->setActionTimeout(invocation->getRegisteredFunction()->getTimeLimit());
 
+        // TODO: TODO: XXXX DEAL WITH MEMORY XXXX
+
         action_executor->setSimulation(this->simulation_);
         // WRENCH_INFO("Starting an action executor for dispatching invocation...");
         invocation->_start_date = Simulation::getCurrentSimulatedDate();
         action_executor->start(action_executor, true, false);
-
 
         _state_of_the_system->_running_invocations.push(invocation);
         // WRENCH_INFO("Function [%s] invoked", invocation->_registered_function->_function->getName().c_str());

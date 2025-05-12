@@ -32,17 +32,21 @@ namespace wrench
     public:
         // getter methods
         // TODO: what does the scheduler need and what does it not?
-        const std::vector<std::string>& getComputeHosts();
-        std::map<std::string, unsigned long> getAvailableCores();
         std::queue<std::shared_ptr<Invocation>> getNewInvocations();
         std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> getAdmittedInvocations();
         std::queue<std::shared_ptr<Invocation>> getSchedulableInvocations();
         std::queue<std::shared_ptr<Invocation>> getScheduledInvocations();
         std::queue<std::shared_ptr<Invocation>> getRunningInvocations();
         std::queue<std::shared_ptr<Invocation>> getFinishedInvocations();
-        std::unordered_map<std::string, std::shared_ptr<StorageService>> getComputeStorages();
-        std::shared_ptr<StorageService> getHeadStorageService();
-        [[nodiscard]] sg_size_t getFreeSpaceOnHeadStorage() const;
+
+        const std::vector<std::string>& getComputeHosts();
+        std::map<std::string, unsigned long> getAvailableCores();
+        std::map<std::string, sg_size_t> getAvailableRAM();
+        [[nodiscard]] sg_size_t getFreeRAMSpaceOnNode(const std::string &node) const;
+
+        // [[nodiscard]] sg_size_t getFreeSpaceOnHeadStorage() const;
+        // std::unordered_map<std::string, std::shared_ptr<StorageService>> getComputeStorages();
+        // std::shared_ptr<StorageService> getHeadStorageService();
 
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
         bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);
