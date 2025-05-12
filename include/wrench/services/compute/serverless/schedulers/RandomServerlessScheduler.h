@@ -7,6 +7,11 @@
 #include "wrench/services/compute/serverless/ServerlessScheduler.h"
 
 namespace wrench {
+
+    /**
+     * @brief A class that implements a random scheduler to use in a
+     *        serverless compute service.
+     */
     class RandomServerlessScheduler : public ServerlessScheduler {
     public:
 

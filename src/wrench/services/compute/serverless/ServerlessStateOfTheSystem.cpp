@@ -51,6 +51,15 @@ namespace wrench {
 
     std::map<std::string, unsigned long> ServerlessStateOfTheSystem::getAvailableCores() { return _available_cores; }
 
+    std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() {
+        std::map<std::string, sg_size_t> to_return;
+        for (const auto& [hostname, ss] : _compute_memories) {
+            to_return[hostname] = ss->getTotalFreeSpaceZeroTime();
+        }
+        return to_return;
+    }
+
+
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getNewInvocations() { return _new_invocations; }
 
     std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>>
@@ -72,17 +81,22 @@ namespace wrench {
         return _finished_invocations;
     }
 
-    std::unordered_map<std::string, std::shared_ptr<StorageService>> ServerlessStateOfTheSystem::getComputeStorages() {
-        return _compute_storages;
+    // std::unordered_map<std::string, std::shared_ptr<StorageService>> ServerlessStateOfTheSystem::getComputeStorages() {
+    //     return _compute_storages;
+    // }
+
+    sg_size_t ServerlessStateOfTheSystem::getFreeRAMSpaceOnNode(const std::string &node) const {
+        return _compute_storages.at(node)->getTotalFreeSpaceZeroTime();
     }
 
-    std::shared_ptr<StorageService> ServerlessStateOfTheSystem::getHeadStorageService() {
-        return _head_storage_service;
-    }
 
-    sg_size_t ServerlessStateOfTheSystem::getFreeSpaceOnHeadStorage() const {
-        return _free_space_on_head_storage;
-    }
+    // std::shared_ptr<StorageService> ServerlessStateOfTheSystem::getHeadStorageService() {
+    //     return _head_storage_service;
+    // }
+    //
+    // sg_size_t ServerlessStateOfTheSystem::getFreeSpaceOnHeadStorage() const {
+    //     return _free_space_on_head_storage;
+    // }
 
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(const std::string& node) {
         if (_being_copied_images.find(node) != _being_copied_images.end()) {

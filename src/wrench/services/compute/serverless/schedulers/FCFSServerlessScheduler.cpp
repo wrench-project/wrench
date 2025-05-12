@@ -37,6 +37,7 @@ namespace wrench {
                             const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
         // Copy data from the state of the system so we can simulate assignment
         auto available_cores = state->getAvailableCores();
+        auto available_ram = state->getAvailableRAM();
         auto compute_nodes = state->getComputeHosts();
 
         // In a first phase we go through all the invocations in order, and while there is an
@@ -73,8 +74,10 @@ namespace wrench {
                 }
                 else if (state->isImageOnNode(node, image_file) &&
                     !state->isImageInRAMAtNode(node, image_file) &&
-                    !state->isImageBeingLoadedAtNode(node, image_file)) {
+                    !state->isImageBeingLoadedAtNode(node, image_file) &&
+                    available_ram[node] >= image_file->getSize()) {
                     decisions->images_to_load_into_RAM_at_compute_node[node].push_back(image_file);
+                    available_ram[node] -= image_file->getSize();
                 }
             }
         }
