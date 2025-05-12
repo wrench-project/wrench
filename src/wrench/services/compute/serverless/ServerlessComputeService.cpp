@@ -438,6 +438,7 @@ namespace wrench {
         while (!_state_of_the_system->_scheduled_invocations.empty()) {
             auto invocation_to_place = _state_of_the_system->_scheduled_invocations.front();
             _state_of_the_system->_scheduled_invocations.pop();
+
             WRENCH_INFO("Trying to run scheduled invocation for function [%s]...",
                         invocation_to_place->_registered_function->_function->getName().c_str());
 
@@ -446,6 +447,7 @@ namespace wrench {
             } else {
                 // Put it back in the schedulable state, and the scheduler will have to deal with it again
                 _state_of_the_system->_schedulable_invocations.push_back(invocation_to_place);
+                _state_of_the_system->_scheduling_decisions.erase(invocation_to_place);
             }
         }
     }
@@ -728,7 +730,7 @@ namespace wrench {
         while (!_state_of_the_system->_schedulable_invocations.empty()) {
             auto invocation = _state_of_the_system->_schedulable_invocations.front();
             schedulable_invocations_vector.push_back(invocation);
-            _state_of_the_system->_schedulable_invocations.pop_back();
+            _state_of_the_system->_schedulable_invocations.pop_front();
         }
 
         // Invoke the scheduler so that it manages images
