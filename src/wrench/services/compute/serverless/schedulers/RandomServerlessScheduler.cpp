@@ -11,12 +11,35 @@ namespace wrench {
         : rng(std::random_device()()) {
     }
 
-    // In this method we simulate a random assignment of invocations to compute nodes,
-    // and then determine per-node which images need to be copied (if missing) and to load (if not loaded).
-    std::shared_ptr<ImageManagementDecision> RandomServerlessScheduler::manageImages(
-        const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
+    /**
+     * @brief Given the list of schedulable invocations and the current system state, decide:
+     *   - which images to copy to compute nodes
+     *   - which images to load into memory at compute nodes
+     *   - which invocations to start at compute nodes
+     *
+     * @param schedulable_invocations A list of invocations whose images reside on the head node
+     * @param state The current system state
+     * @return A SchedulingDecisions object
+     */
+    std::shared_ptr<SchedulingDecisions> RandomServerlessScheduler::schedule(
+        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
         const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
-        auto decision = std::make_shared<ImageManagementDecision>();
+        auto decision = std::make_shared<SchedulingDecisions>();
+
+        this->makeImageDecisions(decision, schedulable_invocations, state);
+        this->makeInvocationDecisions(decision, schedulable_invocations, state);
+        return decision;
+    }
+
+    /**
+     * @brief Helper method to make image decisions
+     * @param decisions An object that contains scheduling decisions
+     * @param schedulable_invocations A list of invocations whose images reside on the head node
+     * @param state The current system state
+     */
+    void RandomServerlessScheduler::makeImageDecisions(std::shared_ptr<SchedulingDecisions>& decisions,
+                                                       const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+                                                       const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
 
         // Copy available cores so we can simulate assignment
         auto availableCores = state->getAvailableCores();
@@ -27,7 +50,7 @@ namespace wrench {
         std::map<std::string, std::set<std::shared_ptr<DataFile>>> requiredImages;
 
         // For each invocation, randomly assign it to a compute node that has an available core
-        for (const auto& inv : schedulableInvocations) {
+        for (const auto& inv : schedulable_invocations) {
             auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
             // std::string imageID = imageFile->getID();
 
@@ -64,45 +87,49 @@ namespace wrench {
                 // Schedule copying only if the image isn't on the node and isn't already being copied.
                 if (!state->isImageOnNode(node, df) &&
                     !state->isImageBeingCopiedToNode(node, df)) {
-                    decision->imagesToCopyToComputeNode[node].push_back(df);
+                    decisions->images_to_copy_to_compute_node[node].push_back(df);
                 }
                 else if (state->isImageOnNode(node, df) &&
                     !state->isImageBeingLoadedAtNode(node, df) &&
                     !state->isImageInRAMAtNode(node, df)) {
-                    decision->imagesToLoadIntoRAMAtComputeNode[node].push_back(df);
+                    decisions->images_to_load_into_RAM_at_compute_node[node].push_back(df);
                 }
             }
         }
-
-        return decision;
     }
 
-    // Implementation of scheduleFunctions
-    std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> RandomServerlessScheduler::scheduleFunctions(
-        const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-        const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
-        std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> schedulingDecisions;
+    /**
+     * @brief Helper method to make invocation decisions
+    * @param decisions An object that contains scheduling decisions
+     * @param schedulable_invocations A list of invocations whose images reside on the head node
+     * @param state The current system state
+     */
+    void RandomServerlessScheduler::makeInvocationDecisions(std::shared_ptr<SchedulingDecisions>& decisions,
+                                const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+                                const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+
         auto availableCores = state->getAvailableCores();
 
         // For each invocation, build a list of candidate nodes and pick one at random
-        for (const auto& inv : schedulableInvocations) {
+        for (const auto& inv : schedulable_invocations) {
             auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
 
             std::vector<std::string> candidates;
-            for (const auto& entry : availableCores) {
-                if (entry.second > 0) {
+            for (const auto& [hostname, num_available_cores
+                ] : availableCores) {
+                if (num_available_cores > 0) {
                     // Only consider nodes that have the image already in RAM
-                    if (state->isImageInRAMAtNode(entry.first, imageFile)) {
-                        candidates.push_back(entry.first);
+                    if (state->isImageInRAMAtNode(hostname, imageFile)) {
+                        candidates.push_back(hostname);
                     }
                 }
             }
 
             if (!candidates.empty()) {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
-                std::string chosenNode = candidates[dist(rng)];
-                schedulingDecisions.emplace_back(inv, chosenNode);
-                availableCores[chosenNode]--;
+                const std::string& chosen_node = candidates[dist(rng)];
+                decisions->invocations_to_start_at_compute_node[chosen_node].push_back(inv);
+                availableCores[chosen_node]--;
             }
             else {
                 // No suitable node with the image available; this invocation will be 
@@ -112,9 +139,6 @@ namespace wrench {
                 //             imageFile->getID().c_str());
             }
         }
-
-        return schedulingDecisions;
     }
 
-    // RandomServerlessScheduler::~RandomServerlessScheduler() = default;
 } // namespace wrench

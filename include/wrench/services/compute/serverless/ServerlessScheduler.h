@@ -7,68 +7,51 @@
  * (at your option) any later version.
  */
 
- #ifndef WRENCH_SERVERLESSSCHEDULER_H
- #define WRENCH_SERVERLESSSCHEDULER_H
+#ifndef WRENCH_SERVERLESSSCHEDULER_H
+#define WRENCH_SERVERLESSSCHEDULER_H
 
- #include <wrench/services/compute/serverless/Invocation.h>
- #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
- #include <vector>
- #include <string>
- 
- namespace wrench {
- 
-     /**
-      * @brief A data structure that stores all decisions for image management:
-      *        - Which images should be copied from the head node to compute nodes' disks
-      *        - Which images should be loaded into compute node's RAMs
-      */
-     struct ImageManagementDecision {
-        std::map<std::string, std::vector<std::shared_ptr<DataFile>>> imagesToCopyToComputeNode;
-         std::map<std::string, std::vector<std::shared_ptr<DataFile>>> imagesToLoadIntoRAMAtComputeNode;
+#include <wrench/services/compute/serverless/Invocation.h>
+#include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
+#include <vector>
+#include <string>
+
+namespace wrench {
+    /**
+     * @brief A data structure that stores all scheduling decisions:
+     *        - Which images should be copied from the head node to compute nodes' disks
+     *        - Which images should be loaded into compute node's RAMs
+     *        - Which invocations should be started at compute nodes
+     */
+    struct SchedulingDecisions {
+        std::map<std::string, std::vector<std::shared_ptr<DataFile>>> images_to_copy_to_compute_node;
+        std::map<std::string, std::vector<std::shared_ptr<DataFile>>> images_to_load_into_RAM_at_compute_node;
+        std::map<std::string, std::vector<std::shared_ptr<Invocation>>> invocations_to_start_at_compute_node;
     };
- 
-     /**
-      * @brief Abstract base class for scheduling in a serverless compute service.
-      *        This scheduler operates on a list of schedulable invocations (i.e., invocations whose images
-      *        are already on the head node) and makes two kinds of decisions:
-      *
-      *        - Image management decisions: Which images to remove and which to copy to compute nodes.
-      *        - Function scheduling decisions: Which invocation should run on which compute node.
-      */
-     class ServerlessScheduler {
-     public:
-         ServerlessScheduler() = default;
-         virtual ~ServerlessScheduler() = default;
- 
-         /**
-          * @brief Analyze the list of schedulable invocations and decide which images need to be downloaded/copied to
-          *        compute nodes or removed from them.
-          *
-          * @param schedulableInvocations A list of invocations whose images reside on the head node.
-          * @param state The current system state snapshot.
-          * @return ImageManagementDecision structure with images to delete and images to download/copy.
-          */
-         virtual std::shared_ptr<ImageManagementDecision> manageImages(
-             const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-             const std::shared_ptr<ServerlessStateOfTheSystem>& state
-         ) = 0;
- 
-         /**
-          * @brief Schedule functions to be executed on specific compute nodes.
-          *
-          * @param schedulableInvocations A list of invocations ready for scheduling.
-          * @param state The current system state snapshot.
-          * @return A vector of scheduling decisions, where each decision is a pair:
-          *         - The first element is an invocation.
-          *         - The second element is the target compute node (as a string) for that invocation.
-          */
-         virtual std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> scheduleFunctions(
-             const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-             const std::shared_ptr<ServerlessStateOfTheSystem>& state
-         ) = 0;
-     };
- 
- } // namespace wrench
- 
- #endif // WRENCH_SERVERLESSSCHEDULER_H
- 
+
+    /**
+     * @brief Abstract base class for scheduling in a serverless compute service.
+     */
+    class ServerlessScheduler {
+    public:
+        ServerlessScheduler() = default;
+        virtual ~ServerlessScheduler() = default;
+
+        /**
+         * @brief Given the list of schedulable invocations and the current system state, decide:
+         *   - which images to copy to compute nodes
+         *   - which images to load into memory at compute nodes
+         *   - which invocations to start at compute nodes
+         *
+         * @param schedulable_invocations A list of invocations whose images reside on the head node
+         * @param state The current system state
+         * @return A SchedulingDecisions object
+         */
+        virtual std::shared_ptr<SchedulingDecisions> schedule(
+            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+            const std::shared_ptr<ServerlessStateOfTheSystem>& state
+        ) = 0;
+
+    };
+} // namespace wrench
+
+#endif // WRENCH_SERVERLESSSCHEDULER_H

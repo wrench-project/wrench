@@ -5,13 +5,38 @@
 #include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
 
 namespace wrench {
-    std::shared_ptr<ImageManagementDecision>
-    WorkloadBalancingServerlessScheduler::manageImages(
-        const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
+
+    /**
+     * @brief Given the list of schedulable invocations and the current system state, decide:
+     *   - which images to copy to compute nodes
+     *   - which images to load into memory at compute nodes
+     *   - which invocations to start at compute nodes
+     *
+     * @param schedulable_invocations A list of invocations whose images reside on the head node
+     * @param state The current system state
+     * @return A SchedulingDecisions object
+     */
+    std::shared_ptr<SchedulingDecisions> WorkloadBalancingServerlessScheduler::schedule(
+        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
         const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
-        auto decision = std::make_shared<ImageManagementDecision>();
-    
-        calculateFunctionWorkloads(schedulableInvocations);
+        auto decisions = std::make_shared<SchedulingDecisions>();
+        makeImageDecisions(decisions, schedulable_invocations, state);
+        makeInvocationDecisions(decisions, schedulable_invocations, state);
+        return decisions;
+    }
+
+    /**
+     * @brief Helper method to make image decisions
+     * @param decisions An object that contains scheduling decisions
+     * @param schedulable_invocations A list of invocations whose images reside on the head node
+     * @param state The current system state
+     */
+    void WorkloadBalancingServerlessScheduler::makeImageDecisions(std::shared_ptr<SchedulingDecisions>& decisions,
+                            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+                            const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+
+
+        calculateFunctionWorkloads(schedulable_invocations);
         createAllocationPlan(state);
     
         for (const auto& [node, function_allocation] : allocation_plan) {
@@ -29,31 +54,32 @@ namespace wrench {
                 auto image = function_images[function_name];
                 if (!state->isImageOnNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
-                    decision->imagesToCopyToComputeNode[node].push_back(image);
+                    decisions->images_to_copy_to_compute_node[node].push_back(image);
                 } else if (state->isImageOnNode(node, image) &&
                     !state->isImageBeingLoadedAtNode(node, image) &&
                     !state->isImageInRAMAtNode(node, image)) {
-                    decision->imagesToLoadIntoRAMAtComputeNode[node].push_back(image);
+                    decisions->images_to_load_into_RAM_at_compute_node[node].push_back(image);
                 }
             }
         }
-    
-        return decision;
     }
-    
-    std::vector<std::pair<std::shared_ptr<Invocation>, std::string> >
-    WorkloadBalancingServerlessScheduler::scheduleFunctions(
-        const std::vector<std::shared_ptr<Invocation> > &schedulableInvocations,
-        const std::shared_ptr<ServerlessStateOfTheSystem> &state
-    ) {
-        std::vector<std::pair<std::shared_ptr<Invocation>, std::string> > schedulingDecisions;
+
+    /**
+     * @brief Helper method to make invocation decisions
+    * @param decisions An object that contains scheduling decisions
+     * @param schedulable_invocations A list of invocations whose images reside on the head node
+     * @param state The current system state
+     */
+    void WorkloadBalancingServerlessScheduler::makeInvocationDecisions(std::shared_ptr<SchedulingDecisions>& decisions,
+                                 const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+                                 const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
 
         // Get current available cores
         auto availableCores = state->getAvailableCores();
 
         // Group invocations by function name
         std::unordered_map<std::string, std::vector<std::shared_ptr<Invocation> > > invocations_by_function;
-        for (const auto &inv: schedulableInvocations) {
+        for (const auto &inv: schedulable_invocations) {
             std::string function_name = inv->getRegisteredFunction()->getFunction()->getName();
             invocations_by_function[function_name].push_back(inv);
         }
@@ -78,17 +104,20 @@ namespace wrench {
                     // Make sure the image is on this node
                     auto image_file = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
                     if (state->isImageInRAMAtNode(node, image_file)) {
-                        schedulingDecisions.emplace_back(inv, node);
+                        decisions->invocations_to_start_at_compute_node[node].push_back(inv);
                         availableCores[node]--;
                         scheduled++;
                     }
                 }
             }
         }
-
-        return schedulingDecisions;
     }
 
+
+    /**
+     * @brief Helper method
+     * @param invocations A list of invocations
+     */
     void WorkloadBalancingServerlessScheduler::calculateFunctionWorkloads(
         const std::vector<std::shared_ptr<Invocation> > &invocations) {
         // Clear existing data
@@ -114,6 +143,10 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Helper method
+     * @param state Curent state
+     */
     void WorkloadBalancingServerlessScheduler::createAllocationPlan(
         const std::shared_ptr<ServerlessStateOfTheSystem> &state) {
         // Clear existing plan

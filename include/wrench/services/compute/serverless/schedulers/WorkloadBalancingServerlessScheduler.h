@@ -18,17 +18,22 @@
      WorkloadBalancingServerlessScheduler() = default;
      ~WorkloadBalancingServerlessScheduler() override = default;
  
-     std::shared_ptr<ImageManagementDecision> manageImages(
-         const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-         const std::shared_ptr<ServerlessStateOfTheSystem>& state
-     ) override;
- 
-     std::vector<std::pair<std::shared_ptr<Invocation>, std::string>> scheduleFunctions(
-         const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
+     std::shared_ptr<SchedulingDecisions> schedule(
+         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
          const std::shared_ptr<ServerlessStateOfTheSystem>& state
      ) override;
  
  private:
+
+     void makeImageDecisions(std::shared_ptr<SchedulingDecisions>& decisions,
+                            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+                            const std::shared_ptr<ServerlessStateOfTheSystem>& state);
+
+     void makeInvocationDecisions(std::shared_ptr<SchedulingDecisions>& decisions,
+                                  const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+                                  const std::shared_ptr<ServerlessStateOfTheSystem>& state);
+
+
      // Function type -> total workload (in time units)
      std::unordered_map<std::string, double> function_workloads;
      
