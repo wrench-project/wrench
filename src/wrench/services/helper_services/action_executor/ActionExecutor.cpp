@@ -186,16 +186,24 @@ namespace wrench {
      */
     int ActionExecutor::main() {
         S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
-        S4U_Simulation::sleep(this->action_startup_overhead); // add the overhead
+
+        this->action->setStartDate(S4U_Simulation::getClock());
+        this->action->setState(Action::State::STARTED);
+
+        // Overhead
+        if (this->action_startup_overhead > 0) {
+            WRENCH_INFO("ACTION EXECUTOR: SLEEPING %lf", this->action_startup_overhead);
+            S4U_Simulation::sleep(this->action_startup_overhead);
+        }
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         // WRENCH_INFO("New Action Executor started to do action %s", this->action->getName().c_str());
-        this->action->setStartDate(S4U_Simulation::getClock());
-        this->action->setState(Action::State::STARTED);
         try {
+            WRENCH_INFO("EXECUTING ACTION");
             execute_action();
-            this->action->terminate(this->getSharedPtr<ActionExecutor>());
+            WRENCH_INFO("ACTION EXECUTED: SETTING STATE TO COMPLETED");
             this->action->setState(Action::State::COMPLETED);
+            this->action->terminate(this->getSharedPtr<ActionExecutor>());
         }
         catch (ExecutionException& e) {
             this->action->setState(Action::State::FAILED);
