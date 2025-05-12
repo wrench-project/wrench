@@ -63,10 +63,8 @@ namespace wrench
 
         explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts);
 
-        // map of Registered functions sorted by function name
-        // std::map<std::string, std::shared_ptr<RegisteredFunction>> _registeredFunctions;
         // set of Registered functions
-        std::set<std::shared_ptr<RegisteredFunction>> _registeredFunctions;
+        std::set<std::shared_ptr<RegisteredFunction>> _registered_functions;
         // vector of compute host names
         std::vector<std::string> _compute_hosts;
 
@@ -80,18 +78,18 @@ namespace wrench
 
         // TODO: change all of these to vectors instead of queues
         // queue of function invocations waiting to be processed
-        std::queue<std::shared_ptr<Invocation>> _newInvocations;
+        std::queue<std::shared_ptr<Invocation>> _new_invocations;
         // queues of function invocations whose images are being downloaded
-        std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admittedInvocations;
+        std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
         // queue of function invocations whose images have been downloaded
-        std::queue<std::shared_ptr<Invocation>> _schedulableInvocations;
+        std::queue<std::shared_ptr<Invocation>> _schedulable_invocations;
         // queue of function invocations whose are scheduled on a host and whose
         // images are being copied there
-        std::queue<std::shared_ptr<Invocation>> _scheduledInvocations;
+        std::queue<std::shared_ptr<Invocation>> _scheduled_invocations;
         // queue of function invocations currently running
-        std::queue<std::shared_ptr<Invocation>> _runningInvocations;
+        std::queue<std::shared_ptr<Invocation>> _running_invocations;
         // queue of function invocations that have finished executing
-        std::queue<std::shared_ptr<Invocation>> _finishedInvocations;
+        std::queue<std::shared_ptr<Invocation>> _finished_invocations;
 
         std::string _head_storage_service_mount_point;
         // std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;

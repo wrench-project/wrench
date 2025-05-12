@@ -51,25 +51,25 @@ namespace wrench {
 
     std::map<std::string, unsigned long> ServerlessStateOfTheSystem::getAvailableCores() { return _available_cores; }
 
-    std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getNewInvocations() { return _newInvocations; }
+    std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getNewInvocations() { return _new_invocations; }
 
     std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>>
-    ServerlessStateOfTheSystem::getAdmittedInvocations() { return _admittedInvocations; }
+    ServerlessStateOfTheSystem::getAdmittedInvocations() { return _admitted_invocations; }
 
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getSchedulableInvocations() {
-        return _schedulableInvocations;
+        return _schedulable_invocations;
     }
 
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getScheduledInvocations() {
-        return _scheduledInvocations;
+        return _scheduled_invocations;
     }
 
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getRunningInvocations() {
-        return _runningInvocations;
+        return _running_invocations;
     }
 
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getFinishedInvocations() {
-        return _finishedInvocations;
+        return _finished_invocations;
     }
 
     std::unordered_map<std::string, std::shared_ptr<StorageService>> ServerlessStateOfTheSystem::getComputeStorages() {

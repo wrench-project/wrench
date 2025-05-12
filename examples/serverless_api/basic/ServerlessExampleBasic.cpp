@@ -143,8 +143,6 @@ int main(int argc, char** argv) {
     unsigned int num_compute_nodes = atoi(argv[2]);
 
     /* Using the basic First Come First Serve (FCFS) scheduler */
-    std::string scheduler_type = "fcfs";
-
     auto scheduler = std::make_shared<wrench::FCFSServerlessScheduler>();
 
     /* Create the simulated platform */
