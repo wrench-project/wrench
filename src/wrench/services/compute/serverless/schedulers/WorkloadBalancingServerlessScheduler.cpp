@@ -8,8 +8,7 @@ namespace wrench {
     std::shared_ptr<ImageManagementDecision>
     WorkloadBalancingServerlessScheduler::manageImages(
         const std::vector<std::shared_ptr<Invocation>>& schedulableInvocations,
-        const std::shared_ptr<ServerlessStateOfTheSystem>& state
-    ) {
+        const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
         auto decision = std::make_shared<ImageManagementDecision>();
     
         calculateFunctionWorkloads(schedulableInvocations);
@@ -31,6 +30,10 @@ namespace wrench {
                 if (!state->isImageOnNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
                     decision->imagesToCopyToComputeNode[node].push_back(image);
+                } else if (state->isImageOnNode(node, image) &&
+                    !state->isImageBeingLoadedAtNode(node, image) &&
+                    !state->isImageInRAMAtNode(node, image)) {
+                    decision->imagesToLoadIntoRAMAtComputeNode[node].push_back(image);
                 }
             }
         }
@@ -74,7 +77,7 @@ namespace wrench {
 
                     // Make sure the image is on this node
                     auto image_file = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
-                    if (state->isImageOnNode(node, image_file)) {
+                    if (state->isImageInRAMAtNode(node, image_file)) {
                         schedulingDecisions.emplace_back(inv, node);
                         availableCores[node]--;
                         scheduled++;
