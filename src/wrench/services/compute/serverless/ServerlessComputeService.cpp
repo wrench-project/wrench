@@ -36,17 +36,20 @@ namespace wrench {
                                                        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
                                                        messagepayload_list) :
         ComputeService(hostname,
-                       "ServerlessComputeService", ""), property_list_(property_list) {
+                       "ServerlessComputeService", "")
+    {
+        // Set default and specified message payloads
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
+
+        // Set default and specified properties
+        this->setProperties(this->default_property_values, property_list);
+
+        // Create the state of the system object
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
             new ServerlessStateOfTheSystem(compute_hosts));
         _state_of_the_system->_head_storage_service_mount_point = head_node_storage_mount_point;
 
         _scheduler = scheduler;
-
-        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
-
-        // Set default and specified properties
-        this->setProperties(this->default_property_values, property_list);
     }
 
     /**

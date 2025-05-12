@@ -23,6 +23,10 @@ namespace wrench {
     class ServerlessComputeServiceProperty : public ComputeServiceProperty {
 
     public:
+        /** @brief The overhead to start a container after the image has been loaded into RAM (default value: "0", default unit: seconds):
+         *         Examples: "5", "5s", "5000ms", etc.
+         **/
+        DECLARE_PROPERTY_NAME(CONTAINER_STARTUP_OVERHEAD);
     };
 
 }// namespace wrench
