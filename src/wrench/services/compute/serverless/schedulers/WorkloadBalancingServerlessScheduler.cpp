@@ -38,6 +38,8 @@ namespace wrench {
 
         calculateFunctionWorkloads(schedulable_invocations);
         createAllocationPlan(state);
+
+        auto available_ram = state->getAvailableRAM();
     
         for (const auto& [node, function_allocation] : allocation_plan) {
             std::set<std::string> required_function_names;
@@ -57,8 +59,11 @@ namespace wrench {
                     decisions->images_to_copy_to_compute_node[node].push_back(image);
                 } else if (state->isImageOnNode(node, image) &&
                     !state->isImageBeingLoadedAtNode(node, image) &&
-                    !state->isImageInRAMAtNode(node, image)) {
+                    !state->isImageInRAMAtNode(node, image) &&
+                    available_ram[node] >= image->getSize()
+                    ) {
                     decisions->images_to_load_into_RAM_at_compute_node[node].push_back(image);
+                    available_ram[node] -= image->getSize();
                 }
             }
         }

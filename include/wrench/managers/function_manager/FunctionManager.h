@@ -50,7 +50,7 @@ namespace wrench {
                                                         const std::shared_ptr<StorageService>&)>& lambda,
                                                         const std::shared_ptr<FileLocation>& image);
 
-        std::shared_ptr<RegisteredFunction> registerFunction(std::shared_ptr<Function> function,
+        std::shared_ptr<RegisteredFunction> registerFunction(const std::shared_ptr<Function>& function,
                               const std::shared_ptr<ServerlessComputeService>& compute_service,
                               double time_limit_in_seconds,
                               sg_size_t disk_space_limit_in_bytes,
@@ -62,8 +62,8 @@ namespace wrench {
                                                     const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
                                                     const std::shared_ptr<FunctionInput>& function_invocation_args);
 
-        bool isDone(std::shared_ptr<Invocation> invocation);
-        void wait_one(std::shared_ptr<Invocation> invocation);
+        bool isDone(const std::shared_ptr<Invocation>& invocation);
+        void wait_one(const std::shared_ptr<Invocation>& invocation);
         void wait_all(const std::vector<std::shared_ptr<Invocation>>& invocations);
         /***********************/
         /** \cond INTERNAL    */

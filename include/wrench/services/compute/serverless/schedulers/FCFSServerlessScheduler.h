@@ -8,6 +8,10 @@
 #include <wrench/services/compute/serverless/ServerlessScheduler.h>
 
 namespace wrench {
+    /**
+     * @brief A class that implements a First Come First Serve (FCFS) scheduler to use in a
+     *        serverless compute service.
+     */
     class FCFSServerlessScheduler : public ServerlessScheduler {
     public:
         FCFSServerlessScheduler() = default;
