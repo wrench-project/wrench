@@ -424,7 +424,7 @@ namespace wrench {
         // Move all relevant invocations from the admitted to the schedulable queue
         auto& queue = _state_of_the_system->_admitted_invocations[image_file];
         while (not queue.empty()) {
-            _state_of_the_system->_schedulable_invocations.push(std::move(queue.front()));
+            _state_of_the_system->_schedulable_invocations.push_front(std::move(queue.front()));
             queue.pop();
         }
         _state_of_the_system->_admitted_invocations.erase(image_file);
@@ -434,13 +434,19 @@ namespace wrench {
      * @brief Dispatches scheduled function invocations to compute hosts
      */
     void ServerlessComputeService::dispatchInvocations() {
+
         while (!_state_of_the_system->_scheduled_invocations.empty()) {
             auto invocation_to_place = _state_of_the_system->_scheduled_invocations.front();
-            WRENCH_INFO("Invoking function [%s]",
-                        invocation_to_place->_registered_function->_function->getName().c_str());
             _state_of_the_system->_scheduled_invocations.pop();
+            WRENCH_INFO("Trying to run scheduled invocation for function [%s]...",
+                        invocation_to_place->_registered_function->_function->getName().c_str());
 
-            dispatchInvocation(invocation_to_place);
+            if (dispatchInvocation(invocation_to_place)) {
+                _state_of_the_system->_running_invocations.push(invocation_to_place);
+            } else {
+                // Put it back in the schedulable state, and the scheduler will have to deal with it again
+                _state_of_the_system->_schedulable_invocations.push_back(invocation_to_place);
+            }
         }
     }
 
@@ -448,8 +454,9 @@ namespace wrench {
      * @brief Helper method to dispatch an invocation
      *
      * @param invocation invocation to dispatch
+     * @return true on success, false on failure
      */
-    void ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation) {
+    bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation) {
         auto target_host = _state_of_the_system->_scheduling_decisions[invocation];
 
         auto ss = startInvocationStorageService(invocation);
@@ -506,8 +513,8 @@ namespace wrench {
         invocation->_start_date = Simulation::getCurrentSimulatedDate();
         action_executor->start(action_executor, true, false);
 
-        _state_of_the_system->_running_invocations.push(invocation);
         // WRENCH_INFO("Function [%s] invoked", invocation->_registered_function->_function->getName().c_str());
+        return true;
     }
 
     /**
@@ -636,7 +643,7 @@ namespace wrench {
             // If the image file is already downloaded, make the invocation schedulable immediately
             if (_state_of_the_system->_head_storage_service->hasFile(image->getFile())) {
                 _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_schedulable_invocations.push(invocation);
+                _state_of_the_system->_schedulable_invocations.push_front(invocation);
                 continue;
             }
 
@@ -721,7 +728,7 @@ namespace wrench {
         while (!_state_of_the_system->_schedulable_invocations.empty()) {
             auto invocation = _state_of_the_system->_schedulable_invocations.front();
             schedulable_invocations_vector.push_back(invocation);
-            _state_of_the_system->_schedulable_invocations.pop();
+            _state_of_the_system->_schedulable_invocations.pop_back();
         }
 
         // Invoke the scheduler so that it manages images
@@ -755,7 +762,7 @@ namespace wrench {
         // Reinsert unscheduled invocations back into the schedulable queue.
         for (const auto& invocation : schedulable_invocations_vector) {
             if (scheduled_set.find(invocation) == scheduled_set.end()) {
-                _state_of_the_system->_schedulable_invocations.push(invocation);
+                _state_of_the_system->_schedulable_invocations.push_front(invocation);
             }
         }
     }
