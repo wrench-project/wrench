@@ -66,6 +66,9 @@ namespace wrench {
 
     private:
 
+        std::shared_ptr<ServerlessScheduler> _scheduler;
+        std::shared_ptr<ServerlessStateOfTheSystem> _state_of_the_system;
+
         int main() override;
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
@@ -97,8 +100,7 @@ namespace wrench {
         bool processNextMessage();
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
-        std::shared_ptr<ServerlessScheduler> _scheduler;
-        std::shared_ptr<ServerlessStateOfTheSystem> _state_of_the_system;
+
 
         void startHeadStorageService();
         void startComputeHostsServices();
@@ -109,10 +111,14 @@ namespace wrench {
         void initiateImageLoadAtComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
 
         void dispatchInvocation(const std::shared_ptr<Invocation>& invocation);
-        
+
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
-            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size}
+            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
         };
 
     };

@@ -58,7 +58,7 @@ namespace wrench {
         this->action_execution_service = action_execution_service;
         this->num_cores = num_cores;
         this->ram_footprint = ram_footprint;
-        this->thread_creation_overhead = thread_creation_overhead;
+        this->action_startup_overhead = thread_creation_overhead;
         this->simulation_compute_as_sleep = simulate_computation_as_sleep;
 
         this->killed_on_purpose = false;
@@ -73,7 +73,7 @@ namespace wrench {
      * @return an overhead (in seconds)
      */
     double ActionExecutor::getThreadCreationOverhead() const {
-        return this->thread_creation_overhead;
+        return this->action_startup_overhead;
     }
 
     /**
@@ -151,7 +151,7 @@ namespace wrench {
             this->hostname,
             this->num_cores,
             this->ram_footprint,
-            this->thread_creation_overhead,
+            this->action_startup_overhead,
             this->simulation_compute_as_sleep,
             this->callback_commport,
             this->custom_callback_message,
@@ -186,6 +186,7 @@ namespace wrench {
      */
     int ActionExecutor::main() {
         S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
+        S4U_Simulation::sleep(this->action_startup_overhead); // add the overhead
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         // WRENCH_INFO("New Action Executor started to do action %s", this->action->getName().c_str());

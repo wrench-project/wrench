@@ -99,7 +99,57 @@ namespace wrench {
      * @return a dictionary
      */
     std::map<std::string, double> ServerlessComputeService::constructResourceInformation(const std::string& key) {
-        throw std::runtime_error("ServerlessComputeService::constructResourceInformation: not implemented");
+         // Build a dictionary
+        std::map<std::string, double> information;
+
+        if (key == "num_hosts") {
+            // Num hosts
+            std::map<std::string, double> num_hosts;
+            num_hosts.insert(std::make_pair(this->getName(), this->_state_of_the_system->_compute_hosts.size()));
+            return num_hosts;
+
+        } else if (key == "num_cores") {
+            // Num cores per hosts
+            std::map<std::string, double> num_cores;
+            for (auto const &h: this->_state_of_the_system->_compute_hosts) {
+                num_cores[h] =  static_cast<double>(S4U_Simulation::getHostNumCores(h));
+            }
+            return num_cores;
+
+        } else if (key == "num_idle_cores") {
+            // Num idle cores per hosts
+            std::map<std::string, double> num_idle_cores;
+            for (const auto & [hostname, cores]: this->_state_of_the_system->_available_cores) {
+                num_idle_cores[hostname] = static_cast<double>(cores);
+            }
+            return num_idle_cores;
+
+        } else if (key == "flop_rates") {
+            // Flop rate per host
+            std::map<std::string, double> flop_rates;
+            for (const auto& h: this->_state_of_the_system->_compute_hosts) {
+                flop_rates[h] = S4U_Simulation::getHostFlopRate(h);
+            }
+            return flop_rates;
+
+        } else if (key == "ram_capacities") {
+            // RAM capacity per host
+            std::map<std::string, double> ram_capacities;
+            for (const auto& h: this->_state_of_the_system->_compute_hosts) {
+                ram_capacities[h] = static_cast<double>(S4U_Simulation::getHostMemoryCapacity(h));
+            }
+            return ram_capacities;
+
+        } else if (key == "ram_availabilities") {
+            // RAM availability per host
+            std::map<std::string, double> ram_availability;
+            for (auto const &h: this->_state_of_the_system->_compute_hosts) {
+                ram_availability[h] = static_cast<double>(this->_state_of_the_system->_compute_memories[h]->getTotalFreeSpaceZeroTime());
+            }
+            return ram_availability;
+        } else {
+            throw std::runtime_error("ServerlessComputeService::getResourceInformation(): unknown key");
+        }
     }
 
     /**
@@ -156,7 +206,8 @@ namespace wrench {
         this->commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
                                                                          registered_function, input,
-                                                                         notify_commport, 0));
+                                                                         notify_commport, this->getMessagePayloadValue(
+                                                                             ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Block here for return, if non-blocking then function manager has to check up on it? or send a message
         const auto msg = answer_commport->getMessage<ServerlessComputeServiceFunctionInvocationAnswerMessage>(
@@ -253,9 +304,11 @@ namespace wrench {
                         (failure_cause ? "FAILURE" : "SUCCESS"));
 
             scsiec_msg->_invocation->_notify_commport->dputMessage(
-                new ServerlessComputeServiceFunctionInvocationCompleteMessage(success,
-                                                                              scsiec_msg->_invocation,
-                                                                              failure_cause, 0));
+                new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                    success,
+                    scsiec_msg->_invocation,
+                    failure_cause, this->getMessagePayloadValue(
+                        ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
             return true;
         }
         else if (const auto scsncc_msg = std::dynamic_pointer_cast<
@@ -310,7 +363,8 @@ namespace wrench {
         _state_of_the_system->_registered_functions.insert(registered_function);
 
         const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-            true, registered_function, nullptr, 0);
+            true, registered_function, nullptr, this->getMessagePayloadValue(
+                ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
         answer_commport->dputMessage(answerMessage);
     }
 
@@ -331,7 +385,8 @@ namespace wrench {
             _state_of_the_system->_registered_functions.end()) {
             // Not found
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                false, nullptr, std::make_shared<FunctionNotFound>(registered_function), 0);
+                false, nullptr, std::make_shared<FunctionNotFound>(registered_function), this->getMessagePayloadValue(
+                    ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answerMessage);
         }
         else {
