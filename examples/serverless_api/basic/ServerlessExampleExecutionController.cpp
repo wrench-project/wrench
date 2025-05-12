@@ -153,7 +153,14 @@ namespace wrench {
             if (not succeeded) {
                 WRENCH_INFO("       (%s)", invocation->getFailureCause()->toString().c_str());
             }
+            if (succeeded) {
+                num_succeeded++;
+            } else {
+                num_failed++;
+            }
         }
+        std::cerr << num_succeeded << " invocations have succeeded\n";
+        std::cerr << num_failed << " invocations have failed\n";
 
         return 0;
     }
