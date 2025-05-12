@@ -65,10 +65,6 @@ namespace wrench {
     std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>>
     ServerlessStateOfTheSystem::getAdmittedInvocations() { return _admitted_invocations; }
 
-    std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getSchedulableInvocations() {
-        return _schedulable_invocations;
-    }
-
     std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getScheduledInvocations() {
         return _scheduled_invocations;
     }
