@@ -32,9 +32,17 @@ namespace wrench {
 
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+            {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}
         };
-        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list_;
+
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
+            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+            {ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
+        };
 
     public:
 
@@ -113,13 +121,7 @@ namespace wrench {
         void dispatchInvocation(const std::shared_ptr<Invocation>& invocation);
 
 
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
-            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-            {ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-            {ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_REQUEST_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-            {ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-            {ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD, S4U_CommPort::default_control_message_size},
-        };
+
 
     };
 
