@@ -65,7 +65,7 @@ namespace wrench {
         bool killed_on_purpose;
 
         bool simulation_compute_as_sleep;
-        double thread_creation_overhead;
+        double action_startup_overhead;
         double action_timeout = 0;
 
         unsigned long num_cores;
