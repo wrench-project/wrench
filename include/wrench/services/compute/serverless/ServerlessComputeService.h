@@ -112,6 +112,8 @@ namespace wrench {
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action,
                                             const std::shared_ptr<DataFile>& image_file);
 
+        void processInvocationCompletion(const std::shared_ptr<Invocation> &invocation, const std::shared_ptr<Action>& action);
+
         void admitInvocations();
         std::shared_ptr<SchedulingDecisions> invokeScheduler() const;
         void initiateImageCopiesAndLoads(const std::shared_ptr<SchedulingDecisions>& decisions);

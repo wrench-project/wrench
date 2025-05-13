@@ -33,8 +33,8 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
 
-    void do_ImageReuse_test();
-    void do_RAMPressureDueToImages_test();
+    void do_ImageReuse_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_RAMPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
     ~ServerlessTimingTest() override {
@@ -191,10 +191,17 @@ private:
 };
 
 TEST_F(ServerlessTimingTest, ImageReuse) {
-    DO_TEST_WITH_FORK(do_ImageReuse_test);
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(),
+        std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_ImageReuse_test, scheduler);
+    }
 }
 
-void ServerlessTimingTest::do_ImageReuse_test() {
+void ServerlessTimingTest::do_ImageReuse_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
@@ -210,7 +217,7 @@ void ServerlessTimingTest::do_ImageReuse_test() {
 
     std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::FCFSServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -320,10 +327,18 @@ private:
 };
 
 TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
-    DO_TEST_WITH_FORK(do_RAMPressureDueToImages_test);
+
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(),
+        std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_RAMPressureDueToImages_test, scheduler);
+    }
 }
 
-void ServerlessTimingTest::do_RAMPressureDueToImages_test() {
+void ServerlessTimingTest::do_RAMPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
@@ -339,7 +354,7 @@ void ServerlessTimingTest::do_RAMPressureDueToImages_test() {
 
     std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::FCFSServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
