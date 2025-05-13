@@ -89,6 +89,9 @@ namespace wrench {
 
         int main() override;
 
+        void check_homogeneity(const std::vector<std::string>& compute_hosts);
+
+
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                const std::map<std::string, std::string>& service_specific_args)
         override;
@@ -116,8 +119,9 @@ namespace wrench {
 
         void admitInvocations();
         std::shared_ptr<SchedulingDecisions> invokeScheduler() const;
-        void initiateImageCopiesAndLoads(const std::shared_ptr<SchedulingDecisions>& decisions);
         void dispatchInvocations(const std::shared_ptr<SchedulingDecisions>& decisions);
+        void initiateImageLoads(const std::shared_ptr<SchedulingDecisions>& decisions);
+        void initiateImageCopies(const std::shared_ptr<SchedulingDecisions>& decisions);
 
         bool processNextMessage(bool& do_scheduling);
 
@@ -137,6 +141,12 @@ namespace wrench {
         bool invocationCanBeStarted(const std::shared_ptr<Invocation>& invocation, const std::string& hostname) const;
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation, const std::string& target_host);
+
+        unsigned long num_cores_of_compute_host;
+        double speed_of_compute_core;
+        sg_size_t ram_of_compute_host;
+        sg_size_t disk_space_of_compute_host;
+
     };
 };
 
