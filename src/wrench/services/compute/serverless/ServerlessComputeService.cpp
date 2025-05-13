@@ -300,6 +300,9 @@ namespace wrench {
             invocation->_finish_date = Simulation::getCurrentSimulatedDate();
             const auto host = _state_of_the_system->_scheduling_decisions[invocation];
             _state_of_the_system->_scheduling_decisions.erase(invocation);
+            invocation->_opened_image_ram_file->close();
+            invocation->_opened_tmp_ram_file->close();
+            StorageService::removeFileAtLocation(invocation->_tmp_ram_file_location);
             _state_of_the_system->_available_cores[host]++;
 
             bool success = scsiec_msg->_action->getState() == Action::State::COMPLETED;
@@ -468,17 +471,17 @@ namespace wrench {
 
         // The image is in RAM
         if (not ss_memory->hasFile(invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile())) {
-            WRENCH_INFO("Invocation cannot be started because image is not loaded");
+            WRENCH_INFO("Scheduled invocation cannot be started because image is not loaded");
             return false;
         }
         // There is an available core
         if (_state_of_the_system->_available_cores[hostname] < 1) {
-            WRENCH_INFO("Invocation cannot be started because there is no available core");
+            WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
             return false;
         }
         // There is available RAM space for the function itself
         if (ss_memory->getTotalFreeSpaceZeroTime() < invocation->getRegisteredFunction()->getRAMLimit()) {
-            WRENCH_INFO("Invocation cannot be started because there is not enough available RAM");
+            WRENCH_INFO("Scheduled invocation cannot be started because there is not enough available RAM");
             return false;
         }
         return true;
@@ -499,6 +502,7 @@ namespace wrench {
             return false;
         }
 
+        // Start the invocation's own private storage service
         auto ss = startInvocationStorageService(invocation);
 
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
@@ -523,6 +527,7 @@ namespace wrench {
             // WRENCH_INFO("Done with the lambda execute!!");
         };
 
+
         // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
@@ -545,11 +550,26 @@ namespace wrench {
             nullptr);
 
         action_executor->setActionTimeout(invocation->getRegisteredFunction()->getTimeLimit());
-
-        // TODO: TODO: XXXX DEAL WITH MEMORY XXXX
-
         action_executor->setSimulation(this->simulation_);
-        // WRENCH_INFO("Starting an action executor for dispatching invocation...");
+
+        // Open the image memory file
+        auto compute_ss = _state_of_the_system->_compute_storages[target_host];
+        invocation->_opened_image_ram_file = compute_ss->openFile(
+            FileLocation::LOCATION(compute_ss, invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
+
+        // Create a tmp memory file in RAM and open it
+        auto tmp_memory_file = Simulation::addFile(
+            "tmp_ram_file_" + std::to_string(reinterpret_cast<unsigned long>(invocation.get())),
+            invocation->getRegisteredFunction()->getRAMLimit());
+        auto compute_ram_ss = _state_of_the_system->_compute_memories[target_host];
+        invocation->_tmp_ram_file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
+        StorageService::createFileAtLocation(invocation->_tmp_ram_file_location);
+        invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
+
+
+        WRENCH_INFO("Starting an action executor for dispatching invocation...");
+        // Reserve a core  TODO: Was it done elsewhere???
+        _state_of_the_system->_available_cores[target_host] -= 1;
         invocation->_start_date = Simulation::getCurrentSimulatedDate();
         action_executor->start(action_executor, true, false);
 
@@ -570,11 +590,11 @@ namespace wrench {
 
             // Start a compute service, with LRU caching, to implement compute-node storage
             {
-                const auto ss = this->simulation_->startNewService(SimpleStorageService::createSimpleStorageService(
+                const auto ss = std::dynamic_pointer_cast<SimpleStorageService>(this->simulation_->startNewService(SimpleStorageService::createSimpleStorageService(
                     hostname,
                     {"/"},
                     {{SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}},
-                    {}));
+                    {})));
                 ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
                 _state_of_the_system->_compute_storages[hostname] = ss;
             }
@@ -591,11 +611,11 @@ namespace wrench {
                 ram_disk->set_property("size", std::to_string(ram_capacity) + "B");
                 ram_disk->set_property("mount", ram_mount_point);
 
-                const auto ss = this->simulation_->startNewService(SimpleStorageService::createSimpleStorageService(
+                const auto ss = std::dynamic_pointer_cast<SimpleStorageService>(this->simulation_->startNewService(SimpleStorageService::createSimpleStorageService(
                     hostname,
                     {ram_mount_point},
                     {{SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}},
-                    {}));
+                    {})));
                 ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
                 _state_of_the_system->_compute_memories[hostname] = ss;
             }
