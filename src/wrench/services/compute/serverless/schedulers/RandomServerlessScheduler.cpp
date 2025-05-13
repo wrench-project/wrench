@@ -53,7 +53,7 @@ namespace wrench {
 
         // For each invocation, randomly assign it to a compute node that has an available core
         for (const auto& inv : schedulable_invocations) {
-            auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
+            auto imageFile = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
             // std::string imageID = imageFile->getID();
 
             // Build list of nodes with available cores
@@ -116,7 +116,7 @@ namespace wrench {
 
         // For each invocation, build a list of candidate nodes and pick one at random
         for (const auto& inv : schedulable_invocations) {
-            auto imageFile = inv->getRegisteredFunction()->getFunctionImage()->getFile();
+            auto imageFile = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
             std::vector<std::string> candidates;
             for (const auto& [hostname, num_available_cores

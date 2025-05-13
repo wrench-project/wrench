@@ -162,7 +162,7 @@ private:
         if (registered_function2->getFunction() != function2) {
             throw std::runtime_error("Registered function should be function2");
         }
-        if (registered_function2->getFunctionImage() != image_location) {
+        if (registered_function2->getOriginalImageLocation() != image_location) {
             throw std::runtime_error("Registered function image should be image location");
         }
         if (registered_function2->getTimeLimit() != 10.0) {
@@ -260,7 +260,7 @@ private:
             if (invocation->getRegisteredFunction()->getTimeLimit() != 10.00) {
                 throw std::runtime_error("Invocation's associated time limit should be 10.0");
             }
-            if (invocation->getRegisteredFunction()->getFunctionImage() != image_location) {
+            if (invocation->getRegisteredFunction()->getOriginalImageLocation() != image_location) {
                 throw std::runtime_error("Invocation's associated image should be the image location");
             }
 
