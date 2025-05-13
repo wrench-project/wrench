@@ -35,6 +35,7 @@ public:
 
     void do_ImageReuse_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_RAMPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_RAMPressureDueToInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
     ~ServerlessTimingTest() override {
@@ -307,17 +308,17 @@ private:
             throw std::runtime_error("Unexpected invocation_1 start date " +
                 std::to_string(invocation_1->getStartDate()) + " instead of " + std::to_string(expected_invocation_1_start));
         }
-        if (fabs(expected_invocation_1_end - invocation_1->getFinishDate()) > EPSILON) {
+        if (fabs(expected_invocation_1_end - invocation_1->getEndDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_1 end date " +
-                std::to_string(invocation_1->getFinishDate()) + " instead of " + std::to_string(expected_invocation_1_end));
+                std::to_string(invocation_1->getEndDate()) + " instead of " + std::to_string(expected_invocation_1_end));
         }
         if (fabs(expected_invocation_2_start - invocation_2->getStartDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_2 start date " +
                 std::to_string(invocation_2->getStartDate()) + " instead of " + std::to_string(expected_invocation_2_start));
         }
-        if (fabs(expected_invocation_2_end - invocation_2->getFinishDate()) > EPSILON) {
+        if (fabs(expected_invocation_2_end - invocation_2->getEndDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_2 end date " +
-                std::to_string(invocation_2->getFinishDate()) + " instead of " + std::to_string(expected_invocation_2_end));
+                std::to_string(invocation_2->getEndDate()) + " instead of " + std::to_string(expected_invocation_2_end));
         }
 
          
@@ -359,6 +360,125 @@ void ServerlessTimingTest::do_RAMPressureDueToImages_test(const std::shared_ptr<
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessRAMPressureDueToImagesController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  RAM PRESSURE DUE TO INVOCATIONS TEST                            **/
+/**********************************************************************/
+
+class ServerlessRAMPressureDueToInvocationsController : public wrench::ExecutionController {
+public:
+    ServerlessRAMPressureDueToInvocationsController(ServerlessTimingTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(50);
+            return std::make_shared<MyFunctionOutput>("Processed!");
+        };
+
+        // Register that function with an image file
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        // Pick the RAM limit so that only 4 invocations can run at a time
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100, 2000 * MB, 1 * GB, 10 * MB, 1 * MB);
+
+        // Place 10 invocations, knowing that only 4 can run at a time
+        std::vector<std::shared_ptr<wrench::Invocation>> invocations;
+        unsigned long num_invocations = 10;
+        invocations.reserve(num_invocations);
+        for (int i=0; i < num_invocations; i++) {
+            auto invocation = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+            invocations.push_back(invocation);
+            wrench::Simulation::sleep(0.1);
+        }
+
+        // Wait for all of them to complete
+        function_manager->wait_all(invocations);
+
+        // for (int i=0; i < num_invocations; i++) {
+        //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
+        // }
+        for (int i=0; i < num_invocations; i+= 4) {
+            double start_date = invocations.at(i)->getStartDate();
+            double end_date = invocations.at(i)->getEndDate();
+            for (int j=i+1; j < std::min<unsigned long>(i+4, num_invocations) ; j++) {
+                if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
+                    throw std::runtime_error("Unexpected execution pattern");
+                }
+                if (fabs(end_date - invocations.at(j)->getEndDate()) > 0.1) {
+                    throw std::runtime_error("Unexpected execution pattern");
+                }
+
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, RAMPressureDueToInvocations) {
+
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_RAMPressureDueToInvocations_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_RAMPressureDueToInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessRAMPressureDueToInvocationsController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 

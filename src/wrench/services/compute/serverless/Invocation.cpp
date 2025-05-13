@@ -60,11 +60,11 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the invocation's finish date
+    * @brief Get the invocation's end date
     * @return A simulated date (or -1.0 if not submitted)
     */
-    double Invocation::getFinishDate() const {
-        return _finish_date;
+    double Invocation::getEndDate() const {
+        return _end_date;
     }
 
     /**

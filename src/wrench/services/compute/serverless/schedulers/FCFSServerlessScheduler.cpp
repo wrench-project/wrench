@@ -92,6 +92,7 @@ namespace wrench {
         auto available_cores = state->getAvailableCores();
 
         for (const auto& inv : schedulable_invocations) {
+
             // Get the image for this invocation
             auto image_file = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 

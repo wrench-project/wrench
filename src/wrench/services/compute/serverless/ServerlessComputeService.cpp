@@ -387,6 +387,7 @@ namespace wrench {
                                                                     & registered_function,
                                                                     const std::shared_ptr<FunctionInput>& input,
                                                                     S4U_CommPort* notify_commport) {
+
         if (_state_of_the_system->_registered_functions.find(registered_function) ==
             _state_of_the_system->_registered_functions.end()) {
             // Not found
@@ -426,7 +427,7 @@ namespace wrench {
         auto& queue = _state_of_the_system->_admitted_invocations[image_file];
         while (not queue.empty()) {
             _state_of_the_system->_schedulable_invocations.emplace(
-                _state_of_the_system->_schedulable_invocations.begin(), std::move(queue.front()));
+                _state_of_the_system->_schedulable_invocations.end(), std::move(queue.front()));
             queue.pop();
         }
         _state_of_the_system->_admitted_invocations.erase(image_file);
@@ -440,7 +441,7 @@ namespace wrench {
     void ServerlessComputeService::processInvocationCompletion(const std::shared_ptr<Invocation>& invocation,
                                                                const std::shared_ptr<Action>& action) {
         std::shared_ptr<FailureCause> failure_cause = action->getFailureCause();
-        invocation->_finish_date = Simulation::getCurrentSimulatedDate();
+        invocation->_end_date = Simulation::getCurrentSimulatedDate();
         WRENCH_INFO("A function invocation for function %s has finished [%s]",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
                     (failure_cause ? "FAILURE" : "SUCCESS"));
@@ -469,7 +470,7 @@ namespace wrench {
      * @return true if at least one invocation was dispatched
      */
     void ServerlessComputeService::dispatchInvocations(const std::shared_ptr<SchedulingDecisions>& decisions) {
-        // Dispatched the invocations
+        // Dispatched the invocations in the order of the schedulable list
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
         for (const auto& [hostname, invocations_to_place] : decisions->invocations_to_start_at_compute_node) {
             for (const auto& invocation : invocations_to_place) {
@@ -602,7 +603,8 @@ namespace wrench {
         invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
 
 
-        WRENCH_INFO("Dispatched invocation for function %s",
+        WRENCH_INFO("Dispatched invocation %p for function %s",
+            invocation.get(),
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
         // Reserve a core  TODO: Was it done elsewhere???
         _state_of_the_system->_available_cores[target_host] -= 1;
