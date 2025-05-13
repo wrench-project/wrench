@@ -103,9 +103,9 @@ namespace wrench {
 
         void admitInvocations();
         void scheduleInvocations();
-        void dispatchInvocations();
+        bool dispatchInvocations();
 
-        bool processNextMessage();
+        bool processNextMessage(bool& do_scheduling);
 
         std::map<std::string, double> constructResourceInformation(const std::string &key) override;
 

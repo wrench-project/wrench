@@ -11,6 +11,8 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
+#include <utility>
+
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
@@ -20,6 +22,7 @@
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
+#define GB (1000000000ULL)
 
 WRENCH_LOG_CATEGORY(serverless_timing_tests,
                     "Log category for ServerlessTimingTests tests");
@@ -29,7 +32,8 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
 
-    void do_FunctionInvocationTest_test();
+    void do_ImageReuse_test();
+    void do_RAMPressureDueToImages_test();
 
 protected:
     ~ServerlessTimingTest() override {
@@ -102,19 +106,19 @@ public:
 
 class MyFunctionOutput : public wrench::FunctionOutput {
 public:
-    MyFunctionOutput(const std::string& msg) : msg_(msg) {
+    explicit MyFunctionOutput(std::string  msg) : msg_(std::move(msg)) {
     }
 
     std::string msg_;
 };
 
 /**********************************************************************/
-/**  FUNCTION INVOCATION TEST                                       **/
+/**  IMAGE REUSE TEST                                                **/
 /**********************************************************************/
 
-class ServerlessTimingTestFunctionInvocationController : public wrench::ExecutionController {
+class ServerlessImageReuseController : public wrench::ExecutionController {
 public:
-    ServerlessTimingTestFunctionInvocationController(ServerlessTimingTest* test,
+    ServerlessImageReuseController(ServerlessTimingTest* test,
                                                     const std::string& hostname,
                                                     const std::shared_ptr<wrench::ServerlessComputeService>
                                                     & compute_service,
@@ -185,11 +189,11 @@ private:
     }
 };
 
-TEST_F(ServerlessTimingTest, FunctionInvocation) {
-    DO_TEST_WITH_FORK(do_FunctionInvocationTest_test);
+TEST_F(ServerlessTimingTest, ImageReuse) {
+    DO_TEST_WITH_FORK(do_ImageReuse_test);
 }
 
-void ServerlessTimingTest::do_FunctionInvocationTest_test() {
+void ServerlessTimingTest::do_ImageReuse_test() {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
@@ -209,7 +213,107 @@ void ServerlessTimingTest::do_FunctionInvocationTest_test() {
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessTimingTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+        new ServerlessImageReuseController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  RAM PRESSURE DUE TO IMAGES TEST                                 **/
+/**********************************************************************/
+
+class ServerlessRAMPressureDueToImagesController : public wrench::ExecutionController {
+public:
+    ServerlessRAMPressureDueToImagesController(ServerlessTimingTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(50);
+            return std::make_shared<MyFunctionOutput>("Processed!");
+        };
+
+        // Register that function with an image file that will fill up RAM
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100, 2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation
+        auto invocation_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+
+        // Register another function with an image file that will not fit int RAM
+        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 60 * GB);
+        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
+        wrench::StorageService::createFileAtLocation(image_location_2);
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
+        auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100, 2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+
+        auto invocation_2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+
+        function_manager->wait_one(invocation_1);
+        function_manager->wait_one(invocation_2);
+
+        std::cerr << "INVOCATION #1: " << invocation_1->getStartDate() << "\n";
+        std::cerr << "INVOCATION #1: " << invocation_1->getFinishDate() << "\n";
+        std::cerr << "INVOCATION #2: " << invocation_2->getStartDate() << "\n";
+        std::cerr << "INVOCATION #2: " << invocation_2->getFinishDate() << "\n";
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
+    DO_TEST_WITH_FORK(do_RAMPressureDueToImages_test);
+}
+
+void ServerlessTimingTest::do_RAMPressureDueToImages_test() {
+    int argc = 2;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::FCFSServerlessScheduler>(), {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessRAMPressureDueToImagesController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 

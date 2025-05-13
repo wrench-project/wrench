@@ -43,7 +43,6 @@ namespace wrench {
 
         // Copy available cores so we can simulate assignment
         auto availableCores = state->getAvailableCores();
-        auto available_ram = state->getAvailableRAM();
 
 
         // Mapping: compute node -> set of required image IDs
@@ -93,10 +92,8 @@ namespace wrench {
                 }
                 else if (state->isImageOnNode(node, df) &&
                     !state->isImageBeingLoadedAtNode(node, df) &&
-                    !state->isImageInRAMAtNode(node, df) &&
-                    available_ram[node] >= df->getSize()) {
+                    !state->isImageInRAMAtNode(node, df)) {
                     decisions->images_to_load_into_RAM_at_compute_node[node].push_back(df);
-                    available_ram[node] -= df->getSize();
                 }
             }
         }
