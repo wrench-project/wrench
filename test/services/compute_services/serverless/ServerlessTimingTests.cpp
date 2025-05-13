@@ -23,6 +23,7 @@
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
+#define EPSILON 0.01
 
 WRENCH_LOG_CATEGORY(serverless_timing_tests,
                     "Log category for ServerlessTimingTests tests");
@@ -285,9 +286,9 @@ private:
         double image_load = 1 * 60 * GB / (100 * MB);
         double compute_time = 50;
 
-        std::cerr << "IMAGE DOWNLOAD = " << image_download << std::endl;
-        std::cerr << "IMAGE COPY = " << image_copy << std::endl;
-        std::cerr << "IMAGE LOAD = " << image_load << std::endl;
+        // std::cerr << "IMAGE DOWNLOAD = " << image_download << std::endl;
+        // std::cerr << "IMAGE COPY = " << image_copy << std::endl;
+        // std::cerr << "IMAGE LOAD = " << image_load << std::endl;
 
         double expected_invocation_1_start = image_download + image_copy + image_load;
         double expected_invocation_1_end = expected_invocation_1_start + compute_time;
@@ -295,10 +296,24 @@ private:
         double expected_invocation_2_start = expected_invocation_1_end + image_load;
         double expected_invocation_2_end = expected_invocation_2_start + compute_time;
 
-        std::cerr << "INVOCATION #1: " << invocation_1->getStartDate() << "  EXPECTED=" <<expected_invocation_1_start << "\n";
-        std::cerr << "INVOCATION #1: " << invocation_1->getFinishDate() << "  EXPECTED=" <<expected_invocation_1_end << "\n";
-        std::cerr << "INVOCATION #2: " << invocation_2->getStartDate() << "  EXPECTED=" <<expected_invocation_2_start<< "\n";
-        std::cerr << "INVOCATION #2: " << invocation_2->getFinishDate() << "  EXPECTED=" <<expected_invocation_2_end<< "\n";
+        if (fabs(expected_invocation_1_start - invocation_1->getStartDate()) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation_1 start date " +
+                std::to_string(invocation_1->getStartDate()) + " instead of " + std::to_string(expected_invocation_1_start));
+        }
+        if (fabs(expected_invocation_1_end - invocation_1->getFinishDate()) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation_1 end date " +
+                std::to_string(invocation_1->getFinishDate()) + " instead of " + std::to_string(expected_invocation_1_end));
+        }
+        if (fabs(expected_invocation_2_start - invocation_2->getStartDate()) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation_2 start date " +
+                std::to_string(invocation_2->getStartDate()) + " instead of " + std::to_string(expected_invocation_2_start));
+        }
+        if (fabs(expected_invocation_2_end - invocation_2->getFinishDate()) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation_2 end date " +
+                std::to_string(invocation_2->getFinishDate()) + " instead of " + std::to_string(expected_invocation_2_end));
+        }
+
+         
 
         return 0;
     }
@@ -309,10 +324,10 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
 }
 
 void ServerlessTimingTest::do_RAMPressureDueToImages_test() {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
