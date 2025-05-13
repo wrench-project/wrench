@@ -137,6 +137,7 @@ namespace wrench {
     }
 
     bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
-        return _compute_memories[node]->hasFile(image);
+        std::cerr << "STATE OF THE SYSTEM: IS " << image->getID() << " IN RAM AT " << node << "?: " << _compute_memories[node]->hasFile(image, "/ram_disk") << "\n";
+        return _compute_memories[node]->hasFile(image, "/ram_disk");
     }
 }; // namespace wrench
