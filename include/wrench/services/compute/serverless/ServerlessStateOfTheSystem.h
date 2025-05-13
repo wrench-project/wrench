@@ -96,8 +96,8 @@ namespace wrench
 
         std::string _head_storage_service_mount_point;
         // std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
-        std::unordered_map<std::string, std::shared_ptr<StorageService>> _compute_storages;
-        std::unordered_map<std::string, std::shared_ptr<StorageService>> _compute_memories;
+        std::unordered_map<std::string, std::shared_ptr<SimpleStorageService>> _compute_storages;
+        std::unordered_map<std::string, std::shared_ptr<SimpleStorageService>> _compute_memories;
         std::shared_ptr<StorageService> _head_storage_service;
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
         // std::set<std::shared_ptr<DataFile>> _downloaded_image_files;
