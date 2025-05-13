@@ -48,7 +48,7 @@ namespace wrench {
 
         // For each invocation, assign it to the first compute node with an available core
         for (const auto& invocation : schedulable_invocations) {
-            auto image_file = invocation->getRegisteredFunction()->getFunctionImage()->getFile();
+            auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
             for (const auto& [hostname, num_available_cores] : available_cores) {
                 if (num_available_cores > 0) {
@@ -96,7 +96,7 @@ namespace wrench {
 
         for (const auto& inv : schedulable_invocations) {
             // Get the image for this invocation
-            auto image_file = inv->getRegisteredFunction()->getFunctionImage()->getFile();
+            auto image_file = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
             for (const auto& [hostname, num_available_cores] : available_cores) {
                 // Checking if the node has available cores and if the image is on the node

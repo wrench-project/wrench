@@ -36,8 +36,7 @@ namespace wrench {
                                                        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
                                                        messagepayload_list) :
         ComputeService(hostname,
-                       "ServerlessComputeService", "")
-    {
+                       "ServerlessComputeService", "") {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
@@ -102,7 +101,7 @@ namespace wrench {
      * @return a dictionary
      */
     std::map<std::string, double> ServerlessComputeService::constructResourceInformation(const std::string& key) {
-         // Build a dictionary
+        // Build a dictionary
         std::map<std::string, double> information;
 
         if (key == "num_hosts") {
@@ -110,47 +109,49 @@ namespace wrench {
             std::map<std::string, double> num_hosts;
             num_hosts.insert(std::make_pair(this->getName(), this->_state_of_the_system->_compute_hosts.size()));
             return num_hosts;
-
-        } else if (key == "num_cores") {
+        }
+        else if (key == "num_cores") {
             // Num cores per hosts
             std::map<std::string, double> num_cores;
-            for (auto const &h: this->_state_of_the_system->_compute_hosts) {
-                num_cores[h] =  static_cast<double>(S4U_Simulation::getHostNumCores(h));
+            for (auto const& h : this->_state_of_the_system->_compute_hosts) {
+                num_cores[h] = static_cast<double>(S4U_Simulation::getHostNumCores(h));
             }
             return num_cores;
-
-        } else if (key == "num_idle_cores") {
+        }
+        else if (key == "num_idle_cores") {
             // Num idle cores per hosts
             std::map<std::string, double> num_idle_cores;
-            for (const auto & [hostname, cores]: this->_state_of_the_system->_available_cores) {
+            for (const auto& [hostname, cores] : this->_state_of_the_system->_available_cores) {
                 num_idle_cores[hostname] = static_cast<double>(cores);
             }
             return num_idle_cores;
-
-        } else if (key == "flop_rates") {
+        }
+        else if (key == "flop_rates") {
             // Flop rate per host
             std::map<std::string, double> flop_rates;
-            for (const auto& h: this->_state_of_the_system->_compute_hosts) {
+            for (const auto& h : this->_state_of_the_system->_compute_hosts) {
                 flop_rates[h] = S4U_Simulation::getHostFlopRate(h);
             }
             return flop_rates;
-
-        } else if (key == "ram_capacities") {
+        }
+        else if (key == "ram_capacities") {
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
-            for (const auto& h: this->_state_of_the_system->_compute_hosts) {
+            for (const auto& h : this->_state_of_the_system->_compute_hosts) {
                 ram_capacities[h] = static_cast<double>(S4U_Simulation::getHostMemoryCapacity(h));
             }
             return ram_capacities;
-
-        } else if (key == "ram_availabilities") {
+        }
+        else if (key == "ram_availabilities") {
             // RAM availability per host
             std::map<std::string, double> ram_availability;
-            for (auto const &h: this->_state_of_the_system->_compute_hosts) {
-                ram_availability[h] = static_cast<double>(this->_state_of_the_system->_compute_memories[h]->getTotalFreeSpaceZeroTime());
+            for (auto const& h : this->_state_of_the_system->_compute_hosts) {
+                ram_availability[h] = static_cast<double>(this->_state_of_the_system->_compute_memories[h]->
+                    getTotalFreeSpaceZeroTime());
             }
             return ram_availability;
-        } else {
+        }
+        else {
             throw std::runtime_error("ServerlessComputeService::getResourceInformation(): unknown key");
         }
     }
@@ -229,7 +230,6 @@ namespace wrench {
      * @return 0 on termination
      */
     int ServerlessComputeService::main() {
-
         S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
         this->state = Service::UP;
 
@@ -434,7 +434,6 @@ namespace wrench {
      * @brief Dispatches scheduled function invocations to compute hosts
      */
     void ServerlessComputeService::dispatchInvocations() {
-
         while (!_state_of_the_system->_scheduled_invocations.empty()) {
             auto invocation_to_place = _state_of_the_system->_scheduled_invocations.front();
             _state_of_the_system->_scheduled_invocations.pop();
@@ -444,13 +443,47 @@ namespace wrench {
 
             if (dispatchInvocation(invocation_to_place)) {
                 _state_of_the_system->_running_invocations.push(invocation_to_place);
-            } else {
+            }
+            else {
                 // Put it back in the schedulable state, and the scheduler will have to deal with it again
                 _state_of_the_system->_schedulable_invocations.push_back(invocation_to_place);
+                // Erase the previous scheduling decision
                 _state_of_the_system->_scheduling_decisions.erase(invocation_to_place);
             }
         }
     }
+
+    /**
+     * @brief Helper method to ensure that an invocation can be started
+     * @param invocation: the invocation to start
+     * @param hostname: the hostname on which to start it
+     * @return true if the invocation can be started, false otherwise
+     */
+    bool ServerlessComputeService::invocationCanBeStarted(
+        const std::shared_ptr<Invocation>& invocation,
+        const std::string& hostname) const {
+
+        auto ss_memory = _state_of_the_system->_compute_memories[hostname];
+        auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
+
+        // The image is in RAM
+        if (not ss_memory->hasFile(invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile())) {
+            WRENCH_INFO("Invocation cannot be started because image is not loaded");
+            return false;
+        }
+        // There is an available core
+        if (_state_of_the_system->_available_cores[hostname] < 1) {
+            WRENCH_INFO("Invocation cannot be started because there is no available core");
+            return false;
+        }
+        // There is available RAM space for the function itself
+        if (ss_memory->getTotalFreeSpaceZeroTime() < invocation->getRegisteredFunction()->getRAMLimit()) {
+            WRENCH_INFO("Invocation cannot be started because there is not enough available RAM");
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * @brief Helper method to dispatch an invocation
@@ -460,6 +493,11 @@ namespace wrench {
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation) {
         auto target_host = _state_of_the_system->_scheduling_decisions[invocation];
+
+        // Check that things can work, which may not be the case because scheduling and LRU is complicated
+        if (not invocationCanBeStarted(invocation, target_host)) {
+            return false;
+        }
 
         auto ss = startInvocationStorageService(invocation);
 

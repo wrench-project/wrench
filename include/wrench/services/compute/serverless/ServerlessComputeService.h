@@ -118,6 +118,8 @@ namespace wrench {
         void initiateImageCopyToComputeHost(const std::string& compute_host, const std::shared_ptr<DataFile>& image);
         void initiateImageLoadAtComputeHost(const std::string& computeHost, const std::shared_ptr<DataFile>& image);
 
+        bool invocationCanBeStarted(const std::shared_ptr<Invocation>& invocation, const std::string &hostname) const;
+
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation);
 
 
