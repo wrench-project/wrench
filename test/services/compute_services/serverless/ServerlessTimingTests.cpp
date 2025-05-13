@@ -36,6 +36,7 @@ public:
     void do_CorePressure_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_RAMPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_RAMPressureDueToInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_DiskPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
     ~ServerlessTimingTest() override {
@@ -68,7 +69,14 @@ protected:
         <host id="ServerlessComputeNode1" speed="50Gf" core="10">
             <prop id="ram" value="64GB" />
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
-                <prop id="size" value="5000GiB"/>
+                <prop id="size" value="200GB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="ServerlessComputeNodeSmallDisk" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="100GB"/>
                 <prop id="mount" value="/"/>
             </disk>
         </host>
@@ -80,7 +88,9 @@ protected:
         <!-- Network routes -->
         <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="wide_area"/></route>
         <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
+        <route src="UserHost" dst="ServerlessComputeNodeSmallDisk"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
         <route src="ServerlessHeadNode" dst="ServerlessComputeNode1">  <link_ctn id="local_area"/></route>
+        <route src="ServerlessHeadNode" dst="ServerlessComputeNodeSmallDisk">  <link_ctn id="local_area"/></route>
 
     </zone>
 </platform>)";
@@ -108,7 +118,7 @@ public:
 
 class MyFunctionOutput : public wrench::FunctionOutput {
 public:
-    explicit MyFunctionOutput(std::string  msg) : msg_(std::move(msg)) {
+    explicit MyFunctionOutput(std::string msg) : msg_(std::move(msg)) {
     }
 
     std::string msg_;
@@ -121,11 +131,11 @@ public:
 class ServerlessImageReuseController : public wrench::ExecutionController {
 public:
     ServerlessImageReuseController(ServerlessTimingTest* test,
-                                                    const std::string& hostname,
-                                                    const std::shared_ptr<wrench::ServerlessComputeService>
-                                                    & compute_service,
-                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
-        wrench::ExecutionController(hostname, "test") {
+                                   const std::string& hostname,
+                                   const std::shared_ptr<wrench::ServerlessComputeService>
+                                   & compute_service,
+                                   const std::shared_ptr<wrench::StorageService>& storage_service) :
+        ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
         this->storage_service = storage_service;
@@ -140,7 +150,8 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(5);
             return std::make_shared<MyFunctionOutput>("Processed!");
@@ -151,7 +162,8 @@ private:
         wrench::StorageService::createFileAtLocation(image_location);
         auto function = wrench::FunctionManager::createFunction("Function", lambda, image_location);
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB,
+                                                                      8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {
@@ -159,14 +171,16 @@ private:
             auto invocation = function_manager->invokeFunction(registered_function, this->compute_service, input);
             function_manager->wait_one(invocation);
             auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
-            double remote_download = 5.4;  // estimated (bottleneck = wide area)
+            double remote_download = 5.4; // estimated (bottleneck = wide area)
             double copy_to_compute_node = 1; // estimated (bottleneck = disk)
             double local_image_read = 1; // estimated (bottleneck = disk)
             double compute = 5; // estimate (bottleneck = sleep)
-            double expected_elapsed = remote_download + copy_to_compute_node + local_image_read  + compute;
+            double expected_elapsed = remote_download + copy_to_compute_node + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
-                throw std::runtime_error("1) Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
+                throw std::runtime_error(
+                    "1) Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(
+                        expected_elapsed) + ")");
             }
         }
 
@@ -176,14 +190,16 @@ private:
             auto invocation = function_manager->invokeFunction(registered_function, this->compute_service, input);
             function_manager->wait_one(invocation);
             auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
-            double remote_download = 0;  // cached
+            double remote_download = 0; // cached
             double local_copy = 0; // ALREADY ON DISK!
             double local_image_read = 0; // ALREADY IN RAM!
             double compute = 5; // extimate (bottleneck = sleep)
             double expected_elapsed = remote_download + local_copy + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
-                throw std::runtime_error("2) Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
+                throw std::runtime_error(
+                    "2) Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(
+                        expected_elapsed) + ")");
             }
         }
 
@@ -239,10 +255,10 @@ void ServerlessTimingTest::do_ImageReuse_test(const std::shared_ptr<wrench::Serv
 class ServerlessCorePressureController : public wrench::ExecutionController {
 public:
     ServerlessCorePressureController(ServerlessTimingTest* test,
-                                                    const std::string& hostname,
-                                                    const std::shared_ptr<wrench::ServerlessComputeService>
-                                                    & compute_service,
-                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                     const std::string& hostname,
+                                     const std::shared_ptr<wrench::ServerlessComputeService>
+                                     & compute_service,
+                                     const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -259,7 +275,8 @@ private:
 
         // Create a function
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(50);
             return std::make_shared<MyFunctionOutput>("Processed!");
@@ -272,13 +289,14 @@ private:
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
-        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100, 2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place 20 invocations, knowing that only 10 can run at a time
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
         unsigned long num_invocations = 20;
         invocations.reserve(num_invocations);
-        for (int i=0; i < num_invocations; i++) {
+        for (int i = 0; i < num_invocations; i++) {
             auto invocation = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
             invocations.push_back(invocation);
             wrench::Simulation::sleep(0.1);
@@ -290,17 +308,16 @@ private:
         // for (int i=0; i < num_invocations; i++) {
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
-        for (int i=0; i < num_invocations; i+= 10) {
+        for (int i = 0; i < num_invocations; i += 10) {
             double start_date = invocations.at(i)->getStartDate();
             double end_date = invocations.at(i)->getEndDate();
-            for (int j=i+1; j < std::min<unsigned long>(i+10, num_invocations) ; j++) {
+            for (int j = i + 1; j < std::min<unsigned long>(i + 10, num_invocations); j++) {
                 if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
                 if (fabs(end_date - invocations.at(j)->getEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-
             }
         }
 
@@ -309,7 +326,6 @@ private:
 };
 
 TEST_F(ServerlessTimingTest, CorePressure) {
-
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
         // std::make_shared<wrench::RandomServerlessScheduler>(),
@@ -356,10 +372,10 @@ void ServerlessTimingTest::do_CorePressure_test(const std::shared_ptr<wrench::Se
 class ServerlessRAMPressureDueToImagesController : public wrench::ExecutionController {
 public:
     ServerlessRAMPressureDueToImagesController(ServerlessTimingTest* test,
-                                                    const std::string& hostname,
-                                                    const std::shared_ptr<wrench::ServerlessComputeService>
-                                                    & compute_service,
-                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                               const std::string& hostname,
+                                               const std::shared_ptr<wrench::ServerlessComputeService>
+                                               & compute_service,
+                                               const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -376,7 +392,8 @@ private:
 
         // Create a function
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(50);
             return std::make_shared<MyFunctionOutput>("Processed!");
@@ -388,25 +405,27 @@ private:
         wrench::StorageService::createFileAtLocation(image_location_1);
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100, 2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         auto invocation_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
 
-        // Register another function with an image file that will not fit int RAM
+        // Register another function with an image file that will not fit in RAM
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 60 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
         auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100, 2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+        auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
+                                                                        2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         auto invocation_2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
 
         function_manager->wait_one(invocation_1);
         function_manager->wait_one(invocation_2);
 
-        double image_download =  6494.84;
+        double image_download = 6494.84;
         double image_copy = 2 * 60 * GB / (100 * MB);
         double image_load = 1 * 60 * GB / (100 * MB);
         double compute_time = 50;
@@ -423,29 +442,31 @@ private:
 
         if (fabs(expected_invocation_1_start - invocation_1->getStartDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_1 start date " +
-                std::to_string(invocation_1->getStartDate()) + " instead of " + std::to_string(expected_invocation_1_start));
+                std::to_string(invocation_1->getStartDate()) + " instead of " + std::to_string(
+                    expected_invocation_1_start));
         }
         if (fabs(expected_invocation_1_end - invocation_1->getEndDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_1 end date " +
-                std::to_string(invocation_1->getEndDate()) + " instead of " + std::to_string(expected_invocation_1_end));
+                std::to_string(invocation_1->getEndDate()) + " instead of " + std::to_string(
+                    expected_invocation_1_end));
         }
         if (fabs(expected_invocation_2_start - invocation_2->getStartDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_2 start date " +
-                std::to_string(invocation_2->getStartDate()) + " instead of " + std::to_string(expected_invocation_2_start));
+                std::to_string(invocation_2->getStartDate()) + " instead of " + std::to_string(
+                    expected_invocation_2_start));
         }
         if (fabs(expected_invocation_2_end - invocation_2->getEndDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_2 end date " +
-                std::to_string(invocation_2->getEndDate()) + " instead of " + std::to_string(expected_invocation_2_end));
+                std::to_string(invocation_2->getEndDate()) + " instead of " + std::to_string(
+                    expected_invocation_2_end));
         }
 
-         
 
         return 0;
     }
 };
 
 TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
-
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
         std::make_shared<wrench::RandomServerlessScheduler>(),
@@ -456,7 +477,8 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
     }
 }
 
-void ServerlessTimingTest::do_RAMPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+void ServerlessTimingTest::do_RAMPressureDueToImages_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
@@ -512,7 +534,8 @@ private:
 
         // Create a function
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(50);
             return std::make_shared<MyFunctionOutput>("Processed!");
@@ -525,13 +548,14 @@ private:
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
-        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100, 2000 * MB, 1 * GB, 10 * MB, 1 * MB);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        2000 * MB, 1 * GB, 10 * MB, 1 * MB);
 
         // Place 10 invocations, knowing that only 4 can run at a time
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
         unsigned long num_invocations = 10;
         invocations.reserve(num_invocations);
-        for (int i=0; i < num_invocations; i++) {
+        for (int i = 0; i < num_invocations; i++) {
             auto invocation = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
             invocations.push_back(invocation);
             wrench::Simulation::sleep(0.1);
@@ -543,17 +567,16 @@ private:
         // for (int i=0; i < num_invocations; i++) {
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
-        for (int i=0; i < num_invocations; i+= 4) {
+        for (int i = 0; i < num_invocations; i += 4) {
             double start_date = invocations.at(i)->getStartDate();
             double end_date = invocations.at(i)->getEndDate();
-            for (int j=i+1; j < std::min<unsigned long>(i+4, num_invocations) ; j++) {
+            for (int j = i + 1; j < std::min<unsigned long>(i + 4, num_invocations); j++) {
                 if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
                 if (fabs(end_date - invocations.at(j)->getEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-
             }
         }
 
@@ -562,7 +585,6 @@ private:
 };
 
 TEST_F(ServerlessTimingTest, RAMPressureDueToInvocations) {
-
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
         // std::make_shared<wrench::RandomServerlessScheduler>(),
@@ -573,7 +595,8 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToInvocations) {
     }
 }
 
-void ServerlessTimingTest::do_RAMPressureDueToInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+void ServerlessTimingTest::do_RAMPressureDueToInvocations_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
@@ -602,3 +625,115 @@ void ServerlessTimingTest::do_RAMPressureDueToInvocations_test(const std::shared
     free(argv);
 }
 
+/**********************************************************************/
+/**  DISK PRESSURE DUE TO IMAGES TEST                                **/
+/**********************************************************************/
+
+class ServerlessDiskPressureDueToImagesController : public wrench::ExecutionController {
+public:
+    ServerlessDiskPressureDueToImagesController(ServerlessTimingTest* test,
+                                                const std::string& hostname,
+                                                const std::shared_ptr<wrench::ServerlessComputeService>
+                                                & compute_service,
+                                                const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(50);
+            return std::make_shared<MyFunctionOutput>("Processed!");
+        };
+
+        // Register that function with an image file that will fill up the disk
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation
+        auto invocation_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+
+        // Register another function with an image file that will not fit on disk
+        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 61 * GB);
+        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
+        wrench::StorageService::createFileAtLocation(image_location_2);
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
+        auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
+                                                                        2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+
+        auto invocation_2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+
+        function_manager->wait_one(invocation_1);
+        function_manager->wait_one(invocation_2);
+
+        // We expect that as soo as invocation_1 has started, then invocation_2 can finally do the copy and load.
+        double expected_invocation_2_start_date = invocation_1->getStartDate() + 2 * (61 * GB / (100 * MB));
+
+        if (fabs(expected_invocation_2_start_date - invocation_2->getStartDate()) > 0.1) {
+            throw std::runtime_error("Unexpected start date for invocation_2 " + std::to_string(invocation_2->getStartDate()) +
+                " (expected: " +std::to_string(expected_invocation_2_start_date) + ")");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, DiskPressureDueToImages) {
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_DiskPressureDueToImages_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_DiskPressureDueToImages_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> batch_nodes = {"ServerlessComputeNodeSmallDisk"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessDiskPressureDueToImagesController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
