@@ -43,7 +43,7 @@ namespace wrench {
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
         [[nodiscard]] double getSubmitDate() const;
         [[nodiscard]] double getStartDate() const;
-        [[nodiscard]] double getFinishDate() const;
+        [[nodiscard]] double getEndDate() const;
 
     private:
         friend class FunctionManager;
@@ -65,7 +65,7 @@ namespace wrench {
 
         double _submit_date = -1.0;
         double _start_date = -1.0;
-        double _finish_date = -1.0;
+        double _end_date = -1.0;
 
         std::string _target_host;
 
