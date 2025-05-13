@@ -38,16 +38,18 @@ namespace wrench {
          * @param ingress_in_bytes The ingress data limit for the function.
          * @param egress_in_bytes The egress data limit for the function.
          */
-        RegisteredFunction(const std::shared_ptr<Function> function, 
+        RegisteredFunction(const std::shared_ptr<Function>& function,
                            double time_limit_in_seconds, 
                            sg_size_t disk_space_limit_in_bytes, 
                            sg_size_t RAM_limit_in_bytes,
                            sg_size_t ingress_in_bytes, 
                            sg_size_t egress_in_bytes);
 
-        std::shared_ptr<FileLocation> getFunctionImage();
+        std::shared_ptr<FileLocation> getOriginalImageLocation() const;
+        std::shared_ptr<DataFile> getImageFile() const;
         std::shared_ptr<Function> getFunction();
-        double getTimeLimit();
+        [[nodiscard]] double getTimeLimit() const;
+        [[nodiscard]] sg_size_t getRAMLimit() const;
 
     private:
         friend class FunctionManager;
