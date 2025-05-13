@@ -15,7 +15,6 @@
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
-#include "wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
@@ -34,6 +33,7 @@ public:
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
 
     void do_ImageReuse_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_CorePressure_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_RAMPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_RAMPressureDueToInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
@@ -233,6 +233,123 @@ void ServerlessTimingTest::do_ImageReuse_test(const std::shared_ptr<wrench::Serv
 
 
 /**********************************************************************/
+/**  RAM CORE PRESSURE TEST                                          **/
+/**********************************************************************/
+
+class ServerlessCorePressureController : public wrench::ExecutionController {
+public:
+    ServerlessCorePressureController(ServerlessTimingTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(50);
+            return std::make_shared<MyFunctionOutput>("Processed!");
+        };
+
+        // Register that function with an image file
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        // Pick the RAM limit so that only 4 invocations can run at a time
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100, 2000 * MB, 1 * MB, 10 * MB, 1 * MB);
+
+        // Place 20 invocations, knowing that only 10 can run at a time
+        std::vector<std::shared_ptr<wrench::Invocation>> invocations;
+        unsigned long num_invocations = 20;
+        invocations.reserve(num_invocations);
+        for (int i=0; i < num_invocations; i++) {
+            auto invocation = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+            invocations.push_back(invocation);
+            wrench::Simulation::sleep(0.1);
+        }
+
+        // Wait for all of them to complete
+        function_manager->wait_all(invocations);
+
+        // for (int i=0; i < num_invocations; i++) {
+        //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
+        // }
+        for (int i=0; i < num_invocations; i+= 10) {
+            double start_date = invocations.at(i)->getStartDate();
+            double end_date = invocations.at(i)->getEndDate();
+            for (int j=i+1; j < std::min<unsigned long>(i+10, num_invocations) ; j++) {
+                if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
+                    throw std::runtime_error("Unexpected execution pattern");
+                }
+                if (fabs(end_date - invocations.at(j)->getEndDate()) > 0.1) {
+                    throw std::runtime_error("Unexpected execution pattern");
+                }
+
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, CorePressure) {
+
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_CorePressure_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_CorePressure_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessCorePressureController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
 /**  RAM PRESSURE DUE TO IMAGES TEST                                 **/
 /**********************************************************************/
 
@@ -368,8 +485,6 @@ void ServerlessTimingTest::do_RAMPressureDueToImages_test(const std::shared_ptr<
     free(argv);
 }
 
-
-
 /**********************************************************************/
 /**  RAM PRESSURE DUE TO INVOCATIONS TEST                            **/
 /**********************************************************************/
@@ -486,3 +601,4 @@ void ServerlessTimingTest::do_RAMPressureDueToInvocations_test(const std::shared
         free(argv[i]);
     free(argv);
 }
+
