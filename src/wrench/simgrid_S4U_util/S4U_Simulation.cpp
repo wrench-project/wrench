@@ -1072,7 +1072,7 @@ namespace wrench {
 * @brief Gets the capacity of a disk attached to some host for a given mount point
 * @param hostname: the host's name
 * @param mount_point: the mount point (e.g.,  "/home")
-* @return the capacity of the disk / mount point
+* @return the capacity of the disk at mount point
 *
 */
     sg_size_t S4U_Simulation::getDiskCapacity(const std::string &hostname, std::string mount_point) {

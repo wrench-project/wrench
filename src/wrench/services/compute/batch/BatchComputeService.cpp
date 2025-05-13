@@ -130,7 +130,7 @@ namespace wrench {
             if (static_cast<double>(h->get_core_count()) != num_cores_available) {
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
-                        "to be homogeneous (different RAM capacities detected)");
+                        "to be homogeneous (different number of cores detected)");
             }
         }
 
