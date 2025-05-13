@@ -303,8 +303,14 @@ namespace wrench {
         }
         else if (const auto scsiec_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
+
             const auto invocation = scsiec_msg->_invocation;
+            std::shared_ptr<FailureCause> failure_cause = scsiec_msg->_action->getFailureCause();
             invocation->_finish_date = Simulation::getCurrentSimulatedDate();
+            WRENCH_INFO("A function invocation for function %s has finished [%s]",
+                        invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
+                        (failure_cause ? "FAILURE" : "SUCCESS"));
+
             const auto host = invocation->_target_host;
             // _state_of_the_system->_scheduling_decisions.erase(invocation);
             invocation->_opened_image_ram_file->close();
@@ -313,11 +319,7 @@ namespace wrench {
             _state_of_the_system->_available_cores[host]++;
 
             bool success = scsiec_msg->_action->getState() == Action::State::COMPLETED;
-            std::shared_ptr<FailureCause> failure_cause = scsiec_msg->_action->getFailureCause();
 
-            WRENCH_INFO("A function invocation for function %s has finished [%s]",
-                        invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
-                        (failure_cause ? "FAILURE" : "SUCCESS"));
 
             scsiec_msg->_invocation->_notify_commport->dputMessage(
                 new ServerlessComputeServiceFunctionInvocationCompleteMessage(
@@ -537,19 +539,15 @@ namespace wrench {
         const std::function lambda_execute = [invocation, target_host, this](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             const auto function = invocation->_registered_function->_function;
-            const auto image_file = function->_image->getFile();
-            const auto local_image_path = wrench::FileLocation::LOCATION(
-                _state_of_the_system->_compute_storages[target_host], image_file);
 
             // Invoke the user's lambda function
             invocation->_function_output = function->_lambda(invocation->_function_input,
                                                              invocation->_tmp_storage_service);
 
-            // Clean up
+            // Clean up the on-disk storage
             invocation->_tmp_storage_service->stop();
             invocation->_tmp_storage_service = nullptr; // Should free up all memory...
             StorageService::removeFileAtLocation(invocation->_tmp_file);
-
             // WRENCH_INFO("Done with the lambda execute!!");
         };
 
@@ -579,19 +577,16 @@ namespace wrench {
         action_executor->setSimulation(this->simulation_);
 
         // Open the image memory file
-        auto compute_ss = _state_of_the_system->_compute_storages[target_host];
-        std::cerr << "OPENING FILE " << invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()->getID() << "\n";
-        invocation->_opened_image_ram_file = compute_ss->openFile(
-            FileLocation::LOCATION(compute_ss, invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
+        auto compute_ram_ss = _state_of_the_system->_compute_memories[target_host];
+        invocation->_opened_image_ram_file = compute_ram_ss->openFile(
+            FileLocation::LOCATION(compute_ram_ss, invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
 
         // Create a tmp memory file in RAM and open it
         auto tmp_memory_file = Simulation::addFile(
             "tmp_ram_file_" + std::to_string(reinterpret_cast<unsigned long>(invocation.get())),
             invocation->getRegisteredFunction()->getRAMLimit());
-        auto compute_ram_ss = _state_of_the_system->_compute_memories[target_host];
         invocation->_tmp_ram_file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
         StorageService::createFileAtLocation(invocation->_tmp_ram_file_location);
-        std::cerr << "OPENING FILE " << invocation->_tmp_ram_file_location->getFile()->getID() << "\n";
         invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
 
 
@@ -907,9 +902,6 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLoadAtComputeHost(const std::string& compute_host,
                                                                   const std::shared_ptr<DataFile>& image) {
 
-        std::cerr << "INITIATING IMAGE LOAD " << image->getID() << std::endl;
-        std::cerr << "FREE SPACE = " << _state_of_the_system->_compute_memories[compute_host]->getTotalFreeSpaceZeroTime() << "\n";
-
         // Add the image to the being_copied_images data structure for this host
         _state_of_the_system->_being_loaded_images[compute_host].insert(image);
 
@@ -927,10 +919,8 @@ namespace wrench {
             try {
                 StorageService::copyFile(src_location, dst_location);
             } catch (ExecutionException &e) {
-                std::cerr << "IMAGE LOAD DIDN'T WORK " << image->getID() << "\n";
                 throw;
             }
-            std::cerr << "IMAGE LOAD WORKED!" << image->getID() << "\n";
             // WRENCH_INFO("Done with the lambda execute!!");
         };
 
