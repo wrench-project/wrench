@@ -67,6 +67,8 @@ namespace wrench {
         double _start_date = -1.0;
         double _finish_date = -1.0;
 
+        std::string _target_host;
+
 
 
     };

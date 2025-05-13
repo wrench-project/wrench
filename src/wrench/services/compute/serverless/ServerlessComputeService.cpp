@@ -245,8 +245,9 @@ namespace wrench {
         while (processNextMessage(do_scheduling)) {
             if (do_scheduling) {
                 admitInvocations();
-                scheduleInvocations();
-                dispatchInvocations();
+                auto decisions = invokeScheduler();
+                dispatchInvocations(decisions);
+                initiateImageCopiesAndLoads(decisions);
             }
         }
         return 0;
@@ -304,8 +305,8 @@ namespace wrench {
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             const auto invocation = scsiec_msg->_invocation;
             invocation->_finish_date = Simulation::getCurrentSimulatedDate();
-            const auto host = _state_of_the_system->_scheduling_decisions[invocation];
-            _state_of_the_system->_scheduling_decisions.erase(invocation);
+            const auto host = invocation->_target_host;
+            // _state_of_the_system->_scheduling_decisions.erase(invocation);
             invocation->_opened_image_ram_file->close();
             invocation->_opened_tmp_ram_file->close();
             StorageService::removeFileAtLocation(invocation->_tmp_ram_file_location);
@@ -314,7 +315,8 @@ namespace wrench {
             bool success = scsiec_msg->_action->getState() == Action::State::COMPLETED;
             std::shared_ptr<FailureCause> failure_cause = scsiec_msg->_action->getFailureCause();
 
-            WRENCH_INFO("A function invocation has finished [%s]",
+            WRENCH_INFO("A function invocation for function %s has finished [%s]",
+                        invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
                         (failure_cause ? "FAILURE" : "SUCCESS"));
 
             scsiec_msg->_invocation->_notify_commport->dputMessage(
@@ -441,7 +443,7 @@ namespace wrench {
         // Move all relevant invocations from the admitted to the schedulable queue
         auto& queue = _state_of_the_system->_admitted_invocations[image_file];
         while (not queue.empty()) {
-            _state_of_the_system->_schedulable_invocations.push_front(std::move(queue.front()));
+            _state_of_the_system->_schedulable_invocations.emplace(_state_of_the_system->_schedulable_invocations.begin(), std::move(queue.front()));
             queue.pop();
         }
         _state_of_the_system->_admitted_invocations.erase(image_file);
@@ -451,27 +453,32 @@ namespace wrench {
      * @brief Dispatches scheduled function invocations to compute hosts
      * @return true if at least one invocation was dispatched
      */
-    bool ServerlessComputeService::dispatchInvocations() {
-        bool one_dispatched = false;
-        while (!_state_of_the_system->_scheduled_invocations.empty()) {
-            auto invocation_to_place = _state_of_the_system->_scheduled_invocations.front();
-            _state_of_the_system->_scheduled_invocations.pop();
+    void ServerlessComputeService::dispatchInvocations(const std::shared_ptr<SchedulingDecisions>& decisions) {
 
-            WRENCH_INFO("Trying to run scheduled invocation for function [%s]...",
-                        invocation_to_place->_registered_function->_function->getName().c_str());
+        // Dispatched the invocations
+        std::set<std::shared_ptr<Invocation>> dispatched_invocations;
+        for (const auto & [hostname, invocations_to_place] : decisions->invocations_to_start_at_compute_node) {
+            for (const auto &invocation : invocations_to_place) {
+                // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
+                //             invocation_to_place->_registered_function->_function->getName().c_str());
 
-            if (dispatchInvocation(invocation_to_place)) {
-                _state_of_the_system->_running_invocations.push(invocation_to_place);
-                one_dispatched = true;
-            }
-            else {
-                // Put it back in the schedulable state, and the scheduler will have to deal with it again
-                _state_of_the_system->_schedulable_invocations.push_back(invocation_to_place);
-                // Erase the previous scheduling decision
-                _state_of_the_system->_scheduling_decisions.erase(invocation_to_place);
+                if (dispatchInvocation(invocation, hostname)) {
+                    _state_of_the_system->_running_invocations.push(invocation);
+                    invocation->_target_host = hostname;
+                    dispatched_invocations.insert(invocation);
+                }
             }
         }
-        return one_dispatched;
+
+        // Update the list of schedulable invocations (not super efficient, but clearer than the erase-as-I-go)
+        std::vector<std::shared_ptr<Invocation>> updated_list_of_schedulable_invocations;
+        for (auto const &invocation : _state_of_the_system->_schedulable_invocations) {
+            if (dispatched_invocations.find(invocation) == dispatched_invocations.end()) {
+                updated_list_of_schedulable_invocations.push_back(invocation);
+                dispatched_invocations.erase(invocation); // Should be more efficient
+            }
+        }
+        _state_of_the_system->_schedulable_invocations = updated_list_of_schedulable_invocations;
     }
 
     /**
@@ -487,7 +494,6 @@ namespace wrench {
         auto ss_memory = _state_of_the_system->_compute_memories[hostname];
         auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
-        std::cerr << "-----> " << _state_of_the_system->isImageInRAMAtNode(hostname, image_file) << "\n";
         // The image is in RAM
         if (not ss_memory->hasFile(image_file, "/ram_disk")) {
             WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",
@@ -512,10 +518,10 @@ namespace wrench {
      * @brief Helper method to dispatch an invocation
      *
      * @param invocation invocation to dispatch
+     * @param target_host the target host
      * @return true on success, false on failure
      */
-    bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation) {
-        auto target_host = _state_of_the_system->_scheduling_decisions[invocation];
+    bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation, const std::string& target_host) {
 
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
         if (not invocationCanBeStarted(invocation, target_host)) {
@@ -523,7 +529,7 @@ namespace wrench {
         }
 
         // Start the invocation's own private storage service
-        auto ss = startInvocationStorageService(invocation);
+        auto ss = startInvocationStorageService(invocation, target_host);
 
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
@@ -574,6 +580,7 @@ namespace wrench {
 
         // Open the image memory file
         auto compute_ss = _state_of_the_system->_compute_storages[target_host];
+        std::cerr << "OPENING FILE " << invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()->getID() << "\n";
         invocation->_opened_image_ram_file = compute_ss->openFile(
             FileLocation::LOCATION(compute_ss, invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
 
@@ -584,10 +591,11 @@ namespace wrench {
         auto compute_ram_ss = _state_of_the_system->_compute_memories[target_host];
         invocation->_tmp_ram_file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
         StorageService::createFileAtLocation(invocation->_tmp_ram_file_location);
+        std::cerr << "OPENING FILE " << invocation->_tmp_ram_file_location->getFile()->getID() << "\n";
         invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
 
 
-        WRENCH_INFO("Starting an action executor for dispatching invocation...");
+        WRENCH_INFO("Dispatched invocation for function %s", invocation->getRegisteredFunction()->getFunction()->getName().c_str());
         // Reserve a core  TODO: Was it done elsewhere???
         _state_of_the_system->_available_cores[target_host] -= 1;
         invocation->_start_date = Simulation::getCurrentSimulatedDate();
@@ -646,31 +654,32 @@ namespace wrench {
      * @brief Method to create a tmp storage service for an invocation
      *
      * @param invocation A function invocation
+     * @param target_host the target host
      * @return A storage service
      */
     std::shared_ptr<StorageService> ServerlessComputeService::startInvocationStorageService(
-        const std::shared_ptr<Invocation>& invocation) {
+        const std::shared_ptr<Invocation>& invocation,
+        const std::string& target_host) {
         static unsigned long seq = -1;
         seq++;
-        const auto host = _state_of_the_system->_scheduling_decisions[invocation];
 
         // WRENCH_INFO("Starting a new storage service for an invocation...");
         // Reserve space on the storage service
-        const auto tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[host],
+        const auto tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[target_host],
                                                              Simulation::addFile(
                                                                  "tmp_" + std::to_string(seq),
                                                                  invocation->_registered_function->_disk_space));
         StorageService::createFileAtLocation(tmp_file);
 
         // Create a tmp file system
-        const auto disk = S4U_Simulation::hostHasMountPoint(host, "/");
+        const auto disk = S4U_Simulation::hostHasMountPoint(target_host, "/");
         const auto ods = simgrid::fsmod::OneDiskStorage::create("is_" + std::to_string(seq), disk);
         const auto fs = simgrid::fsmod::FileSystem::create("fs" + std::to_string(seq));
         fs->mount_partition("/", ods, invocation->_registered_function->_disk_space);
 
         // Create a tmp storage service
         auto ss = std::shared_ptr<SimpleStorageService>(
-            SimpleStorageService::createSimpleStorageServiceWithExistingFileSystem(host, fs, {}, {}));
+            SimpleStorageService::createSimpleStorageServiceWithExistingFileSystem(target_host, fs, {}, {}));
         ss->setSimulation(this->simulation_);
         ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
         ss->start(ss, true, false);
@@ -723,7 +732,7 @@ namespace wrench {
             // If the image file is already downloaded, make the invocation schedulable immediately
             if (_state_of_the_system->_head_storage_service->hasFile(image->getFile())) {
                 _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_schedulable_invocations.push_front(invocation);
+                _state_of_the_system->_schedulable_invocations.emplace(_state_of_the_system->_schedulable_invocations.begin(), invocation);
                 continue;
             }
 
@@ -799,30 +808,23 @@ namespace wrench {
         action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
     }
 
-
-
     /**
-     * @brief 
-     *
+     * @brief Helper method to invoke the scheduler
+     * @return
      */
-    void ServerlessComputeService::scheduleInvocations() {
-        // Drain the schedulable invocations queue into a set.
-        std::vector<std::shared_ptr<Invocation>> schedulable_invocations_vector;
-        while (!_state_of_the_system->_schedulable_invocations.empty()) {
-            auto invocation = _state_of_the_system->_schedulable_invocations.front();
-            schedulable_invocations_vector.push_back(invocation);
-            _state_of_the_system->_schedulable_invocations.pop_front();
-        }
-
+    std::shared_ptr<SchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
         // Invoke the scheduler so that it manages images
-        const auto scheduling_decisions = _scheduler->schedule(schedulable_invocations_vector, _state_of_the_system);
-        std::cerr << "DECISIONS:  COPY=" <<
-            scheduling_decisions->images_to_copy_to_compute_node.size() << " LOAD=" <<
-            scheduling_decisions->images_to_load_into_RAM_at_compute_node.size() << " INVOKE=" <<
-            scheduling_decisions->invocations_to_start_at_compute_node.size() << "\n";
+        auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations, _state_of_the_system);
+        // std::cerr << "DECISIONS:  COPY=" <<
+        //     decisions->images_to_copy_to_compute_node.size() << " LOAD=" <<
+        //     decisions->images_to_load_into_RAM_at_compute_node.size() << " INVOKE=" <<
+        //     decisions->invocations_to_start_at_compute_node.size() << "\n";
+        return decisions;
+    }
 
+    void ServerlessComputeService::initiateImageCopiesAndLoads(const std::shared_ptr<SchedulingDecisions>& decisions) {
         // For each compute node, initiate image copy (from head node) if need be
-        for (const auto& entry : scheduling_decisions->images_to_copy_to_compute_node) {
+        for (const auto& entry : decisions->images_to_copy_to_compute_node) {
             const std::string& hostname = entry.first;
             for (const auto& image : entry.second) {
                 initiateImageCopyToComputeHost(hostname, image);
@@ -830,26 +832,9 @@ namespace wrench {
         }
 
         // For each compute node, load initiate image load from disk into RAM and if space
-        for (const auto& [hostname, images_to_load] : scheduling_decisions->images_to_load_into_RAM_at_compute_node) {
+        for (const auto& [hostname, images_to_load] : decisions->images_to_load_into_RAM_at_compute_node) {
             for (const auto& image : images_to_load) {
                 initiateImageLoadAtComputeHost(hostname, image);
-            }
-        }
-
-        std::unordered_set<std::shared_ptr<Invocation>> scheduled_set;
-        // For each scheduling decision, record the decision and enqueue for dispatch.
-        for (const auto& [target_host, invocations] : scheduling_decisions->invocations_to_start_at_compute_node) {
-            for (const auto& invocation : invocations) {
-                _state_of_the_system->_scheduling_decisions[invocation] = target_host;
-                _state_of_the_system->_scheduled_invocations.push(invocation);
-                scheduled_set.insert(invocation);
-            }
-        }
-
-        // Reinsert unscheduled invocations back into the schedulable queue.
-        for (const auto& invocation : schedulable_invocations_vector) {
-            if (scheduled_set.find(invocation) == scheduled_set.end()) {
-                _state_of_the_system->_schedulable_invocations.push_front(invocation);
             }
         }
     }
@@ -922,7 +907,9 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLoadAtComputeHost(const std::string& compute_host,
                                                                   const std::shared_ptr<DataFile>& image) {
 
-        WRENCH_INFO("INITIATING IMAGE LOAD FOR %s", image->getID().c_str());
+        std::cerr << "INITIATING IMAGE LOAD " << image->getID() << std::endl;
+        std::cerr << "FREE SPACE = " << _state_of_the_system->_compute_memories[compute_host]->getTotalFreeSpaceZeroTime() << "\n";
+
         // Add the image to the being_copied_images data structure for this host
         _state_of_the_system->_being_loaded_images[compute_host].insert(image);
 
@@ -940,8 +927,10 @@ namespace wrench {
             try {
                 StorageService::copyFile(src_location, dst_location);
             } catch (ExecutionException &e) {
+                std::cerr << "IMAGE LOAD DIDN'T WORK " << image->getID() << "\n";
                 throw;
             }
+            std::cerr << "IMAGE LOAD WORKED!" << image->getID() << "\n";
             // WRENCH_INFO("Done with the lambda execute!!");
         };
 

@@ -280,10 +280,25 @@ private:
         function_manager->wait_one(invocation_1);
         function_manager->wait_one(invocation_2);
 
-        std::cerr << "INVOCATION #1: " << invocation_1->getStartDate() << "\n";
-        std::cerr << "INVOCATION #1: " << invocation_1->getFinishDate() << "\n";
-        std::cerr << "INVOCATION #2: " << invocation_2->getStartDate() << "\n";
-        std::cerr << "INVOCATION #2: " << invocation_2->getFinishDate() << "\n";
+        double image_download =  6494.84;
+        double image_copy = 2 * 60 * GB / (100 * MB);
+        double image_load = 1 * 60 * GB / (100 * MB);
+        double compute_time = 50;
+
+        std::cerr << "IMAGE DOWNLOAD = " << image_download << std::endl;
+        std::cerr << "IMAGE COPY = " << image_copy << std::endl;
+        std::cerr << "IMAGE LOAD = " << image_load << std::endl;
+
+        double expected_invocation_1_start = image_download + image_copy + image_load;
+        double expected_invocation_1_end = expected_invocation_1_start + compute_time;
+
+        double expected_invocation_2_start = expected_invocation_1_end + image_load;
+        double expected_invocation_2_end = expected_invocation_2_start + compute_time;
+
+        std::cerr << "INVOCATION #1: " << invocation_1->getStartDate() << "  EXPECTED=" <<expected_invocation_1_start << "\n";
+        std::cerr << "INVOCATION #1: " << invocation_1->getFinishDate() << "  EXPECTED=" <<expected_invocation_1_end << "\n";
+        std::cerr << "INVOCATION #2: " << invocation_2->getStartDate() << "  EXPECTED=" <<expected_invocation_2_start<< "\n";
+        std::cerr << "INVOCATION #2: " << invocation_2->getFinishDate() << "  EXPECTED=" <<expected_invocation_2_end<< "\n";
 
         return 0;
     }
