@@ -289,7 +289,7 @@ namespace wrench {
      * @param answer_commport the answer commport to send the wakeup message to when the invocation is finished
      */
     void FunctionManager::processWaitOne(const std::shared_ptr<Invocation>& invocation, S4U_CommPort* answer_commport) {
-        WRENCH_INFO("Processing a wait_one message");
+        // WRENCH_INFO("Processing a wait_one message");
         _invocations_being_waited_for.emplace_back(invocation, answer_commport);
     }
 
@@ -301,7 +301,7 @@ namespace wrench {
      */
     void FunctionManager::processWaitAll(const std::vector<std::shared_ptr<Invocation>>& invocations,
                                          S4U_CommPort* answer_commport) {
-        WRENCH_INFO("Processing a wait_many message");
+        // WRENCH_INFO("Processing a wait_many message");
         for (const auto& invocation : invocations) {
             _invocations_being_waited_for.emplace_back(invocation, answer_commport);
         }

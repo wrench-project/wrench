@@ -78,14 +78,14 @@ namespace wrench
         std::map<std::string, sg_size_t> _available_ram;
 
         // map of scheduling decisions for each invocation
-        std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
+        // std::map<std::shared_ptr<Invocation>, std::string> _scheduling_decisions;
 
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _new_invocations;
         // queues of function invocations whose images are being downloaded
         std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
         // queue of function invocations whose images have been downloaded
-        std::deque<std::shared_ptr<Invocation>> _schedulable_invocations;
+        std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
         // queue of function invocations whose are scheduled on a host and whose
         // images are being copied there
         std::queue<std::shared_ptr<Invocation>> _scheduled_invocations;
