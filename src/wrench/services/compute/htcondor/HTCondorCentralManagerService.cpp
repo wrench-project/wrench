@@ -456,7 +456,7 @@ namespace wrench {
                 if (max_cores < job->getMinimumRequiredNumCores()) {
                     continue;
                 }
-                auto ram_resources = cs->getMemoryCapacity();
+                auto ram_resources = cs->getPerHostMemoryCapacity();
                 sg_size_t max_ram = 0;
                 for (auto const &entry: ram_resources) {
                     max_ram = std::max<sg_size_t>(max_ram, entry.second);

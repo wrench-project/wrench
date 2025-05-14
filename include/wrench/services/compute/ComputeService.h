@@ -117,7 +117,7 @@ namespace wrench {
 
         virtual bool isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, sg_size_t ram);
 
-        std::map<std::string, double> getMemoryCapacity(bool simulate_it = false);
+        std::map<std::string, double> getPerHostMemoryCapacity(bool simulate_it = false);
 
         std::map<std::string, double> getPerHostAvailableMemoryCapacity(bool simulate_it = false);
 
