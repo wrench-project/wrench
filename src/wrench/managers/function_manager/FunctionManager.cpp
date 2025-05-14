@@ -90,8 +90,8 @@ namespace wrench {
      * @param time_limit_in_seconds the time limit for the function execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
      * @param RAM_limit_in_bytes the RAM limit for the function
-     * @param ingress_in_bytes the ingress data limit (this is currently ignored and not implemented)
-     * @param egress_in_bytes the egress data limit (this is currently ignored and not implemented)
+     * @param ingress_in_bytes the ingress data limit (this is currently completely IGNORED)
+     * @param egress_in_bytes the egress data limit (this is currently completely IGNORED)
      * @return true if the function was registered successfully
      * @throw ExecutionException if the function registration fails
      */
@@ -124,7 +124,7 @@ namespace wrench {
         const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
         const std::shared_ptr<FunctionInput>& function_input) {
         // WRENCH_INFO("Function [%s] invoked with compute service [%s]", registered_function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
-        // Pass in the function manager's commport as the notify commport
+        // Pass in the function manager's commport as the commport to notify
 
         return sl_compute_service->invokeFunction(registered_function, function_input, this->commport);
     }
@@ -190,13 +190,6 @@ namespace wrench {
         // WRENCH_INFO("FunctionManager::wait_all(): Received a wakeup message");
     }
 
-    // /**
-    // *
-    // */
-    // FunctionManager::wait_any(one) {
-
-    // }
-
     /**
      * @brief Main method of the daemon that implements the FunctionManager
      * @return 0 on success
@@ -243,7 +236,6 @@ namespace wrench {
             return true;
         }
         else if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-            // TODO: Die...
             return false;
         }
         else if (auto scsfic_msg = std::dynamic_pointer_cast<
@@ -252,7 +244,7 @@ namespace wrench {
             return true;
         }
         else if (auto fmfc_msg = std::dynamic_pointer_cast<FunctionManagerFunctionCompletedMessage>(message)) {
-            // TODO: Notify some controller?
+            // Do nothing for now
             return true;
         }
         else if (auto wait_one_msg = std::dynamic_pointer_cast<FunctionManagerWaitOneMessage>(message)) {
@@ -269,7 +261,10 @@ namespace wrench {
     }
 
     /**
-     * @brief TODO
+     * @brief Method to process a function invocation completion
+     * @param invocation the invocation
+     * @param success whether the invocation has succeeded or not
+     * @param failure_cause the failure cause (if failure)
      *
      */
     void FunctionManager::processFunctionInvocationComplete(const std::shared_ptr<Invocation>& invocation,

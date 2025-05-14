@@ -60,11 +60,12 @@ namespace wrench {
 
         std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction> &registered_function,
                                                     const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
-                                                    const std::shared_ptr<FunctionInput>& function_invocation_args);
+                                                    const std::shared_ptr<FunctionInput>& function_input);
 
         bool isDone(const std::shared_ptr<Invocation>& invocation);
         void wait_one(const std::shared_ptr<Invocation>& invocation);
         void wait_all(const std::vector<std::shared_ptr<Invocation>>& invocations);
+
         /***********************/
         /** \cond INTERNAL    */
         /***********************/

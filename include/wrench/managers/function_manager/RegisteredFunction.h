@@ -30,13 +30,13 @@ namespace wrench {
     class RegisteredFunction {
     public:
         /**
-         * @brief Constructs a RegisteredFunction object.
-         * @param function The function to be registered.
-         * @param time_limit_in_seconds The time limit for the function execution.
-         * @param disk_space_limit_in_bytes The disk space limit for the function.
-         * @param RAM_limit_in_bytes The RAM limit for the function.
-         * @param ingress_in_bytes The ingress data limit for the function.
-         * @param egress_in_bytes The egress data limit for the function.
+         * @brief Constructs a RegisteredFunction object
+         * @param function The function to be registered
+         * @param time_limit_in_seconds The time limit for the function execution
+         * @param disk_space_limit_in_bytes The disk space limit for the function
+         * @param RAM_limit_in_bytes The RAM limit for the function
+         * @param ingress_in_bytes The ingress data limit for the function (currently ignored)
+         * @param egress_in_bytes The egress data limit for the function (currently ignored)
          */
         RegisteredFunction(const std::shared_ptr<Function>& function,
                            double time_limit_in_seconds, 
