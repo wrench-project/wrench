@@ -476,7 +476,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv">
 <span id="_CPPv3N6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv"></span><span id="_CPPv2N6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv"></span><span id="wrench::ServerlessStateOfTheSystem::getAvailableDiskSpace"></span><span class="target" id="classwrench_1_1_serverless_state_of_the_system_1a1ee3dfa4e41f9b956eddfad12b96cf21"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">sg_size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getAvailableDiskSpace</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Getter for the map of available disk space. </p>
+<dd><p>Getter for the map of available disk space. Note that Disk space is managed in an LRU fashion, so it’s not because a disk is full that nothing can be done, perhaps. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The RAM availability map </p>
@@ -487,7 +487,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench26ServerlessStateOfTheSystem15getAvailableRAMEv">
 <span id="_CPPv3N6wrench26ServerlessStateOfTheSystem15getAvailableRAMEv"></span><span id="_CPPv2N6wrench26ServerlessStateOfTheSystem15getAvailableRAMEv"></span><span id="wrench::ServerlessStateOfTheSystem::getAvailableRAM"></span><span class="target" id="classwrench_1_1_serverless_state_of_the_system_1a1dc2ef111f4cbc3f06d48cfb77ab00c3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">sg_size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getAvailableRAM</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Getter for the map of available RAM. </p>
+<dd><p>Getter for the map of available RAM. Note that RAM is managed in an LRU fashion, so it’s not because RAM is full that nothing can be done, perhaps. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The RAM availability map </p>
