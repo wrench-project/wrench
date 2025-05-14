@@ -29,6 +29,10 @@ namespace wrench {
      */
     class RegisteredFunction {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
         /**
          * @brief Constructs a RegisteredFunction object
          * @param function The function to be registered
@@ -45,10 +49,15 @@ namespace wrench {
                            sg_size_t ingress_in_bytes, 
                            sg_size_t egress_in_bytes);
 
-        std::shared_ptr<FileLocation> getOriginalImageLocation() const;
-        std::shared_ptr<DataFile> getImageFile() const;
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        [[nodiscard]] std::shared_ptr<FileLocation> getOriginalImageLocation() const;
+        [[nodiscard]] std::shared_ptr<DataFile> getImageFile() const;
         std::shared_ptr<Function> getFunction();
         [[nodiscard]] double getTimeLimit() const;
+        [[nodiscard]] sg_size_t getDiskSpaceLimit() const;
         [[nodiscard]] sg_size_t getRAMLimit() const;
 
     private:

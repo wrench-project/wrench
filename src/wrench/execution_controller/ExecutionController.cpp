@@ -49,8 +49,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Instantiate and start a job manager
-    * @return a job manager
+    * @brief Instantiate and start a function manager
+    * @return a function manager
     */
     std::shared_ptr<FunctionManager> ExecutionController::createFunctionManager() {
         auto function_manager = std::shared_ptr<FunctionManager>(

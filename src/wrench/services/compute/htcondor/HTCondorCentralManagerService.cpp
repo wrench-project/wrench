@@ -509,5 +509,13 @@ namespace wrench {
         return false;
     }
 
+    /**
+    * @brief Returns true if the service supports functions
+    * @return true or false
+    */
+    bool HTCondorCentralManagerService::supportsFunctions() {
+        return false;
+    }
+
 
 }// namespace wrench

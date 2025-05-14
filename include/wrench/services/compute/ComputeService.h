@@ -95,6 +95,12 @@ namespace wrench {
          */
         virtual bool supportsPilotJobs() = 0;
 
+        /**
+         * @brief Returns true if the service supports functions
+         * @return true or false
+         */
+        virtual bool supportsFunctions() = 0;
+
         virtual bool hasScratch() const;
 
         unsigned long getNumHosts(bool simulate_it = false);
