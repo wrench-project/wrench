@@ -34,6 +34,11 @@ namespace wrench {
     class ServerlessScheduler {
     public:
         ServerlessScheduler() = default;
+
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
         virtual ~ServerlessScheduler() = default;
 
         /**
@@ -50,6 +55,10 @@ namespace wrench {
             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
             const std::shared_ptr<ServerlessStateOfTheSystem>& state
         ) = 0;
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
     };
 } // namespace wrench

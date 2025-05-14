@@ -1389,4 +1389,12 @@ namespace wrench {
         return true;
     }
 
+    /**
+    * @brief Returns true if the service supports functions
+    * @return true or false
+    */
+    bool BatchComputeService::supportsFunctions() {
+        return false;
+    }
+
 }// namespace wrench

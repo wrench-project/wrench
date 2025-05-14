@@ -1,6 +1,3 @@
-//
-// Created by Victor Pagan on 4/22/25.
-//
 
 #ifndef FCFSSERVERLESSSCHEDULER_H
 #define FCFSSERVERLESSSCHEDULER_H
@@ -16,6 +13,10 @@ namespace wrench {
     public:
         FCFSServerlessScheduler() = default;
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
         ~FCFSServerlessScheduler() override = default;
 
         std::shared_ptr<SchedulingDecisions> schedule(
@@ -30,6 +31,10 @@ namespace wrench {
         void makeInvocationDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
                                      const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                      const std::shared_ptr<ServerlessStateOfTheSystem>& state);
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
     };
 } // namespace wrench
 

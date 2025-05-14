@@ -31,6 +31,15 @@ namespace wrench {
 
     unsigned long ServerlessComputeService::sequence_number = 0;
 
+    /**
+     * @brief Constructor
+     * @param hostname name of the head host on which the service runs
+     * @param compute_hosts list of (homogeneous) compute node hostnames
+     * @param head_node_storage_mount_point the mount point of storage at the head host (where images will be stored)
+     * @param scheduler the scheduler used to decide which invocations should be executed and when
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     */
     ServerlessComputeService::ServerlessComputeService(const std::string& hostname,
                                                        const std::vector<std::string>& compute_hosts,
                                                        const std::string& head_node_storage_mount_point,
@@ -134,6 +143,14 @@ namespace wrench {
      */
     bool ServerlessComputeService::supportsPilotJobs() {
         return false;
+    }
+
+    /**
+    * @brief Returns true if the service supports functions
+    * @return true or false
+    */
+    bool ServerlessComputeService::supportsFunctions() {
+        return true;
     }
 
     /**

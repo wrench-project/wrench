@@ -26,9 +26,17 @@ namespace wrench {
      * @brief Gets the name of the function.
      * @return The name of the function.
      */
-    std::string Function::getName() const { return _name; }
+    std::string Function::getName() const {
+        return _name;
+    }
 
-    std::shared_ptr<FileLocation> Function::getImage() const { return _image; }
+    /**
+     * @brief Gets the image associated to the function
+     * @return An image's file location
+     */
+    std::shared_ptr<FileLocation> Function::getImage() const {
+        return _image;
+    }
 
     /**
      * @brief Executes the function with the provided input and storage service.

@@ -79,6 +79,7 @@ namespace wrench {
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
+        bool supportsFunctions() override;
 
         /***********************/
         /** \cond DEVELOPER    */

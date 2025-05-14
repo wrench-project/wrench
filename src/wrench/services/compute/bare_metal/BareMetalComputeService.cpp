@@ -1063,6 +1063,14 @@ namespace wrench
     }
 
     /**
+    * @brief Returns true if the service supports functions
+    * @return true or false
+    */
+    bool BareMetalComputeService::supportsFunctions() {
+        return false;
+    }
+
+    /**
      * @brief An "out of simulation time" (instant) method to check on resource availability
      * @param num_cores: desired number of cores
      * @param ram: desire RAM footprint

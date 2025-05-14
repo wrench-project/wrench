@@ -18,7 +18,11 @@
 #include <wrench/failure_causes/FailureCause.h>
 
 namespace wrench {
-   
+
+    /***********************/
+    /** \cond DEVELOPER   **/
+    /***********************/
+
     /**
      * @class Invocation
      * @brief Represents an invocation of a registered function.
@@ -26,16 +30,6 @@ namespace wrench {
     class Invocation {
 
     public:
-        /**
-         * @brief Constructor for Invocation.
-         * @param registered_function The registered function to be invoked.
-         * @param function_input The input for the function.
-         * @param notify_commport The communication port for notifications.
-         */
-        Invocation(const std::shared_ptr<RegisteredFunction> &registered_function,
-                   const std::shared_ptr<FunctionInput> &function_input,
-                   S4U_CommPort* notify_commport);
-
         [[nodiscard]] bool isDone() const;
         [[nodiscard]] bool hasSucceeded() const;
         [[nodiscard]] std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;
@@ -45,6 +39,13 @@ namespace wrench {
         [[nodiscard]] double getStartDate() const;
         [[nodiscard]] double getEndDate() const;
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
+        Invocation(const std::shared_ptr<RegisteredFunction> &registered_function,
+                   const std::shared_ptr<FunctionInput> &function_input,
+                   S4U_CommPort* notify_commport);
     private:
         friend class FunctionManager;
         friend class ServerlessComputeService;
@@ -70,7 +71,13 @@ namespace wrench {
 
         std::string _target_host;
 
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
+    /***********************/
+    /** \endcond          **/
+    /***********************/
 
     };
 }

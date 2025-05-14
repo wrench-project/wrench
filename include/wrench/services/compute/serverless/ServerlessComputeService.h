@@ -24,9 +24,9 @@
 
 namespace wrench {
     /**
-         * @brief A serverless compute service that manages a set of compute hosts and
-         *        controls access to their resource via function registration/invocation operations.
-         */
+     * @brief A serverless compute service that manages a set of compute hosts and
+     *        controls access to their resource via function registration/invocation operations.
+     */
     class ServerlessComputeService : public ComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
@@ -68,6 +68,11 @@ namespace wrench {
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
+        bool supportsFunctions() override;
+
+    /***********************/
+    /** \cond INTERNAL    **/
+    /***********************/
 
     protected:
         friend class FunctionManager;
@@ -149,6 +154,9 @@ namespace wrench {
         sg_size_t ram_of_compute_host;
         sg_size_t disk_space_of_compute_host;
 
+        /***********************/
+        /** \endcond          **/
+        /***********************/
     };
 };
 

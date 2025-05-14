@@ -54,6 +54,7 @@ namespace wrench {
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
+        bool supportsFunctions() override;
 
         void addComputeService(const std::shared_ptr<ComputeService>& compute_service);
 

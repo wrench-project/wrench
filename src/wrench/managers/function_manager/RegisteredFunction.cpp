@@ -62,6 +62,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the registered function's disk space limit
+     * @return A RAN limit in bytes
+     */
+    sg_size_t RegisteredFunction::getDiskSpaceLimit() const {
+        return _disk_space;
+    }
+
+    /**
      * @brief Get the registered function's RAM limit
      * @return A RAN limit in bytes
      */
