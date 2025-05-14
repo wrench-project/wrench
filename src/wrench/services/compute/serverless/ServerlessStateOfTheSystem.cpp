@@ -8,27 +8,24 @@
  */
 
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
-#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
-#include <wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h>
-#include <wrench/services/compute/serverless/Invocation.h>
 #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
-#include <wrench/managers/function_manager/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/failure_causes/NotAllowed.h>
-#include <wrench/failure_causes/FunctionNotFound.h>
+// #include <wrench/failure_causes/NotAllowed.h>
 
 #include <utility>
 
-#include "wrench/action/CustomAction.h"
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/services/helper_services/action_executor/ActionExecutor.h"
+// #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
-#include "wrench/simulation/Simulation.h"
+#include "wrench/simgrid_S4U_util//S4U_Simulation.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_serverless_state_of_the_system, "Log category for Serverless State of the System");
 
 namespace wrench {
+    /**
+     * @brief Constructor
+     * @param compute_hosts the list of compute hosts
+     */
     ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts)
         : _compute_hosts(compute_hosts),
           _head_storage_service(nullptr),
@@ -43,14 +40,26 @@ namespace wrench {
         }
     }
 
-    ServerlessStateOfTheSystem::~ServerlessStateOfTheSystem() = default;
+    /**
+     * @brief Getter for the compute hosts
+     * @return The compute hosts
+     */
+    const std::vector<std::string>& ServerlessStateOfTheSystem::getComputeHosts() {
+        return _compute_hosts;
+    }
 
-    // getters
-    // TODO: code commenting
-    const std::vector<std::string>& ServerlessStateOfTheSystem::getComputeHosts() { return _compute_hosts; }
+    /**
+     * @brief Getter for the map of available cores
+     * @return The core availability map
+     */
+    std::map<std::string, unsigned long> ServerlessStateOfTheSystem::getAvailableCores() {
+        return _available_cores;
+    }
 
-    std::map<std::string, unsigned long> ServerlessStateOfTheSystem::getAvailableCores() { return _available_cores; }
-
+    /**
+     * @brief Getter for the map of available RAM
+     * @return The RAM availability map
+     */
     std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() {
         std::map<std::string, sg_size_t> to_return;
         for (const auto& [hostname, ss] : _compute_memories) {
@@ -59,41 +68,20 @@ namespace wrench {
         return to_return;
     }
 
-
-    std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getNewInvocations() { return _new_invocations; }
-
-    std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>>
-    ServerlessStateOfTheSystem::getAdmittedInvocations() { return _admitted_invocations; }
-
-    std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getScheduledInvocations() {
-        return _scheduled_invocations;
-    }
-
-    std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getRunningInvocations() {
-        return _running_invocations;
-    }
-
-    std::queue<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getFinishedInvocations() {
-        return _finished_invocations;
-    }
-
-    // std::unordered_map<std::string, std::shared_ptr<StorageService>> ServerlessStateOfTheSystem::getComputeStorages() {
-    //     return _compute_storages;
-    // }
-
+    /**
+     * @brief Get the currently free RAM space on Node
+     * @param node the compute node
+     * @return free RAM space
+     */
     sg_size_t ServerlessStateOfTheSystem::getFreeRAMSpaceOnNode(const std::string &node) const {
         return _compute_storages.at(node)->getTotalFreeSpaceZeroTime();
     }
 
-
-    // std::shared_ptr<StorageService> ServerlessStateOfTheSystem::getHeadStorageService() {
-    //     return _head_storage_service;
-    // }
-    //
-    // sg_size_t ServerlessStateOfTheSystem::getFreeSpaceOnHeadStorage() const {
-    //     return _free_space_on_head_storage;
-    // }
-
+    /**
+     * @brief Get the current images being copied to a node
+     * @param node the compute node
+     * @return a set of image files
+     */
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(const std::string& node) {
         if (_being_copied_images.find(node) != _being_copied_images.end()) {
             return _being_copied_images[node];
@@ -101,6 +89,13 @@ namespace wrench {
         return {};
     }
 
+    /**
+     * @brief Determine whether an image is currently being copied to a node
+     * @param node the compute node
+     * @param image an image file
+     *
+     * @return true or false
+     */
     bool ServerlessStateOfTheSystem::isImageBeingCopiedToNode(const std::string& node,
                                                               const std::shared_ptr<DataFile>& image) {
         // Check if the image has been copied to the node
@@ -113,10 +108,22 @@ namespace wrench {
         return false;
     }
 
+    /**
+     * @brief Determine whether an image is currently on disk at a node
+     * @param node the compute node
+     * @param image an image file
+     *
+     * @return true or false
+     */
     bool ServerlessStateOfTheSystem::isImageOnNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
         return _compute_storages[node]->hasFile(image);
     }
 
+    /**
+     * @brief Get the current images being loaded into RAM at a node
+     * @param node the compute node
+     * @return a set of image files
+     */
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingLoadedAtNode(const std::string& node) {
         if (_being_loaded_images.find(node) != _being_loaded_images.end()) {
             return _being_loaded_images[node];
@@ -124,6 +131,13 @@ namespace wrench {
         return {};
     }
 
+    /**
+     * @brief Determine whether an image is currently being loading into RAM at a node
+     * @param node the compute node
+     * @param image an image file
+     *
+     * @return true or false
+     */
     bool ServerlessStateOfTheSystem::isImageBeingLoadedAtNode(const std::string& node,
                                                         const std::shared_ptr<DataFile>& image) {
         // Check if the image has been copied to the node
@@ -136,6 +150,13 @@ namespace wrench {
         return false;
     }
 
+    /**
+     * @brief Determine whether an image is currently in RAM at a node
+     * @param node the compute node
+     * @param image an image file
+     *
+     * @return true or false
+     */
     bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
         return _compute_memories[node]->hasFile(image, "/ram_disk");
     }
