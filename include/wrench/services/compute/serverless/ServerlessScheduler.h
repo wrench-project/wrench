@@ -23,8 +23,11 @@ namespace wrench {
      *        - Which invocations should be started at compute nodes
      */
     struct SchedulingDecisions {
+	/** @brief The hostname-keyed map of images to copy to compute nodes */
         std::map<std::string, std::vector<std::shared_ptr<DataFile>>> images_to_copy_to_compute_node;
+	/** @brief The hostname-keyed map of images to load in RAM at compute nodes */
         std::map<std::string, std::vector<std::shared_ptr<DataFile>>> images_to_load_into_RAM_at_compute_node;
+	/** @brief The hostname-keyed map of functions to invoke at compute nodes */
         std::map<std::string, std::vector<std::shared_ptr<Invocation>>> invocations_to_start_at_compute_node;
     };
 

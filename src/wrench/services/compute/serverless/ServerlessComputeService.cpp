@@ -33,6 +33,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
      * @param hostname name of the head host on which the service runs
      * @param compute_hosts list of (homogeneous) compute node hostnames
      * @param head_node_storage_mount_point the mount point of storage at the head host (where images will be stored)
