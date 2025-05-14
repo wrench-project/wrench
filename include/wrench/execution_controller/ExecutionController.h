@@ -14,6 +14,7 @@
 #include "wrench/services/metering/BandwidthMeterService.h"
 #include "wrench/services/Service.h"
 #include "wrench/managers/data_movement_manager/DataMovementManager.h"
+#include "wrench/managers/function_manager/FunctionManager.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/execution_events/CompoundJobFailedEvent.h"
 #include "wrench/execution_events/CompoundJobCompletedEvent.h"
@@ -48,6 +49,9 @@ namespace wrench {
 
     public:
         virtual std::shared_ptr<JobManager> createJobManager();
+
+        virtual std::shared_ptr<FunctionManager> createFunctionManager();
+
         virtual std::shared_ptr<DataMovementManager> createDataMovementManager();
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);

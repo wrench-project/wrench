@@ -65,9 +65,11 @@ namespace wrench {
     void DataMovementManager::initiateAsynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
                                                            const std::shared_ptr<FileLocation> &dst,
                                                            const std::shared_ptr<FileRegistryService> &file_registry_service) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileCopy(): Invalid nullptr arguments");
         }
+#endif
         if (src->getFile() != dst->getFile()) {
             throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileCopy(): src and dst locations should be for the same file");
         }
@@ -103,9 +105,11 @@ namespace wrench {
      */
     void DataMovementManager::initiateAsynchronousFileRead(const std::shared_ptr<FileLocation> &location,
                                                            const sg_size_t num_bytes) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((location == nullptr)) {
             throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileRead(): Invalid nullptr arguments");
         }
+#endif
 
         DataMovementManager::ReadRequestSpecs request(location, num_bytes);
 
@@ -131,9 +135,11 @@ namespace wrench {
      */
     void DataMovementManager::initiateAsynchronousFileWrite(const std::shared_ptr<FileLocation> &location,
                                                             const std::shared_ptr<FileRegistryService> &file_registry_service) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((location == nullptr)) {
             throw std::invalid_argument("DataMovementManager::initiateAsynchronousFileWrite(): Invalid nullptr arguments");
         }
+#endif
 
         DataMovementManager::WriteRequestSpecs request(location, file_registry_service);
 
@@ -163,9 +169,11 @@ namespace wrench {
     void DataMovementManager::doSynchronousFileCopy(const std::shared_ptr<FileLocation> &src,
                                                     const std::shared_ptr<FileLocation> &dst,
                                                     const std::shared_ptr<FileRegistryService> &file_registry_service) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("DataMovementManager::doSynchronousFileCopy(): Invalid nullptr arguments");
         }
+#endif
         if (src->getFile() != dst->getFile()) {
             throw std::invalid_argument("DataMovementManager::doSynchronousFileCopy(): src and dst locations should be for the same file");
         }
