@@ -18,6 +18,7 @@
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
+#define GB (1000000000ULL)
 
 WRENCH_LOG_CATEGORY(serverless_basic_tests,
                     "Log category for ServerlessBasicTests tests");
@@ -180,17 +181,41 @@ private:
             throw std::runtime_error("Unexpected idle_cores map");
         }
         if (memories != std::map<std::string, sg_size_t>{
-            {"ServerlessComputeNode1", 64UL * 1000 * 1000 * 1000},
-            {"ServerlessComputeNode2", 64UL * 1000 * 1000 * 1000}
+            {"ServerlessComputeNode1", 64 * GB},
+            {"ServerlessComputeNode2", 64 * GB}
         }) {
             throw std::runtime_error("Unexpected memories map");
         }
         if (available_memories != std::map<std::string, sg_size_t>{
-            {"ServerlessComputeNode1", 64UL * 1000 * 1000 * 1000},
-            {"ServerlessComputeNode2", 64UL * 1000 * 1000 * 1000}
+            {"ServerlessComputeNode1", 64 * GB},
+            {"ServerlessComputeNode2", 64 * GB}
         }) {
             throw std::runtime_error("Unexpected available_memories map");
         }
+
+        // Bad registration
+        auto function_manager = this->createFunctionManager();
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& storage_service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            return std::make_shared<
+                MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
+        };
+
+        auto image_file = wrench::Simulation::addFile("image_file", 100 * GB);
+        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        wrench::StorageService::createFileAtLocation(image_location);
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+        try {
+            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+            throw std::runtime_error("Function registration should have failed due to RAM space");
+        } catch (const wrench::ExecutionException& expected) {}
+
+        try {
+            function_manager->registerFunction(function1, this->compute_service, 10, 20000 * GB, 8000 * MB, 10 * MB, 1 * MB);
+            throw std::runtime_error("Function registration should have failed due to disk space");
+        } catch (const wrench::ExecutionException& expected) {}
 
         return 0;
     }
