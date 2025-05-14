@@ -156,7 +156,7 @@ private:
 
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_read_action, nullptr));
 
         // Start it
         file_read_action_executor->setSimulation(this->getSimulation());
@@ -276,7 +276,7 @@ private:
                                                         wrench::FileLocation::LOCATION(this->test->ss, this->test->file)});
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_read_action, nullptr));
         // Start it
         file_read_action_executor->setSimulation(this->getSimulation());
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -380,7 +380,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_read_action, nullptr));
         // Start it
         file_read_action_executor->setSimulation(this->getSimulation());
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -493,7 +493,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss, this->test->file));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_read_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_read_action, nullptr));
         // Start it
         file_read_action_executor->setSimulation(this->getSimulation());
         file_read_action_executor->start(file_read_action_executor, true, false);

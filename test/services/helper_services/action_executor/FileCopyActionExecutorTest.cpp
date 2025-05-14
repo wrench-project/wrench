@@ -150,7 +150,7 @@ private:
         // Create a file copy action executor
         auto file_copy_action_executor = std::make_shared<wrench::ActionExecutor>(
                 "Host2", 0, 0.0, 0, false,
-                this->commport, file_copy_action, nullptr);
+                this->commport, nullptr, file_copy_action, nullptr);
         // Start it
         file_copy_action_executor->setSimulation(this->getSimulation());
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -276,7 +276,7 @@ private:
 
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_copy_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_copy_action, nullptr));
         // Start it
         file_copy_action_executor->setSimulation(this->getSimulation());
         file_copy_action_executor->start(file_copy_action_executor, true, false);

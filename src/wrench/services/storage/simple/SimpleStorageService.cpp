@@ -43,12 +43,46 @@ namespace wrench {
      */
     SimpleStorageService* SimpleStorageService::createSimpleStorageService(const std::string& hostname,
                                                                            const std::set<std::string>& mount_points,
-                                                                           WRENCH_PROPERTY_COLLECTION_TYPE
-                                                                           property_list,
-                                                                           const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
-                                                                           messagepayload_list) {
-        bool bufferized = false; // By default, non-bufferized
-        //        bool bufferized = true; // By default, bufferized
+                                                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                                           const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) {
+
+        return SimpleStorageService::createSimpleStorageServiceInternal(hostname, mount_points, nullptr, property_list, messagepayload_list);
+    }
+
+
+    /**
+     * @brief Factory method to create SimpleStorageService instances
+     *
+     * @param hostname: the name of the host on which to start the service
+     * @param file_system: the file system to use
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @return a pointer to a simple storage service
+     */
+    SimpleStorageService *SimpleStorageService::createSimpleStorageServiceWithExistingFileSystem(const std::string &hostname,
+                                                                           const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
+                                                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                                           const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) {
+
+        return SimpleStorageService::createSimpleStorageServiceInternal(hostname, {}, file_system, property_list, messagepayload_list);
+    }
+
+    /**
+     * @brief Factory method to create SimpleStorageService instances
+     *
+     * @param hostname: the name of the host on which to start the service
+     * @param file_system: the file system to use
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @return a pointer to a simple storage service
+     */
+    SimpleStorageService *SimpleStorageService::createSimpleStorageServiceInternal(const std::string &hostname,
+                                                                           const std::set<std::string>& mount_points,
+                                                                           const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
+                                                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                                           const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) {
+
+        bool bufferized = false;// By default, non-bufferized
 
         if (property_list.find(wrench::SimpleStorageServiceProperty::BUFFER_SIZE) != property_list.end()) {
             sg_size_t buffer_size = UnitParser::parse_size(
@@ -66,12 +100,9 @@ namespace wrench {
         }
 
         if (bufferized) {
-            return (SimpleStorageService*)(new SimpleStorageServiceBufferized(
-                hostname, mount_points, property_list, messagepayload_list));
-        }
-        else {
-            return (SimpleStorageService*)(new SimpleStorageServiceNonBufferized(
-                hostname, mount_points, property_list, messagepayload_list));
+            return new SimpleStorageServiceBufferized(hostname, mount_points, file_system, property_list, messagepayload_list);
+        } else {
+            return new SimpleStorageServiceNonBufferized(hostname, mount_points, file_system, property_list, messagepayload_list);
         }
     }
 
@@ -95,18 +126,21 @@ namespace wrench {
      * @brief Private constructor
      *
      * @param hostname: the name of the host on which to start the service
-     * @param mount_points: the set of mount points
+     * @param mount_points: the set of mount points (if no file system is provided)
+     * @param file_system: the file system to use (if no mount points are provided)
      * @param property_list: the property list
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param suffix: the suffix (for the service name)
      *
      */
     SimpleStorageService::SimpleStorageService(
-        const std::string& hostname,
-        const std::set<std::string>& mount_points,
-        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
-        const std::string& suffix) : StorageService(hostname, "simple_storage" + suffix) {
+            const std::string &hostname,
+            const std::set<std::string> &mount_points,
+            const std::shared_ptr<simgrid::fsmod::FileSystem>& file_system,
+            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
+            const std::string &suffix) : StorageService(hostname, "simple_storage" + suffix) {
+
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
@@ -115,40 +149,35 @@ namespace wrench {
 
         this->validateProperties();
 
-        if (mount_points.empty()) {
-            throw std::invalid_argument(
-                "SimpleStorageService::SimpleStorageService(): A storage service must have at least one mount point");
+        if (mount_points.empty() and file_system == nullptr) {
+            throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): A storage service must have at least one mount point specified or a file system");
         }
 
-        this->file_system = sgfs::FileSystem::create(this->getName() + "_fs", INT_MAX);
-        for (const auto& mp : mount_points) {
-            // Find the disk
-            auto disk = S4U_Simulation::hostHasMountPoint(this->hostname, mp);
-            if (disk == nullptr) {
-                throw std::invalid_argument(
-                    "SimpleStorageService::SimpleStorageService(): There is no disk at host " + this->hostname +
-                    " mounted at " + mp);
+        if (file_system) {
+            this->file_system = file_system;
+        } else {
+            this->file_system = sgfs::FileSystem::create(this->getName() + "_fs", INT_MAX);
+            for (const auto &mp: mount_points) {
+                // Find the disk
+                auto disk = S4U_Simulation::hostHasMountPoint(this->hostname, mp);
+                if (disk == nullptr) {
+                    throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): There is no disk at host " + this->hostname + " mounted at " + mp);
+                }
+                auto disk_capacity = S4U_Simulation::getDiskCapacity(this->hostname, mp);
+                sgfs::Partition::CachingScheme caching_scheme;
+                std::string caching_behavior_property = this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR);
+                if (caching_behavior_property == "NONE") {
+                    caching_scheme = sgfs::Partition::CachingScheme::NONE;
+                } else if (caching_behavior_property == "FIFO") {
+                    caching_scheme = sgfs::Partition::CachingScheme::FIFO;
+                } else if (caching_behavior_property == "LRU") {
+                    caching_scheme = sgfs::Partition::CachingScheme::LRU;
+                } else {
+                    throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): Invalid caching behavior " + caching_behavior_property);
+                }
+                auto storage = sgfs::OneDiskStorage::create(this->getName()+"_fspart_"+mp, disk);
+                this->file_system->mount_partition(mp, storage, (sg_size_t)disk_capacity, caching_scheme);
             }
-            auto disk_capacity = S4U_Simulation::getDiskCapacity(this->hostname, mp);
-            sgfs::Partition::CachingScheme caching_scheme;
-            std::string caching_behavior_property = this->getPropertyValueAsString(
-                wrench::StorageServiceProperty::CACHING_BEHAVIOR);
-            if (caching_behavior_property == "NONE") {
-                caching_scheme = sgfs::Partition::CachingScheme::NONE;
-            }
-            else if (caching_behavior_property == "FIFO") {
-                caching_scheme = sgfs::Partition::CachingScheme::FIFO;
-            }
-            else if (caching_behavior_property == "LRU") {
-                caching_scheme = sgfs::Partition::CachingScheme::LRU;
-            }
-            else {
-                throw std::invalid_argument(
-                    "SimpleStorageService::SimpleStorageService(): Invalid caching behavior " +
-                    caching_behavior_property);
-            }
-            auto storage = sgfs::OneDiskStorage::create(this->getName() + "_fspart_" + mp, disk);
-            this->file_system->mount_partition(mp, storage, (sg_size_t)disk_capacity, caching_scheme);
         }
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(
@@ -464,7 +493,7 @@ namespace wrench {
 
 
     /**
-     * @brief Get a file's last write date at a the storage service (in zero simulated time)
+     * @brief Get a file's last write date at the storage service (in zero simulated time)
      * @param location:  a location
      * @return a date in seconds, or -1 if the file is not found
      */
@@ -483,6 +512,61 @@ namespace wrench {
         catch (simgrid::Exception& e) {
             return -1.0;
         }
+    }
+
+     /**
+     * @brief Reserve space at the storage service (basically, add bytes to a hidden un-evictable file in zero time)
+     * @param location: a location
+     * @return true if success, false otherwise
+     */
+    bool SimpleStorageService::reserveSpace(std::shared_ptr<FileLocation> &location) {
+        std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
+        if (not partition) {
+            throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
+        }
+        std::string reservation_file_path = partition->get_name() + "/.reserved_space";
+        if (not this->file_system->file_exists(reservation_file_path)) {
+            this->file_system->create_file(reservation_file_path, 0);
+            this->file_system->make_file_evictable(reservation_file_path, true);
+        }
+        auto reservation_file = this->file_system->open(reservation_file_path, "a");
+        // reservation_file->seek(SEEK_END);
+        bool success = true;
+        try {
+            reservation_file->write(location->getFile()->getSize(), false);
+        } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
+            success = false;
+        }
+        reservation_file->close();
+        return success;
+    }
+
+    /**
+     * @brief Un-reserve space at the storage service (basically, remove bytes to a hidden un-evictable file in zero time)
+     * @param location: a location
+     */
+    void SimpleStorageService::unreserveSpace(std::shared_ptr<FileLocation> &location) {
+
+        std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
+        if (not partition) {
+            throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
+        }
+        std::string reservation_file_path = partition->get_name() + "/.reserved_space";
+        if (not this->file_system->file_exists(reservation_file_path)) {
+            throw std::runtime_error("StorageService::unreserveSpace(): .reserved_space file not found - internal error");
+        }
+        this->file_system->truncate_file(reservation_file_path, location->getFile()->getSize());
+    }
+
+    /**
+     * @brief A method to open a file, which really doesn't do anything besides making the
+     *        file unevictable, in case the storage service implements caching. Calling
+     *        close() on the returned file will decrement the file's refcount, thus possibly
+     *        making it evictable again.
+     * @param location: the file's location
+     */
+    std::shared_ptr<simgrid::fsmod::File> SimpleStorageService::openFile(const std::shared_ptr<FileLocation> &location) {
+        return this->file_system->open(location->getFilePath(), "r");
     }
 
     /**

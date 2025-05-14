@@ -113,7 +113,7 @@ namespace wrench {
      * @return the job
      */
     std::shared_ptr<CompoundJob> Action::getJob() const {
-        return this->job.lock();
+        return (this->job.expired() ? nullptr : this->job.lock());
     }
 
     /**
@@ -122,7 +122,9 @@ namespace wrench {
      */
     void Action::setState(const Action::State new_state) {
         auto old_state = this->execution_history.top().state;
-        this->job.lock()->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
+        if (not this->job.expired()) {
+            this->job.lock()->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
+        }
         //        std::cerr << "ACTION " << this->getName() << ": " << Action::stateToString(old_state) << "-->" << Action::stateToString(new_state) << "\n";
         this->execution_history.top().state = new_state;
     }

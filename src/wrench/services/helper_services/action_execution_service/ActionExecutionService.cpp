@@ -457,16 +457,16 @@ namespace wrench {
 
             /** Dispatch it **/
             // Create an action executor on the target host
-            auto action_executor = std::make_shared<ActionExecutor>(target_host->get_name(),
-                                                                    target_num_cores,
-                                                                    required_ram,
-                                                                    this->getPropertyValueAsTimeInSecond(
-                                                                        ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
-                                                                    this->getPropertyValueAsBoolean(
-                                                                        ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
-                                                                    this->commport,
-                                                                    action,
-                                                                    this->getSharedPtr<ActionExecutionService>());
+            auto action_executor = std::shared_ptr<ActionExecutor>(
+                    new ActionExecutor(target_host->get_name(),
+                                       target_num_cores,
+                                       required_ram,
+                                       this->getPropertyValueAsTimeInSecond(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
+                                       this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
+                                       this->commport,
+                                       nullptr,
+                                       action,
+                                       this->getSharedPtr<ActionExecutionService>()));
 
             action_executor->setSimulation(this->simulation_);
             try {

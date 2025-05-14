@@ -97,8 +97,8 @@ include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_
 
 
 # For MacOS's MacPorts
-set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
-include_directories(/opt/local/include)
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/local/lib)
+include_directories(/usr/local/include)
 
 # library header files
 set(HEADER_FILES
@@ -111,6 +111,10 @@ set(HEADER_FILES
         include/wrench/managers/data_movement_manager/FileReaderThread.h
         include/wrench/managers/data_movement_manager/FileWriterThread.h
         include/wrench/managers/job_manager/JobManager.h
+        include/wrench/managers/function_manager/FunctionManager.h
+        include/wrench/managers/function_manager/FunctionManagerMessage.h
+        include/wrench/managers/function_manager/Function.h
+        include/wrench/managers/function_manager/RegisteredFunction.h
         include/wrench/services/Service.h
         include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceMessagePayload.h
@@ -129,6 +133,16 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchComputeServiceProperty.h
         include/wrench/services/compute/batch/BatchJob.h
         include/wrench/services/compute/batch/BatschedNetworkListener.h
+        include/wrench/services/compute/serverless/ServerlessComputeService.h
+        include/wrench/services/compute/serverless/ServerlessComputeServiceMessage.h
+        include/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h
+        include/wrench/services/compute/serverless/ServerlessComputeServiceProperty.h
+        include/wrench/services/compute/serverless/Invocation.h
+        include/wrench/services/compute/serverless/ServerlessScheduler.h
+        include/wrench/services/compute/serverless/ServerlessStateOfTheSystem.h
+        include/wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h
+        include/wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h
+        include/wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h
         include/wrench/services/compute/cloud/CloudComputeService.h
         include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
@@ -216,11 +230,13 @@ set(HEADER_FILES
         include/wrench/failure_causes/FileAlreadyBeingRead.h
         include/wrench/failure_causes/FileAlreadyBeingWritten.h
         include/wrench/failure_causes/FileNotFound.h
+        include/wrench/failure_causes/FunctionNotFound.h
         include/wrench/failure_causes/FunctionalityNotAvailable.h
         include/wrench/failure_causes/HostError.h
         include/wrench/failure_causes/InvalidDirectoryPath.h
         include/wrench/failure_causes/JobKilled.h
         include/wrench/failure_causes/JobTimeout.h
+        include/wrench/failure_causes/OperationTimeout.h
         include/wrench/failure_causes/NetworkError.h
         include/wrench/failure_causes/NotAllowed.h
         include/wrench/failure_causes/NotEnoughResources.h
@@ -277,6 +293,10 @@ set(SOURCE_FILES
         src/wrench/managers/job_manager/JobManager.cpp
         src/wrench/managers/job_manager/JobManagerMessage.cpp
         include/wrench/managers/job_manager/JobManagerMessage.h
+        src/wrench/managers/function_manager/FunctionManager.cpp
+        src/wrench/managers/function_manager/FunctionManagerMessage.cpp
+        src/wrench/managers/function_manager/Function.cpp
+        src/wrench/managers/function_manager/RegisteredFunction.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -329,6 +349,15 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/workload_helper_classes/TraceFileLoader.cpp
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
+        src/wrench/services/compute/serverless/ServerlessComputeService.cpp
+        src/wrench/services/compute/serverless/ServerlessComputeServiceMessage.cpp
+        src/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.cpp
+        src/wrench/services/compute/serverless/ServerlessComputeServiceProperty.cpp
+        src/wrench/services/compute/serverless/Invocation.cpp
+        src/wrench/services/compute/serverless/ServerlessStateOfTheSystem.cpp
+        src/wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.cpp
+        src/wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.cpp
+        src/wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
         include/wrench/services/compute/cloud/CloudComputeServiceMessage.h
@@ -405,11 +434,13 @@ set(SOURCE_FILES
         src/wrench/failure_causes/FileAlreadyBeingRead.cpp
         src/wrench/failure_causes/FileAlreadyBeingWritten.cpp
         src/wrench/failure_causes/FileNotFound.cpp
+        src/wrench/failure_causes/FunctionNotFound.cpp
         src/wrench/failure_causes/FunctionalityNotAvailable.cpp
         src/wrench/failure_causes/HostError.cpp
         src/wrench/failure_causes/InvalidDirectoryPath.cpp
         src/wrench/failure_causes/JobKilled.cpp
         src/wrench/failure_causes/JobTimeout.cpp
+        src/wrench/failure_causes/OperationTimeout.cpp
         src/wrench/failure_causes/NetworkError.cpp
         src/wrench/failure_causes/NotAllowed.cpp
         src/wrench/failure_causes/NotEnoughResources.cpp
@@ -479,6 +510,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/action_executor/ComputeActionExecutorTest.cpp
         test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
+        test/services/helper_services/action_executor/ActionTimeoutExecutorTest.cpp
         test/services/helper_services/action_executor/FileReadActionExecutorTest.cpp
         test/services/helper_services/action_executor/CustomActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileDeleteActionExecutorTest.cpp
@@ -500,6 +532,9 @@ set(TEST_FILES
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceResourceInformationTest.cpp
+        test/services/compute_services/serverless/ServerlessLoadBalancingSchedulerTests.cpp
+        test/services/compute_services/serverless/ServerlessBasicTests.cpp
+        test/services/compute_services/serverless/ServerlessTimingTests.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
         test/services/storage_services/XRootDStorageService/XRootDStorageServiceBasicFunctionalTest.cpp
