@@ -28,6 +28,9 @@
 WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
 
 namespace wrench {
+
+    unsigned long ServerlessComputeService::sequence_number = 0;
+
     ServerlessComputeService::ServerlessComputeService(const std::string& hostname,
                                                        const std::vector<std::string>& compute_hosts,
                                                        const std::string& head_node_storage_mount_point,
@@ -302,9 +305,14 @@ namespace wrench {
         bool do_scheduling;
         while (processNextMessage(do_scheduling)) {
             if (do_scheduling) {
+                // Make invocations whose images have downloaded schedulable
                 admitInvocations();
+
+                // Invoke the scheduler
                 auto decisions = invokeScheduler();
-                // Important to do things in this order so that files get open(), and thus
+
+                // Implement the scheduler's decisions, if possible.
+                // It's important to do things in this order below so that files get open(), and thus
                 // unevictable, thus preventing ping-pong effects.
                 dispatchInvocations(decisions);
                 initiateImageLoads(decisions);
@@ -596,11 +604,12 @@ namespace wrench {
             WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
             return false;
         }
-        // There is available RAM space for the function itself
-        if (ss_memory->getTotalFreeSpaceZeroTime() < invocation->getRegisteredFunction()->getRAMLimit()) {
-            WRENCH_INFO("Scheduled invocation cannot be started because there is not enough available RAM");
-            return false;
-        }
+        // We shouldn't check this, this will fail if LRU says it should...
+        // // There is available RAM space for the function itself
+        // if (ss_memory->getTotalFreeSpaceZeroTime() < invocation->getRegisteredFunction()->getRAMLimit()) {
+        //     WRENCH_INFO("Scheduled invocation cannot be started because there is not enough available RAM");
+        //     return false;
+        // }
         return true;
     }
 
@@ -614,13 +623,46 @@ namespace wrench {
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                                       const std::string& target_host) {
+
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
         if (not invocationCanBeStarted(invocation, target_host)) {
             return false;
         }
 
-        // Start the invocation's own private storage service
-        auto ss = startInvocationStorageService(invocation, target_host);
+        // Start the invocation's own private storage service, on disk, if possible
+        std::shared_ptr<StorageService> private_ss;
+        try {
+            private_ss = startInvocationStorageService(invocation, target_host);
+        } catch (ExecutionException &e) {
+            WRENCH_INFO("Couldn't start private on-disk storage for an invocation for %s due to lack of space",
+                invocation->_registered_function->_function->getName().c_str());
+            return false;
+        }
+
+
+        // Create and open a tmp memory file in RAM and open it, if possible
+        auto tmp_memory_file = Simulation::addFile(
+            "tmp_ram_file_" + std::to_string(++ServerlessComputeService::sequence_number),
+            invocation->getRegisteredFunction()->getRAMLimit());
+        auto compute_ram_ss = _state_of_the_system->_compute_memories[target_host];
+        try {
+            auto file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
+            StorageService::createFileAtLocation(file_location);
+            invocation->_tmp_ram_file_location = file_location;
+            invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
+        } catch (ExecutionException &e) {
+            WRENCH_INFO("Couldn't create a private RAM space for an invocation for %s due to lack of space",
+                invocation->_registered_function->_function->getName().c_str());
+            // Kill private storage service
+            private_ss->stop();
+            return false;
+        }
+
+        // Open the image memory file
+        invocation->_opened_image_ram_file = compute_ram_ss->openFile(
+            FileLocation::LOCATION(compute_ram_ss,
+                                   invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
+
 
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
@@ -635,6 +677,7 @@ namespace wrench {
 
             // Clean up the on-disk storage
             invocation->_tmp_storage_service->stop();
+            invocation->_opened_tmp_file->close();
             invocation->_tmp_storage_service = nullptr; // Should free up all memory...
             StorageService::removeFileAtLocation(invocation->_tmp_file);
             // WRENCH_INFO("Done with the lambda execute!!");
@@ -665,25 +708,8 @@ namespace wrench {
         action_executor->setActionTimeout(invocation->getRegisteredFunction()->getTimeLimit());
         action_executor->setSimulation(this->simulation_);
 
-        // Open the image memory file
-        auto compute_ram_ss = _state_of_the_system->_compute_memories[target_host];
-        invocation->_opened_image_ram_file = compute_ram_ss->openFile(
-            FileLocation::LOCATION(compute_ram_ss,
-                                   invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
-
-        // Create a tmp memory file in RAM and open it
-        auto tmp_memory_file = Simulation::addFile(
-            "tmp_ram_file_" + std::to_string(reinterpret_cast<unsigned long>(invocation.get())),
-            invocation->getRegisteredFunction()->getRAMLimit());
-        invocation->_tmp_ram_file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
-        StorageService::createFileAtLocation(invocation->_tmp_ram_file_location);
-        invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
-
-
-        WRENCH_INFO("Dispatched invocation %p for function %s",
-            invocation.get(),
+        WRENCH_INFO("Dispatched an invocation for function %s",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
-        // Reserve a core  TODO: Was it done elsewhere???
         _state_of_the_system->_available_cores[target_host] -= 1;
         invocation->_start_date = Simulation::getCurrentSimulatedDate();
         action_executor->start(action_executor, true, false);
@@ -749,21 +775,26 @@ namespace wrench {
     std::shared_ptr<StorageService> ServerlessComputeService::startInvocationStorageService(
         const std::shared_ptr<Invocation>& invocation,
         const std::string& target_host) {
-        static unsigned long seq = -1;
-        seq++;
 
         // WRENCH_INFO("Starting a new storage service for an invocation...");
-        // Reserve space on the storage service
-        const auto tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[target_host],
-                                                             Simulation::addFile(
-                                                                 "tmp_" + std::to_string(seq),
-                                                                 invocation->_registered_function->_disk_space));
-        StorageService::createFileAtLocation(tmp_file);
+        // Reserve space on the storage service if possible
+        std::shared_ptr<FileLocation> tmp_file;
+        std::shared_ptr<simgrid::fsmod::File> opened_tmp_file;
+        try {
+            tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[target_host],
+                                                                 Simulation::addFile(
+                                                                     "tmp_" + std::to_string(++ServerlessComputeService::sequence_number),
+                                                                     invocation->_registered_function->_disk_space));
+            StorageService::createFileAtLocation(tmp_file);
+            opened_tmp_file = _state_of_the_system->_compute_storages[target_host]->openFile(tmp_file);
+        } catch (ExecutionException &e) {
+            throw;
+        }
 
         // Create a tmp file system
         const auto disk = S4U_Simulation::hostHasMountPoint(target_host, "/");
-        const auto ods = simgrid::fsmod::OneDiskStorage::create("is_" + std::to_string(seq), disk);
-        const auto fs = simgrid::fsmod::FileSystem::create("fs" + std::to_string(seq));
+        const auto ods = simgrid::fsmod::OneDiskStorage::create("is_" + std::to_string(ServerlessComputeService::sequence_number), disk);
+        const auto fs = simgrid::fsmod::FileSystem::create("fs" + std::to_string(ServerlessComputeService::sequence_number));
         fs->mount_partition("/", ods, invocation->_registered_function->_disk_space);
 
         // Create a tmp storage service
@@ -775,6 +806,7 @@ namespace wrench {
 
         // Keep track of all this
         invocation->_tmp_file = tmp_file;
+        invocation->_opened_tmp_file = opened_tmp_file;
         invocation->_tmp_storage_service = ss;
 
         return ss;
