@@ -106,6 +106,7 @@ namespace wrench {
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
+        bool supportsFunctions() override;
 
         /***********************/
         /** \cond INTERNAL     */
@@ -117,7 +118,7 @@ namespace wrench {
 
         ~BareMetalComputeService() override;
 
-        bool isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, sg_size_t ram);
+        bool isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, sg_size_t ram) const;
 
     protected:
         friend class JobManager;
@@ -221,7 +222,7 @@ namespace wrench {
         void processIsThereAtLeastOneHostWithAvailableResources(
                 S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram);
 
-        void cleanup(bool has_terminated_cleanly, int return_value) override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
 
         static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
 

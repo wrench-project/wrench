@@ -130,7 +130,7 @@ namespace wrench {
         }
 
         void reset();
-        void putMessage(SimulationMessage *m);
+        void putMessage(SimulationMessage *msg);
         void dputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> iputMessage(SimulationMessage *msg);
         std::shared_ptr<S4U_PendingCommunication> igetMessage();

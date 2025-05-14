@@ -30,7 +30,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NotAllowed(std::shared_ptr<Service> service, std::string &error_message);
+        NotAllowed(std::shared_ptr<Service> service, std::string error_message);
         /***********************/
         /** \endcond           */
         /***********************/

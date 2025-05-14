@@ -510,6 +510,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+        WRENCH_INFO("Creating two pilot jobs");
         auto pjob1 = job_manager->createPilotJob();
         auto pjob2 = job_manager->createPilotJob();
 
@@ -518,32 +519,49 @@ private:
         batch_job_args["-t"] = "300";//time in seconds
         batch_job_args["-c"] = "10"; //number of cores per node
         try {
+            WRENCH_INFO("Submitting both pilot jobs, each of them asking for 4 compute nodes and 300 seconds");
             job_manager->submitJob(pjob1, this->test->compute_service, batch_job_args);
             job_manager->submitJob(pjob2, this->test->compute_service, batch_job_args);
         } catch (wrench::ExecutionException &e) {
-            throw std::runtime_error(
-                    "Exception: " + std::string(e.what()));
+            throw std::runtime_error("Exception: " + std::string(e.what()));
         }
 
+        WRENCH_INFO("Sleeping for 1 second");
+        wrench::Simulation::sleep(1);
+        WRENCH_INFO("At this point one of the two jobs should be running");
+        {
+            auto num_running_pilots = job_manager->getNumRunningPilotJobs();
+            if (num_running_pilots != 1) {
+                throw std::runtime_error("The number of running pilot jobs should be 1 but is " + std::to_string(num_running_pilots));
+            }
+        }
 
+        // Terminate job 1 (which is running)
+        WRENCH_INFO("Terminating pilot job #1");
+        job_manager->terminateJob(pjob1);
+
+        WRENCH_INFO("Sleeping another second");
         wrench::Simulation::sleep(1);
 
-        if (job_manager->getNumRunningPilotJobs() != 2) {
-            throw std::runtime_error("The number of running pilot jobs should be 2");
+        {
+            auto num_running_pilots = job_manager->getNumRunningPilotJobs();
+            if (num_running_pilots != 1) {
+                throw std::runtime_error("The number of running pilot jobs should be 1 but is " + std::to_string(num_running_pilots));
+            }
         }
 
-        // Terminate job 2 (which is pending)
-        job_manager->terminateJob(pjob2);
-        // Terminate job 1 (which is running)
-        job_manager->terminateJob(pjob1);
+        // Letting pilot job 2 expire...
+        // WRENCH_INFO("Terminating pilot job #2");
+        // job_manager->terminateJob(pjob2);
+        wrench::Simulation::sleep(10000);
 
         if (pjob1->getState() != wrench::PilotJob::State::TERMINATED) {
             throw std::runtime_error(
                     "Pilot job #1's state should be TERMINATED (instead: " + std::to_string(pjob1->getState()) + ")");
         }
-        if (pjob2->getState() != wrench::PilotJob::State::TERMINATED) {
+        if (pjob2->getState() != wrench::PilotJob::State::EXPIRED) {
             throw std::runtime_error(
-                    "Pilot job #2's state should be TERMINATED (instead: " + std::to_string(pjob2->getState()) + ")");
+                    "Pilot job #2's state should be EXPIRED (instead: " + std::to_string(pjob2->getState()) + ")");
         }
 
         return 0;
@@ -565,6 +583,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -594,7 +613,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
 
     ASSERT_NO_THROW(wms = simulation->add(
-                            new TerminateOneStandardJobSubmissionTestWMS(
+                            new TerminateOnePilotJobSubmissionTestWMS(
                                     this, hostname)));
 
     // Create two files

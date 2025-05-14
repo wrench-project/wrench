@@ -204,7 +204,7 @@ namespace wrench {
      */
     class CloudComputeServiceResumeVMRequestMessage : public CloudComputeServiceMessage {
     public:
-        CloudComputeServiceResumeVMRequestMessage(S4U_CommPort *commport,
+        CloudComputeServiceResumeVMRequestMessage(S4U_CommPort *answer_commport,
                                                   const std::string &vm_name,
                                                   sg_size_t payload);
 

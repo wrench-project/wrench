@@ -67,7 +67,7 @@ namespace wrench {
 
         virtual std::string createVM(unsigned long num_cores,
                                      sg_size_t ram_memory,
-                                     const std::string &pm_name,
+                                     const std::string &physical_host,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                      WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 

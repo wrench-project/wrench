@@ -38,7 +38,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<DataFile> getFile();
+        std::shared_ptr<DataFile> getFile() const;
         std::shared_ptr<FileLocation> getLocation();
         std::string toString() override;
 

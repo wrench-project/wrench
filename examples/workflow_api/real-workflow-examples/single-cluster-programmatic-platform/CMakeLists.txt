@@ -23,6 +23,7 @@ if (ENABLE_BATSCHED)
             wrench
             wrenchwfcommonsworkflowparser
             ${SimGrid_LIBRARY}
+	    ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             ${ZMQ_LIBRARY}
             )
@@ -31,6 +32,7 @@ else()
             wrench
             wrenchwfcommonsworkflowparser
             ${SimGrid_LIBRARY}
+	    ${FSMOD_LIBRARY}
             ${Boost_LIBRARIES}
             )
 endif()

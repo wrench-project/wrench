@@ -222,7 +222,7 @@ namespace wrench {
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampFileRead(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service, std::shared_ptr<WorkflowTask> task = nullptr);
+        SimulationTimestampFileRead(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<StorageService> service, std::shared_ptr<WorkflowTask> task = nullptr);
     };
 
     class SimulationTimestampFileReadFailure;
@@ -305,7 +305,7 @@ namespace wrench {
         void setEndpoints();
 
         friend class SimulationOutput;
-        SimulationTimestampFileWrite(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> dst, std::shared_ptr<StorageService> service, std::shared_ptr<WorkflowTask> task = nullptr);
+        SimulationTimestampFileWrite(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> dst_location, std::shared_ptr<StorageService> service, std::shared_ptr<WorkflowTask> task = nullptr);
     };
 
     class SimulationTimestampFileWriteFailure;
@@ -357,7 +357,7 @@ namespace wrench {
         std::shared_ptr<FileLocation> getDestination();
 
     protected:
-        SimulationTimestampFileCopy(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopy(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
 
         /**
          * @brief The DataFile that was being copied

@@ -154,11 +154,11 @@ namespace wrench {
                                                                        std::set<simgrid::s4u::Host *> &hosts_to_avoid);
 
 
-        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, sg_size_t ram);
+        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, sg_size_t ram) const;
 
-        void cleanup(bool has_terminated_cleanly, int return_value) override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
 
-        bool areAllComputeResourcesDownWithNoActionExecutorRunning();
+        bool areAllComputeResourcesDownWithNoActionExecutorRunning() const;
 
         int exit_code = 0;
 

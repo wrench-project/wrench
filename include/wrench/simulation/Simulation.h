@@ -79,7 +79,7 @@ namespace wrench {
         static sg_size_t getHostMemoryCapacity(const std::string &hostname);
         static unsigned long getHostNumCores(const std::string &hostname);
         static double getHostFlopRate(const std::string &hostname);
-        static bool hostHasMountPoint(const std::string &hostname, const std::string &scratch_space_mount_point);
+        static bool hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(const std::shared_ptr<DataFile> &file);
@@ -237,7 +237,7 @@ namespace wrench {
 //        static int unique_disk_sequence_number;
 
         void platformSanityCheck() const;
-        void checkSimulationSetup();
+        void checkSimulationSetup() const;
 
         void startAllProcesses();
         void addService(const std::shared_ptr<ComputeService> &service);

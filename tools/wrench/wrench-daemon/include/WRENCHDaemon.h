@@ -32,7 +32,7 @@ public:
                  bool daemon_logging,
                  unsigned long num_commports,
                  int port_number,
-                 int fixed_simulation_port_number,
+                 int simulation_port_number,
                  const std::string &allowed_origin,
                  int sleep_us);
 

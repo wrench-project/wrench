@@ -1309,8 +1309,7 @@ namespace wrench
      * @brief Returns true if the service supports standard jobs
      * @return true or false
      */
-    bool CloudComputeService::supportsStandardJobs()
-    {
+    bool CloudComputeService::supportsStandardJobs() {
         return false;
     }
 
@@ -1318,8 +1317,7 @@ namespace wrench
      * @brief Returns true if the service supports compound jobs
      * @return true or false
      */
-    bool CloudComputeService::supportsCompoundJobs()
-    {
+    bool CloudComputeService::supportsCompoundJobs() {
         return false;
     }
 
@@ -1327,8 +1325,15 @@ namespace wrench
      * @brief Returns true if the service supports pilot jobs
      * @return true or false
      */
-    bool CloudComputeService::supportsPilotJobs()
-    {
+    bool CloudComputeService::supportsPilotJobs() {
+        return false;
+    }
+
+    /**
+    * @brief Returns true if the service supports functions
+    * @return true or false
+    */
+    bool CloudComputeService::supportsFunctions() {
         return false;
     }
 

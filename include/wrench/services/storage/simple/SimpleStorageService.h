@@ -15,7 +15,6 @@
 #include "SimpleStorageServiceProperty.h"
 #include "SimpleStorageServiceMessagePayload.h"
 #include "wrench/services/memory/MemoryManager.h"
-#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include <fsmod.hpp>
 
@@ -86,6 +85,7 @@ namespace wrench {
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                                 const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
+
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
@@ -99,8 +99,8 @@ namespace wrench {
 
         std::string getMountPoint() override;
         std::set<std::string> getMountPoints() override;
-        bool hasMultipleMountPoints();
-        bool hasMountPoint(const std::string &mp);
+        bool hasMultipleMountPoints() const;
+        bool hasMountPoint(const std::string &mp) const;
 
         sg_size_t getTotalSpace() override;
 
@@ -110,67 +110,14 @@ namespace wrench {
 
         std::string getBaseRootPath() override;
 
-        /**
-         * @brief Reserve space at the storage service (basically, add bytes to a hidden un-evictable file in zero time)
-         * @param location: a location
-         * @return true if success, false otherwise
-         */
-        bool reserveSpace(std::shared_ptr<FileLocation> &location) override {
-            std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            if (not partition) {
-                throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
-            }
-            std::string reservation_file_path = partition->get_name() + "/.reserved_space";
-            if (not this->file_system->file_exists(reservation_file_path)) {
-                this->file_system->create_file(reservation_file_path, 0);
-                this->file_system->make_file_evictable(reservation_file_path, true);
-            }
-            auto reservation_file = this->file_system->open(reservation_file_path, "a");
-//            reservation_file->seek(SEEK_END);
-            bool success = true;
-            try {
-                reservation_file->write(location->getFile()->getSize(), false);
-            } catch (simgrid::fsmod::NotEnoughSpaceException &e) {
-                success = false;
-            }
-            reservation_file->close();
-            return success;
-        }
-
-        /**
-         * @brief Unreserve space at the storage service (basically, remove bytes to a hidden un-evictable file in zero time)
-         * @param location: a location
-         */
-        void unreserveSpace(std::shared_ptr<FileLocation> &location) override {
-
-            std::shared_ptr<simgrid::fsmod::Partition> partition = this->file_system->get_partition_for_path_or_null(location->getFilePath());
-            if (not partition) {
-                throw std::runtime_error("SimpleStorageService::reserveSpace(): Internal error, partition not found");
-            }
-            std::string reservation_file_path = partition->get_name() + "/.reserved_space";
-            if (not this->file_system->file_exists(reservation_file_path)) {
-                throw std::runtime_error("StorageService::unreserveSpace(): .reserved_space file not found - internal error");
-            }
-            this->file_system->truncate_file(reservation_file_path, location->getFile()->getSize());
-        }
-
-//        /**
-//        * @brief Get the mount point that stores a path
-//        * @param path: path
-//        *
-//        * @return a mount point
-//        */
-//        std::string getPathMountPoint(const std::string &path) {
-//            std::string mount_point, path_at_mount_point;
-//            this->splitPath(path, mount_point, path_at_mount_point);
-//            return mount_point;
-//        }
+        bool reserveSpace(std::shared_ptr<FileLocation> &location) override;
+        void unreserveSpace(std::shared_ptr<FileLocation> &location) override;
 
         void createFile(const std::shared_ptr<FileLocation> &location) override;
 
         double getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) override;
 
-        simgrid::s4u::Disk *getDiskForPathOrNull(const std::string &path);
+        simgrid::s4u::Disk *getDiskForPathOrNull(const std::string &path) const;
 
         /***********************/
         /** \endcond          **/
@@ -221,6 +168,7 @@ namespace wrench {
         /***********************/
         SimpleStorageService(const std::string &hostname,
                              const std::set<std::string> &mount_points,
+                             const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                              const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                              const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list,
                              const std::string &suffix);
@@ -253,7 +201,7 @@ namespace wrench {
 
 //        bool splitPath(const std::string &path, std::string &mount_point, std::string &path_at_mount_point);
 
-        std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location, std::shared_ptr<simgrid::fsmod::File> &opened_file);
+        std::shared_ptr<FailureCause> validateFileReadRequest(const std::shared_ptr<FileLocation> &location, std::shared_ptr<simgrid::fsmod::File> &opened_file) const;
         std::shared_ptr<FailureCause> validateFileWriteRequest(const std::shared_ptr<FileLocation> &location, sg_size_t num_bytes_to_write, std::shared_ptr<simgrid::fsmod::File> &opened_file);
         std::shared_ptr<FailureCause> validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location, std::shared_ptr<FileLocation> &dst_location,
                                                               std::shared_ptr<simgrid::fsmod::File> &src_opened_file, std::shared_ptr<simgrid::fsmod::File> &dst_opened_file);
@@ -264,8 +212,23 @@ namespace wrench {
 
     private:
         friend class Simulation;
+        friend class ServerlessComputeService;
+
+        std::shared_ptr<simgrid::fsmod::File> openFile(const std::shared_ptr<FileLocation> &location);
 
         void validateProperties();
+
+        static SimpleStorageService *createSimpleStorageServiceWithExistingFileSystem(const std::string &hostname,
+                                                                const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
+                                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
+
+
+        static SimpleStorageService *createSimpleStorageServiceInternal(const std::string &hostname,
+                                                                const std::set<std::string>& mount_points,
+                                                                const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
+                                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                                                const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
 
 #ifdef PAGE_CACHE_SIMULATION

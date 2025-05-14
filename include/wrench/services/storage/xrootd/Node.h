@@ -36,7 +36,7 @@ namespace wrench {
                                                         WRENCH_PROPERTY_COLLECTION_TYPE node_property_list = {}, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE node_messagepayload_list = {});
 
             std::shared_ptr<Node> getChild(unsigned int n);
-            Node *getParent();
+            Node *getParent() const;
 
             /***********************/
             /** \cond DEVELOPER    */
@@ -128,7 +128,7 @@ namespace wrench {
 
             int main() override;
             bool processNextMessage();
-            Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& storage_property_list, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& storage_messagepayload_list);
+            Node(Deployment *deployment, const std::string &hostname, const WRENCH_PROPERTY_COLLECTION_TYPE& property_list, const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list);
 
             /**
             * @brief Return the storage service's default mountpoint, if any.
@@ -175,7 +175,7 @@ namespace wrench {
             map<Node *, vector<stack<Node *>>> splitStack(const vector<stack<Node *>>& search_stack);
             virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             vector<stack<Node *>> constructFileSearchTree(const vector<shared_ptr<Node>> &targets);
-            stack<Node *> constructSearchStack(Node *target);
+            stack<Node *> constructSearchStack(Node *target) const;
             //std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
 
             bool makeSupervisor();

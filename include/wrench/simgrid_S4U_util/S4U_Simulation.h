@@ -12,6 +12,7 @@
 #define WRENCH_S4U_SIMULATION_H
 
 #include <climits>
+#include <cfloat>
 #include <limits>
 #include <simgrid/s4u.hpp>
 #include <simgrid/kernel/routing/ClusterZone.hpp>
@@ -30,6 +31,8 @@ namespace wrench {
     public:
         /** @brief The ram capacity of a physical host whenever not specified in the platform description file */
         static constexpr sg_size_t DEFAULT_RAM = LLONG_MAX;
+        static constexpr double RAM_READ_BANDWIDTH = DBL_MAX;
+        static constexpr double RAM_WRITE_BANDWIDTH = DBL_MAX;
 
     public:
         static void enableSMPI();

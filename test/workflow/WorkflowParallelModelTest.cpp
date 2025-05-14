@@ -192,7 +192,10 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     auto parallel_model = task->getParallelModel();
     auto real_parallel_model = std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(parallel_model);
     ASSERT_NE(real_parallel_model, nullptr);
-    ASSERT_EQ(real_parallel_model->getEfficiency(), 0.3);
+    ASSERT_DOUBLE_EQ(real_parallel_model->getEfficiency(), 0.3);
+    ASSERT_NO_THROW(real_parallel_model->setEfficiency(0.5));
+    ASSERT_DOUBLE_EQ(real_parallel_model->getEfficiency(), 0.5);
+    ASSERT_NO_THROW(real_parallel_model->setEfficiency(0.3));
 
     ASSERT_NO_THROW(simulation->launch());
 

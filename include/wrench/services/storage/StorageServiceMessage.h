@@ -150,7 +150,7 @@ namespace wrench {
     public:
         StorageServiceFileCopyAnswerMessage(std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst,
-                                            bool success, std::shared_ptr<FailureCause> cause,
+                                            bool success, std::shared_ptr<FailureCause> failure_cause,
                                             sg_size_t payload);
 
         /** @brief The source location */
@@ -193,7 +193,7 @@ namespace wrench {
         StorageServiceFileWriteAnswerMessage(std::shared_ptr<FileLocation> &location,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
-                                             std::map<S4U_CommPort *, sg_size_t> data_write_commport_and_bytes,
+                                             std::map<S4U_CommPort *, sg_size_t> data_write_commports_and_bytes,
                                              sg_size_t buffer_size,
                                              sg_size_t payload);
 

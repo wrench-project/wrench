@@ -57,8 +57,9 @@ namespace wrench {
      */
     SimpleStorageServiceBufferized::SimpleStorageServiceBufferized(const std::string &hostname,
                                                                    const std::set<std::string>& mount_points,
+                                                                   const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                   WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, std::move(property_list), std::move(messagepayload_list), "_" + std::to_string(getNewUniqueNumber())) {
+                                                                   WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, file_system, std::move(property_list), std::move(messagepayload_list), "_" + std::to_string(getNewUniqueNumber())) {
         this->buffer_size = this->getPropertyValueAsSizeInByte(StorageServiceProperty::BUFFER_SIZE);
         this->is_bufferized = true;
     }
@@ -189,8 +190,6 @@ namespace wrench {
     bool SimpleStorageServiceBufferized::processFileWriteRequest(std::shared_ptr<FileLocation> &location,
                                                                  sg_size_t num_bytes_to_write,
                                                                  S4U_CommPort *answer_commport) {
-
-
         std::shared_ptr<simgrid::fsmod::File> opened_file;
         auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, opened_file);
 
@@ -261,7 +260,6 @@ namespace wrench {
             const std::shared_ptr<FileLocation> &location,
             sg_size_t num_bytes_to_read,
             S4U_CommPort *answer_commport) {
-
         std::shared_ptr<simgrid::fsmod::File> opened_file;
         auto failure_cause = validateFileReadRequest(location, opened_file);
 
@@ -324,7 +322,6 @@ namespace wrench {
             std::shared_ptr<FileLocation> &src_location,
             std::shared_ptr<FileLocation> &dst_location,
             S4U_CommPort *answer_commport) {
-
         std::shared_ptr<simgrid::fsmod::File> src_opened_file;
         std::shared_ptr<simgrid::fsmod::File> dst_opened_file;
 
@@ -414,7 +411,6 @@ namespace wrench {
                                                                                S4U_CommPort *answer_commport_if_read,
                                                                                S4U_CommPort *answer_commport_if_write,
                                                                                S4U_CommPort *answer_commport_if_copy) {
-
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
             WRENCH_INFO(
@@ -486,7 +482,7 @@ namespace wrench {
      * @brief Get number of File Transfer Threads that are currently running or are pending
      * @return The number of threads
      */
-    unsigned long SimpleStorageServiceBufferized::countRunningFileTransferThreads() {
+    unsigned long SimpleStorageServiceBufferized::countRunningFileTransferThreads() const {
         return this->running_file_transfer_threads.size() + this->pending_file_transfer_threads.size();
     }
 

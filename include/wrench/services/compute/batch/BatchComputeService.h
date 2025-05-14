@@ -114,11 +114,12 @@ namespace wrench {
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
+        bool supportsFunctions() override;
 
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> resources);
+        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs);
 
         std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> getQueue();
 
@@ -133,7 +134,7 @@ namespace wrench {
         // helper function
         static unsigned long parseUnsignedLongServiceSpecificArgument(const std::string &key, const std::map<std::string, std::string> &args);
 
-        void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &compound_job,
+        void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &cjob,
                                               std::map<std::string, std::string> &service_specific_args) override;
 
         /***********************/
@@ -243,13 +244,13 @@ namespace wrench {
 
         void processGetResourceInformation(S4U_CommPort *answer_commport, const std::string &key);
 
-        void processCompoundJobCompletion(const std::shared_ptr<BareMetalComputeServiceOneShot> &executor, const std::shared_ptr<CompoundJob> &job);
+        void processCompoundJobCompletion(const std::shared_ptr<BareMetalComputeServiceOneShot> &executor, const std::shared_ptr<CompoundJob> &cjob);
 
         void processCompoundJobFailure(const std::shared_ptr<BareMetalComputeServiceOneShot> &executor,
-                                       const std::shared_ptr<CompoundJob> &job,
+                                       const std::shared_ptr<CompoundJob> &cjob,
                                        const std::shared_ptr<FailureCause> &cause);
 
-        void terminateRunningCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
+        void terminateRunningCompoundJob(const std::shared_ptr<CompoundJob> &cjob, ComputeService::TerminationCause termination_cause);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
@@ -263,7 +264,7 @@ namespace wrench {
         //process standard job termination request
         void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, S4U_CommPort *answer_commport);
 
-        // process a batch bach_job tiemout event
+        // process a batch bach_job timeout event
         void processAlarmJobTimeout(const std::shared_ptr<BatchJob> &batch_job);
 
         //free up resources

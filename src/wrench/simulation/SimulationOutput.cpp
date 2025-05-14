@@ -285,7 +285,7 @@ namespace wrench {
         //       with unsigned long longs instead of doubles (thus avoiding float comparison weirdness)
         //       And the goal of this EPSILON is to capture the fact that this is for a visual display
         //       made up of pixels, thus we don't want to be too stringent in terms of overlaps
-        const unsigned long long EPSILON = 1000 * 1000 * 10;
+        constexpr unsigned long long EPSILON = 1000 * 1000 * 10;
         if (std::fabs(segment1.second - segment2.first) <= EPSILON or
             std::fabs(segment2.second - segment1.first) <= EPSILON) {
             return false;
@@ -335,7 +335,7 @@ namespace wrench {
      * @return bool
      */
     bool searchForLayout(std::vector<WorkflowTaskExecutionInstance> &data, std::size_t index) {
-        const unsigned long long PRECISION = 1000 * 1000 * 1000;
+        constexpr unsigned long long PRECISION = 1000 * 1000 * 1000;
 
         WorkflowTaskExecutionInstance &current_execution_instance = data.at(index);
 
@@ -1755,12 +1755,12 @@ namespace wrench {
      * @return a unique integer id
      */
     int SimulationOutput::addTimestampDiskWriteStart(double date, std::string hostname,
-                                                      std::string path,
+                                                      const std::string& path,
                                                       sg_size_t bytes) {
         if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
             SimulationOutput::unique_disk_sequence_number++;
             this->addTimestamp<SimulationTimestampDiskWriteStart>(
-                    new SimulationTimestampDiskWriteStart(date, std::move(hostname), std::move(path), bytes, SimulationOutput::unique_disk_sequence_number));
+                    new SimulationTimestampDiskWriteStart(date, std::move(hostname), path, bytes, SimulationOutput::unique_disk_sequence_number));
         }
         return SimulationOutput::unique_disk_sequence_number;
     }

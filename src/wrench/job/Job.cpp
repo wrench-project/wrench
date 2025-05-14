@@ -59,7 +59,7 @@ namespace wrench {
      *
      * @return the next callback commport
      */
-    S4U_CommPort *Job::getOriginCallbackCommPort() {
+    S4U_CommPort *Job::getOriginCallbackCommPort() const {
         return this->originator_commport;
     }
 
@@ -67,7 +67,7 @@ namespace wrench {
     /**
      * @brief Method to print the call back stack
      */
-    void Job::printCallbackCommPortStack() {
+    void Job::printCallbackCommPortStack() const {
         auto mystack = this->callback_commport_stack;
         while (not mystack.empty()) {
             WRENCH_INFO("   STACK : %s", mystack.top()->get_cname());

@@ -28,7 +28,6 @@ namespace wrench {
 	 * @brief The actor's main method
 	 */
         void operator()() {
-
             MPI_Init();
             void *data = SMPI_SHARED_MALLOC(data_size * data_size);
             MPI_Alltoall(data, data_size, MPI_CHAR, data, data_size, MPI_CHAR, MPI_COMM_WORLD);
@@ -72,7 +71,6 @@ namespace wrench {
 	 */
         void operator()() const
         {
-
             MPI_Init();
             MPI_Barrier(MPI_COMM_WORLD);
             MPI_Finalize();
@@ -109,7 +107,6 @@ namespace wrench {
 	 * @brief The actor's main method
 	 */
         void operator()() {
-
             MPI_Init();
             void *data = SMPI_SHARED_MALLOC(data_size);
             MPI_Bcast(data, data_size, MPI_CHAR, 0, MPI_COMM_WORLD);
@@ -130,7 +127,6 @@ namespace wrench {
     void SMPIExecutor::performBcast(std::vector<simgrid::s4u::Host *> &hosts,
                                     const simgrid::s4u::Host *root_host,
                                     const int data_size) {
-
         // Make sure that the root_host is the first host in the list of hosts, so that it's always rank 0
         auto it = std::find(hosts.begin(), hosts.end(), root_host);
         std::iter_swap(hosts.begin(), it);

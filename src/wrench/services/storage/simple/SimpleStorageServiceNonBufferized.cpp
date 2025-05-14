@@ -48,9 +48,10 @@ namespace wrench {
      */
     SimpleStorageServiceNonBufferized::SimpleStorageServiceNonBufferized(const std::string &hostname,
                                                                          const std::set<std::string>& mount_points,
+                                                                         const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                                                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                          WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
-            SimpleStorageService(hostname, mount_points, std::move(property_list), std::move(messagepayload_list),
+            SimpleStorageService(hostname, mount_points, file_system, std::move(property_list), std::move(messagepayload_list),
                                  "_" + std::to_string(SimpleStorageService::getNewUniqueNumber())) {
         this->buffer_size = 0;
         this->is_bufferized = false;
@@ -119,7 +120,7 @@ namespace wrench {
                 }
             }
 
-            WRENCH_INFO("Sending back an ack for a file copy");
+            // WRENCH_INFO("Sending back an ack for a file copy");
             transaction->commport->dputMessage(
                     new StorageServiceFileCopyAnswerMessage(
                             transaction->src_location,
@@ -290,7 +291,7 @@ namespace wrench {
      */
     bool SimpleStorageServiceNonBufferized::processNextMessage(SimulationMessage *message) {
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message)) {
             return processStopDaemonRequest(msg->ack_commport);

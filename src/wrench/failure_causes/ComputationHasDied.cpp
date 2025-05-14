@@ -8,7 +8,6 @@
  */
 
 #include <wrench/logging/TerminalOutput.h>
-
 #include <wrench/failure_causes/ComputationHasDied.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_computation_has_died, "Log category for ComputationHasDied");

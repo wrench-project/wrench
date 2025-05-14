@@ -51,9 +51,9 @@ namespace wrench {
         /***********************/
 
         std::string toString() override;
-        bool whileReceiving();
-        bool whileSending();
-        bool isTimeout();
+        bool whileReceiving() const;
+        bool whileSending() const;
+        bool isTimeout() const;
         std::string getCommPortName();
         std::string getMessageName();
 

@@ -182,3 +182,9 @@ echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/batch-mpi-action/wrench-example-
 ${INSTALL_DIR}/action_api/batch-mpi-action/wrench-example-batch-mpi-action ${INSTALL_DIR}/action_api/batch-mpi-action/dragonfly_cluster.xml
 fi
 
+if [[ "${TO_EXCLUDE}" == *"wrench-example-serverless-basic"* ]]; then
+        echo "${bold}SKIPPING: wrench-example-serverless-basic${normal}"
+else
+echo "${bold}RUNNING: ${INSTALL_DIR}/serverless_api/basic/wrench-example-serverless-basic 20 1${normal}"
+${INSTALL_DIR}/serverless_api/basic/wrench-example-serverless-basic 20 1
+fi

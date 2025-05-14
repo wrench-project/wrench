@@ -457,16 +457,16 @@ namespace wrench {
 
             /** Dispatch it **/
             // Create an action executor on the target host
-            auto action_executor = std::make_shared<ActionExecutor>(target_host->get_name(),
-                                                                    target_num_cores,
-                                                                    required_ram,
-                                                                    this->getPropertyValueAsTimeInSecond(
-                                                                        ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
-                                                                    this->getPropertyValueAsBoolean(
-                                                                        ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
-                                                                    this->commport,
-                                                                    action,
-                                                                    this->getSharedPtr<ActionExecutionService>());
+            auto action_executor = std::shared_ptr<ActionExecutor>(
+                    new ActionExecutor(target_host->get_name(),
+                                       target_num_cores,
+                                       required_ram,
+                                       this->getPropertyValueAsTimeInSecond(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
+                                       this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
+                                       this->commport,
+                                       nullptr,
+                                       action,
+                                       this->getSharedPtr<ActionExecutionService>()));
 
             action_executor->setSimulation(this->simulation_);
             try {
@@ -840,7 +840,7 @@ namespace wrench {
      * @param ram: ram capacity
      * @return true is a host was found
      */
-    bool ActionExecutionService::isThereAtLeastOneHostWithResources(unsigned long num_cores, sg_size_t ram) {
+    bool ActionExecutionService::isThereAtLeastOneHostWithResources(unsigned long num_cores, sg_size_t ram) const {
         for (auto const &r: this->compute_resources) {
             if ((std::get<0>(r.second) >= num_cores) and (std::get<1>(r.second) >= ram)) {
                 return true;
@@ -1101,7 +1101,7 @@ namespace wrench {
      * @brief A helper method to checks if all compute resources are down
      * @return true or false
      */
-    bool ActionExecutionService::areAllComputeResourcesDownWithNoActionExecutorRunning() {
+    bool ActionExecutionService::areAllComputeResourcesDownWithNoActionExecutorRunning() const {
         bool all_resources_down = true;
         //        for (auto const &h: this->compute_resources) {
         //            if (h.first->is_on()) {

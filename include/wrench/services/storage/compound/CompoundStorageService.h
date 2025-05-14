@@ -298,7 +298,7 @@ namespace wrench {
 
         int main() override;
 
-        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile>& concrete_file_location,
+        std::vector<std::shared_ptr<FileLocation>> lookupOrDesignateStorageService(const std::shared_ptr<DataFile>& file,
                                                                                    unsigned int stripe_count,
                                                                                    S4U_CommPort *answer_commport);
 

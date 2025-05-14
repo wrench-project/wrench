@@ -65,7 +65,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-        NetworkProximityService(const std::string& db_hostname,
+        NetworkProximityService(const std::string& hostname,
                                 std::vector<std::string> hosts_in_network,
                                 const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
                                 const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
@@ -111,7 +111,7 @@ namespace wrench {
         std::shared_ptr<NetworkProximityReceiverDaemon>
         getCommunicationPeer(const std::shared_ptr<NetworkProximitySenderDaemon>& sender_daemon);
 
-        void vivaldiUpdate(double proximityValue, const std::string& sender_hostname, const std::string& peer_hostname);
+        void vivaldiUpdate(double proximity_value, const std::string& sender_hostname, const std::string& peer_hostname);
 
         void validateProperties();
     };

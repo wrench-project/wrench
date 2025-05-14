@@ -123,28 +123,28 @@ namespace wrench {
                                             std::shared_ptr<FileLocation> dst);
 
         int
-        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, sg_size_t bytes);
+        addTimestampDiskReadStart(double date, std::string hostname, std::string path, sg_size_t bytes);
 
         void
-        addTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int unique_sequence_number);
+        addTimestampDiskReadFailure(double date, const std::string &hostname, const std::string &path, sg_size_t bytes, int unique_sequence_number);
 
-        void addTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes,
+        void addTimestampDiskReadCompletion(double date, const std::string &hostname, const std::string &path, sg_size_t bytes,
                                             int unique_sequence_number);
 
         int
-        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, sg_size_t bytes);
+        addTimestampDiskWriteStart(double date, std::string hostname, const std::string& path, sg_size_t bytes);
 
         void
-        addTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes, int unique_sequence_number);
+        addTimestampDiskWriteFailure(double date, const std::string &hostname, const std::string &path, sg_size_t bytes, int unique_sequence_number);
 
-        void addTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &mount, sg_size_t bytes,
+        void addTimestampDiskWriteCompletion(double date, const std::string &hostname, const std::string &path, sg_size_t bytes,
                                              int unique_sequence_number);
 
         void addTimestampPstateSet(double date, const std::string &hostname, int pstate);
 
         void addTimestampEnergyConsumption(double date, const std::string &hostname, double joules);
 
-        void addTimestampLinkUsage(double date, const std::string &linkname, double bytes_per_second);
+        void addTimestampLinkUsage(double date, const std::string &link_name, double bytes_per_second);
 
         /**
         * @brief Append a simulation timestamp to a simulation output trace

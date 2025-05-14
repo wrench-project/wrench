@@ -87,7 +87,6 @@ namespace wrench {
 
             // Do a bulk-synchronous loop of 10 iterations
             for (unsigned long iter = 0; iter < 10; iter++) {
-
                 if (my_rank == 0) {
                     WRENCH_INFO("Iteration %lu", iter);
                 }
@@ -112,7 +111,7 @@ namespace wrench {
                 auto event = controller->waitForNextEvent();
                 auto io_event = std::dynamic_pointer_cast<wrench::FileReadCompletedEvent>(event);
                 if (not io_event) {
-                    throw std::runtime_error("Custom action: unexpected IO event: " + io_event->toString());
+                    throw std::runtime_error("Custom action: unexpected IO event: " + event->toString());
                 }
             }
             SMPI_SHARED_FREE(data);

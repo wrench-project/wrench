@@ -141,9 +141,7 @@ private:
         }
 
         // Get Ram capacities
-        std::map<std::string, double> ram_capacities;
-
-        ram_capacities = this->test->compute_service1->getMemoryCapacity();
+        auto ram_capacities = this->test->compute_service1->getPerHostMemoryCapacity();
         std::vector<double> sorted_ram_capacities;
         sorted_ram_capacities.reserve(ram_capacities.size());
         for (auto const &r: ram_capacities) {

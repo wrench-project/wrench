@@ -31,7 +31,7 @@ namespace wrench {
      * @brief Get the file that wasn't found
      * @return a file
      */
-    std::shared_ptr<DataFile> FileNotFound::getFile() {
+    std::shared_ptr<DataFile> FileNotFound::getFile() const {
         return this->location->getFile();
     }
 

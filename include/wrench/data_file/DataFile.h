@@ -23,13 +23,13 @@ namespace wrench {
 
     public:
         [[nodiscard]] sg_size_t getSize() const;
-        void setSize(sg_size_t size);
+        void setSize(sg_size_t s);
         [[nodiscard]] std::string getID() const;
         ~DataFile();
 
     protected:
         friend class Simulation;
-        DataFile(std::string id, sg_size_t size);
+        DataFile(std::string id, sg_size_t s);
 
         /** @brief File id/name **/
         std::string id;

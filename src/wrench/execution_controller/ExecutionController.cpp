@@ -12,6 +12,7 @@
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/managers/data_movement_manager/DataMovementManager.h"
 #include "wrench/managers/job_manager/JobManager.h"
+#include "wrench/managers/function_manager/FunctionManager.h"
 #include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/failure_causes/NetworkError.h>
 
@@ -45,6 +46,19 @@ namespace wrench {
         job_manager->start(job_manager, true, false);// Always daemonize, no auto-restart
 
         return job_manager;
+    }
+
+    /**
+    * @brief Instantiate and start a function manager
+    * @return a function manager
+    */
+    std::shared_ptr<FunctionManager> ExecutionController::createFunctionManager() {
+        auto function_manager = std::shared_ptr<FunctionManager>(
+                new FunctionManager(this->hostname, this->commport));
+        function_manager->simulation_ = this->simulation_;
+        function_manager->start(function_manager, true, false);// Always daemonize, no auto-restart
+
+        return function_manager;
     }
 
     /**

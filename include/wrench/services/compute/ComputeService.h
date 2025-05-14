@@ -95,6 +95,12 @@ namespace wrench {
          */
         virtual bool supportsPilotJobs() = 0;
 
+        /**
+         * @brief Returns true if the service supports functions
+         * @return true or false
+         */
+        virtual bool supportsFunctions() = 0;
+
         virtual bool hasScratch() const;
 
         unsigned long getNumHosts(bool simulate_it = false);
@@ -111,9 +117,9 @@ namespace wrench {
 
         virtual bool isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, sg_size_t ram);
 
-        std::map<std::string, double> getMemoryCapacity(bool simulate_it = false);
+        std::map<std::string, sg_size_t> getPerHostMemoryCapacity(bool simulate_it = false);
 
-        std::map<std::string, double> getPerHostAvailableMemoryCapacity(bool simulate_it = false);
+        std::map<std::string, sg_size_t> getPerHostAvailableMemoryCapacity(bool simulate_it = false);
 
         std::map<std::string, double> getCoreFlopRate(bool simulate_it = false);
 
@@ -198,7 +204,7 @@ namespace wrench {
         std::string scratch_space_mount_point;
         //        std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
-        std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries, bool simulate_it);
+        std::map<std::string, double> getServiceResourceInformation(const std::string &key, bool simulate_it);
     };
 
 

@@ -3,7 +3,7 @@ WRENCH Release Notes
 
 ### wrench 2.7-dev
 
-- Removed all usage of httplib in wrench-daemon
+- Removed all usage of httplib in wrench-daemon (which now uses only CrowCPP)
 - Minor code/documentation cleanups
 
 ### wrench 2.6

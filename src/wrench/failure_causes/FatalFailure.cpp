@@ -8,7 +8,6 @@
  */
 
 #include <wrench/failure_causes/FatalFailure.h>
-
 #include <wrench/logging/TerminalOutput.h>
 
 #include <utility>
