@@ -99,6 +99,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController25createDataMovementManagerEv"><code class="docutils literal notranslate"><span class="pre">createDataMovementManager()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController17createEnergyMeterERKNSt3mapINSt6stringEdEE"><code class="docutils literal notranslate"><span class="pre">createEnergyMeter()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController17createEnergyMeterERKNSt6vectorINSt6stringEEEd"><code class="docutils literal notranslate"><span class="pre">createEnergyMeter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController21createFunctionManagerEv"><code class="docutils literal notranslate"><span class="pre">createFunctionManager()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController16createJobManagerEv"><code class="docutils literal notranslate"><span class="pre">createJobManager()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController33processEventCompoundJobCompletionERKNSt10shared_ptrI25CompoundJobCompletedEventEE"><code class="docutils literal notranslate"><span class="pre">processEventCompoundJobCompletion()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController30processEventCompoundJobFailureERKNSt10shared_ptrI22CompoundJobFailedEventEE"><code class="docutils literal notranslate"><span class="pre">processEventCompoundJobFailure()</span></code></a></li>
@@ -121,6 +122,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_event.html">wrench::ExecutionEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_exception.html">wrench::ExecutionException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_failure_cause.html">wrench::FailureCause</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fatal_failure.html">wrench::FatalFailure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_copied.html">wrench::FileAlreadyBeingCopied</a></li>
@@ -144,12 +146,18 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_action.html">wrench::FileWriteAction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_completed_event.html">wrench::FileWriteCompletedEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_failed_event.html">wrench::FileWriteFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager.html">wrench::FunctionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_not_found.html">wrench::FunctionNotFound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_functionality_not_available.html">wrench::FunctionalityNotAvailable</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_error.html">wrench::HostError</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_killed.html">wrench::JobKilled</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager.html">wrench::JobManager</a></li>
@@ -166,10 +174,18 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_expired_event.html">wrench::PilotJobExpiredEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_started_event.html">wrench::PilotJobStartedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_registered_function.html">wrench::RegisteredFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_state_of_the_system.html">wrench::ServerlessStateOfTheSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_down.html">wrench::ServiceIsDown</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_suspended.html">wrench::ServiceIsSuspended</a></li>
@@ -231,6 +247,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_wf_commons_workflow_parser.html">wrench::WfCommonsWorkflowParser</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow_task.html">wrench::WorkflowTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html">wrench::WorkloadBalancingServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_deployment.html">wrench::XRootD::Deployment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message_payload.html">wrench::XRootD::MessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_node.html">wrench::XRootD::Node</a></li>
@@ -359,6 +376,17 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>an energy meter </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench19ExecutionController21createFunctionManagerEv">
+<span id="_CPPv3N6wrench19ExecutionController21createFunctionManagerEv"></span><span id="_CPPv2N6wrench19ExecutionController21createFunctionManagerEv"></span><span id="wrench::ExecutionController::createFunctionManager"></span><span class="target" id="classwrench_1_1_execution_controller_1ae39be6f8c95cecee576f44b0578a2d3f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_function_manager.html#_CPPv4N6wrench15FunctionManagerE" title="wrench::FunctionManager"><span class="n"><span class="pre">FunctionManager</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createFunctionManager</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench19ExecutionController21createFunctionManagerEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Instantiate and start a job manager. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a job manager </p>
 </dd>
 </dl>
 </dd></dl>

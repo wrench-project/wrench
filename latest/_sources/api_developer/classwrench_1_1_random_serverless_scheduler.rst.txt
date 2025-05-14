@@ -1,0 +1,8 @@
+.. _RandomServerlessScheduler:
+wrench::RandomServerlessScheduler
+*********************************
+
+.. doxygenclass:: wrench::RandomServerlessScheduler
+   :project: developer
+   :members:
+

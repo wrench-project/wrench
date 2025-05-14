@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceNodeLoadCompleteMessage:
+wrench::ServerlessComputeServiceNodeLoadCompleteMessage
+*******************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceNodeLoadCompleteMessage
+   :project: internal
+   :members:
+

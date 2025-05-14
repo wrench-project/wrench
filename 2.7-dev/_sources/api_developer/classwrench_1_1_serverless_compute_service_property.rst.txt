@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceProperty:
+wrench::ServerlessComputeServiceProperty
+****************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceProperty
+   :project: developer
+   :members:
+

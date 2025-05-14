@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceMessage:
+wrench::ServerlessComputeServiceMessage
+***************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceMessage
+   :project: internal
+   :members:
+

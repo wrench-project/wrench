@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceDownloadCompleteMessage:
+wrench::ServerlessComputeServiceDownloadCompleteMessage
+*******************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceDownloadCompleteMessage
+   :project: internal
+   :members:
+
