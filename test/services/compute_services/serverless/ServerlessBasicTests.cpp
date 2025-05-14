@@ -68,6 +68,13 @@ protected:
                 <prop id="mount" value="/"/>
             </disk>
         </host>
+    <host id="ServerlessComputeNode2" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
 
         <!-- A network link that connects both hosts -->
         <link id="wide_area" bandwidth="20MBps" latency="20us"/>
@@ -118,10 +125,10 @@ public:
 class ServerlessBasicTestSanityController : public wrench::ExecutionController {
 public:
     ServerlessBasicTestSanityController(ServerlessBasicTest* test,
-                                                      const std::string& hostname,
-                                                      const std::shared_ptr<wrench::ServerlessComputeService>
-                                                      & compute_service,
-                                                      const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                        const std::string& hostname,
+                                        const std::shared_ptr<wrench::ServerlessComputeService>
+                                        & compute_service,
+                                        const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -134,17 +141,56 @@ private:
     std::shared_ptr<wrench::StorageService> storage_service;
 
     int main() override {
-
         wrench::Simulation::sleep(1); // so that the service has started its sub-services
 
-        // Receive resource information
+        // Retrieve resource information
         auto num_hosts = compute_service->getNumHosts();
-
         auto cores = compute_service->getPerHostNumCores();
         auto idle_cores = compute_service->getPerHostNumIdleCores();
-
         auto memories = compute_service->getPerHostMemoryCapacity();
-        auto available_memory = compute_service->getPerHostAvailableMemoryCapacity();
+        auto available_memories = compute_service->getPerHostAvailableMemoryCapacity();
+
+        if (num_hosts != 2) {
+            throw std::runtime_error("Unexpected number of hosts: " + std::to_string(num_hosts));
+        }
+        if (cores.size() != 2) {
+            throw std::runtime_error("Unexpected number of entries in cores map: " + std::to_string(cores.size()));
+        }
+        if (idle_cores.size() != 2) {
+            throw std::runtime_error(
+                "Unexpected number of entries in idle_cores map: " + std::to_string(idle_cores.size()));
+        }
+        if (memories.size() != 2) {
+            throw std::runtime_error(
+                "Unexpected number of entries in memories map: " + std::to_string(memories.size()));
+        }
+        if (available_memories.size() != 2) {
+            throw std::runtime_error(
+                "Unexpected number of entries in available_memories map: " + std::to_string(available_memories.size()));
+        }
+
+        if (cores != std::map<std::string, unsigned long>{
+            {"ServerlessComputeNode1", 10}, {"ServerlessComputeNode2", 10}
+        }) {
+            throw std::runtime_error("Unexpected cores map");
+        }
+        if (idle_cores != std::map<std::string, unsigned long>{
+            {"ServerlessComputeNode1", 10}, {"ServerlessComputeNode2", 10}
+        }) {
+            throw std::runtime_error("Unexpected idle_cores map");
+        }
+        if (memories != std::map<std::string, sg_size_t>{
+            {"ServerlessComputeNode1", 64UL * 1000 * 1000 * 1000},
+            {"ServerlessComputeNode2", 64UL * 1000 * 1000 * 1000}
+        }) {
+            throw std::runtime_error("Unexpected memories map");
+        }
+        if (available_memories != std::map<std::string, sg_size_t>{
+            {"ServerlessComputeNode1", 64UL * 1000 * 1000 * 1000},
+            {"ServerlessComputeNode2", 64UL * 1000 * 1000 * 1000}
+        }) {
+            throw std::runtime_error("Unexpected available_memories map");
+        }
 
         return 0;
     }
@@ -168,7 +214,7 @@ void ServerlessBasicTest::do_SanityTest_test() {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
@@ -215,9 +261,11 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& storage_service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                  const std::shared_ptr<wrench::StorageService>& storage_service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            return std::make_shared<MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
+            return std::make_shared<
+                MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -230,7 +278,9 @@ private:
         try {
             auto function_duplicate = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
             throw std::runtime_error("Redundant function creation should have failed");
-        } catch (const std::exception& expected) {}
+        }
+        catch (const std::exception& expected) {
+        }
 
         function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
@@ -311,7 +361,8 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(5);
             return std::make_shared<MyFunctionOutput>("DONE");
@@ -325,7 +376,8 @@ private:
 
         // Invoking a non-registered function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {
@@ -355,14 +407,17 @@ private:
 
             try {
                 auto ignore = invocation->getFailureCause();
-                throw std::runtime_error("Shouldn't be able to call getFailureCause() on an invocation that's not done");
-            } catch (std::runtime_error &expected) {
+                throw std::runtime_error(
+                    "Shouldn't be able to call getFailureCause() on an invocation that's not done");
+            }
+            catch (std::runtime_error& expected) {
             }
 
             try {
                 auto ignore = invocation->getOutput();
                 throw std::runtime_error("Shouldn't be able to call getOutput() on an invocation that's not done");
-            } catch (std::runtime_error &expected) {
+            }
+            catch (std::runtime_error& expected) {
             }
 
             wrench::Simulation::sleep(1);
@@ -434,10 +489,10 @@ void ServerlessBasicTest::do_FunctionInvocationTest_test() {
 class ServerlessBasicTestFunctionTimeoutController : public wrench::ExecutionController {
 public:
     ServerlessBasicTestFunctionTimeoutController(ServerlessBasicTest* test,
-                                                    const std::string& hostname,
-                                                    const std::shared_ptr<wrench::ServerlessComputeService>
-                                                    & compute_service,
-                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                 const std::string& hostname,
+                                                 const std::shared_ptr<wrench::ServerlessComputeService>
+                                                 & compute_service,
+                                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -453,10 +508,12 @@ private:
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(50);
-            return std::make_shared<MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
+            return std::make_shared<
+                MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -467,7 +524,8 @@ private:
 
         // Invoking a non-registered function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {
@@ -528,7 +586,6 @@ void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
 }
 
 
-
 /**********************************************************************/
 /**  FUNCTION ERROR TEST                                             **/
 /**********************************************************************/
@@ -536,10 +593,10 @@ void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
 class ServerlessBasicTestFunctionErrorController : public wrench::ExecutionController {
 public:
     ServerlessBasicTestFunctionErrorController(ServerlessBasicTest* test,
-                                                    const std::string& hostname,
-                                                    const std::shared_ptr<wrench::ServerlessComputeService>
-                                                    & compute_service,
-                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                               const std::string& hostname,
+                                               const std::shared_ptr<wrench::ServerlessComputeService>
+                                               & compute_service,
+                                               const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -553,19 +610,20 @@ private:
     std::shared_ptr<wrench::DataFile> data_file;
 
     int main() override {
-
         // Create a datafile that's nowhere
         this->data_file = wrench::Simulation::addFile("data_file", 100 * MB);
         // Register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [this](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<wrench::FunctionOutput> {
+                                      const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
             wrench::Simulation::sleep(1);
             // Will fail
             wrench::StorageService::readFileAtLocation(
                 wrench::FileLocation::LOCATION(this->storage_service, this->data_file));
-            return std::make_shared<MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
+            return std::make_shared<
+                MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
@@ -576,7 +634,8 @@ private:
 
         // Invoking a non-registered function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 =  function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
         {

@@ -28,7 +28,6 @@
 WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
 
 namespace wrench {
-
     unsigned long ServerlessComputeService::sequence_number = 0;
 
     /**
@@ -50,7 +49,6 @@ namespace wrench {
                                                        messagepayload_list) :
         ComputeService(hostname,
                        "ServerlessComputeService", "") {
-
         // Check platform homogeneity
         check_homogeneity(compute_hosts);
 
@@ -80,44 +78,47 @@ namespace wrench {
         this->ram_of_compute_host = S4U_Simulation::getHostMemoryCapacity(first_hostname);
         try {
             this->disk_space_of_compute_host = S4U_Simulation::getDiskCapacity(first_hostname, "/");
-        } catch (std::invalid_argument& e) {
+        }
+        catch (std::invalid_argument& e) {
             throw std::invalid_argument("Compute hosts for a serverless compute service must have a '/' mountpoint");
         }
 
-        for (auto const &hostname: compute_hosts) {
+        for (auto const& hostname : compute_hosts) {
             auto num_cores_available = S4U_Simulation::getHostNumCores(hostname);
             double speed = S4U_Simulation::getHostFlopRate(hostname);
             sg_size_t ram_available = S4U_Simulation::getHostMemoryCapacity(hostname);
             sg_size_t disk_capacity;
             try {
                 disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
-            } catch (std::invalid_argument& e) {
-                throw std::invalid_argument("Compute hosts for a serverless compute service must have a '/' mountpoint");
+            }
+            catch (std::invalid_argument& e) {
+                throw std::invalid_argument(
+                    "Compute hosts for a serverless compute service must have a '/' mountpoint");
             }
 
             // Compute speed
             if (std::abs(speed - this->speed_of_compute_core) > DBL_EPSILON) {
                 throw std::invalid_argument(
-                        "Compute hosts for a serverless compute service need "
-                        "to be homogeneous (different flop rates detected)");
+                    "Compute hosts for a serverless compute service need "
+                    "to be homogeneous (different flop rates detected)");
             }
             // RAM
             if (ram_available != this->ram_of_compute_host) {
                 throw std::invalid_argument(
-                        "Compute hosts for a serverless compute service need "
-                        "to be homogeneous (different RAM capacities detected)");
+                    "Compute hosts for a serverless compute service need "
+                    "to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
             if (num_cores_available != this->num_cores_of_compute_host) {
                 throw std::invalid_argument(
-                        "Compute hosts for a serverless service need "
-                        "to be homogeneous (different number of cores detected)");
+                    "Compute hosts for a serverless service need "
+                    "to be homogeneous (different number of cores detected)");
             }
             // Disk capacity
             if (disk_capacity != this->disk_space_of_compute_host) {
                 throw std::invalid_argument(
-                        "Compute hosts for a serverless service need "
-                        "to be homogeneous (different disk capacities detected)");
+                    "Compute hosts for a serverless service need "
+                    "to be homogeneous (different disk capacities detected)");
             }
         }
     }
@@ -444,17 +445,29 @@ namespace wrench {
                                                                       sg_size_t ram_limit_in_bytes,
                                                                       sg_size_t ingress_in_bytes,
                                                                       sg_size_t egress_in_bytes) {
-
         // Check that function can ever run!
         {
             sg_size_t needed_disk_space = function->getImage()->getFile()->getSize() + disk_space_limit_in_bytes;
             sg_size_t needed_ram_space = function->getImage()->getFile()->getSize() + ram_limit_in_bytes;
 
             if (needed_disk_space > this->disk_space_of_compute_host) {
-                throw std::invalid_argument("ServerlessComputeService::processFunctionRegistrationRequest(): Function cannot be registered because no compute host has sufficient disk space to execute it");
+                const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
+                    false, nullptr,
+                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
+                                                 "Function cannot be registered because no compute host has sufficient disk space to execute it"),
+                    this->getMessagePayloadValue(
+                        ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
+                answer_commport->dputMessage(answerMessage);
             }
+
             if (needed_ram_space > this->ram_of_compute_host) {
-                throw std::invalid_argument("ServerlessComputeService::processFunctionRegistrationRequest(): Function cannot be registered because no compute host has sufficient RAM to execute it");
+                const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
+                    false, nullptr,
+                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
+                                                 "Function cannot be registered because no compute host has sufficient RAM space to execute it"),
+                    this->getMessagePayloadValue(
+                        ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
+                answer_commport->dputMessage(answerMessage);
             }
         }
 
@@ -489,7 +502,6 @@ namespace wrench {
                                                                     & registered_function,
                                                                     const std::shared_ptr<FunctionInput>& input,
                                                                     S4U_CommPort* notify_commport) {
-
         if (_state_of_the_system->_registered_functions.find(registered_function) ==
             _state_of_the_system->_registered_functions.end()) {
             // Not found
@@ -640,7 +652,6 @@ namespace wrench {
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                                       const std::string& target_host) {
-
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
         if (not invocationCanBeStarted(invocation, target_host)) {
             return false;
@@ -650,9 +661,10 @@ namespace wrench {
         std::shared_ptr<StorageService> private_ss;
         try {
             private_ss = startInvocationStorageService(invocation, target_host);
-        } catch (ExecutionException &e) {
+        }
+        catch (ExecutionException& e) {
             WRENCH_INFO("Couldn't start private on-disk storage for an invocation for %s due to lack of space",
-                invocation->_registered_function->_function->getName().c_str());
+                        invocation->_registered_function->_function->getName().c_str());
             return false;
         }
 
@@ -667,9 +679,10 @@ namespace wrench {
             StorageService::createFileAtLocation(file_location);
             invocation->_tmp_ram_file_location = file_location;
             invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
-        } catch (ExecutionException &e) {
+        }
+        catch (ExecutionException& e) {
             WRENCH_INFO("Couldn't create a private RAM space for an invocation for %s due to lack of space",
-                invocation->_registered_function->_function->getName().c_str());
+                        invocation->_registered_function->_function->getName().c_str());
             // Kill private storage service
             private_ss->stop();
             return false;
@@ -792,26 +805,29 @@ namespace wrench {
     std::shared_ptr<StorageService> ServerlessComputeService::startInvocationStorageService(
         const std::shared_ptr<Invocation>& invocation,
         const std::string& target_host) {
-
         // WRENCH_INFO("Starting a new storage service for an invocation...");
         // Reserve space on the storage service if possible
         std::shared_ptr<FileLocation> tmp_file;
         std::shared_ptr<simgrid::fsmod::File> opened_tmp_file;
         try {
             tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[target_host],
-                                                                 Simulation::addFile(
-                                                                     "tmp_" + std::to_string(++ServerlessComputeService::sequence_number),
-                                                                     invocation->_registered_function->_disk_space));
+                                                      Simulation::addFile(
+                                                          "tmp_" + std::to_string(
+                                                              ++ServerlessComputeService::sequence_number),
+                                                          invocation->_registered_function->_disk_space));
             StorageService::createFileAtLocation(tmp_file);
             opened_tmp_file = _state_of_the_system->_compute_storages[target_host]->openFile(tmp_file);
-        } catch (ExecutionException &e) {
+        }
+        catch (ExecutionException& e) {
             throw;
         }
 
         // Create a tmp file system
         const auto disk = S4U_Simulation::hostHasMountPoint(target_host, "/");
-        const auto ods = simgrid::fsmod::OneDiskStorage::create("is_" + std::to_string(ServerlessComputeService::sequence_number), disk);
-        const auto fs = simgrid::fsmod::FileSystem::create("fs" + std::to_string(ServerlessComputeService::sequence_number));
+        const auto ods = simgrid::fsmod::OneDiskStorage::create(
+            "is_" + std::to_string(ServerlessComputeService::sequence_number), disk);
+        const auto fs = simgrid::fsmod::FileSystem::create(
+            "fs" + std::to_string(ServerlessComputeService::sequence_number));
         fs->mount_partition("/", ods, invocation->_registered_function->_disk_space);
 
         // Create a tmp storage service
