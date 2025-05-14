@@ -274,13 +274,13 @@ namespace wrench {
      * @return the ram availability map (could be empty)
      *
      */
-    std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity(bool simulate_it) {
+    std::map<std::string, sg_size_t> ComputeService::getPerHostAvailableMemoryCapacity(bool simulate_it) {
         std::map<std::string, double> dict = this->getServiceResourceInformation("ram_availabilities", simulate_it);
 
-        std::map<std::string, double> to_return;
+        std::map<std::string, sg_size_t> to_return;
 
         for (auto const &x: dict) {
-            to_return.insert(std::make_pair(x.first, static_cast<double>(x.second)));
+            to_return.insert(std::make_pair(x.first, static_cast<sg_size_t>(x.second)));
         }
 
         return to_return;
@@ -363,10 +363,10 @@ namespace wrench {
     * @return a map of RAM capacities, indexed by hostname
     *
     */
-    std::map<std::string, double> ComputeService::getPerHostMemoryCapacity(bool simulate_it) {
+    std::map<std::string, sg_size_t> ComputeService::getPerHostMemoryCapacity(bool simulate_it) {
         auto dict = this->getServiceResourceInformation("ram_capacities", simulate_it);
 
-        std::map<std::string, double> to_return;
+        std::map<std::string, sg_size_t> to_return;
 
         for (auto const &x: dict) {
             to_return.insert(std::make_pair(x.first, x.second));
