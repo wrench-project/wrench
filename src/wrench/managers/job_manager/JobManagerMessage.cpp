@@ -87,6 +87,7 @@ namespace wrench {
 
     /**
      * @brief Message from by job manager to notify somebody of a standard job successfully completed
+     *
      * @param job: the job
      * @param compute_service: the compute service that did the job
      */
@@ -103,6 +104,7 @@ namespace wrench {
 
     /**
      * @brief Message from by job manager to notify somebody of a standard job has failed to complete
+     *
      * @param job: the job
      * @param compute_service: the compute service that did the job
      * @param cause: the failure cause

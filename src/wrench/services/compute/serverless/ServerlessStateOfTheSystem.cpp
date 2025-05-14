@@ -46,6 +46,7 @@ namespace wrench {
 
     /**
      * @brief Getter for the map of available cores
+     *
      * @return The core availability map
      */
     std::map<std::string, unsigned long> ServerlessStateOfTheSystem::getAvailableCores() {
@@ -55,6 +56,7 @@ namespace wrench {
     /**
      * @brief Getter for the map of available RAM. Note that RAM is managed in an LRU fashion, so it's
      *        not because RAM is full that nothing can be done, perhaps.
+     *
      * @return The RAM availability map
      */
     std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() {
@@ -66,8 +68,9 @@ namespace wrench {
     }
 
     /**
-    * @brief Getter for the map of available disk space. Note that Disk space is managed in an LRU fashion, so it's
+     * @brief Getter for the map of available disk space. Note that Disk space is managed in an LRU fashion, so it's
      *        not because a disk is full that nothing can be done, perhaps.
+     *
      * @return The RAM availability map
      */
     std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableDiskSpace() {
@@ -80,6 +83,7 @@ namespace wrench {
 
     /**
      * @brief Get the current images being copied to a node
+     *
      * @param node the compute node
      * @return a set of image files
      */
@@ -92,6 +96,7 @@ namespace wrench {
 
     /**
      * @brief Determine whether an image is currently being copied to a node
+     *
      * @param node the compute node
      * @param image an image file
      *
@@ -111,6 +116,7 @@ namespace wrench {
 
     /**
      * @brief Determine whether an image is currently on disk at a node
+     *
      * @param node the compute node
      * @param image an image file
      *
@@ -122,6 +128,7 @@ namespace wrench {
 
     /**
      * @brief Get the current images being loaded into RAM at a node
+     *
      * @param node the compute node
      * @return a set of image files
      */
@@ -134,6 +141,7 @@ namespace wrench {
 
     /**
      * @brief Determine whether an image is currently being loading into RAM at a node
+     *
      * @param node the compute node
      * @param image an image file
      *
@@ -153,6 +161,7 @@ namespace wrench {
 
     /**
      * @brief Determine whether an image is currently in RAM at a node
+     *
      * @param node the compute node
      * @param image an image file
      *

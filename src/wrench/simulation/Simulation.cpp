@@ -774,6 +774,7 @@ namespace wrench {
 
     /**
      * @brief Method to create a new disk in the platform, which can be handy
+     *
      * @param hostname: the name of the host to which the disk should be attached
      * @param disk_id: the name of the disk
      * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
