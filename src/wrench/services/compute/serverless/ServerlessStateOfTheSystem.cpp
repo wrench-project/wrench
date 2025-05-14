@@ -53,7 +53,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter for the map of available RAM
+     * @brief Getter for the map of available RAM. Note that RAM is managed in an LRU fashion, so it's
+     *        not because RAM is full that nothing can be done, perhaps.
      * @return The RAM availability map
      */
     std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() {
@@ -65,7 +66,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter for the map of available disk space
+    * @brief Getter for the map of available disk space. Note that Disk space is managed in an LRU fashion, so it's
+     *        not because a disk is full that nothing can be done, perhaps.
      * @return The RAM availability map
      */
     std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableDiskSpace() {
