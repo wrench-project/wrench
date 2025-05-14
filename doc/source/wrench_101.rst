@@ -411,6 +411,7 @@ on how to create them.
       Platforms <guide-101-virtualizedcluster>`
    -  :ref:`Batch-scheduled Clusters <guide-101-batch>`
    -  :ref:`HTCondor <guide-101-htcondor>`
+   -  :ref:`Serverless Providers <guide-101-serverless>`
 
 -  **Storage Services**: These are services that know how to store and
    give access to workflow files:
