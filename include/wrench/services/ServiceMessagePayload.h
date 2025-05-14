@@ -49,9 +49,9 @@ namespace wrench {
         static std::map<WRENCH_MESSAGEPAYLOAD_TYPE, std::string> payloadToString;
 
     public:
-        static WRENCH_MESSAGEPAYLOAD_TYPE addMessagePayload(std::string classname, std::string messagePayload);
-        static WRENCH_MESSAGEPAYLOAD_TYPE translateString(std::string messagePayload);
-        static std::string translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE messagePayload);
+        static WRENCH_MESSAGEPAYLOAD_TYPE addMessagePayload(std::string classname, std::string message_payload);
+        static WRENCH_MESSAGEPAYLOAD_TYPE translateString(std::string message_payload);
+        static std::string translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE message_payload);
 
         /** @brief The number of bytes in the control message sent to the daemon to terminate it **/
         DECLARE_MESSAGEPAYLOAD_NAME(STOP_DAEMON_MESSAGE_PAYLOAD);

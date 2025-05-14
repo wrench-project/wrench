@@ -33,7 +33,6 @@ WRENCH_LOG_CATEGORY(compute_action_executor_test, "Log category for ComputeActio
 
 
 class ComputeActionExecutorTest : public ::testing::Test {
-
 public:
     std::shared_ptr<wrench::Simulation> simulation;
     std::shared_ptr<wrench::DataFile> file;
@@ -44,67 +43,66 @@ public:
 
 protected:
     ComputeActionExecutorTest() {
-
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-                          "<platform version=\"4.1\"> "
-                          "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2/\"/>"
-                          "          </disk>"
+            "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
+            "<platform version=\"4.1\"> "
+            "   <zone id=\"AS0\" routing=\"Full\"> "
+            "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+            "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100GB\"/>"
+            "             <prop id=\"mount\" value=\"/disk1/\"/>"
+            "          </disk>"
+            "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100GB\"/>"
+            "             <prop id=\"mount\" value=\"/disk2/\"/>"
+            "          </disk>"
 
-                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "         <prop id=\"ram\" value=\"1024B\"/> "
-                          "       </host>  "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"10us\"/>"
-                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
-                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
-                          "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
-                          "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
-                          "   </zone> "
-                          "</platform>";
+            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100B\"/>"
+            "             <prop id=\"mount\" value=\"/scratch\"/>"
+            "          </disk>"
+            "       </host>"
+            "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+            "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100GB\"/>"
+            "             <prop id=\"mount\" value=\"/\"/>"
+            "          </disk>"
+            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100B\"/>"
+            "             <prop id=\"mount\" value=\"/scratch\"/>"
+            "          </disk>"
+            "       </host>"
+            "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+            "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100GB\"/>"
+            "             <prop id=\"mount\" value=\"/\"/>"
+            "          </disk>"
+            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100B\"/>"
+            "             <prop id=\"mount\" value=\"/scratch\"/>"
+            "          </disk>"
+            "       </host>"
+            "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
+            "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100GB\"/>"
+            "             <prop id=\"mount\" value=\"/\"/>"
+            "          </disk>"
+            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+            "             <prop id=\"size\" value=\"100B\"/>"
+            "             <prop id=\"mount\" value=\"/scratch\"/>"
+            "          </disk>"
+            "         <prop id=\"ram\" value=\"1024B\"/> "
+            "       </host>  "
+            "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+            "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"10us\"/>"
+            "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+            "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
+            "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+            "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+            "   </zone> "
+            "</platform>";
         // Create a four-host 10-core platform file
-        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+        FILE* platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
     }
@@ -120,20 +118,21 @@ protected:
 
 
 class ComputeActionExecutorTestWMS : public wrench::ExecutionController {
-
 public:
-    ComputeActionExecutorTestWMS(ComputeActionExecutorTest *test,
-                                 std::string hostname,
-                                 bool simulation_computation_as_sleep) : wrench::ExecutionController(hostname, "test"), test(test), simulation_computation_as_sleep(simulation_computation_as_sleep) {
+    ComputeActionExecutorTestWMS(ComputeActionExecutorTest* test,
+                                 const std::string& hostname,
+                                 bool simulation_computation_as_sleep) :
+        wrench::ExecutionController(hostname, "test"),
+        test(test),
+        simulation_computation_as_sleep(
+            simulation_computation_as_sleep) {
     }
 
-
 private:
-    ComputeActionExecutorTest *test;
+    ComputeActionExecutorTest* test;
     bool simulation_computation_as_sleep;
 
     int main() override {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -146,20 +145,22 @@ private:
         double ram = 200;
 
         action = std::dynamic_pointer_cast<wrench::Action>(
-                job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
+            job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
 
         // coverage
         wrench::Action::getActionTypeAsString(action);
 
-        auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2",
-                                           num_cores,
-                                           ram,
-                                           0.1,
-                                           simulation_computation_as_sleep,
-                                           this->commport,
-                                           action,
-                                           nullptr));
+        double thread_creation_overhead = 0.1;
+        auto action_executor = std::make_shared<wrench::ActionExecutor>(
+            "Host2",
+            num_cores,
+            ram,
+            thread_creation_overhead,
+            simulation_computation_as_sleep,
+            this->commport,
+            nullptr,
+            action,
+            nullptr);
 
         // Start it
         action_executor->setSimulation(this->getSimulation());
@@ -169,7 +170,8 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = this->commport->getMessage();
-        } catch (wrench::ExecutionException &e) {
+        }
+        catch (wrench::ExecutionException& e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }
@@ -181,13 +183,15 @@ private:
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
+        if (action->getStartDate() > EPSILON) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 10.2 or action->getEndDate() > 10.2 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~12.0)");
+        double expected_end_date = 10.2 + thread_creation_overhead;
+        if (fabs(action->getEndDate() - expected_end_date) > EPSILON) {
+            throw std::runtime_error(
+                "Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~" + std::to_string(expected_end_date) + ")");
         }
 
         // Is the state sensible?
@@ -205,14 +209,13 @@ TEST_F(ComputeActionExecutorTest, Success) {
 }
 
 void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool simulation_computation_as_sleep) {
-
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char** argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    //    argv[2] = strdup("--wrench-full-log");
+    // argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -222,7 +225,13 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
+    this->ss = simulation->add(
+        wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {
+                                                                     {
+                                                                         wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
+                                                                         "10MB"
+                                                                     }
+                                                                 }));
 
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000);
@@ -232,7 +241,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new ComputeActionExecutorTestWMS(this, "Host1", simulation_computation_as_sleep)));
+        new ComputeActionExecutorTestWMS(this, "Host1", simulation_computation_as_sleep)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -251,17 +260,16 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
 
 
 class ComputeActionExecutorFailureTestWMS : public wrench::ExecutionController {
-
 public:
-    ComputeActionExecutorFailureTestWMS(ComputeActionExecutorTest *test,
-                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    ComputeActionExecutorFailureTestWMS(ComputeActionExecutorTest* test,
+                                        std::string hostname) : wrench::ExecutionController(hostname, "test"),
+                                                                test(test) {
     }
 
 private:
-    ComputeActionExecutorTest *test;
+    ComputeActionExecutorTest* test;
 
     int main() override {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -277,21 +285,24 @@ private:
         try {
             job->addComputeAction("", -1.0, 0, 0, 1, wrench::ParallelModel::AMDAHL(1.0));
             throw std::runtime_error("Shouldn't be able to create a compute action with bogus arguments");
-        } catch (std::invalid_argument &ignore) {}
+        }
+        catch (std::invalid_argument& ignore) {
+        }
 
         // Too much RAM
         action = std::dynamic_pointer_cast<wrench::Action>(
-                job->addComputeAction("", 20.0, 300.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
+            job->addComputeAction("", 20.0, 300.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
 
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2",
-                                           num_cores,
-                                           ram,
-                                           0.1,
-                                           false,
-                                           this->commport,
-                                           action,
-                                           nullptr));
+            new wrench::ActionExecutor("Host2",
+                                       num_cores,
+                                       ram,
+                                       0.1,
+                                       false,
+                                       this->commport,
+                                       nullptr,
+                                       action,
+                                       nullptr));
 
         // Start it
         action_executor->setSimulation(this->getSimulation());
@@ -301,7 +312,8 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = this->commport->getMessage();
-        } catch (wrench::ExecutionException &e) {
+        }
+        catch (wrench::ExecutionException& e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }
@@ -329,11 +341,10 @@ TEST_F(ComputeActionExecutorTest, Failure) {
 }
 
 void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
-
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char** argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -346,7 +357,13 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
-    this->ss = simulation->add(wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}}));
+    this->ss = simulation->add(
+        wrench::SimpleStorageService::createSimpleStorageService("Host3", {"/"}, {
+                                                                     {
+                                                                         wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
+                                                                         "10MB"
+                                                                     }
+                                                                 }));
 
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000);
@@ -356,7 +373,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new ComputeActionExecutorFailureTestWMS(this, "Host1")));
+        new ComputeActionExecutorFailureTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

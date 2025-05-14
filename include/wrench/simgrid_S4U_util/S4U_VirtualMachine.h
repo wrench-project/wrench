@@ -40,7 +40,7 @@ namespace wrench {
             SUSPENDED
         };
 
-        S4U_VirtualMachine(const std::string &vm_hostname,
+        S4U_VirtualMachine(const std::string &vm_name,
                            unsigned long num_cores,
                            sg_size_t ram_memory,
                            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
@@ -62,8 +62,8 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE getPropertyList();
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE getMessagePayloadList();
 
-        State getState();
-        std::string getStateAsString();
+        State getState() const;
+        std::string getStateAsString() const;
 
 
     private:

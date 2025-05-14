@@ -22,9 +22,9 @@ namespace wrench {
      * @param service: the service that cause the error (or nullptr if no known service for the error)
      * @param error_message: a custom error message
      */
-    NotAllowed::NotAllowed(std::shared_ptr<Service> service, std::string &error_message) {
+    NotAllowed::NotAllowed(std::shared_ptr<Service> service, std::string error_message) {
         this->service = std::move(service);
-        this->error_message = error_message;
+        this->error_message = std::move(error_message);
     }
 
     /**

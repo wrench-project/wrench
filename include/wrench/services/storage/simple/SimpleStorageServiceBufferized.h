@@ -51,12 +51,12 @@ namespace wrench {
 
         friend class SimpleStorageService;
 
-        // Public Constructor
+        // Private Constructors
         SimpleStorageServiceBufferized(const std::string &hostname,
                                        const std::set<std::string>& mount_points,
+                                       const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
-
 
     public:
         double getLoad() override;
@@ -65,7 +65,7 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
         void cleanup(bool has_returned_from_main, int return_value) override;
-        unsigned long countRunningFileTransferThreads();
+        unsigned long countRunningFileTransferThreads() const;
 
         /***********************/
         /** \endcond          **/
@@ -87,15 +87,15 @@ namespace wrench {
                                sg_size_t num_bytes_to_read, S4U_CommPort *answer_commport);
 
         bool processFileCopyRequest(
-                std::shared_ptr<FileLocation> &src,
-                std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src_location,
+                std::shared_ptr<FileLocation> &dst_location,
                 S4U_CommPort *answer_commport);
 
         bool processFileTransferThreadNotification(
                 const std::shared_ptr<FileTransferThread> &ftt,
                 S4U_CommPort *src_commport,
                 const std::shared_ptr<FileLocation> &src_location,
-                S4U_CommPort *dst_commportx,
+                S4U_CommPort *dst_commport,
                 const std::shared_ptr<FileLocation> &dst_location,
                 bool success,
                 const std::shared_ptr<FailureCause>& failure_cause,

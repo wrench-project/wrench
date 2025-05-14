@@ -26,6 +26,7 @@
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"

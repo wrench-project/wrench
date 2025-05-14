@@ -38,8 +38,7 @@ namespace wrench {
                                                                   memory_requirement(memory_requirement),
                                                                   execution_host(""),
                                                                   visible_state(WorkflowTask::State::READY),
-                                                                  //            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
-                                                                  //            internal_state(WorkflowTask::InternalState::TASK_READY),
+                                                                  ready_date(Simulation::getCurrentSimulatedDate()),
                                                                   job(nullptr) {
         // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
@@ -263,15 +262,6 @@ namespace wrench {
         }
     }
 
-    //    /**
-    //    * @brief Get the state of the task
-    //    *
-    //    * @return a task state
-    //    */
-    //    WorkflowTask::State WorkflowTask::getUpcomingState() const {
-    //        return this->upcoming_visible_state;
-    //    }
-
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
      *
@@ -352,20 +342,15 @@ namespace wrench {
         if (this->visible_state == WorkflowTask::State::READY) {
             this->workflow->ready_tasks.erase(this->getSharedPtr());
         }
+        if (this->visible_state == WorkflowTask::State::READY and state == WorkflowTask::State::NOT_READY) {
+            this->ready_date = -1.0;
+        }
         this->visible_state = state;
         if (state == WorkflowTask::State::READY) {
+            this->ready_date = Simulation::getCurrentSimulatedDate();
             this->workflow->ready_tasks.insert(this->getSharedPtr());
         }
     }
-
-    //    /**
-    //     * @brief Set the upcoming visible state of the task
-    //     *
-    //     * @param state: the task state
-    //     */
-    //    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
-    //        this->upcoming_visible_state = state;
-    //    }
 
     /**
      * @brief Set the task's containing j
@@ -657,6 +642,15 @@ namespace wrench {
     double WorkflowTask::getStartDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().task_start : -1.0;
     }
+
+    /**
+     * @brief Get the task's ready date (the last time it became ready after being not ready)
+     * @return a date (-1 if task has not become ready yet)
+     */
+    double WorkflowTask::getReadyDate() const {
+        return this->ready_date;
+    }
+
 
     /**
      * @brief Get the task's most recent end date

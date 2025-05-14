@@ -364,7 +364,7 @@ private:
         cs->resumeVM(vm_name);
 
         // Coverage
-        cs->getMemoryCapacity();
+        cs->getPerHostMemoryCapacity();
         cs->getPerHostAvailableMemoryCapacity();
 
         // Check that we can get the CS back
