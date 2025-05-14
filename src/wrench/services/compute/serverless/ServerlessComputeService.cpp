@@ -225,8 +225,8 @@ namespace wrench {
             // RAM availability per host
             std::map<std::string, double> ram_availability;
             for (auto const& h : this->_state_of_the_system->_compute_hosts) {
-                ram_availability[h] = static_cast<double>(this->_state_of_the_system->_compute_memories[h]->
-                    getTotalFreeSpaceZeroTime());
+                auto ss = this->_state_of_the_system->_compute_memories[h];
+                ram_availability[h] = (ss ? static_cast<double>(ss->getTotalFreeSpaceZeroTime()) : 0.0);
             }
             return ram_availability;
         }

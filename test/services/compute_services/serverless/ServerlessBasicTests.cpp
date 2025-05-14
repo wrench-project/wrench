@@ -27,6 +27,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
 
+    void do_SanityTest_test();
     void do_FunctionRegistrationTest_test();
     void do_FunctionInvocationTest_test();
     void do_FunctionTimeoutTest_test();
@@ -103,11 +104,89 @@ public:
 
 class MyFunctionOutput : public wrench::FunctionOutput {
 public:
-    MyFunctionOutput(const std::string& msg) : msg_(msg) {
+    explicit MyFunctionOutput(const std::string& msg) : msg_(msg) {
     }
 
     std::string msg_;
 };
+
+
+/**********************************************************************/
+/**  SANITY TEST                                                     **/
+/**********************************************************************/
+
+class ServerlessBasicTestSanityController : public wrench::ExecutionController {
+public:
+    ServerlessBasicTestSanityController(ServerlessBasicTest* test,
+                                                      const std::string& hostname,
+                                                      const std::shared_ptr<wrench::ServerlessComputeService>
+                                                      & compute_service,
+                                                      const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessBasicTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+
+        wrench::Simulation::sleep(1); // so that the service has started its sub-services
+
+        // Receive resource information
+        auto num_hosts = compute_service->getNumHosts();
+
+        auto cores = compute_service->getPerHostNumCores();
+        auto idle_cores = compute_service->getPerHostNumIdleCores();
+
+        auto memories = compute_service->getPerHostMemoryCapacity();
+        auto available_memory = compute_service->getPerHostAvailableMemoryCapacity();
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessBasicTest, Sanity) {
+    DO_TEST_WITH_FORK(do_SanityTest_test);
+}
+
+void ServerlessBasicTest::do_SanityTest_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessBasicTestSanityController(this, user_host, serverless_provider, storage_service));
+
+    ASSERT_FALSE(serverless_provider->supportsCompoundJobs());
+    ASSERT_FALSE(serverless_provider->supportsPilotJobs());
+    ASSERT_FALSE(serverless_provider->supportsStandardJobs());
+    ASSERT_TRUE(serverless_provider->supportsFunctions());
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
 
 
 /**********************************************************************/
@@ -191,9 +270,9 @@ void ServerlessBasicTest::do_FunctionRegistrationTest_test() {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -332,9 +411,9 @@ void ServerlessBasicTest::do_FunctionInvocationTest_test() {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -433,9 +512,9 @@ void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -542,9 +621,9 @@ void ServerlessBasicTest::do_FunctionErrorTest_test() {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
