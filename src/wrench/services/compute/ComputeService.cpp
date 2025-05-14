@@ -363,7 +363,7 @@ namespace wrench {
     * @return a map of RAM capacities, indexed by hostname
     *
     */
-    std::map<std::string, double> ComputeService::getMemoryCapacity(bool simulate_it) {
+    std::map<std::string, double> ComputeService::getPerHostMemoryCapacity(bool simulate_it) {
         auto dict = this->getServiceResourceInformation("ram_capacities", simulate_it);
 
         std::map<std::string, double> to_return;

@@ -148,7 +148,7 @@ private:
                         this->test->cs->getTotalNumIdleCores();
                         break;
                     case 6:
-                        this->test->cs->getMemoryCapacity();
+                        this->test->cs->getPerHostMemoryCapacity();
                         break;
                     case 7:
                         this->test->cs->getPerHostAvailableMemoryCapacity();
