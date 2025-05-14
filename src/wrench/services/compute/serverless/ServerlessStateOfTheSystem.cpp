@@ -9,15 +9,11 @@
 
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
 #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/exceptions/ExecutionException.h>
-// #include <wrench/failure_causes/NotAllowed.h>
-
-#include <utility>
-
-// #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/simgrid_S4U_util//S4U_Simulation.h"
+
+#include <utility>
 
 WRENCH_LOG_CATEGORY(wrench_core_serverless_state_of_the_system, "Log category for Serverless State of the System");
 
@@ -69,12 +65,15 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the currently free RAM space on Node
-     * @param node the compute node
-     * @return free RAM space
+     * @brief Getter for the map of available disk space
+     * @return The RAM availability map
      */
-    sg_size_t ServerlessStateOfTheSystem::getFreeRAMSpaceOnNode(const std::string &node) const {
-        return _compute_storages.at(node)->getTotalFreeSpaceZeroTime();
+    std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableDiskSpace() {
+        std::map<std::string, sg_size_t> to_return;
+        for (const auto& [hostname, ss] : _compute_storages) {
+            to_return[hostname] = ss->getTotalFreeSpaceZeroTime();
+        }
+        return to_return;
     }
 
     /**

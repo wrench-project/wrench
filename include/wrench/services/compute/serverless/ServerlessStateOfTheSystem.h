@@ -33,7 +33,7 @@ namespace wrench
         const std::vector<std::string>& getComputeHosts();
         std::map<std::string, unsigned long> getAvailableCores();
         std::map<std::string, sg_size_t> getAvailableRAM();
-        [[nodiscard]] sg_size_t getFreeRAMSpaceOnNode(const std::string &node) const;
+        std::map<std::string, sg_size_t> getAvailableDiskSpace();
 
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node);
         bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image);
