@@ -41,6 +41,9 @@ namespace wrench {
         this->creator_commport = creator_commport;
     }
 
+    /**
+     * @brief Stop the function manager
+     */
     void FunctionManager::stop() {
         // Implementation of stop logic, e.g., cleanup resources or notify shutdown
         this->Service::stop();

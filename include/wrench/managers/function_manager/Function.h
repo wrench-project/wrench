@@ -31,15 +31,23 @@ namespace wrench {
     class Function {
     public:
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
         Function(const std::string &name,
                  const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
                  const std::shared_ptr<FileLocation> &image);
 
-        [[nodiscard]] std::string getName() const;
+        [[nodiscard]] std::shared_ptr<FunctionOutput> execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const;
 
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        [[nodiscard]] std::string getName() const;
         [[nodiscard]] std::shared_ptr<FileLocation> getImage() const;
 
-        [[nodiscard]] std::shared_ptr<FunctionOutput> execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const;
 
     private:
         friend class FunctionManager;

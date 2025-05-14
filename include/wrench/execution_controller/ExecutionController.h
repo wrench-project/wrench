@@ -49,10 +49,9 @@ namespace wrench {
 
     public:
         virtual std::shared_ptr<JobManager> createJobManager();
-
         virtual std::shared_ptr<FunctionManager> createFunctionManager();
-
         virtual std::shared_ptr<DataMovementManager> createDataMovementManager();
+
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
         std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::map<std::string, double> &measurement_periods);

@@ -19,6 +19,11 @@ namespace wrench {
     class WorkloadBalancingServerlessScheduler : public ServerlessScheduler {
     public:
         WorkloadBalancingServerlessScheduler() = default;
+
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
         ~WorkloadBalancingServerlessScheduler() override = default;
 
         std::shared_ptr<SchedulingDecisions> schedule(
@@ -53,6 +58,10 @@ namespace wrench {
 
         // Map function names to their image files
         std::unordered_map<std::string, std::shared_ptr<DataFile>> function_images;
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
     };
 } // namespace wrench
 

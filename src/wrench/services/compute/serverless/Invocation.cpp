@@ -83,20 +83,20 @@ namespace wrench {
         if (_done) {
             return _success;
         }
-        throw std::runtime_error("Invocation::isSuccess(): Invocation is not done yet");
+        throw std::runtime_error("Invocation::hasSucceeded(): Invocation is not done yet");
     }
 
     /**
-     * @brief Gets the registered function.
-     * @return A shared pointer to the registered function.
+     * @brief Gets the registered function for this invocation
+     * @return A registered function
      */
     std::shared_ptr<RegisteredFunction> Invocation::getRegisteredFunction() const {
         return _registered_function;
     }
 
     /**
-     * @brief Gets the cause of failure.
-     * @return A shared pointer to the failure cause.
+     * @brief Gets the cause of failure
+     * @return A failure cause
      */
     std::shared_ptr<FailureCause> Invocation::getFailureCause() const {
         if (_done) {
