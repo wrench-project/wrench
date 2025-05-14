@@ -84,6 +84,8 @@ namespace wrench {
                                                              sg_size_t egress_in_bytes);
 
     private:
+        static unsigned long sequence_number;
+
         std::shared_ptr<ServerlessScheduler> _scheduler;
         std::shared_ptr<ServerlessStateOfTheSystem> _state_of_the_system;
 
