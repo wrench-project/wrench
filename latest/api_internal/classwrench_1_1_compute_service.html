@@ -133,9 +133,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService15getCoreFlopRateEb"><code class="docutils literal notranslate"><span class="pre">getCoreFlopRate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench14ComputeService23getFreeScratchSpaceSizeEv"><code class="docutils literal notranslate"><span class="pre">getFreeScratchSpaceSize()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService8getHostsEb"><code class="docutils literal notranslate"><span class="pre">getHosts()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService17getMemoryCapacityEb"><code class="docutils literal notranslate"><span class="pre">getMemoryCapacity()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService11getNumHostsEb"><code class="docutils literal notranslate"><span class="pre">getNumHosts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService33getPerHostAvailableMemoryCapacityEb"><code class="docutils literal notranslate"><span class="pre">getPerHostAvailableMemoryCapacity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService24getPerHostMemoryCapacityEb"><code class="docutils literal notranslate"><span class="pre">getPerHostMemoryCapacity()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService18getPerHostNumCoresEb"><code class="docutils literal notranslate"><span class="pre">getPerHostNumCores()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService22getPerHostNumIdleCoresEb"><code class="docutils literal notranslate"><span class="pre">getPerHostNumIdleCores()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14ComputeService10getScratchEv"><code class="docutils literal notranslate"><span class="pre">getScratch()</span></code></a></li>
@@ -566,20 +566,6 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench14ComputeService17getMemoryCapacityEb">
-<span id="_CPPv3N6wrench14ComputeService17getMemoryCapacityEb"></span><span id="_CPPv2N6wrench14ComputeService17getMemoryCapacityEb"></span><span id="wrench::ComputeService::getMemoryCapacity__b"></span><span class="target" id="classwrench_1_1_compute_service_1aa030fe82fabce81ff3fc940da8fb264b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMemoryCapacity</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">simulate_it</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Get the RAM capacities for each of the compute service’s hosts. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>simulate_it</strong> – if true, simulate a message sent to the service to retrieve the information, otherwise perform this operation in zero simulated time. </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a map of RAM capacities, indexed by hostname </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench14ComputeService11getNumHostsEb">
 <span id="_CPPv3N6wrench14ComputeService11getNumHostsEb"></span><span id="_CPPv2N6wrench14ComputeService11getNumHostsEb"></span><span id="wrench::ComputeService::getNumHosts__b"></span><span class="target" id="classwrench_1_1_compute_service_1afb31e206bad1dcdd5f93820373d129ff"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumHosts</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">simulate_it</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Get the number of hosts that the compute service manages. </p>
@@ -603,6 +589,20 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the ram availability map (could be empty) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench14ComputeService24getPerHostMemoryCapacityEb">
+<span id="_CPPv3N6wrench14ComputeService24getPerHostMemoryCapacityEb"></span><span id="_CPPv2N6wrench14ComputeService24getPerHostMemoryCapacityEb"></span><span id="wrench::ComputeService::getPerHostMemoryCapacity__b"></span><span class="target" id="classwrench_1_1_compute_service_1ac429210e699be3ae0ed1ed714d953b7d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPerHostMemoryCapacity</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">simulate_it</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the RAM capacities for each of the compute service’s hosts. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>simulate_it</strong> – if true, simulate a message sent to the service to retrieve the information, otherwise perform this operation in zero simulated time. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a map of RAM capacities, indexed by hostname </p>
 </dd>
 </dl>
 </dd></dl>
