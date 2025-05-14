@@ -60,6 +60,7 @@ namespace wrench {
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
+        bool supportsFunctions() override;
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -67,19 +68,13 @@ namespace wrench {
 
         void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) override;
 
-        void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &compound_job,
+        void validateServiceSpecificArguments(const std::shared_ptr<CompoundJob> &job,
                                               std::map<std::string, std::string> &service_specific_args) override;
 
         void addComputeService(const std::shared_ptr<ComputeService>& compute_service);
 
-        //        void submitStandardJob(std::shared_ptr<StandardJob> job,
-        //                               const std::map<std::string, std::string> &service_specific_arguments);
-
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                               const std::map<std::string, std::string> &service_specific_arguments) override;
-
-
-        //        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
+                               const std::map<std::string, std::string> &service_specific_args) override;
 
         std::shared_ptr<StorageService> getLocalStorageService() const;
 

@@ -107,9 +107,10 @@ namespace wrench {
     private:
         friend class SimpleStorageService;
 
-        //  Constructor
+        //  Constructors
         SimpleStorageServiceNonBufferized(const std::string &hostname,
                                           const std::set<std::string>& mount_points,
+                                          const std::shared_ptr<simgrid::fsmod::FileSystem> &file_system,
                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
 
@@ -135,18 +136,18 @@ namespace wrench {
 
 
         bool processFileCopyRequest(
-                std::shared_ptr<FileLocation> &src,
-                std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src_location,
+                std::shared_ptr<FileLocation> &dst_location,
                 S4U_CommPort *answer_commport);
 
         bool processFileCopyRequestIAmTheSource(
-                std::shared_ptr<FileLocation> &src,
-                std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src_location,
+                std::shared_ptr<FileLocation> &dst_location,
                 S4U_CommPort *answer_commport);
 
         bool processFileCopyRequestIAmNotTheSource(
-                std::shared_ptr<FileLocation> &src,
-                std::shared_ptr<FileLocation> &dst,
+                std::shared_ptr<FileLocation> &src_location,
+                std::shared_ptr<FileLocation> &dst_location,
                 S4U_CommPort *answer_commport);
 
 

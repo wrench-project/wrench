@@ -29,6 +29,7 @@ namespace wrench {
     public:
     protected:
         friend class CompoundJob;
+        friend class ServerlessComputeService;
 
         CustomAction(const std::string &name,
                      sg_size_t ram,

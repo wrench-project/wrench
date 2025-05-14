@@ -257,6 +257,7 @@ of how jobs are submitted to each compute service type:
 - :ref:`Cloud compute service <guide-102-cloud>`
 - :ref:`Virtualized cluster compute service <guide-102-virtualizedcluster>`
 - :ref:`HTCondor compute service <guide-102-htcondor>`
+- :ref:`Serverless compute service <guide-102-serverless>`
 
 .. _wrench-102-controller-services-registry:
 

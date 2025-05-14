@@ -39,7 +39,7 @@ private:
     unsigned long num_compute_hosts;
 
     void create_platform() const {
-        // Create the top-level zone
+        // Get the top-level zone
         auto zone = simgrid::s4u::Engine::get_instance()->get_netzone_root();
 
         // Create the WMSHost host with its disk
@@ -55,7 +55,7 @@ private:
         auto network_link = zone->add_link("network_link", 100 * MBPS)->set_latency("20us");
 
         // Create the compute hosts and routes to them (could be done as a single cluster)
-        for (int i=0; i < num_compute_hosts; i++) {
+        for (unsigned long i=0; i < num_compute_hosts; i++) {
             auto compute_host = zone->add_host("ComputeHost_" + std::to_string(i), "1Gf");
             compute_host->set_core_count(1);
             sg4::LinkInRoute network_link_in_route{network_link};

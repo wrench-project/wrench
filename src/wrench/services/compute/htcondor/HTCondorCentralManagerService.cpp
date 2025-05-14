@@ -389,57 +389,23 @@ namespace wrench {
         this->running_jobs.clear();
     }
 
-    //    /**
-    //   * @brief Helper function to check whether a job kind is supported
-    //   * @param job: the job
-    //   * @param service_specific_arguments: the service-specific argument
-    //   * @return true or false
-    //   */
-    //    bool HTCondorCentralManagerService::jobKindIsSupported(
-    //            const std::shared_ptr<Job> &job,
-    //            std::map<std::string, std::string> service_specific_arguments) {
-    //        bool is_grid_universe =
-    //                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
-    //                (service_specific_arguments["-universe"] == "grid");
-    //        bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
-    //
-    //        bool found_one = false;
-    //        for (auto const &cs: this->compute_services) {
-    //            if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
-    //                continue;
-    //            }
-    //            if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
-    //                continue;
-    //            }
-    //            if (is_standard_job and (not cs->supportsStandardJobs())) {
-    //                continue;
-    //            }
-    //            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
-    //                continue;
-    //            }
-    //            found_one = true;
-    //            break;
-    //        }
-    //
-    //        return found_one;
-    //    }
 
     /**
      * @brief Helper function to check whether a job can run on at least one child compute service
      * @param job: the job
-     * @param service_specific_arguments: the service-specific argument
+     * @param service_specific_args: the service-specific argument
      * @return true or false
      */
     std::shared_ptr<FailureCause> HTCondorCentralManagerService::jobCanRunSomewhere(
             const std::shared_ptr<CompoundJob> &job,
-            std::map<std::string, std::string> service_specific_arguments) {
+            std::map<std::string, std::string> service_specific_args) {
 
         std::shared_ptr<FailureCause> failure_cause;
         bool there_is_a_grid_appropriate_service = false;
 
         bool is_grid_universe =
-                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
-                (service_specific_arguments["-universe"] == "grid");
+                (service_specific_args.find("-universe") != service_specific_args.end()) and
+                (service_specific_args["-universe"] == "grid");
         bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
 
 
@@ -459,20 +425,20 @@ namespace wrench {
 
             // Check for resources for a grid universe job
             if (is_grid_universe) {
-                if (service_specific_arguments.find("-N") == service_specific_arguments.end()) {
+                if (service_specific_args.find("-N") == service_specific_args.end()) {
                     throw std::invalid_argument(
                             "HTCondorCentralManagerService::jobCanRunSomewhere(): Grid universe job must have a '-N' service-specific argument");
                 }
-                if (service_specific_arguments.find("-c") == service_specific_arguments.end()) {
+                if (service_specific_args.find("-c") == service_specific_args.end()) {
                     throw std::invalid_argument(
                             "HTCondorCentralManagerService::jobCanRunSomewhere(): Grid universe job must have a '-c' service-specific argument");
                 }
                 unsigned long num_hosts = 0;
                 unsigned long num_cores_per_host = 0;
                 num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
-                        "-N", service_specific_arguments);
+                        "-N", service_specific_args);
                 num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
-                        "-c", service_specific_arguments);
+                        "-c", service_specific_args);
                 if (cs->getNumHosts() < num_hosts) {
                     continue;
                 }
@@ -490,7 +456,7 @@ namespace wrench {
                 if (max_cores < job->getMinimumRequiredNumCores()) {
                     continue;
                 }
-                auto ram_resources = cs->getMemoryCapacity();
+                auto ram_resources = cs->getPerHostMemoryCapacity();
                 sg_size_t max_ram = 0;
                 for (auto const &entry: ram_resources) {
                     max_ram = std::max<sg_size_t>(max_ram, entry.second);
@@ -540,6 +506,14 @@ namespace wrench {
      * @return true or false
      */
     bool HTCondorCentralManagerService::supportsPilotJobs() {
+        return false;
+    }
+
+    /**
+    * @brief Returns true if the service supports functions
+    * @return true or false
+    */
+    bool HTCondorCentralManagerService::supportsFunctions() {
         return false;
     }
 

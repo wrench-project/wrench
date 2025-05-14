@@ -42,7 +42,7 @@ namespace wrench {
 
 
     private:
-        void cleanup(bool has_terminated_cleanly, int return_value) override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
         void hostStateChangeCallback(const simgrid::s4u::Host *host);
         void hostSpeedChangeCallback(const simgrid::s4u::Host *host);
 

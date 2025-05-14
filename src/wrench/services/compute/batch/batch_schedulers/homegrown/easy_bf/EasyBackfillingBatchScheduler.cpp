@@ -23,6 +23,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param cs: The BatchComputeService for which this scheduler is working
+     * @param depth: The scheduling (reservation) depth
      * @param backfilling_depth: the backfilling depth
      */
     EasyBackfillingBatchScheduler::EasyBackfillingBatchScheduler(

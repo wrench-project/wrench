@@ -1063,13 +1063,20 @@ namespace wrench
     }
 
     /**
+    * @brief Returns true if the service supports functions
+    * @return true or false
+    */
+    bool BareMetalComputeService::supportsFunctions() {
+        return false;
+    }
+
+    /**
      * @brief An "out of simulation time" (instant) method to check on resource availability
      * @param num_cores: desired number of cores
      * @param ram: desire RAM footprint
      * @return true if there is at least one host with the available free resources, false otherwise
      */
-    bool BareMetalComputeService::isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, sg_size_t ram)
-    {
+    bool BareMetalComputeService::isThereAtLeastOneHostWithIdleResourcesInstant(unsigned long num_cores, sg_size_t ram) const {
         return this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
     }
 } // namespace wrench

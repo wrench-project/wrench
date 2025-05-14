@@ -15,7 +15,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(stress_test_action_controller, "Log category for St
 namespace wrench {
 
     int StressTestActionAPIController::main() {
-
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         unsigned long max_num_pending_jobs = 10;
@@ -24,9 +23,7 @@ namespace wrench {
 
 
         while (num_completed_jobs < num_jobs) {
-
             while ((num_pending_jobs < max_num_pending_jobs) and (num_pending_jobs + num_completed_jobs < num_jobs)) {
-
                 WRENCH_INFO("Creating a new job");
 
                 auto job = job_manager->createCompoundJob("job_" + std::to_string(num_completed_jobs));

@@ -45,13 +45,13 @@ namespace wrench {
 
         S4U_CommPort *popCallbackCommPort();
 
-        void printCallbackCommPortStack();
+        void printCallbackCommPortStack() const;
 
         void pushCallbackCommPort(S4U_CommPort *commport);
 
         S4U_CommPort *getCallbackCommPort();
 
-        S4U_CommPort *getOriginCallbackCommPort();
+        S4U_CommPort *getOriginCallbackCommPort() const;
 
         void setParentComputeService(std::shared_ptr<ComputeService> compute_service);
 

@@ -140,7 +140,7 @@ private:
 
             // Create a file read action executor
             auto file_read_action_executor = std::make_shared<wrench::ActionExecutor>(
-                    "Host2", 0, 0.0, 0, false, this->commport, file_registry_add_entry_action,
+                    "Host2", 0, 0.0, 0, false, this->commport, nullptr, file_registry_add_entry_action,
                     nullptr);
 
             // Start it
@@ -183,7 +183,7 @@ private:
 
             // Create a file read action executor
             auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_registry_delete_entry_action,
+                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_registry_delete_entry_action,
                                                nullptr));
 
             // Start it
