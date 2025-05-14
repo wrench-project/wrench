@@ -340,8 +340,7 @@ namespace wrench {
             message = this->commport->getMessage();
         }
         catch (ExecutionException& e) {
-            WRENCH_INFO(
-                "Got a network error while getting some message... ignoring");
+            WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;
         }
 
@@ -965,9 +964,8 @@ namespace wrench {
     */
     void ServerlessComputeService::initiateImageCopies(const std::shared_ptr<SchedulingDecisions>& decisions) {
         // For each compute node, initiate image copy (from head node) if need be
-        for (const auto& entry : decisions->images_to_copy_to_compute_node) {
-            const std::string& hostname = entry.first;
-            for (const auto& image : entry.second) {
+        for (const auto& [hostname, image_files] : decisions->images_to_copy_to_compute_node) {
+            for (const auto& image : image_files) {
                 initiateImageCopyToComputeHost(hostname, image);
             }
         }
