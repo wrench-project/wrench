@@ -145,7 +145,7 @@ private:
 
         // Create a file read action executor
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, file_write_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_write_action, nullptr));
         // Start it
         file_write_action_executor->setSimulation(this->getSimulation());
         file_write_action_executor->start(file_write_action_executor, true, false);

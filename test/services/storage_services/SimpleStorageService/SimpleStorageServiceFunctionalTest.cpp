@@ -418,6 +418,7 @@ private:
 
 
         // Do a bogus asynchronous file copy (src = nullptr);
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         try {
             data_movement_manager->initiateAsynchronousFileCopy(
                     nullptr,
@@ -434,6 +435,7 @@ private:
             throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr dst");
         } catch (std::invalid_argument &e) {
         }
+#endif
 
         // Do a valid asynchronous file copy
         try {
@@ -751,6 +753,8 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+
         // Do a bogus file copy (src = nullptr)
         try {
             data_movement_manager->doSynchronousFileCopy(nullptr,
@@ -766,6 +770,7 @@ private:
             throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
         } catch (std::invalid_argument &e) {
         }
+#endif
 
         // Do a bogus file copy (src->getFile() = dst->getFile())
         try {

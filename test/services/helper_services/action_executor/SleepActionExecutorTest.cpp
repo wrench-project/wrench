@@ -144,7 +144,7 @@ private:
 
         // Create a sleep action executor
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, sleep_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, sleep_action, nullptr));
         // Start it
         sleep_action_executor->setSimulation(this->getSimulation());
         sleep_action_executor->start(sleep_action_executor, true, false);

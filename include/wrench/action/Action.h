@@ -108,6 +108,7 @@ namespace wrench {
     protected:
         friend class CompoundJob;
         friend class ActionExecutor;
+        friend class ActionExecutorActorWithTimeout;
         friend class ActionExecutionService;
         friend class BareMetalComputeService;// this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
         friend class BatchComputeService;    // this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
@@ -131,6 +132,7 @@ namespace wrench {
         * @param action_executor: the executor that executes this action
         */
         virtual void execute(const std::shared_ptr<ActionExecutor> &action_executor) = 0;
+
         /**
          * @brief Method called when the task terminates
          * @param action_executor:  the executor that executes this action

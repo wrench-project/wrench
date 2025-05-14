@@ -43,7 +43,7 @@ namespace wrench {
         }
         this->shutting_down = true;// This is to avoid another process calling stop() and being stuck
 
-        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->commport->get_cname());
+        WRENCH_DEBUG("Telling the daemon listening on (%s) to terminate", this->commport->get_cname());
 
         // Send a termination message to the daemon's commport - SYNCHRONOUSLY
         auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
