@@ -85,12 +85,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
@@ -103,10 +100,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessScheduler</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench19ServerlessSchedulerE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessScheduler</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE"><code class="docutils literal notranslate"><span class="pre">schedule()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench19ServerlessSchedulerE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessScheduler</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
@@ -205,32 +199,6 @@
 <span id="_CPPv3N6wrench19ServerlessSchedulerE"></span><span id="_CPPv2N6wrench19ServerlessSchedulerE"></span><span id="wrench::ServerlessScheduler"></span><span class="target" id="classwrench_1_1_serverless_scheduler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessScheduler</span></span></span><br /></dt>
 <dd><p>Abstract base class for scheduling in a serverless compute service. </p>
 <p>Subclassed by <a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html#classwrench_1_1_f_c_f_s_serverless_scheduler"><span class="std std-ref">wrench::FCFSServerlessScheduler</span></a>, <a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html#classwrench_1_1_random_serverless_scheduler"><span class="std std-ref">wrench::RandomServerlessScheduler</span></a>, <a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html#classwrench_1_1_workload_balancing_serverless_scheduler"><span class="std std-ref">wrench::WorkloadBalancingServerlessScheduler</span></a></p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench19ServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE">
-<span id="_CPPv3N6wrench19ServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE"></span><span id="_CPPv2N6wrench19ServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE"></span><span id="wrench::ServerlessScheduler::schedule__std::vector:std::shared_ptr:Invocation::CR.std::shared_ptr:ServerlessStateOfTheSystem:CR"></span><span class="target" id="classwrench_1_1_serverless_scheduler_1a6b6d960ab4af2339e52790ba5d8942d4"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">SchedulingDecisions</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">schedule</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">schedulable_invocations</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_state_of_the_system.html#_CPPv4N6wrench26ServerlessStateOfTheSystemE" title="wrench::ServerlessStateOfTheSystem"><span class="n"><span class="pre">ServerlessStateOfTheSystem</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><br /></dt>
-<dd><p>Given the list of schedulable invocations and the current system state, decide: </p>
-<p><ul class="simple">
-<li><p>which images to copy to compute nodes</p></li>
-<li><p>which images to load into memory at compute nodes</p></li>
-<li><p>which invocations to start at compute nodes</p></li>
-</ul>
-</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>schedulable_invocations</strong> – A list of invocations whose images reside on the head node </p></li>
-<li><p><strong>state</strong> – The current system state </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A SchedulingDecisions object </p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 </dd></dl>
 
 </section>

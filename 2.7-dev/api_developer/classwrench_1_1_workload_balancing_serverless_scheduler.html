@@ -220,10 +220,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow_task.html">wrench::WorkflowTask</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::WorkloadBalancingServerlessScheduler</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench36WorkloadBalancingServerlessSchedulerE"><code class="docutils literal notranslate"><span class="pre">wrench::WorkloadBalancingServerlessScheduler</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench36WorkloadBalancingServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE"><code class="docutils literal notranslate"><span class="pre">schedule()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench36WorkloadBalancingServerlessSchedulerE"><code class="docutils literal notranslate"><span class="pre">wrench::WorkloadBalancingServerlessScheduler</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_deployment.html">wrench::XRootD::Deployment</a></li>
@@ -268,32 +265,6 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench36WorkloadBalancingServerlessSchedulerE">
 <span id="_CPPv3N6wrench36WorkloadBalancingServerlessSchedulerE"></span><span id="_CPPv2N6wrench36WorkloadBalancingServerlessSchedulerE"></span><span id="wrench::WorkloadBalancingServerlessScheduler"></span><span class="target" id="classwrench_1_1_workload_balancing_serverless_scheduler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WorkloadBalancingServerlessScheduler</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE" title="wrench::ServerlessScheduler"><span class="n"><span class="pre">ServerlessScheduler</span></span></a><a class="headerlink" href="#_CPPv4N6wrench36WorkloadBalancingServerlessSchedulerE" title="Link to this definition"></a><br /></dt>
 <dd><p>A class that implements a very experimental/untested scheduler that attempts to make good load-balancing decisions. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench36WorkloadBalancingServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE">
-<span id="_CPPv3N6wrench36WorkloadBalancingServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE"></span><span id="_CPPv2N6wrench36WorkloadBalancingServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE"></span><span id="wrench::WorkloadBalancingServerlessScheduler::schedule__std::vector:std::shared_ptr:Invocation::CR.std::shared_ptr:ServerlessStateOfTheSystem:CR"></span><span class="target" id="classwrench_1_1_workload_balancing_serverless_scheduler_1a406c649b547703edba484eb9bf9e5aa7"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">SchedulingDecisions</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">schedule</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">schedulable_invocations</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_state_of_the_system.html#_CPPv4N6wrench26ServerlessStateOfTheSystemE" title="wrench::ServerlessStateOfTheSystem"><span class="n"><span class="pre">ServerlessStateOfTheSystem</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench36WorkloadBalancingServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEERKNSt10shared_ptrI26ServerlessStateOfTheSystemEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Given the list of schedulable invocations and the current system state, decide: </p>
-<p><ul class="simple">
-<li><p>which images to copy to compute nodes</p></li>
-<li><p>which images to load into memory at compute nodes</p></li>
-<li><p>which invocations to start at compute nodes</p></li>
-</ul>
-</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>schedulable_invocations</strong> – A list of invocations whose images reside on the head node </p></li>
-<li><p><strong>state</strong> – The current system state </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A SchedulingDecisions object </p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 </dd></dl>
 
 </section>

@@ -154,7 +154,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::RegisteredFunction</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench18RegisteredFunctionE"><code class="docutils literal notranslate"><span class="pre">wrench::RegisteredFunction</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18RegisteredFunction18RegisteredFunctionERKNSt10shared_ptrI8FunctionEEd9sg_size_t9sg_size_t9sg_size_t9sg_size_t"><code class="docutils literal notranslate"><span class="pre">RegisteredFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction17getDiskSpaceLimitEv"><code class="docutils literal notranslate"><span class="pre">getDiskSpaceLimit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18RegisteredFunction11getFunctionEv"><code class="docutils literal notranslate"><span class="pre">getFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction12getImageFileEv"><code class="docutils literal notranslate"><span class="pre">getImageFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction24getOriginalImageLocationEv"><code class="docutils literal notranslate"><span class="pre">getOriginalImageLocation()</span></code></a></li>
@@ -276,25 +276,12 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench18RegisteredFunction18RegisteredFunctionERKNSt10shared_ptrI8FunctionEEd9sg_size_t9sg_size_t9sg_size_t9sg_size_t">
-<span id="_CPPv3N6wrench18RegisteredFunction18RegisteredFunctionERKNSt10shared_ptrI8FunctionEEd9sg_size_t9sg_size_t9sg_size_t9sg_size_t"></span><span id="_CPPv2N6wrench18RegisteredFunction18RegisteredFunctionERKNSt10shared_ptrI8FunctionEEd9sg_size_t9sg_size_t9sg_size_t9sg_size_t"></span><span id="wrench::RegisteredFunction::RegisteredFunction__std::shared_ptr:Function:CR.double.sg_size_t.sg_size_t.sg_size_t.sg_size_t"></span><span class="target" id="classwrench_1_1_registered_function_1add2c0b28fa6b962704f6f1e56708442e"></span><span class="sig-name descname"><span class="n"><span class="pre">RegisteredFunction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_function.html#_CPPv4N6wrench8FunctionE" title="wrench::Function"><span class="n"><span class="pre">Function</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">function</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">time_limit_in_seconds</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">disk_space_limit_in_bytes</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">RAM_limit_in_bytes</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ingress_in_bytes</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">egress_in_bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench18RegisteredFunction18RegisteredFunctionERKNSt10shared_ptrI8FunctionEEd9sg_size_t9sg_size_t9sg_size_t9sg_size_t" title="Link to this definition"></a><br /></dt>
-<dd><p>Constructs a <a class="reference internal" href="../api_internal/classwrench_1_1_registered_function.html#classwrench_1_1_registered_function"><span class="std std-ref">RegisteredFunction</span></a> object. </p>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench18RegisteredFunction17getDiskSpaceLimitEv">
+<span id="_CPPv3NK6wrench18RegisteredFunction17getDiskSpaceLimitEv"></span><span id="_CPPv2NK6wrench18RegisteredFunction17getDiskSpaceLimitEv"></span><span id="wrench::RegisteredFunction::getDiskSpaceLimitC"></span><span class="target" id="classwrench_1_1_registered_function_1aedc1d3e3bbaff09c802a6cbe3d0120ae"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDiskSpaceLimit</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench18RegisteredFunction17getDiskSpaceLimitEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the registered function’s disk space limit. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>function</strong> – The function to be registered </p></li>
-<li><p><strong>time_limit_in_seconds</strong> – The time limit for the function execution </p></li>
-<li><p><strong>disk_space_limit_in_bytes</strong> – The disk space limit for the function </p></li>
-<li><p><strong>RAM_limit_in_bytes</strong> – The RAM limit for the function </p></li>
-<li><p><strong>ingress_in_bytes</strong> – The ingress data limit for the function (currently ignored) </p></li>
-<li><p><strong>egress_in_bytes</strong> – The egress data limit for the function (currently ignored)</p></li>
-<li><p><strong>function</strong> – The function to be registered. </p></li>
-<li><p><strong>time_limit_in_seconds</strong> – The time limit for the function execution. </p></li>
-<li><p><strong>disk_space_limit_in_bytes</strong> – The disk space limit for the function. </p></li>
-<li><p><strong>RAM_limit_in_bytes</strong> – The RAM limit for the function. </p></li>
-<li><p><strong>ingress_in_bytes</strong> – The ingress data limit for the function. </p></li>
-<li><p><strong>egress_in_bytes</strong> – The egress data limit for the function. </p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A RAN limit in bytes </p>
 </dd>
 </dl>
 </dd></dl>

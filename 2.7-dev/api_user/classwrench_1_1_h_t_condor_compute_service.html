@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="wrench::HTCondorComputeServiceMessagePayload" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html" />
-    <link rel="prev" title="wrench::FunctionOutput" href="classwrench_1_1_function_output.html" /> 
+    <link rel="prev" title="wrench::FileRegistryServiceProperty" href="classwrench_1_1_file_registry_service_property.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -85,12 +85,11 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::HTCondorComputeService</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench22HTCondorComputeServiceE"><code class="docutils literal notranslate"><span class="pre">wrench::HTCondorComputeService</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench22HTCondorComputeService22HTCondorComputeServiceERKNSt6stringERKNSt3setINSt10shared_ptrI14ComputeServiceEEEERK31WRENCH_PROPERTY_COLLECTION_TYPERK38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE"><code class="docutils literal notranslate"><span class="pre">HTCondorComputeService()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench22HTCondorComputeService20supportsCompoundJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsCompoundJobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench22HTCondorComputeService17supportsFunctionsEv"><code class="docutils literal notranslate"><span class="pre">supportsFunctions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench22HTCondorComputeService17supportsPilotJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsPilotJobs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench22HTCondorComputeService20supportsStandardJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsStandardJobs()</span></code></a></li>
 </ul>
@@ -99,7 +98,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
@@ -242,6 +240,17 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench22HTCondorComputeService17supportsFunctionsEv">
+<span id="_CPPv3N6wrench22HTCondorComputeService17supportsFunctionsEv"></span><span id="_CPPv2N6wrench22HTCondorComputeService17supportsFunctionsEv"></span><span id="wrench::HTCondorComputeService::supportsFunctions"></span><span class="target" id="classwrench_1_1_h_t_condor_compute_service_1a9750eb44a00e69974ee09f1d6c9c3528"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsFunctions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Returns true if the service supports functions. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench22HTCondorComputeService17supportsPilotJobsEv">
 <span id="_CPPv3N6wrench22HTCondorComputeService17supportsPilotJobsEv"></span><span id="_CPPv2N6wrench22HTCondorComputeService17supportsPilotJobsEv"></span><span id="wrench::HTCondorComputeService::supportsPilotJobs"></span><span class="target" id="classwrench_1_1_h_t_condor_compute_service_1afbcd30b4c1d4781d7c13223c630efbb6"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsPilotJobs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
 <dd><p>Returns true if the service supports pilot jobs. </p>
@@ -272,7 +281,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="classwrench_1_1_function_output.html" class="btn btn-neutral float-left" title="wrench::FunctionOutput" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_file_registry_service_property.html" class="btn btn-neutral float-left" title="wrench::FileRegistryServiceProperty" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="classwrench_1_1_h_t_condor_compute_service_message_payload.html" class="btn btn-neutral float-right" title="wrench::HTCondorComputeServiceMessagePayload" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

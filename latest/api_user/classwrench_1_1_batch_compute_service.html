@@ -68,6 +68,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeServiceE"><code class="docutils literal notranslate"><span class="pre">wrench::BatchComputeService</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService19BatchComputeServiceERKNSt6stringENSt6vectorINSt6stringEEERKNSt6stringE31WRENCH_PROPERTY_COLLECTION_TYPE38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE"><code class="docutils literal notranslate"><span class="pre">BatchComputeService()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService20supportsCompoundJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsCompoundJobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService17supportsFunctionsEv"><code class="docutils literal notranslate"><span class="pre">supportsFunctions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService17supportsPilotJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsPilotJobs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService20supportsStandardJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsStandardJobs()</span></code></a></li>
 </ul>
@@ -94,12 +95,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
@@ -236,6 +234,17 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench19BatchComputeService20supportsCompoundJobsEv">
 <span id="_CPPv3N6wrench19BatchComputeService20supportsCompoundJobsEv"></span><span id="_CPPv2N6wrench19BatchComputeService20supportsCompoundJobsEv"></span><span id="wrench::BatchComputeService::supportsCompoundJobs"></span><span class="target" id="classwrench_1_1_batch_compute_service_1a4d1162f826bf064b9317b67c93e526ef"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsCompoundJobs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
 <dd><p>Returns true if the service supports compound jobs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench19BatchComputeService17supportsFunctionsEv">
+<span id="_CPPv3N6wrench19BatchComputeService17supportsFunctionsEv"></span><span id="_CPPv2N6wrench19BatchComputeService17supportsFunctionsEv"></span><span id="wrench::BatchComputeService::supportsFunctions"></span><span class="target" id="classwrench_1_1_batch_compute_service_1a0da3322692a6f4a025f08dec030fd183"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsFunctions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Returns true if the service supports functions. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>true or false </p>

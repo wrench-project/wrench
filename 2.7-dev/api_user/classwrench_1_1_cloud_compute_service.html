@@ -71,6 +71,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench19CloudComputeServiceE"><code class="docutils literal notranslate"><span class="pre">wrench::CloudComputeService</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19CloudComputeService19CloudComputeServiceERKNSt6stringERKNSt6vectorINSt6stringEEERKNSt6stringERK31WRENCH_PROPERTY_COLLECTION_TYPERK38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE"><code class="docutils literal notranslate"><span class="pre">CloudComputeService()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19CloudComputeService20supportsCompoundJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsCompoundJobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19CloudComputeService17supportsFunctionsEv"><code class="docutils literal notranslate"><span class="pre">supportsFunctions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19CloudComputeService17supportsPilotJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsPilotJobs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19CloudComputeService20supportsStandardJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsStandardJobs()</span></code></a></li>
 </ul>
@@ -94,12 +95,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
@@ -231,6 +229,17 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench19CloudComputeService20supportsCompoundJobsEv">
 <span id="_CPPv3N6wrench19CloudComputeService20supportsCompoundJobsEv"></span><span id="_CPPv2N6wrench19CloudComputeService20supportsCompoundJobsEv"></span><span id="wrench::CloudComputeService::supportsCompoundJobs"></span><span class="target" id="classwrench_1_1_cloud_compute_service_1abdd58db8fdae862168de7bdfd0af45f4"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsCompoundJobs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
 <dd><p>Returns true if the service supports compound jobs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench19CloudComputeService17supportsFunctionsEv">
+<span id="_CPPv3N6wrench19CloudComputeService17supportsFunctionsEv"></span><span id="_CPPv2N6wrench19CloudComputeService17supportsFunctionsEv"></span><span id="wrench::CloudComputeService::supportsFunctions"></span><span class="target" id="classwrench_1_1_cloud_compute_service_1a08272ed1618d3c6ecfdb1a6737f11624"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsFunctions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Returns true if the service supports functions. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>true or false </p>
