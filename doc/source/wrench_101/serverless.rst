@@ -10,7 +10,8 @@ Overview
 
 A serverless compute service provides
 users with a "function" abstraction, as done by providers such as Google Functions, AWS lambdas, etc.
-The serverless compute service provides all necessary functions to register and invoke functions, which run inside containers.
+The serverless compute service provides all necessary functions to register and invoke functions, which, in practice,
+run inside containers.
 
 .. _guide-serverless-creating:
 
@@ -22,11 +23,11 @@ In WRENCH, a serverless compute service is defined by the
 service requires the following parameters:
 
 -  The name of a head host on which to start the service;
--  A list (``std::vector``) of hostnames (all cores and all RAM of each
-   host are available to the cloud service);
+-  A list (``std::vector``) of hostnames for homogeneous hosts. All cores and all RAM of each
+   host are available to the cloud service), and each host has a disk with mount point '/';
 -  A mount point (corresponding to a disk attached to the head host) for the
    storage local to the cloud service (used to
-   store container images and to support running functions in containers);
+   store container images);
 -  A scheduler that defines the resource management algorithms used internally
    to decide which function invocations should be executed and when; and
 -  Maps (``std::map``) of configurable properties
@@ -50,4 +51,4 @@ See the documentation of :cpp:class:`wrench::ServerlessComputeServiceProperty` f
 configuration options.
 
 Also see the simulator in the ``examples/serverless_api/basic/``
-directories, which use serverless compute services.
+directory, which uses a serverless compute service.
