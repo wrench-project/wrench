@@ -12,7 +12,8 @@
 namespace wrench {
 
     /**
-     * @brief Constructs a RegisteredFunction object.
+     * @brief Constructor
+     *
      * @param function The function to be registered.
      * @param time_limit_in_seconds The time limit for the function execution.
      * @param disk_space_limit_in_bytes The disk space limit for the function.
