@@ -45,7 +45,11 @@ namespace wrench {
         if (num_bytes_to_read > this->file->getSize()) {
             throw std::invalid_argument("FileReadAction::FileReadAction(): cannot create a file read action that would read more bytes than the file size");
         }
-        this->num_bytes_to_read = num_bytes_to_read;
+        if (num_bytes_to_read == 0) {
+            this->num_bytes_to_read = this->file->getSize();
+        } else {
+            this->num_bytes_to_read = num_bytes_to_read;
+        }
     }
 
     /**
@@ -83,12 +87,8 @@ namespace wrench {
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             try {
                 this->used_location = this->file_locations[i];
-                if (this->num_bytes_to_read) {
                     StorageService::readFileAtLocation(this->file_locations[i], this->num_bytes_to_read);
-                } else {
-                    StorageService::readFileAtLocation(this->file_locations[i], this->file_locations[i]->getFile()->getSize());
-                }
-                continue;
+                break;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() - 1) {
                     throw e;
