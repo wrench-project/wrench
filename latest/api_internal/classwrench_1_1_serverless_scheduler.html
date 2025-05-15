@@ -465,6 +465,8 @@
 <li><p>which invocations to start at compute nodes</p></li>
 </ul>
 </p>
+<p>Note that the disk and RAM at each compute host is managed using LRU, and so the scheduler doesn’t have full control (which would likely be intractable anyway). But that means that when asking from the system state questions like “how much RAM is available at that node?” is not clear-cut: the answer may be 0 but one can perhaps use the node because some memory content will be evicted due to the LRU behavior…</p>
+<p>As a result of the above, the scheduling decisions returned by this method may not all be feasible, and the same invocations could be passed to the method over and over….</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
