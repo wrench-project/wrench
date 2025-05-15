@@ -208,7 +208,7 @@ namespace wrench {
      * @brief Add a file read action to the job
      * @param name: the action's name (if empty, a unique name will be picked for you)
      * @param file_location: the file's location
-     * @param num_bytes_to_read: the number of bytes to read
+     * @param num_bytes_to_read: the number of bytes to read (if 0, read the whole file)
      * @return a file read action
      */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
@@ -234,7 +234,7 @@ namespace wrench {
     * @brief Add a file read action to the job
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
-    * @param num_bytes_to_read: number of bytes to read
+    * @param num_bytes_to_read: number of bytes to read (if 0, read the whole file)
     * @return a file read action
     */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
