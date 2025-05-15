@@ -297,7 +297,7 @@ private:
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
         unsigned long num_invocations = 20;
         invocations.reserve(num_invocations);
-        for (int i = 0; i < num_invocations; i++) {
+        for (unsigned long i = 0; i < num_invocations; i++) {
             auto invocation = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
             invocations.push_back(invocation);
             wrench::Simulation::sleep(0.1);
@@ -309,10 +309,10 @@ private:
         // for (int i=0; i < num_invocations; i++) {
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
-        for (int i = 0; i < num_invocations; i += 10) {
+        for (unsigned long i = 0; i < num_invocations; i += 10) {
             double start_date = invocations.at(i)->getStartDate();
             double end_date = invocations.at(i)->getEndDate();
-            for (int j = i + 1; j < std::min<unsigned long>(i + 10, num_invocations); j++) {
+            for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 10, num_invocations); j++) {
                 if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
@@ -556,7 +556,7 @@ private:
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
         unsigned long num_invocations = 10;
         invocations.reserve(num_invocations);
-        for (int i = 0; i < num_invocations; i++) {
+        for (unsigned long i = 0; i < num_invocations; i++) {
             auto invocation = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
             invocations.push_back(invocation);
             wrench::Simulation::sleep(0.1);
@@ -568,10 +568,10 @@ private:
         // for (int i=0; i < num_invocations; i++) {
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
-        for (int i = 0; i < num_invocations; i += 4) {
+        for (unsigned long i = 0; i < num_invocations; i += 4) {
             double start_date = invocations.at(i)->getStartDate();
             double end_date = invocations.at(i)->getEndDate();
-            for (int j = i + 1; j < std::min<unsigned long>(i + 4, num_invocations); j++) {
+            for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 4, num_invocations); j++) {
                 if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
@@ -786,7 +786,7 @@ private:
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
         unsigned long num_invocations = 5;
         invocations.reserve(num_invocations);
-        for (int i = 0; i < num_invocations; i++) {
+        for (unsigned long i = 0; i < num_invocations; i++) {
             auto invocation = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
             invocations.push_back(invocation);
             wrench::Simulation::sleep(0.1);
@@ -797,10 +797,10 @@ private:
         // for (int i=0; i < num_invocations; i++) {
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
-        for (int i = 0; i < num_invocations; i += 3) {
+        for (unsigned long i = 0; i < num_invocations; i += 3) {
             double start_date = invocations.at(i)->getStartDate();
             double end_date = invocations.at(i)->getEndDate();
-            for (int j = i + 1; j < std::min<unsigned long>(i + 3, num_invocations); j++) {
+            for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 3, num_invocations); j++) {
                 if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
