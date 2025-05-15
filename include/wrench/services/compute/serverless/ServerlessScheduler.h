@@ -50,6 +50,15 @@ namespace wrench {
          *   - which images to load into memory at compute nodes
          *   - which invocations to start at compute nodes
          *
+         *   Note that the disk and RAM at each compute host is managed using LRU, and so the scheduler
+         *   doesn't have full control (which would likely be intractable anyway). But that means that
+         *   when asking from the system state questions like "how much RAM is available at that node?"
+         *   is not clear-cut: the answer may be 0 but one can perhaps use the node because some memory
+         *   content will be evicted due to the LRU behavior...
+         *
+         *   As a result of the above, the scheduling decisions returned by this method may not all be
+         *   feasible, and the same invocations could be passed to the method over and over....
+         *
          * @param schedulable_invocations A list of invocations whose images reside on the head node
          * @param state The current system state
          * @return A SchedulingDecisions object
