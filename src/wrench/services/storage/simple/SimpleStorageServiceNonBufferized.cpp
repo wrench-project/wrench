@@ -341,7 +341,7 @@ namespace wrench {
             throw std::runtime_error("SimpleStorageServiceNonBufferized::processFileWriteRequest(): Cannot process a write requests with a non-zero buffer size");
         }
 
-        WRENCH_INFO("Processing FileWriteRequests");
+        WRENCH_INFO("Processing File Write Request");
 
         std::shared_ptr<simgrid::fsmod::File> opened_file;
         auto failure_cause = validateFileWriteRequest(location, num_bytes_to_write, opened_file);
@@ -419,6 +419,8 @@ namespace wrench {
             sg_size_t num_bytes_to_read,
             S4U_CommPort *answer_commport,
             simgrid::s4u::Host *requesting_host) {
+
+        WRENCH_INFO("Processing File Read Request");
 
         std::shared_ptr<simgrid::fsmod::File> opened_file;
         auto failure_cause = validateFileReadRequest(location, opened_file);
