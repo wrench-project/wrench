@@ -113,6 +113,8 @@ set(HEADER_FILES
         include/wrench/managers/job_manager/JobManager.h
         include/wrench/managers/function_manager/FunctionManager.h
         include/wrench/managers/function_manager/FunctionManagerMessage.h
+        include/wrench/managers/function_manager/FunctionInput.h
+        include/wrench/managers/function_manager/FunctionOutput.h
         include/wrench/managers/function_manager/Function.h
         include/wrench/managers/function_manager/RegisteredFunction.h
         include/wrench/services/Service.h
@@ -296,6 +298,8 @@ set(SOURCE_FILES
         src/wrench/managers/function_manager/FunctionManager.cpp
         src/wrench/managers/function_manager/FunctionManagerMessage.cpp
         src/wrench/managers/function_manager/Function.cpp
+        src/wrench/managers/function_manager/FunctionInput.cpp
+        src/wrench/managers/function_manager/FunctionOutput.cpp
         src/wrench/managers/function_manager/RegisteredFunction.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
