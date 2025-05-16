@@ -3,9 +3,7 @@ WRENCH Release Notes
 
 ### wrench 2.7-dev
 
-- Implementation of a new Compute Service to simulate serverless (i.e., function-based) cloud infrastructures
-  (e.g., AWS Lambda, Google Functions, etc). Comes with a simple user-level API and a FunctionManager component
-  to deelop simulation contollers that place function invocations. 
+- Implementation of a new Compute Service to simulate serverless (i.e., function-based) cloud infrastructures (e.g., AWS Lambda, Google Functions, etc). Comes with a simple user-level API and a FunctionManager component to develop simulation contollers that place function invocations.  An example is provided in the `examples` directory. Although several unit tests have been developed, this serverless simulation feature is still experimental, an it will likely evolved, along with its API, in the near future.
 - Removed all usage of httplib in wrench-daemon (which now uses only CrowCPP)
 - Minor code/documentation cleanups
 
