@@ -320,47 +320,6 @@ namespace wrench {
     }
 
 
-    //    /**
-    //     * @brief Get the set of mount points of the remote server, if not returns {}
-    //     * @return the set of mount points
-    //     */
-    //    std::set<std::string> StorageServiceProxy::getMountPoints() {
-    //        if (remote) {
-    //            return remote->getMountPoints();
-    //        }
-    //        if (cache) {
-    //            return cache->getMountPoints();
-    //        }
-    //        return {};
-    //    }
-    //    /**
-    //     * @brief Checked whether the remote storage service has multiple mount points
-    //     * @return true whether the service has multiple mount points
-    //     */
-    //    bool StorageServiceProxy::hasMultipleMountPoints() {
-    //        if (remote) {
-    //            return remote->hasMultipleMountPoints();
-    //        }
-    //
-    //        return false;
-    //    }
-    //    /**
-    //    * @brief Checked whether the remote storage service has a particular mount point
-    //    * @param mp: a mount point
-    //    *
-    //    * @return true whether the service has that mount point
-    //    */
-    //    bool StorageServiceProxy::hasMountPoint(const std::string &mp) {
-    //        if (remote) {
-    //            return remote->hasMountPoint(mp);
-    //        }
-    //        if (cache) {
-    //            return cache->hasMountPoint(mp);
-    //        }
-    //        return false;
-    //    }
-
-
     /**
      * @brief Forward to remote server
      * @param location: the file location

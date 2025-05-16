@@ -15,6 +15,7 @@ namespace wrench {
      *
      * @param schedulable_invocations A list of invocations whose images reside on the head node
      * @param state The current system state
+     *
      * @return A SchedulingDecisions object
      */
     std::shared_ptr<SchedulingDecisions> FCFSServerlessScheduler::schedule(
