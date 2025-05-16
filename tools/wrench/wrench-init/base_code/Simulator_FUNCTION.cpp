@@ -45,9 +45,10 @@ int main(int argc, char **argv) {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "UserHost", {"/"}, {}, {}));
 
-    /* Instantiate a bare-metal compute service on the platform */
-    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
-            "HeadHost", {"ComputeHost"}, "", {}, {}));
+    /* Instantiate a serverless compute service service on the platform */
+    auto scheduler = std::make_shared<wrench::FCFSServerlessScheduler>();
+    auto baremetal_service = simulation->add(new wrench::ServerlessComputeService(
+            "HeadHost", {"/"}, {"ComputeHost"}, scheduler, {}, {}));
 
     /* Instantiate an execution controller */
     auto controller = simulation->add(

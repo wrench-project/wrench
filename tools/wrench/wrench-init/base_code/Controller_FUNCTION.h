@@ -23,21 +23,17 @@ namespace wrench {
     public:
         // Constructor
         Controller(
-                std::shared_ptr<Workflow> workflow,
-                const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                const std::shared_ptr<ServerlessComputeService> &serverless_compute_service,
                 const std::shared_ptr<SimpleStorageService> &storage_service,
                 const std::string &hostname);
 
     protected:
-        // Overridden method
-        void processEventStandardJobCompletion(const std::shared_ptr<StandardJobCompletedEvent>&) override;
 
     private:
-        // main() method of the Execution Controller
+        // main() method of the Controller
         int main() override;
 
-        std::shared_ptr<Workflow> workflow;
-        const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
+        const std::shared_ptr<ServerlessComputeService> serverless_compute_service;
         const std::shared_ptr<SimpleStorageService> storage_service;
     };
 }// namespace wrench

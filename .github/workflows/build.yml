@@ -87,6 +87,12 @@ jobs:
           docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init -a ACTION -d ./wrench-init-generated-simulator 
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init -a WORKFLOW -d ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init -a FUNCTION -d ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
 
       - name: Documentation Build and Deployment
         env:
