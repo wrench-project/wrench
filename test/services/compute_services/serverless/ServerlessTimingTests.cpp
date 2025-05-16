@@ -233,9 +233,9 @@ void ServerlessTimingTest::do_ImageReuse_test(const std::shared_ptr<wrench::Serv
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+        "ServerlessHeadNode",  "/", compute_nodes, scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -351,9 +351,9 @@ void ServerlessTimingTest::do_CorePressure_test(const std::shared_ptr<wrench::Se
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -493,9 +493,9 @@ void ServerlessTimingTest::do_RAMPressureDueToImages_test(
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -611,9 +611,9 @@ void ServerlessTimingTest::do_RAMPressureDueToInvocations_test(
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -724,9 +724,9 @@ void ServerlessTimingTest::do_DiskPressureDueToImages_test(
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNodeSmallDisk"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNodeSmallDisk"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -840,9 +840,9 @@ void ServerlessTimingTest::do_DiskPressureDueToInvocations_test(
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNodeSmallDisk"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNodeSmallDisk"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", scheduler, {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(

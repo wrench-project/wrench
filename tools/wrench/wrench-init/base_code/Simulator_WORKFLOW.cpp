@@ -62,11 +62,11 @@ int main(int argc, char **argv) {
     task2->setParallelModel(wrench::ParallelModel::AMDAHL(0.8));
 
     /* Create a couple of workflow files */
-    auto task1_input = workflow->addFile("task1_input", 50 * MBYTE);
-    auto task1_output = workflow->addFile("task1_output", 20 * MBYTE);
+    auto task1_input = wrench::Simulation::addFile("task1_input", 50 * MBYTE);
+    auto task1_output = wrench::Simulation::addFile("task1_output", 20 * MBYTE);
     task1->addInputFile(task1_input);
     task1->addOutputFile(task1_output);
-    auto task2_output = workflow->addFile("task2_output", 30 * MBYTE);
+    auto task2_output = wrench::Simulation::addFile("task2_output", 30 * MBYTE);
     task2->addOutputFile(task2_output);
 
     /* Create data/control dependencies
@@ -82,21 +82,17 @@ int main(int argc, char **argv) {
     workflow->addControlDependency(task3, task4);
     task4->addInputFile(task2_output);
 
-    /* Instantiate a storage service on the platform */
+    /* Instantiate a storage service on the user's host */
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
-            "StorageHost", {"/"}, {}, {}));
+            "UserHost", {"/"}, {}, {}));
 
     /* Instantiate a bare-metal compute service on the platform */
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
-            "ComputeHost", {"ComputeHost"}, "", {}, {}));
+            "HeadHost", {"ComputeHost"}, "", {}, {}));
 
     /* Instantiate an execution controller */
-    auto wms = simulation->add(
+    auto controller = simulation->add(
             new wrench::Controller(workflow, baremetal_service, storage_service, "UserHost"));
-
-    /* Instantiate a file registry service */
-    auto file_registry_service = new wrench::FileRegistryService("UserHost");
-    simulation->add(file_registry_service);
 
     /* Stage input files on the storage service */
     for (auto const &f: workflow->getInputFiles()) {
