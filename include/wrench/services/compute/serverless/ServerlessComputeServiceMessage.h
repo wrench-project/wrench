@@ -158,7 +158,6 @@ namespace wrench {
     /**
      * @brief a message sent to a ServerlessComputeService to notify it that a memory load at a compute node has completed
      */
-    class ServerlessComputeServiceNodeCopyCompleteMessage : public ServerlessComputeServiceMessage {
     class ServerlessComputeServiceNodeLoadCompleteMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceNodeLoadCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::string compute_host, sg_size_t payload);
