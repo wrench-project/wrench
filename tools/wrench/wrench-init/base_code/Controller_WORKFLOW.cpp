@@ -25,7 +25,7 @@ namespace wrench {
      * @param workflow: the workflow to execute
      * @param bare_metal_compute_service: a set of compute services available to run tasks
      * @param storage_services: a set of storage services available to store files
-     * @param hostname: the name of the host on which to start the WMS
+     * @param hostname: the name of the host on which to start the Execution Controller
      */
     Controller::Controller(std::shared_ptr<Workflow> workflow,
                            const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,

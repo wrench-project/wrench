@@ -59,8 +59,8 @@ namespace wrench {
 
     public:
         ServerlessComputeService(const std::string& hostname,
-                                 const std::vector<std::string>& compute_hosts,
                                  const std::string& head_node_storage_mount_point,
+                                 const std::vector<std::string>& compute_hosts,
                                  const std::shared_ptr<ServerlessScheduler>& scheduler,
                                  const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
                                  const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});

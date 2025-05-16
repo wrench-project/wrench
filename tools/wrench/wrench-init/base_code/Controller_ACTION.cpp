@@ -28,7 +28,7 @@ namespace wrench {
      *
      * @param bare_metal_compute_service: a set of compute services available to run actions
      * @param storage_services: a set of storage services available to store files
-     * @param hostname: the name of the host on which to start the WMS
+     * @param hostname: the name of the host on which to start the Execution Controller
      */
     Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                            const std::shared_ptr<SimpleStorageService> &storage_service,
@@ -47,7 +47,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         WRENCH_INFO("Controller starting");
 
-        /* Create a files */
+        /* Create files */
         auto some_file = wrench::Simulation::addFile("some_file", 1 * GBYTE);
         auto some_other_file = wrench::Simulation::addFile("some_other_file", 2 * GBYTE);
         wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(this->storage_service, some_file));

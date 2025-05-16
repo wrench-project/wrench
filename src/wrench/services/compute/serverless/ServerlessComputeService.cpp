@@ -29,20 +29,19 @@ WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless
 
 namespace wrench {
     unsigned long ServerlessComputeService::sequence_number = 0;
-
     /**
      * @brief Constructor
      *
      * @param hostname name of the head host on which the service runs
-     * @param compute_hosts list of (homogeneous) compute node hostnames
      * @param head_node_storage_mount_point the mount point of storage at the head host (where images will be stored)
+     * @param compute_hosts list of (homogeneous) compute node hostnames
      * @param scheduler the scheduler used to decide which invocations should be executed and when
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     ServerlessComputeService::ServerlessComputeService(const std::string& hostname,
-                                                       const std::vector<std::string>& compute_hosts,
                                                        const std::string& head_node_storage_mount_point,
+                                                       const std::vector<std::string>& compute_hosts,
                                                        const std::shared_ptr<ServerlessScheduler>& scheduler,
                                                        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                                                        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
@@ -65,6 +64,7 @@ namespace wrench {
 
         _scheduler = scheduler;
     }
+
 
     /**
      * @brief Helper method to check homogeneity of the compute hosts

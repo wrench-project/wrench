@@ -73,6 +73,21 @@ cat $1"/tools/wrench/wrench-init/base_code/Controller_ACTION.h"
 echo "\"\"\""
 echo ""
 
+echo "FILE_CONTENT_SIMULATOR_FUNCTION_CPP = r\"\"\""
+cat $1"/tools/wrench/wrench-init/base_code/Simulator_FUNCTION.cpp"
+echo "\"\"\""
+echo ""
+
+echo "FILE_CONTENT_CONTROLLER_FUNCTION_CPP = r\"\"\""
+cat $1"/tools/wrench/wrench-init/base_code/Controller_FUNCTION.cpp"
+echo "\"\"\""
+echo ""
+
+echo "FILE_CONTENT_CONTROLLER_FUNCTION_H = r\"\"\""
+cat $1"/tools/wrench/wrench-init/base_code/Controller_FUNCTION.h"
+echo "\"\"\""
+echo ""
+
 echo "FILE_CONTENT_PLATFORM_XML = r\"\"\""
 cat $1"/tools/wrench/wrench-init/base_code/platform.xml"
 echo "\"\"\""
