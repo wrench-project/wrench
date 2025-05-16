@@ -89,9 +89,10 @@
              
   <section id="interacting-with-a-serverless-compute-service">
 <span id="guide-102-serverless"></span><h1>Interacting with a serverless compute service<a class="headerlink" href="#interacting-with-a-serverless-compute-service" title="Link to this heading"></a></h1>
-<p>A serverless service provides mechanisms to register and invoke functions,
-all of which is done via a <a class="reference internal" href="../api_developer/classwrench_1_1_function_manager.html#_CPPv4N6wrench15FunctionManagerE" title="wrench::FunctionManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FunctionManager</span></code></a>.
-Here is an example interaction with a <a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE" title="wrench::ServerlessComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeService</span></code></a>:</p>
+<p>A serverless service provides simply user-level mechanisms to register and
+invoke functions, all of which is done via a
+<a class="reference internal" href="../api_developer/classwrench_1_1_function_manager.html#_CPPv4N6wrench15FunctionManagerE" title="wrench::FunctionManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FunctionManager</span></code></a>.</p>
+<p>Here is an example interaction with a <a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE" title="wrench::ServerlessComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeService</span></code></a>:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="nl">std</span><span class="p">:</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">ServerlessComputeService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">some_serverless_cs</span><span class="p">;</span>
 
 <span class="c1">// Start a function manager</span>

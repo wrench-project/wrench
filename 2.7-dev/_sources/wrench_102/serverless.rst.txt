@@ -3,8 +3,11 @@
 Interacting with a serverless compute service
 ==============================================
 
-A serverless service provides mechanisms to register and invoke functions,
-all of which is done via a :cpp:class:`wrench::FunctionManager`.
+
+A serverless service provides simply user-level mechanisms to register and
+invoke functions, all of which is done via a
+:cpp:class:`wrench::FunctionManager`.
+
 Here is an example interaction with a :cpp:class:`wrench::ServerlessComputeService`:
 
 .. code:: cpp
