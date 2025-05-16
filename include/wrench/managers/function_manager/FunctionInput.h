@@ -10,11 +10,10 @@
 #ifndef WRENCH_FUNCTIONINPUT_H
 #define WRENCH_FUNCTIONINPUT_H
 
-
 namespace wrench {
 
     /***********************/
-    /** \cond DEVELOPER   **/
+    /** \cond DEVELOPER    */
     /***********************/
 
     /**
@@ -22,18 +21,15 @@ namespace wrench {
      */
     class FunctionInput {
     public:
-        /**
-         * @brief Default constructor
-         */
-        FunctionInput() = default;
+
+        FunctionInput();
 
         virtual ~FunctionInput() = default;
     };
 
     /***********************/
-    /** \endcond          **/
+    /** \endcond           */
     /***********************/
-
     
 } // namespace wrench
 
