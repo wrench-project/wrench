@@ -8,10 +8,34 @@ Creating a serverless compute service
 Overview
 ========
 
-A serverless compute service provides
-users with a "function" abstraction, as done by providers such as Google Functions, AWS lambdas, etc.
-The serverless compute service provides all necessary functions to register and invoke functions, which, in practice,
-run inside containers.
+A serverless compute service provides users with a "function" abstraction,
+as done by providers such as Google Functions, AWS lambdas, etc.  The
+serverless compute service provides all necessary functions to register and
+invoke functions, which, in practice, run inside containers.
+
+.. _guide-serverless-architecture:
+
+Architecture of a serverless compute service
+============================================
+
+A serverless compute service consists of:
+
+- A head node with disk storage
+- A set of homogeneous compute nodes, each with its own local disk storage
+
+Once a function is registered at the compute service, and once it's image is downloaded
+to the head node's storage, then the function can be invoked.  A function invocation 
+on a core of a compute node consists in:
+
+- Copying the function's image from the head node's storage to the compute node's storage, if not already present there
+- Loading the function's image from the compute node's storage to the compute node's RAM, if not already present there
+- Executing the function's code
+
+The choice of which function invocation to execute on which compute node is done by a
+:cpp:class:`wrench::ServerlessScheduler` class.  A key thing to note is that each compute node's
+storage and RAM are managed using an LRU (Least Recently Used) scheme.  That is, images
+are automatically evicted from disk or RAM. 
+
 
 .. _guide-serverless-creating:
 
@@ -34,6 +58,7 @@ service requires the following parameters:
    (:cpp:class:`wrench::ServerlessComputeServiceProperty`) and configurable message
    payloads (:cpp:class:`wrench::ServerlessComputeServiceMessagePayload`).
 
+
 The example below creates an instance of a serverless compute service that runs on
 host ``serverless_gateway``, provides access to 4 execution hosts, and has storage
 on the disk mounted at path ``/`` at host
@@ -48,7 +73,8 @@ the container startup overhead is set to 1 second:
                                       {}));
 
 See the documentation of :cpp:class:`wrench::ServerlessComputeServiceProperty` for all possible
-configuration options.
+configuration options.   See :ref:`this page <guide-102-serverless>` for more information of how
+a serverless compute infrastructure is simulated. 
 
 Also see the simulator in the ``examples/serverless_api/basic/``
 directory, which uses a serverless compute service.
