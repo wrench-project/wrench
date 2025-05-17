@@ -576,8 +576,6 @@ set(TEST_FILES
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/services/compute_services/htcondor/HTCondorServiceTest.cpp
-        src/wrench/services/metering/EnergyMeterService.cpp
-        src/wrench/services/metering/BandwidthMeterService.cpp
         include/wrench/services/metering/EnergyMeterService.h
         include/wrench/services/metering/BandwidthMeterService.h
         test/services/bandwidth_meter_service/BandwidthMeterServiceTest.cpp
