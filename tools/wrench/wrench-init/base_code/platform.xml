@@ -20,7 +20,7 @@
         </host>
 
         <!-- The compute host that the Compute Service can use -->
-        <host id="ComputeHost" speed="1Gf" core="10">
+        <host id="ComputeHost" speed="100Gf" core="10">
             <prop id="ram" value="16GB" />
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
                 <prop id="size" value="5000GiB"/>

@@ -42,11 +42,11 @@ def _create_file(content, file_path):
 def main():
     # Application's arguments
     parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based simulator source code.')
-    parser.add_argument('project_dir', metavar='PROJECT_DIR', help='Project directory name')
-    parser.add_argument('-a', '--api', action='store', metavar='API',
+    parser.add_argument('--project_dir', action='store', metavar='PROJECT_DIR', help='Project directory name (required)', required=True)
+    parser.add_argument('--api', action='store', metavar='API',
                         help='Specify which API (action, workflow, or function)', default='action')
-    parser.add_argument('-d', '--debug', action='store_true', help='Print debug messages to stderr')
-    parser.add_argument('-f', '--force', action='store_true',
+    parser.add_argument('--debug', action='store_true', help='Print debug messages to stderr')
+    parser.add_argument('--force', action='store_true',
                         help='Overwrites existing project directory (use sparingly)')
     args = parser.parse_args()
 

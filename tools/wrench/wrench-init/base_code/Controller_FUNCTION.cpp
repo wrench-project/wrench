@@ -11,6 +11,7 @@
  ** An execution controller to execute a workflow
  **/
 
+#define GFLOPS (1000.0 * 1000.0 * 1000.0)
 #define MB (1000.0 * 1000.0)
 #define GB (1000.0 * 1000.0 * 1000.0)
 
@@ -54,12 +55,13 @@ namespace wrench {
         auto image_file_location = wrench::FileLocation::LOCATION(this->storage_service, some_file);
         wrench::StorageService::createFileAtLocation(image_file_location);
 
-         // Create the code for a function. This function sleeps for 10 seconds. It has absolutely generic Input and Output
-         // objects that one would have to specialize to do whatever makes sense
+        // Create the code for a function. This function computes a fixed amount of flops.
+        //  It has absolutely generic Input and Output
+        // objects that one would have to specialize to do whatever makes sense
         auto function_code = [](const std::shared_ptr<FunctionInput>& input,
                                 const std::shared_ptr<StorageService>& my_storage_service) -> std::shared_ptr<
             FunctionOutput> {
-            Simulation::sleep(10);
+            Simulation::compute(250 * GFLOPS);
             return std::make_shared<FunctionOutput>();
         };
 
