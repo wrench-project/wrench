@@ -576,8 +576,6 @@ set(TEST_FILES
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/services/compute_services/htcondor/HTCondorServiceTest.cpp
-        include/wrench/services/metering/EnergyMeterService.h
-        include/wrench/services/metering/BandwidthMeterService.h
         test/services/bandwidth_meter_service/BandwidthMeterServiceTest.cpp
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
@@ -623,7 +621,7 @@ install(DIRECTORY include/ DESTINATION include)
 find_library(GTEST_LIBRARY NAMES gtest)
 if(GTEST_LIBRARY)
     add_definitions(-DGTEST_USED)
-    add_executable(unit_tests EXCLUDE_FROM_ALL  ${TEST_FILES})
+    add_executable(unit_tests EXCLUDE_FROM_ALL  ${TEST_FILES} ${SOURCE_FILES})
     if (ENABLE_BATSCHED)
         find_library(ZMQ_LIBRARY NAMES zmq)
         target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
