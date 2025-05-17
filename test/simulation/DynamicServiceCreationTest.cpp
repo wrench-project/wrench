@@ -200,7 +200,8 @@ private:
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
         auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
 
-        std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
+
+        std::vector<std::shared_ptr<wrench::StandardJob>> one_task_jobs;
         int job_index = 0;
         for (auto const &task: tasks) {
             try {
@@ -342,7 +343,7 @@ private:
         tasks = this->test->workflow->getReadyTasks();
 //        tasks = {this->test->task1, this->test->task2};
 
-        std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
+        std::vector<std::shared_ptr<wrench::StandardJob>> one_task_jobs;
         int job_index = 0;
         for (auto const &task: tasks) {
             try {
