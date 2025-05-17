@@ -84,13 +84,13 @@ jobs:
           docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh 
           # run wrench-init
           echo "Testing wrench-init...";
-          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --api ACTION --project_dir ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --force --api ACTION --project_dir ./wrench-init-generated-simulator 
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
-          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --api WORKFLOW --project_dir ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --force --api WORKFLOW --project_dir ./wrench-init-generated-simulator 
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
-          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --api FUNCTION --project_dir ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --force --api FUNCTION --project_dir ./wrench-init-generated-simulator 
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
 
