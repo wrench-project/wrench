@@ -58,10 +58,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#basic-blueprint-for-an-execution-controller-implementation">Basic blueprint for an execution controller implementation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#a-finding-out-information-about-running-services">A) Finding out information about running services</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#b-interacting-with-services">B) Interacting with services</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#job-manager-and-data-movement-manager">Job Manager and Data Movement Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#managers">Managers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#interacting-with-storage-services">Interacting with storage services</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#interacting-with-compute-services">Interacting with compute services</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#the-job-abstraction">The Job abstraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-function-abstraction">The Function abstraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#more-details">More details</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#interacting-with-file-registry-services">Interacting with file registry services</a></li>
@@ -184,8 +186,8 @@ services, especially with compute and storage services. In this section,
 we describe how WRENCH makes these interactions relatively easy,
 providing examples for each kind of interaction for each kind of
 service.</p>
-<section id="job-manager-and-data-movement-manager">
-<span id="wrench-102-controller-services-managers"></span><h3>Job Manager and Data Movement Manager<a class="headerlink" href="#job-manager-and-data-movement-manager" title="Link to this heading"></a></h3>
+<section id="managers">
+<span id="wrench-102-controller-services-managers"></span><h3>Managers<a class="headerlink" href="#managers" title="Link to this heading"></a></h3>
 <p>As expected, each service type provides its own API. For instance, a
 network proximity service provides member functions to query the
 service’s host distance databases. The <a class="reference internal" href="api_developer.html#developer-api"><span class="std std-ref">Developer API
@@ -195,7 +197,7 @@ synchronous and which are asynchronous (in which case some
 <a class="reference internal" href="#wrench-102-controller-events"><span class="std std-ref">event</span></a> will occur in the
 future). <strong>However, the WRENCH developer will find that many member
 functions that one would expect are nowhere to be found. For instance,
-the compute services do not have (public) member functions for
+a bare-metal compute service does not have (public) member functions for
 submitting jobs for execution!</strong></p>
 <p>The rationale for the above is that many member functions need to be
 asynchronous so that the execution controller can use services
@@ -210,14 +212,16 @@ or alternately register many callbacks. Instead, WRENCH provides
 <strong>managers</strong>. One can think of managers as separate threads that handle
 all asynchronous interactions with services, and which have been
 implemented for your convenience to make interacting with services easy.</p>
-<p>There are two managers: a <strong>job manager</strong>
-(class <a class="reference internal" href="api_developer/classwrench_1_1_job_manager.html#_CPPv4N6wrench10JobManagerE" title="wrench::JobManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::JobManager</span></code></a>) and a <strong>data movement manager</strong> (class
+<p>There are three managers: a <strong>job manager</strong>
+(class <a class="reference internal" href="api_developer/classwrench_1_1_job_manager.html#_CPPv4N6wrench10JobManagerE" title="wrench::JobManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::JobManager</span></code></a>), a <strong>function manager</strong> (class <a class="reference internal" href="api_developer/classwrench_1_1_function_manager.html#_CPPv4N6wrench15FunctionManagerE" title="wrench::FunctionManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FunctionManager</span></code></a>),
+and a <strong>data movement manager</strong> (class
 <a class="reference internal" href="api_developer/classwrench_1_1_data_movement_manager.html#_CPPv4N6wrench19DataMovementManagerE" title="wrench::DataMovementManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::DataMovementManager</span></code></a>). The base
-<a class="reference internal" href="api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionControllerE" title="wrench::ExecutionController"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionController</span></code></a> class provides two member functions for
+<a class="reference internal" href="api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionControllerE" title="wrench::ExecutionController"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionController</span></code></a> class provides member functions for
 instantiating and starting these managers:
-<a class="reference internal" href="api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionController16createJobManagerEv" title="wrench::ExecutionController::createJobManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionController::createJobManager()</span></code></a> and
+<a class="reference internal" href="api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionController16createJobManagerEv" title="wrench::ExecutionController::createJobManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionController::createJobManager()</span></code></a>,
+<a class="reference internal" href="api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionController21createFunctionManagerEv" title="wrench::ExecutionController::createFunctionManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionController::createFunctionManager()</span></code></a>, and
 <a class="reference internal" href="api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionController25createDataMovementManagerEv" title="wrench::ExecutionController::createDataMovementManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionController::createDataMovementManager()</span></code></a>.</p>
-<p>Creating one or two of these managers typically is the first thing an
+<p>Creating managers typically is the first thing an
 execution controller does. For instance, the execution controller in
 <code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp</span></code>
 starts by doing:</p>
@@ -232,8 +236,9 @@ sections below.</p>
 <span id="wrench-102-controller-services-storage"></span><h3>Interacting with storage services<a class="headerlink" href="#interacting-with-storage-services" title="Link to this heading"></a></h3>
 <p>Typical interactions between an execution controller and a storage
 service include locating, reading, writing, and copying files. Different storage
-service implementations may or not implement some of of these operations.
-Click on the following links to see concrete examples
+service implementations may or not implement some of of these operations. Some operations
+can be done directly, while other require using a data movement manager (see above).</p>
+<p>Click on the following links to see concrete examples
 of interactions with the currently available storage service type:</p>
 <blockquote>
 <div><ul class="simple">
@@ -247,14 +252,15 @@ of interactions with the currently available storage service type:</p>
 <span id="wrench-102-controller-services-compute"></span><h3>Interacting with compute services<a class="headerlink" href="#interacting-with-compute-services" title="Link to this heading"></a></h3>
 <section id="the-job-abstraction">
 <span id="wrench-102-controller-services-compute-job"></span><h4>The Job abstraction<a class="headerlink" href="#the-job-abstraction" title="Link to this heading"></a></h4>
-<p>The main activity of an execution controller is to execute workflow
-tasks on compute services. Rather than submitting tasks directly to
-compute services, an execution controller must create “jobs”, which can
-comprise multiple tasks and involve data copy/deletion operations. The
+<p>Some compute services support the execution of “jobs”, and
+a common activity of an execution controller is to execute jobs
+on these compute services. An execution controller must use a job manager (see previous section)
+to create and submit jobs for execution to compute services. The
 job abstraction is powerful and greatly simplifies the task of an
 execution controller while affording flexibility.</p>
 <p><strong>There are three kinds of jobs in WRENCH</strong>: <a class="reference internal" href="api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::CompoundJob</span></code></a>,
-<a class="reference internal" href="api_developer/classwrench_1_1_standard_job.html#_CPPv4N6wrench11StandardJobE" title="wrench::StandardJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StandardJob</span></code></a>, and <a class="reference internal" href="api_developer/classwrench_1_1_pilot_job.html#_CPPv4N6wrench8PilotJobE" title="wrench::PilotJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::PilotJob</span></code></a>.</p>
+<a class="reference internal" href="api_developer/classwrench_1_1_standard_job.html#_CPPv4N6wrench11StandardJobE" title="wrench::StandardJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StandardJob</span></code></a>, and <a class="reference internal" href="api_developer/classwrench_1_1_pilot_job.html#_CPPv4N6wrench8PilotJobE" title="wrench::PilotJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::PilotJob</span></code></a>. Different
+compute services support different kinds of jobs.</p>
 <p>A <strong>Compound Job</strong> is simply set of actions to be performed, with
 possible control dependencies between actions. It is the most generic,
 flexible, and expressive kind of job. See the API documentation for the
@@ -307,8 +313,18 @@ to a compute service.</p></li>
 <li><p><a class="reference internal" href="api_developer/classwrench_1_1_job_manager.html#_CPPv4N6wrench10JobManager12terminateJobERKNSt10shared_ptrI11CompoundJobEE" title="wrench::JobManager::terminateJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::JobManager::terminateJob()</span></code></a>: synchronous termination of a
 previously submitted job.</p></li>
 </ul>
-<p>The next section gives examples of interactions with each kind of
-compute service.</p>
+</section>
+<section id="the-function-abstraction">
+<h4>The Function abstraction<a class="headerlink" href="#the-function-abstraction" title="Link to this heading"></a></h4>
+<p>Another way for an execution controller to use compute service is not via a job abstraction, but via
+a function abstraction. This abstraction is only supported by serverless compute services (<a class="reference internal" href="api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE" title="wrench::ServerlessComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeService</span></code></a>).
+Functions are created, registered, invoked, and monitored by a function manager (<a class="reference internal" href="api_developer/classwrench_1_1_function_manager.html#_CPPv4N6wrench15FunctionManagerE" title="wrench::FunctionManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FunctionManager</span></code></a>).  A function
+is defined by arbitrary code (i.e., any lambda function that uses the WRENCH API), an image file that is stored on at least one storage
+service, limits on a function invocation’s resource usage, and a timeout.  Once registered, the function can be invoked any number of times,
+and the controller can check on the status of an invocation and wait for one or more invocations to complete (successfully or not).</p>
+</section>
+<section id="more-details">
+<h4>More details<a class="headerlink" href="#more-details" title="Link to this heading"></a></h4>
 <p>Click on the following links to see detailed descriptions and examples
 of how jobs are submitted to each compute service type:</p>
 <ul class="simple">

@@ -58,7 +58,7 @@ instance, a :cpp:class:`wrench::ComputeService` has a
 how many compute hosts the service has access to in total. A
 :cpp:class:`wrench::StorageService` has a
 :cpp:class:`wrench::StorageService::getFreeSpace()` member function to find out
-how many bytes of free space are available on it. And so on…
+how many bytes of free space are available on it. And so on...
 
 To take a concrete example, consider the execution controller
 implementation in
@@ -98,8 +98,8 @@ service.
 
 .. _wrench-102-controller-services-managers:
 
-Job Manager and Data Movement Manager
--------------------------------------
+Managers
+--------
 
 As expected, each service type provides its own API. For instance, a
 network proximity service provides member functions to query the
@@ -110,7 +110,7 @@ synchronous and which are asynchronous (in which case some
 :ref:`event <wrench-102-controller-events>` will occur in the
 future). **However, the WRENCH developer will find that many member
 functions that one would expect are nowhere to be found. For instance,
-the compute services do not have (public) member functions for
+a bare-metal compute service does not have (public) member functions for
 submitting jobs for execution!**
 
 The rationale for the above is that many member functions need to be
@@ -127,15 +127,17 @@ or alternately register many callbacks. Instead, WRENCH provides
 all asynchronous interactions with services, and which have been
 implemented for your convenience to make interacting with services easy.
 
-There are two managers: a **job manager**
-(class :cpp:class:`wrench::JobManager`) and a **data movement manager** (class
+There are three managers: a **job manager**
+(class :cpp:class:`wrench::JobManager`), a **function manager** (class :cpp:class:`wrench::FunctionManager`),
+and a **data movement manager** (class
 :cpp:class:`wrench::DataMovementManager`). The base
-:cpp:class:`wrench::ExecutionController` class provides two member functions for
+:cpp:class:`wrench::ExecutionController` class provides member functions for
 instantiating and starting these managers:
-:cpp:class:`wrench::ExecutionController::createJobManager()` and
+:cpp:class:`wrench::ExecutionController::createJobManager()`,
+:cpp:class:`wrench::ExecutionController::createFunctionManager()`, and
 :cpp:class:`wrench::ExecutionController::createDataMovementManager()`.
 
-Creating one or two of these managers typically is the first thing an
+Creating managers typically is the first thing an
 execution controller does. For instance, the execution controller in
 ``examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp``
 starts by doing:
@@ -155,7 +157,9 @@ Interacting with storage services
 
 Typical interactions between an execution controller and a storage
 service include locating, reading, writing, and copying files. Different storage
-service implementations may or not implement some of of these operations.
+service implementations may or not implement some of of these operations. Some operations
+can be done directly, while other require using a data movement manager (see above).
+
 Click on the following links to see concrete examples
 of interactions with the currently available storage service type:
 
@@ -167,6 +171,7 @@ of interactions with the currently available storage service type:
 
 .. _wrench-102-controller-services-compute:
 
+
 Interacting with compute services
 ---------------------------------
 
@@ -175,15 +180,16 @@ Interacting with compute services
 The Job abstraction
 ~~~~~~~~~~~~~~~~~~~
 
-The main activity of an execution controller is to execute workflow
-tasks on compute services. Rather than submitting tasks directly to
-compute services, an execution controller must create “jobs”, which can
-comprise multiple tasks and involve data copy/deletion operations. The
+Some compute services support the execution of "jobs", and
+a common activity of an execution controller is to execute jobs
+on these compute services. An execution controller must use a job manager (see previous section)
+to create and submit jobs for execution to compute services. The
 job abstraction is powerful and greatly simplifies the task of an
 execution controller while affording flexibility.
 
 **There are three kinds of jobs in WRENCH**: :cpp:class:`wrench::CompoundJob`,
-:cpp:class:`wrench::StandardJob`, and :cpp:class:`wrench::PilotJob`.
+:cpp:class:`wrench::StandardJob`, and :cpp:class:`wrench::PilotJob`. Different
+compute services support different kinds of jobs.
 
 A **Compound Job** is simply set of actions to be performed, with
 possible control dependencies between actions. It is the most generic,
@@ -246,8 +252,19 @@ provides the following:
 -  :cpp:class:`wrench::JobManager::terminateJob()`: synchronous termination of a
    previously submitted job.
 
-The next section gives examples of interactions with each kind of
-compute service.
+
+The Function abstraction
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another way for an execution controller to use compute service is not via a job abstraction, but via
+a function abstraction. This abstraction is only supported by serverless compute services (:cpp:class:`wrench::ServerlessComputeService`).
+Functions are created, registered, invoked, and monitored by a function manager (:cpp:class:`wrench::FunctionManager`).  A function
+is defined by arbitrary code (i.e., any lambda function that uses the WRENCH API), an image file that is stored on at least one storage
+service, limits on a function invocation's resource usage, and a timeout.  Once registered, the function can be invoked any number of times,
+and the controller can check on the status of an invocation and wait for one or more invocations to complete (successfully or not).
+
+More details
+~~~~~~~~~~~~
 
 Click on the following links to see detailed descriptions and examples
 of how jobs are submitted to each compute service type:
