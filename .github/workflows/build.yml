@@ -78,6 +78,8 @@ jobs:
           docker exec -w /home/wrench/wrench/build wrench make;
           echo "Building wrench-daemon...";
           docker exec -w /home/wrench/wrench/build wrench make wrench-daemon;
+          echo "Installing wrench...";
+          docker exec -w /home/wrench/wrench/build wrench sudo make install
           echo "Building examples...";
           docker exec -w /home/wrench/wrench/build wrench make examples;
           echo "Running examples...";
