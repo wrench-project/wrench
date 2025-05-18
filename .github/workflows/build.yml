@@ -69,19 +69,26 @@ jobs:
             BRANCH_NAME=$(echo ${GITHUB_REF} | sed 's/refs\/heads\///g');
             docker exec -w /home/wrench/wrench wrench git checkout ${BRANCH_NAME};
           fi
-          # build wrench, including unit_tests and examples
-          echo "Building wrench...";
+          # Running cmake
+          echo "Running cmake...";
           docker exec wrench mkdir wrench/build;
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-          docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples wrench-daemon;
-          docker exec -w /home/wrench/wrench/build wrench sudo make install
-          # run unit_tests
-          echo "Running tests...";
-          docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
-          # run examples
-          echo "Running examples...";
-          #docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
+          # build wrench, including unit_tests and examples
+          echo "Building wrench and wrench-daemon...";
+          docker exec -w /home/wrench/wrench/build wrench make examples wrench-daemon;
+          echo "Building and running examples...";
+          docker exec -w /home/wrench/wrench/build wrench make examples;
           docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh 
+          echo "Building and running unit tests...";
+          if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
+            # With coverage
+            docker exec -w /home/wrench/wrench/build wrench make unit_tests_coverage;
+            docker exec -w /home/wrench/wrench/build wrench ./unit_tests_coverage;
+          else
+            # Without coverage
+            docker exec -w /home/wrench/wrench/build wrench make unit_tests;
+            docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
+          fi
           # run wrench-init
           echo "Testing wrench-init...";
           docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --force --api ACTION --project_dir ./wrench-init-generated-simulator 
