@@ -616,25 +616,28 @@ add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOU
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
-
 # generate unit tests if Google Test is found
 find_library(GTEST_LIBRARY NAMES gtest)
 if(GTEST_LIBRARY)
     add_definitions(-DGTEST_USED)
-    add_executable(unit_tests EXCLUDE_FROM_ALL  ${TEST_FILES} ${SOURCE_FILES})
+    add_executable(unit_tests EXCLUDE_FROM_ALL  ${TEST_FILES})
+    add_executable(unit_tests_coverage EXCLUDE_FROM_ALL  ${TEST_FILES} ${SOURCE_FILES})
     if (ENABLE_BATSCHED)
         find_library(ZMQ_LIBRARY NAMES zmq)
         target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
+        target_link_libraries(unit_tests_coverage ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
     else ()
         target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
+        target_link_libraries(unit_tests_coverage ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
     endif ()
-    set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
-    set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
-    add_custom_command(TARGET unit_tests POST_BUILD COMMAND find . -name *.gcda -delete)
+    set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0")
+    set_target_properties(unit_tests PROPERTIES LINK_FLAGS "")
+    set_target_properties(unit_tests_coverage PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
+    set_target_properties(unit_tests_coverage PROPERTIES LINK_FLAGS "--coverage")
+    add_custom_command(TARGET unit_tests_coverage POST_BUILD COMMAND find . -name *.gcda -delete)
 else()
     add_custom_target(unit_tests echo "ERROR: Cannot build unit_tests because Google Test (libgtest) was not found by cmake." COMMAND echo "       If you have installed Google Test, re-run cmake." VERBATIM)
 endif()
-
 
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/DefinePackages.cmake)
