@@ -75,9 +75,12 @@ jobs:
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
           # build wrench, including unit_tests and examples
           echo "Building wrench...";
-          docker exec -w /home/wrench/wrench/build wrench make all wrench-init wrench-daemon;
-          echo "Building and running examples...";
+          docker exec -w /home/wrench/wrench/build wrench make;
+          echo "Building wrench-daemon...";
+          docker exec -w /home/wrench/wrench/build wrench make wrench-daemon;
+          echo "Building examples...";
           docker exec -w /home/wrench/wrench/build wrench make examples;
+          echo "Running examples...";
           docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh 
           if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
             # With coverage
