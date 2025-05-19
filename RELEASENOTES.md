@@ -3,7 +3,7 @@ WRENCH Release Notes
 
 ### wrench 2.7-dev
 
-(May XX, 2025) This release includes **a new API for simulating serverless infrastructures**, as well as **minor enhancements and updates**. More specifically:
+(May 19, 2025) This release includes **a new API for simulating serverless infrastructures**, as well as **minor enhancements and updates**. More specifically:
 
 - Implementation of a `ServerlessComputeService` to simulate serverless, function-based cloud infrastructures (e.g., AWS Lambda, Google Functions, etc). Comes with a simple user-level API and a `FunctionManager` component to develop simulation controllers that place function invocations.  An example is provided in the `examples` directory. Although several unit tests have been developed, this serverless simulation feature is still experimental. It will likely evolved, along with its API, in the near future.
 - Removed all usage of `httplib` in wrench-daemon (which now uses only CrowCPP)
