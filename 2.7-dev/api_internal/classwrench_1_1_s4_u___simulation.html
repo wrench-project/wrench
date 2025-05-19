@@ -310,7 +310,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation18getClusterPropertyERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getClusterProperty()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation16getCurrentPstateERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getCurrentPstate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation15getDiskCapacityERKNSt6stringENSt6stringE"><code class="docutils literal notranslate"><span class="pre">getDiskCapacity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation20getDiskReadBandwidthERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getDiskReadBandwidth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation8getDisksERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getDisks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation21getDiskWriteBandwidthERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getDiskWriteBandwidth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation23getEnergyConsumedByHostERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getEnergyConsumedByHost()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation11getFlopRateEv"><code class="docutils literal notranslate"><span class="pre">getFlopRate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench14S4U_Simulation15getHostFlopRateERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getHostFlopRate()</span></code></a></li>
@@ -634,7 +636,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hostname</strong> – the name of the host to which the disk should be attached </p></li>
-<li><p><strong>disk_id</strong> – the nae of the disk </p></li>
+<li><p><strong>disk_id</strong> – the name of the disk </p></li>
 <li><p><strong>read_bandwidth_in_bytes_per_sec</strong> – the disk’s read bandwidth in byte/sec </p></li>
 <li><p><strong>write_bandwidth_in_bytes_per_sec</strong> – the disk’s write bandwidth in byte/sec </p></li>
 <li><p><strong>capacity_in_bytes</strong> – the disk’s capacity in bytes </p></li>
@@ -798,7 +800,24 @@
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the capacity of the disk at mount point </p>
+<dd class="field-even"><p>the capacity of the disk at mount point (in byte) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench14S4U_Simulation20getDiskReadBandwidthERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N6wrench14S4U_Simulation20getDiskReadBandwidthERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N6wrench14S4U_Simulation20getDiskReadBandwidthERKNSt6stringERKNSt6stringE"></span><span id="wrench::S4U_Simulation::getDiskReadBandwidth__ssCR.ssCR"></span><span class="target" id="classwrench_1_1_s4_u___simulation_1a7466dcc89a4f79a2dd89f50ccb67b12a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDiskReadBandwidth</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mount_point</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench14S4U_Simulation20getDiskReadBandwidthERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Gets the read bandwidth of a disk attached to some host for a given mount point. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hostname</strong> – the host’s name </p></li>
+<li><p><strong>mount_point</strong> – the mount point (e.g., “/home”) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the bandwidth of the disk at mount point (in byte/sec) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -813,6 +832,23 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a vector of mount points </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench14S4U_Simulation21getDiskWriteBandwidthERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N6wrench14S4U_Simulation21getDiskWriteBandwidthERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N6wrench14S4U_Simulation21getDiskWriteBandwidthERKNSt6stringERKNSt6stringE"></span><span id="wrench::S4U_Simulation::getDiskWriteBandwidth__ssCR.ssCR"></span><span class="target" id="classwrench_1_1_s4_u___simulation_1a1fffbf02fc28ebfdcf9a22099c704030"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDiskWriteBandwidth</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mount_point</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench14S4U_Simulation21getDiskWriteBandwidthERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Gets the write bandwidth of a disk attached to some host for a given mount point. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hostname</strong> – the host’s name </p></li>
+<li><p><strong>mount_point</strong> – the mount point (e.g., “/home”) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the bandwidth of the disk at mount point (in byte/sec) </p>
 </dd>
 </dl>
 </dd></dl>
