@@ -1,0 +1,8 @@
+.. _CompoundJobCompletedEvent:
+wrench::CompoundJobCompletedEvent
+*********************************
+
+.. doxygenclass:: wrench::CompoundJobCompletedEvent
+   :project: internal
+   :members:
+

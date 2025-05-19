@@ -1,0 +1,8 @@
+.. _NetworkProximityMessage:
+wrench::NetworkProximityMessage
+*******************************
+
+.. doxygenclass:: wrench::NetworkProximityMessage
+   :project: internal
+   :members:
+

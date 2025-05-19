@@ -1,0 +1,8 @@
+.. _CloudComputeService:
+wrench::CloudComputeService
+***************************
+
+.. doxygenclass:: wrench::CloudComputeService
+   :project: user
+   :members:
+

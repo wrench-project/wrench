@@ -1,0 +1,8 @@
+.. _XRootD::MessagePayload:
+wrench::XRootD::MessagePayload
+******************************
+
+.. doxygenclass:: wrench::XRootD::MessagePayload
+   :project: developer
+   :members:
+

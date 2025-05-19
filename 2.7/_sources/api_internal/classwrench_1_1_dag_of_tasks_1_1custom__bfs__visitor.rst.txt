@@ -1,0 +1,8 @@
+.. _DagOfTasks::custom_bfs_visitor:
+wrench::DagOfTasks::custom_bfs_visitor
+**************************************
+
+.. doxygenclass:: wrench::DagOfTasks::custom_bfs_visitor
+   :project: internal
+   :members:
+

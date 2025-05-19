@@ -1,0 +1,8 @@
+.. _HTCondorComputeServiceMessagePayload:
+wrench::HTCondorComputeServiceMessagePayload
+********************************************
+
+.. doxygenclass:: wrench::HTCondorComputeServiceMessagePayload
+   :project: developer
+   :members:
+

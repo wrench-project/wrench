@@ -1,0 +1,8 @@
+.. _TimerEvent:
+wrench::TimerEvent
+******************
+
+.. doxygenclass:: wrench::TimerEvent
+   :project: developer
+   :members:
+

@@ -1,0 +1,8 @@
+.. _SimulationTimestampLinkUsage:
+wrench::SimulationTimestampLinkUsage
+************************************
+
+.. doxygenclass:: wrench::SimulationTimestampLinkUsage
+   :project: user
+   :members:
+

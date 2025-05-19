@@ -1,0 +1,8 @@
+.. _JobKilled:
+wrench::JobKilled
+*****************
+
+.. doxygenclass:: wrench::JobKilled
+   :project: internal
+   :members:
+

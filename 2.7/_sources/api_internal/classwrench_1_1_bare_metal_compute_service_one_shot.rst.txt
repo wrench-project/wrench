@@ -1,0 +1,8 @@
+.. _BareMetalComputeServiceOneShot:
+wrench::BareMetalComputeServiceOneShot
+**************************************
+
+.. doxygenclass:: wrench::BareMetalComputeServiceOneShot
+   :project: internal
+   :members:
+

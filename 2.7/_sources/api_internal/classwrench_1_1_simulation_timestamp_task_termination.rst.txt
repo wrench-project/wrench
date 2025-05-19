@@ -1,0 +1,8 @@
+.. _SimulationTimestampTaskTermination:
+wrench::SimulationTimestampTaskTermination
+******************************************
+
+.. doxygenclass:: wrench::SimulationTimestampTaskTermination
+   :project: internal
+   :members:
+

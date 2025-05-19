@@ -1,0 +1,8 @@
+.. _Simulation:
+wrench::Simulation
+******************
+
+.. doxygenclass:: wrench::Simulation
+   :project: user
+   :members:
+

@@ -1,0 +1,8 @@
+.. _BatschedNetworkListener:
+wrench::BatschedNetworkListener
+*******************************
+
+.. doxygenclass:: wrench::BatschedNetworkListener
+   :project: internal
+   :members:
+

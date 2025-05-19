@@ -1,0 +1,8 @@
+.. _StorageServiceFreeSpaceRequestMessage:
+wrench::StorageServiceFreeSpaceRequestMessage
+*********************************************
+
+.. doxygenclass:: wrench::StorageServiceFreeSpaceRequestMessage
+   :project: internal
+   :members:
+

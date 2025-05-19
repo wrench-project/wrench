@@ -1,0 +1,8 @@
+.. _StorageServiceProxy:
+wrench::StorageServiceProxy
+***************************
+
+.. doxygenclass:: wrench::StorageServiceProxy
+   :project: internal
+   :members:
+

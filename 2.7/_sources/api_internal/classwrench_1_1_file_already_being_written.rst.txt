@@ -1,0 +1,8 @@
+.. _FileAlreadyBeingWritten:
+wrench::FileAlreadyBeingWritten
+*******************************
+
+.. doxygenclass:: wrench::FileAlreadyBeingWritten
+   :project: internal
+   :members:
+

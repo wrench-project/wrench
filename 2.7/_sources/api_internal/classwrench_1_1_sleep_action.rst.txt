@@ -1,0 +1,8 @@
+.. _SleepAction:
+wrench::SleepAction
+*******************
+
+.. doxygenclass:: wrench::SleepAction
+   :project: internal
+   :members:
+

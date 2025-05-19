@@ -1,0 +1,8 @@
+.. _CloudComputeServiceShutdownVMRequestMessage:
+wrench::CloudComputeServiceShutdownVMRequestMessage
+***************************************************
+
+.. doxygenclass:: wrench::CloudComputeServiceShutdownVMRequestMessage
+   :project: internal
+   :members:
+

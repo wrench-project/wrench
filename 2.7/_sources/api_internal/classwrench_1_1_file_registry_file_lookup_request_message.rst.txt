@@ -1,0 +1,8 @@
+.. _FileRegistryFileLookupRequestMessage:
+wrench::FileRegistryFileLookupRequestMessage
+********************************************
+
+.. doxygenclass:: wrench::FileRegistryFileLookupRequestMessage
+   :project: internal
+   :members:
+

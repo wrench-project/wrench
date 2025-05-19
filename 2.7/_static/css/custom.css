@@ -1,0 +1,15 @@
+.wy-side-nav-search {
+    background-color: #3a3a3a !important;
+}
+
+.wy-side-nav-search .wy-dropdown>a img.logo, .wy-side-nav-search>a img.logo {
+    max-width: 50%;
+}
+
+.wy-menu-vertical header, .wy-menu-vertical p.caption {
+    color: #E06E38 !important;
+}
+
+.wy-side-nav-search>div.version {
+    color: hsla(0,0%,100%,.5);
+}

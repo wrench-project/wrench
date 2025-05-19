@@ -1,0 +1,8 @@
+.. _ServiceIsDown:
+wrench::ServiceIsDown
+*********************
+
+.. doxygenclass:: wrench::ServiceIsDown
+   :project: internal
+   :members:
+

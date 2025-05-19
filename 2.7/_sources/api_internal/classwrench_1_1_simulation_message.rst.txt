@@ -1,0 +1,8 @@
+.. _SimulationMessage:
+wrench::SimulationMessage
+*************************
+
+.. doxygenclass:: wrench::SimulationMessage
+   :project: internal
+   :members:
+

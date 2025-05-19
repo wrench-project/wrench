@@ -1,0 +1,8 @@
+.. _BatchComputeServiceMessagePayload:
+wrench::BatchComputeServiceMessagePayload
+*****************************************
+
+.. doxygenclass:: wrench::BatchComputeServiceMessagePayload
+   :project: user
+   :members:
+

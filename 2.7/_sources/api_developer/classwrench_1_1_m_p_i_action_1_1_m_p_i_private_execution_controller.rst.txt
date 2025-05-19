@@ -1,0 +1,8 @@
+.. _MPIAction::MPIPrivateExecutionController:
+wrench::MPIAction::MPIPrivateExecutionController
+************************************************
+
+.. doxygenclass:: wrench::MPIAction::MPIPrivateExecutionController
+   :project: developer
+   :members:
+

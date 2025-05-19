@@ -1,0 +1,8 @@
+.. _HostHasTurnedOffMessage:
+wrench::HostHasTurnedOffMessage
+*******************************
+
+.. doxygenclass:: wrench::HostHasTurnedOffMessage
+   :project: internal
+   :members:
+

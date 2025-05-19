@@ -1,0 +1,8 @@
+.. _CompoundStorageAllocationRequestMessage:
+wrench::CompoundStorageAllocationRequestMessage
+***********************************************
+
+.. doxygenclass:: wrench::CompoundStorageAllocationRequestMessage
+   :project: internal
+   :members:
+

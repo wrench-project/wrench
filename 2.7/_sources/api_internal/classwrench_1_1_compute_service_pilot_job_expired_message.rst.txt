@@ -1,0 +1,8 @@
+.. _ComputeServicePilotJobExpiredMessage:
+wrench::ComputeServicePilotJobExpiredMessage
+********************************************
+
+.. doxygenclass:: wrench::ComputeServicePilotJobExpiredMessage
+   :project: internal
+   :members:
+

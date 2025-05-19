@@ -1,0 +1,8 @@
+.. _FileReadAction:
+wrench::FileReadAction
+**********************
+
+.. doxygenclass:: wrench::FileReadAction
+   :project: developer
+   :members:
+

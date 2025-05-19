@@ -1,0 +1,8 @@
+.. _CustomParallelModel:
+wrench::CustomParallelModel
+***************************
+
+.. doxygenclass:: wrench::CustomParallelModel
+   :project: internal
+   :members:
+

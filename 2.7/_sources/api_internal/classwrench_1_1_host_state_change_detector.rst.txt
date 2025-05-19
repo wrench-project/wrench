@@ -1,0 +1,8 @@
+.. _HostStateChangeDetector:
+wrench::HostStateChangeDetector
+*******************************
+
+.. doxygenclass:: wrench::HostStateChangeDetector
+   :project: internal
+   :members:
+

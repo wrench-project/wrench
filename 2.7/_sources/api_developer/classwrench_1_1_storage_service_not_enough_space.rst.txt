@@ -1,0 +1,8 @@
+.. _StorageServiceNotEnoughSpace:
+wrench::StorageServiceNotEnoughSpace
+************************************
+
+.. doxygenclass:: wrench::StorageServiceNotEnoughSpace
+   :project: developer
+   :members:
+

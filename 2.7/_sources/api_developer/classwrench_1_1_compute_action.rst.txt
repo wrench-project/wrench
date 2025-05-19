@@ -1,0 +1,8 @@
+.. _ComputeAction:
+wrench::ComputeAction
+*********************
+
+.. doxygenclass:: wrench::ComputeAction
+   :project: developer
+   :members:
+

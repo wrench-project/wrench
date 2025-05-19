@@ -1,0 +1,8 @@
+.. _MPI_Alltoall_participant:
+wrench::MPI_Alltoall_participant
+********************************
+
+.. doxygenclass:: wrench::MPI_Alltoall_participant
+   :project: user
+   :members:
+

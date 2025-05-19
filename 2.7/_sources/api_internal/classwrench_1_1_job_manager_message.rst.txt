@@ -1,0 +1,8 @@
+.. _JobManagerMessage:
+wrench::JobManagerMessage
+*************************
+
+.. doxygenclass:: wrench::JobManagerMessage
+   :project: internal
+   :members:
+

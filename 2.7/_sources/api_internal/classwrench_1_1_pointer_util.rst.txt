@@ -1,0 +1,8 @@
+.. _PointerUtil:
+wrench::PointerUtil
+*******************
+
+.. doxygenclass:: wrench::PointerUtil
+   :project: internal
+   :members:
+

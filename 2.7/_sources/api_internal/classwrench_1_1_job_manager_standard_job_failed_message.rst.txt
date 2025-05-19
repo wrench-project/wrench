@@ -1,0 +1,8 @@
+.. _JobManagerStandardJobFailedMessage:
+wrench::JobManagerStandardJobFailedMessage
+******************************************
+
+.. doxygenclass:: wrench::JobManagerStandardJobFailedMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _SimulationTimestampTaskFailure:
+wrench::SimulationTimestampTaskFailure
+**************************************
+
+.. doxygenclass:: wrench::SimulationTimestampTaskFailure
+   :project: developer
+   :members:
+

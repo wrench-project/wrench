@@ -1,0 +1,8 @@
+.. _FileRegistryAction:
+wrench::FileRegistryAction
+**************************
+
+.. doxygenclass:: wrench::FileRegistryAction
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _XRootD::UpdateCacheMessage:
+wrench::XRootD::UpdateCacheMessage
+**********************************
+
+.. doxygenclass:: wrench::XRootD::UpdateCacheMessage
+   :project: internal
+   :members:
+

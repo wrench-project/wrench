@@ -1,0 +1,8 @@
+.. _Service:
+wrench::Service
+***************
+
+.. doxygenclass:: wrench::Service
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _SimulationTimestampTaskCompletion:
+wrench::SimulationTimestampTaskCompletion
+*****************************************
+
+.. doxygenclass:: wrench::SimulationTimestampTaskCompletion
+   :project: user
+   :members:
+

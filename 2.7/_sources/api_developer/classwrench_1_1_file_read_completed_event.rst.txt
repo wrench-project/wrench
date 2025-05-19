@@ -1,0 +1,8 @@
+.. _FileReadCompletedEvent:
+wrench::FileReadCompletedEvent
+******************************
+
+.. doxygenclass:: wrench::FileReadCompletedEvent
+   :project: developer
+   :members:
+

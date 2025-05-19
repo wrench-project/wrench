@@ -1,0 +1,8 @@
+.. _ActionExecutionServiceTerminateActionRequestMessage:
+wrench::ActionExecutionServiceTerminateActionRequestMessage
+***********************************************************
+
+.. doxygenclass:: wrench::ActionExecutionServiceTerminateActionRequestMessage
+   :project: internal
+   :members:
+

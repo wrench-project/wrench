@@ -1,0 +1,8 @@
+.. _BatchQueryAnswerMessage:
+wrench::BatchQueryAnswerMessage
+*******************************
+
+.. doxygenclass:: wrench::BatchQueryAnswerMessage
+   :project: internal
+   :members:
+

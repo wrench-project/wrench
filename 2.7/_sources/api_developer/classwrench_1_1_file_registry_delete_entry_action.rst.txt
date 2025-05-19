@@ -1,0 +1,8 @@
+.. _FileRegistryDeleteEntryAction:
+wrench::FileRegistryDeleteEntryAction
+*************************************
+
+.. doxygenclass:: wrench::FileRegistryDeleteEntryAction
+   :project: developer
+   :members:
+

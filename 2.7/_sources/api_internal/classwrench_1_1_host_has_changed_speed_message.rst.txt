@@ -1,0 +1,8 @@
+.. _HostHasChangedSpeedMessage:
+wrench::HostHasChangedSpeedMessage
+**********************************
+
+.. doxygenclass:: wrench::HostHasChangedSpeedMessage
+   :project: internal
+   :members:
+

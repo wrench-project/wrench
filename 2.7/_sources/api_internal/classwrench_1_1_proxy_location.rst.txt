@@ -1,0 +1,8 @@
+.. _ProxyLocation:
+wrench::ProxyLocation
+*********************
+
+.. doxygenclass:: wrench::ProxyLocation
+   :project: internal
+   :members:
+
