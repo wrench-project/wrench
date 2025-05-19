@@ -1,0 +1,8 @@
+.. _CompoundStorageService:
+wrench::CompoundStorageService
+******************************
+
+.. doxygenclass:: wrench::CompoundStorageService
+   :project: user
+   :members:
+

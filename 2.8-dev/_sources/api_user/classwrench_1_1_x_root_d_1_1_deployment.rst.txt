@@ -1,0 +1,8 @@
+.. _XRootD::Deployment:
+wrench::XRootD::Deployment
+**************************
+
+.. doxygenclass:: wrench::XRootD::Deployment
+   :project: user
+   :members:
+

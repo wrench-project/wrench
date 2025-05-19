@@ -1,0 +1,8 @@
+.. _ComputeServiceCompoundJobDoneMessage:
+wrench::ComputeServiceCompoundJobDoneMessage
+********************************************
+
+.. doxygenclass:: wrench::ComputeServiceCompoundJobDoneMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _ParallelModel:
+wrench::ParallelModel
+*********************
+
+.. doxygenclass:: wrench::ParallelModel
+   :project: user
+   :members:
+

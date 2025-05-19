@@ -1,0 +1,8 @@
+.. _ComputeServiceResourceInformationRequestMessage:
+wrench::ComputeServiceResourceInformationRequestMessage
+*******************************************************
+
+.. doxygenclass:: wrench::ComputeServiceResourceInformationRequestMessage
+   :project: internal
+   :members:
+

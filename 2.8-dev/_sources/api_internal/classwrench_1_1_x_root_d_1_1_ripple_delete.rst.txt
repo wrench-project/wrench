@@ -1,0 +1,8 @@
+.. _XRootD::RippleDelete:
+wrench::XRootD::RippleDelete
+****************************
+
+.. doxygenclass:: wrench::XRootD::RippleDelete
+   :project: internal
+   :members:
+

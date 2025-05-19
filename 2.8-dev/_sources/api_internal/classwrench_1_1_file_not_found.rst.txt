@@ -1,0 +1,8 @@
+.. _FileNotFound:
+wrench::FileNotFound
+********************
+
+.. doxygenclass:: wrench::FileNotFound
+   :project: internal
+   :members:
+

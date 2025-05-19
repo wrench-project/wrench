@@ -1,0 +1,8 @@
+.. _CloudComputeServiceStartVMAnswerMessage:
+wrench::CloudComputeServiceStartVMAnswerMessage
+***********************************************
+
+.. doxygenclass:: wrench::CloudComputeServiceStartVMAnswerMessage
+   :project: internal
+   :members:
+

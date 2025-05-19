@@ -1,0 +1,8 @@
+.. _WorkflowTask:
+wrench::WorkflowTask
+********************
+
+.. doxygenclass:: wrench::WorkflowTask
+   :project: internal
+   :members:
+

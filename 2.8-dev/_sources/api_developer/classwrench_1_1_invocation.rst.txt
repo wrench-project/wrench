@@ -1,0 +1,8 @@
+.. _Invocation:
+wrench::Invocation
+******************
+
+.. doxygenclass:: wrench::Invocation
+   :project: developer
+   :members:
+

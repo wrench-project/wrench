@@ -1,0 +1,8 @@
+.. _MemoryManager:
+wrench::MemoryManager
+*********************
+
+.. doxygenclass:: wrench::MemoryManager
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _Block:
+wrench::Block
+*************
+
+.. doxygenclass:: wrench::Block
+   :project: internal
+   :members:
+

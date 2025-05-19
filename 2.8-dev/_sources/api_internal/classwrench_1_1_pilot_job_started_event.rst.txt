@@ -1,0 +1,8 @@
+.. _PilotJobStartedEvent:
+wrench::PilotJobStartedEvent
+****************************
+
+.. doxygenclass:: wrench::PilotJobStartedEvent
+   :project: internal
+   :members:
+

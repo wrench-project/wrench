@@ -1,0 +1,8 @@
+.. _CompoundStorageServiceMessagePayload:
+wrench::CompoundStorageServiceMessagePayload
+********************************************
+
+.. doxygenclass:: wrench::CompoundStorageServiceMessagePayload
+   :project: user
+   :members:
+

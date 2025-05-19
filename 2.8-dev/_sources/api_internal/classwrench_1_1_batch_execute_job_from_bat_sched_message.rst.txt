@@ -1,0 +1,8 @@
+.. _BatchExecuteJobFromBatSchedMessage:
+wrench::BatchExecuteJobFromBatSchedMessage
+******************************************
+
+.. doxygenclass:: wrench::BatchExecuteJobFromBatSchedMessage
+   :project: internal
+   :members:
+

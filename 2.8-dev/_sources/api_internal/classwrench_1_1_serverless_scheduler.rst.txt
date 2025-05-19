@@ -1,0 +1,8 @@
+.. _ServerlessScheduler:
+wrench::ServerlessScheduler
+***************************
+
+.. doxygenclass:: wrench::ServerlessScheduler
+   :project: internal
+   :members:
+

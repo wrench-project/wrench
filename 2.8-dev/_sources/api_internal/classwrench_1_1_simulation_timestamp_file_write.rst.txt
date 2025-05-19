@@ -1,0 +1,8 @@
+.. _SimulationTimestampFileWrite:
+wrench::SimulationTimestampFileWrite
+************************************
+
+.. doxygenclass:: wrench::SimulationTimestampFileWrite
+   :project: internal
+   :members:
+

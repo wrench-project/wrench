@@ -1,0 +1,8 @@
+.. _FileRegistryMessage:
+wrench::FileRegistryMessage
+***************************
+
+.. doxygenclass:: wrench::FileRegistryMessage
+   :project: internal
+   :members:
+

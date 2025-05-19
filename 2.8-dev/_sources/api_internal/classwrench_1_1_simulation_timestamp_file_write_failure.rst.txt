@@ -1,0 +1,8 @@
+.. _SimulationTimestampFileWriteFailure:
+wrench::SimulationTimestampFileWriteFailure
+*******************************************
+
+.. doxygenclass:: wrench::SimulationTimestampFileWriteFailure
+   :project: internal
+   :members:
+

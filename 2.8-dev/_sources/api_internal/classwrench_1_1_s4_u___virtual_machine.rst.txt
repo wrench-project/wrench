@@ -1,0 +1,8 @@
+.. _S4U_VirtualMachine:
+wrench::S4U_VirtualMachine
+**************************
+
+.. doxygenclass:: wrench::S4U_VirtualMachine
+   :project: internal
+   :members:
+

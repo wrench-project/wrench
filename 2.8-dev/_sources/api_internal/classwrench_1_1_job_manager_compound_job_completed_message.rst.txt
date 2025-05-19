@@ -1,0 +1,8 @@
+.. _JobManagerCompoundJobCompletedMessage:
+wrench::JobManagerCompoundJobCompletedMessage
+*********************************************
+
+.. doxygenclass:: wrench::JobManagerCompoundJobCompletedMessage
+   :project: internal
+   :members:
+

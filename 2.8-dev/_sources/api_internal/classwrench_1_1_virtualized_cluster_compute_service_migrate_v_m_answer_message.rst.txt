@@ -1,0 +1,8 @@
+.. _VirtualizedClusterComputeServiceMigrateVMAnswerMessage:
+wrench::VirtualizedClusterComputeServiceMigrateVMAnswerMessage
+**************************************************************
+
+.. doxygenclass:: wrench::VirtualizedClusterComputeServiceMigrateVMAnswerMessage
+   :project: internal
+   :members:
+

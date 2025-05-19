@@ -1,0 +1,8 @@
+.. _CustomAction:
+wrench::CustomAction
+********************
+
+.. doxygenclass:: wrench::CustomAction
+   :project: developer
+   :members:
+

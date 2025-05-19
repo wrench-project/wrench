@@ -1,0 +1,8 @@
+.. _ExecutionControllerMessage:
+wrench::ExecutionControllerMessage
+**********************************
+
+.. doxygenclass:: wrench::ExecutionControllerMessage
+   :project: internal
+   :members:
+

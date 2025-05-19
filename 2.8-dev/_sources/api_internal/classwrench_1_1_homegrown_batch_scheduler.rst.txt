@@ -1,0 +1,8 @@
+.. _HomegrownBatchScheduler:
+wrench::HomegrownBatchScheduler
+*******************************
+
+.. doxygenclass:: wrench::HomegrownBatchScheduler
+   :project: internal
+   :members:
+

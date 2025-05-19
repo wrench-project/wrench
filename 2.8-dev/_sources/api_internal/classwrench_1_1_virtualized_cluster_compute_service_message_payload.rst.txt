@@ -1,0 +1,8 @@
+.. _VirtualizedClusterComputeServiceMessagePayload:
+wrench::VirtualizedClusterComputeServiceMessagePayload
+******************************************************
+
+.. doxygenclass:: wrench::VirtualizedClusterComputeServiceMessagePayload
+   :project: internal
+   :members:
+

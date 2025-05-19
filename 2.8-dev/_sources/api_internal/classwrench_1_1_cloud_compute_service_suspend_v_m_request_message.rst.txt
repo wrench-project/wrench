@@ -1,0 +1,8 @@
+.. _CloudComputeServiceSuspendVMRequestMessage:
+wrench::CloudComputeServiceSuspendVMRequestMessage
+**************************************************
+
+.. doxygenclass:: wrench::CloudComputeServiceSuspendVMRequestMessage
+   :project: internal
+   :members:
+

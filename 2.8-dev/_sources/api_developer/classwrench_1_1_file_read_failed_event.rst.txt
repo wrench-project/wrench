@@ -1,0 +1,8 @@
+.. _FileReadFailedEvent:
+wrench::FileReadFailedEvent
+***************************
+
+.. doxygenclass:: wrench::FileReadFailedEvent
+   :project: developer
+   :members:
+

@@ -1,0 +1,8 @@
+.. _S4U_Simulation:
+wrench::S4U_Simulation
+**********************
+
+.. doxygenclass:: wrench::S4U_Simulation
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _DataManagerFileWriteAnswerMessage:
+wrench::DataManagerFileWriteAnswerMessage
+*****************************************
+
+.. doxygenclass:: wrench::DataManagerFileWriteAnswerMessage
+   :project: internal
+   :members:
+

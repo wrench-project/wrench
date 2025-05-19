@@ -1,0 +1,8 @@
+.. _FileWriterThread:
+wrench::FileWriterThread
+************************
+
+.. doxygenclass:: wrench::FileWriterThread
+   :project: internal
+   :members:
+

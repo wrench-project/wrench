@@ -1,0 +1,8 @@
+.. _Communicator:
+wrench::Communicator
+********************
+
+.. doxygenclass:: wrench::Communicator
+   :project: user
+   :members:
+

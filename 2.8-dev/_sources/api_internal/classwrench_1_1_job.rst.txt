@@ -1,0 +1,8 @@
+.. _Job:
+wrench::Job
+***********
+
+.. doxygenclass:: wrench::Job
+   :project: internal
+   :members:
+

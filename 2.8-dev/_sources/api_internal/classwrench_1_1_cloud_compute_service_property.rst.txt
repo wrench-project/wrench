@@ -1,0 +1,8 @@
+.. _CloudComputeServiceProperty:
+wrench::CloudComputeServiceProperty
+***********************************
+
+.. doxygenclass:: wrench::CloudComputeServiceProperty
+   :project: internal
+   :members:
+

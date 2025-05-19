@@ -1,0 +1,8 @@
+.. _VirtualizedClusterComputeServiceProperty:
+wrench::VirtualizedClusterComputeServiceProperty
+************************************************
+
+.. doxygenclass:: wrench::VirtualizedClusterComputeServiceProperty
+   :project: internal
+   :members:
+

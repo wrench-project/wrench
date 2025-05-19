@@ -1,0 +1,8 @@
+.. _WorkloadTraceFileReplayerEventReceiver:
+wrench::WorkloadTraceFileReplayerEventReceiver
+**********************************************
+
+.. doxygenclass:: wrench::WorkloadTraceFileReplayerEventReceiver
+   :project: internal
+   :members:
+

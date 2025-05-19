@@ -1,0 +1,8 @@
+.. _JobTimeout:
+wrench::JobTimeout
+******************
+
+.. doxygenclass:: wrench::JobTimeout
+   :project: internal
+   :members:
+

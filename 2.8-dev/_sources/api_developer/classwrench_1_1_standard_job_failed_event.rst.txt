@@ -1,0 +1,8 @@
+.. _StandardJobFailedEvent:
+wrench::StandardJobFailedEvent
+******************************
+
+.. doxygenclass:: wrench::StandardJobFailedEvent
+   :project: developer
+   :members:
+

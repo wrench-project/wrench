@@ -1,0 +1,8 @@
+.. _SimulationTrace:
+wrench::SimulationTrace
+***********************
+
+.. doxygenclass:: wrench::SimulationTrace
+   :project: internal
+   :members:
+

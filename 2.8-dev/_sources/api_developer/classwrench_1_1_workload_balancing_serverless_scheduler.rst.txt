@@ -1,0 +1,8 @@
+.. _WorkloadBalancingServerlessScheduler:
+wrench::WorkloadBalancingServerlessScheduler
+********************************************
+
+.. doxygenclass:: wrench::WorkloadBalancingServerlessScheduler
+   :project: developer
+   :members:
+

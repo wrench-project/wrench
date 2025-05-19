@@ -1,0 +1,8 @@
+.. _ComputeService:
+wrench::ComputeService
+**********************
+
+.. doxygenclass:: wrench::ComputeService
+   :project: developer
+   :members:
+

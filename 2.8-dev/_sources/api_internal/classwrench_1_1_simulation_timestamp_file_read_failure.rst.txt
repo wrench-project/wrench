@@ -1,0 +1,8 @@
+.. _SimulationTimestampFileReadFailure:
+wrench::SimulationTimestampFileReadFailure
+******************************************
+
+.. doxygenclass:: wrench::SimulationTimestampFileReadFailure
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _SimulationTimestampDiskReadFailure:
+wrench::SimulationTimestampDiskReadFailure
+******************************************
+
+.. doxygenclass:: wrench::SimulationTimestampDiskReadFailure
+   :project: user
+   :members:
+

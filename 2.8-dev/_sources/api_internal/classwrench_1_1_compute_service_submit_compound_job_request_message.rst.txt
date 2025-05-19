@@ -1,0 +1,8 @@
+.. _ComputeServiceSubmitCompoundJobRequestMessage:
+wrench::ComputeServiceSubmitCompoundJobRequestMessage
+*****************************************************
+
+.. doxygenclass:: wrench::ComputeServiceSubmitCompoundJobRequestMessage
+   :project: internal
+   :members:
+

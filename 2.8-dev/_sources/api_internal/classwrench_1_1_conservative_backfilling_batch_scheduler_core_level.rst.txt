@@ -1,0 +1,8 @@
+.. _ConservativeBackfillingBatchSchedulerCoreLevel:
+wrench::ConservativeBackfillingBatchSchedulerCoreLevel
+******************************************************
+
+.. doxygenclass:: wrench::ConservativeBackfillingBatchSchedulerCoreLevel
+   :project: internal
+   :members:
+

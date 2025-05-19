@@ -1,0 +1,8 @@
+.. _DataFile:
+wrench::DataFile
+****************
+
+.. doxygenclass:: wrench::DataFile
+   :project: internal
+   :members:
+

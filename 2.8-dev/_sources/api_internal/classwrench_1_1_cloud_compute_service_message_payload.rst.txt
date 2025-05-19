@@ -1,0 +1,8 @@
+.. _CloudComputeServiceMessagePayload:
+wrench::CloudComputeServiceMessagePayload
+*****************************************
+
+.. doxygenclass:: wrench::CloudComputeServiceMessagePayload
+   :project: internal
+   :members:
+

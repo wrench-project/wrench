@@ -1,0 +1,8 @@
+.. _AmdahlParallelModel:
+wrench::AmdahlParallelModel
+***************************
+
+.. doxygenclass:: wrench::AmdahlParallelModel
+   :project: internal
+   :members:
+

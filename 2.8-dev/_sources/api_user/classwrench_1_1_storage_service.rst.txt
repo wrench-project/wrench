@@ -1,0 +1,8 @@
+.. _StorageService:
+wrench::StorageService
+**********************
+
+.. doxygenclass:: wrench::StorageService
+   :project: user
+   :members:
+

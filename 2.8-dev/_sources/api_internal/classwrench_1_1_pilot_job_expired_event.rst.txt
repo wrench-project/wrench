@@ -1,0 +1,8 @@
+.. _PilotJobExpiredEvent:
+wrench::PilotJobExpiredEvent
+****************************
+
+.. doxygenclass:: wrench::PilotJobExpiredEvent
+   :project: internal
+   :members:
+

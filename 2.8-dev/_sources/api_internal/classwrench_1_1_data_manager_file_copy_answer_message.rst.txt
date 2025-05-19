@@ -1,0 +1,8 @@
+.. _DataManagerFileCopyAnswerMessage:
+wrench::DataManagerFileCopyAnswerMessage
+****************************************
+
+.. doxygenclass:: wrench::DataManagerFileCopyAnswerMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _ServiceIsSuspended:
+wrench::ServiceIsSuspended
+**************************
+
+.. doxygenclass:: wrench::ServiceIsSuspended
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _StorageServiceFileCopyRequestMessage:
+wrench::StorageServiceFileCopyRequestMessage
+********************************************
+
+.. doxygenclass:: wrench::StorageServiceFileCopyRequestMessage
+   :project: internal
+   :members:
+

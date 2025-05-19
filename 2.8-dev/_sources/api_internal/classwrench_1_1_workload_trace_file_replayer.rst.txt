@@ -1,0 +1,8 @@
+.. _WorkloadTraceFileReplayer:
+wrench::WorkloadTraceFileReplayer
+*********************************
+
+.. doxygenclass:: wrench::WorkloadTraceFileReplayer
+   :project: internal
+   :members:
+

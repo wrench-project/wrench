@@ -1,0 +1,8 @@
+.. _FileLocation:
+wrench::FileLocation
+********************
+
+.. doxygenclass:: wrench::FileLocation
+   :project: internal
+   :members:
+

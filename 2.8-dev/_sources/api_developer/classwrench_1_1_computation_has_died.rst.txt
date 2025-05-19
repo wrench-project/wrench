@@ -1,0 +1,8 @@
+.. _ComputationHasDied:
+wrench::ComputationHasDied
+**************************
+
+.. doxygenclass:: wrench::ComputationHasDied
+   :project: developer
+   :members:
+

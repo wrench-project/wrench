@@ -1,0 +1,8 @@
+.. _TerminalOutput:
+wrench::TerminalOutput
+**********************
+
+.. doxygenclass:: wrench::TerminalOutput
+   :project: developer
+   :members:
+

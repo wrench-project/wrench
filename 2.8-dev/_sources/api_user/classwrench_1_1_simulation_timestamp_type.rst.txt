@@ -1,0 +1,8 @@
+.. _SimulationTimestampType:
+wrench::SimulationTimestampType
+*******************************
+
+.. doxygenclass:: wrench::SimulationTimestampType
+   :project: user
+   :members:
+

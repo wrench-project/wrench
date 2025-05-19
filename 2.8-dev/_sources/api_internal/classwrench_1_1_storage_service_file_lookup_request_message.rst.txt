@@ -1,0 +1,8 @@
+.. _StorageServiceFileLookupRequestMessage:
+wrench::StorageServiceFileLookupRequestMessage
+**********************************************
+
+.. doxygenclass:: wrench::StorageServiceFileLookupRequestMessage
+   :project: internal
+   :members:
+

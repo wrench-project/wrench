@@ -1,0 +1,8 @@
+.. _SomeActionsHaveFailed:
+wrench::SomeActionsHaveFailed
+*****************************
+
+.. doxygenclass:: wrench::SomeActionsHaveFailed
+   :project: developer
+   :members:
+
