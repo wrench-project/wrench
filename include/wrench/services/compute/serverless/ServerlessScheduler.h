@@ -22,12 +22,12 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A data structure that stores all scheduling decisions:
+     * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
      *        - Which images should be copied from the head node to compute nodes' disks
      *        - Which images should be loaded into compute node's RAMs
      *        - Which invocations should be started at compute nodes
      */
-    struct SchedulingDecisions {
+    struct ServerlessSchedulingDecisions {
 	/** @brief The hostname-keyed map of images to copy to compute nodes */
         std::map<std::string, std::vector<std::shared_ptr<DataFile>>> images_to_copy_to_compute_node;
 	/** @brief The hostname-keyed map of images to load in RAM at compute nodes */
@@ -63,7 +63,7 @@ namespace wrench {
          * @param state The current system state
          * @return A SchedulingDecisions object
          */
-        virtual std::shared_ptr<SchedulingDecisions> schedule(
+        virtual std::shared_ptr<ServerlessSchedulingDecisions> schedule(
             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
             const std::shared_ptr<ServerlessStateOfTheSystem>& state
         ) = 0;

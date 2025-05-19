@@ -23,7 +23,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::shared_ptr<SchedulingDecisions> schedule(
+        std::shared_ptr<ServerlessSchedulingDecisions> schedule(
             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
             const std::shared_ptr<ServerlessStateOfTheSystem>& state
         ) override;
@@ -36,11 +36,11 @@ namespace wrench {
 
 
     private:
-        void makeImageDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+        void makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                 const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                 const std::shared_ptr<ServerlessStateOfTheSystem>& state);
 
-        void makeInvocationDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+        void makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                      const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                      const std::shared_ptr<ServerlessStateOfTheSystem>& state);
 
