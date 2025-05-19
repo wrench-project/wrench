@@ -74,6 +74,8 @@ namespace wrench {
                                                            simgrid::s4u::Disk *dst_disk);
 
         static sg_size_t getDiskCapacity(const std::string &hostname, std::string mount_point);
+        static double getDiskReadBandwidth(const std::string &hostname, const std::string& mount_point);
+        static double getDiskWriteBandwidth(const std::string &hostname, const std::string& mount_point);
         static std::vector<std::string> getDisks(const std::string &hostname);
         static simgrid::s4u::Disk *hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
 
@@ -124,6 +126,9 @@ namespace wrench {
                                                  std::vector<std::string>> &result,
                                                  bool get_subzones, bool get_clusters,
                                                  bool get_hosts_from_zones, bool get_hosts_from_clusters);
+
+        static double getDiskBandwidth(const std::string &hostname, std::string mount_point, int read_or_write);
+
 
         simgrid::s4u::Engine *engine = nullptr;
         bool initialized = false;

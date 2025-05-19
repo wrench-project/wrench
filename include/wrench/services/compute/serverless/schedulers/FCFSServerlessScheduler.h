@@ -7,7 +7,8 @@
 namespace wrench {
     /**
      * @brief A class that implements a First Come First Serve (FCFS) scheduler to use in a
-     *        serverless compute service.
+     *        serverless compute service. This is likely not representative of any real-world
+     *        serverless deployment.
      */
     class FCFSServerlessScheduler : public ServerlessScheduler {
     public:

@@ -88,6 +88,8 @@ namespace wrench {
             double speed = S4U_Simulation::getHostFlopRate(hostname);
             sg_size_t ram_available = S4U_Simulation::getHostMemoryCapacity(hostname);
             sg_size_t disk_capacity;
+            sg_size_t disk_read_bandwidth;
+            sg_size_t disk_write_bandwidth;
             try {
                 disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
             }
