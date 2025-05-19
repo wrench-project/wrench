@@ -10,7 +10,8 @@ namespace wrench {
 
     /**
      * @brief A class that implements a random scheduler to use in a
-     *        serverless compute service.
+     *        serverless compute service. Likely (hopefully?) not representative
+     *        of any real-world serverless deployment.
      */
     class RandomServerlessScheduler : public ServerlessScheduler {
     public:

@@ -16,6 +16,11 @@
 #include <string>
 
 namespace wrench {
+
+    /***********************/
+    /** \cond DEVELOPER   **/
+    /***********************/
+
     /**
      * @brief A data structure that stores all scheduling decisions:
      *        - Which images should be copied from the head node to compute nodes' disks
@@ -37,11 +42,6 @@ namespace wrench {
     class ServerlessScheduler {
     public:
         ServerlessScheduler() = default;
-
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
-
         virtual ~ServerlessScheduler() = default;
 
         /**
@@ -68,11 +68,11 @@ namespace wrench {
             const std::shared_ptr<ServerlessStateOfTheSystem>& state
         ) = 0;
 
-        /***********************/
-        /** \endcond          **/
-        /***********************/
 
     };
+    /***********************/
+    /** \endcond          **/
+    /***********************/
 } // namespace wrench
 
 #endif // WRENCH_SERVERLESSSCHEDULER_H

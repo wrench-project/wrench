@@ -206,11 +206,33 @@ private:
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Getting disk capacity for a non-bogus host should not have thrown");
         }
+        try {
+            wrench::S4U_Simulation::getDiskReadBandwidth("Host1", "/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk read bandwidth for a non-bogus host should not have thrown");
+        }
+        try {
+            wrench::S4U_Simulation::getDiskReadBandwidth("Host1", "/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk write bandwidth for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskReadBandwidth("Host1", "/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk read bandwidth for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskReadBandwidth("Host1", "/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk write bandwidth for a non-bogus host should not have thrown");
+        }
 
         try {
             wrench::S4U_Simulation::getDiskCapacity("Host1", "/no_capacity");
         } catch (std::invalid_argument &e) {
-            throw std::runtime_error("Getting disk capacity for a disk with no capacity capacity should not have thrown");
+            throw std::runtime_error("Getting disk capacity for a disk with no capacity  should not have thrown");
         }
 
         try {
