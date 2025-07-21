@@ -1069,12 +1069,12 @@ namespace wrench {
 
 
     /**
-* @brief Gets the capacity of a disk attached to some host for a given mount point
-* @param hostname: the host's name
-* @param mount_point: the mount point (e.g.,  "/home")
-* @return the capacity of the disk at mount point
-*
-*/
+    * @brief Gets the capacity of a disk attached to some host for a given mount point
+    * @param hostname: the host's name
+    * @param mount_point: the mount point (e.g.,  "/home")
+    * @return the capacity of the disk at mount point (in byte)
+    *
+    */
     sg_size_t S4U_Simulation::getDiskCapacity(const std::string &hostname, std::string mount_point) {
         //        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
         simgrid::s4u::Host *host;
@@ -1121,11 +1121,76 @@ namespace wrench {
                                     mount_point + " at host " + hostname);
     }
 
+    /**
+    * @brief Gets the read bandwidth of a disk attached to some host for a given mount point
+    * @param hostname: the host's name
+    * @param mount_point: the mount point (e.g., "/home")
+    * @return the bandwidth of the disk at mount point (in byte/sec)
+    *
+    */
+    double S4U_Simulation::getDiskReadBandwidth(const std::string &hostname, const std::string& mount_point) {
+        return getDiskBandwidth(hostname, mount_point, 0);
+    }
+
+    /**
+    * @brief Gets the write bandwidth of a disk attached to some host for a given mount point
+    * @param hostname: the host's name
+    * @param mount_point: the mount point (e.g., "/home")
+    * @return the bandwidth of the disk at mount point (in byte/sec)
+    *
+    */
+    double S4U_Simulation::getDiskWriteBandwidth(const std::string &hostname, const std::string& mount_point) {
+        return getDiskBandwidth(hostname, mount_point, 1);
+    }
+
+
+    /**
+    * @brief Gets the read or write bandwidth of a disk attached to some host for a given mount point
+    * @param hostname: the host's name
+    * @param mount_point: the mount point (e.g.,  "/home")
+    * @param read_or_write: 0 (read) or 1 (write)
+    * @return a read or write bandwidth of the disk at mount point (in byte/sec)
+    *
+    */
+    double S4U_Simulation::getDiskBandwidth(const std::string &hostname, std::string mount_point, int read_or_write) {
+        simgrid::s4u::Host *host;
+        try {
+            host = S4U_Simulation::get_host_or_vm_by_name(hostname);
+        } catch (std::exception &) {
+            throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown host " + hostname);
+        }
+
+        mount_point = FileLocation::sanitizePath(mount_point + "/");
+
+        for (auto const &d: host->get_disks()) {
+            // Get the disk's mount point
+            const char *mp = d->get_property("mount");
+            if (!mp) {
+                mp = "/";
+            }
+
+            std::string dmp = FileLocation::sanitizePath(std::string(mp) + "/");
+
+            // This is not the mount point you're looking for
+            if (dmp != mount_point) {
+                continue;
+            }
+
+            if (read_or_write == 0) {
+                return d->get_read_bandwidth();
+            } else {
+                return d->get_write_bandwidth();
+            }
+        }
+        throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown mount point " +
+                                    mount_point + " at host " + hostname);
+    }
+
 
     /**
  * @brief Method to create, programmatically, a new disk
  * @param hostname: the name of the host to which the disk should be attached
- * @param disk_id: the nae of the disk
+ * @param disk_id: the name of the disk
  * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
  * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
  * @param capacity_in_bytes: the disk's capacity in bytes

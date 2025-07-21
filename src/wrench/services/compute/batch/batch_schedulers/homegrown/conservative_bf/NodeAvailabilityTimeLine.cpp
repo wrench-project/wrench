@@ -51,6 +51,7 @@ namespace wrench {
      * @param t: a date
      */
     void NodeAvailabilityTimeLine::setTimeOrigin(u_int32_t t) {
+
         while (true) {
             auto ts = this->availability_timeslots.begin();
             if (ts->first.lower() >= t) {
@@ -101,6 +102,7 @@ namespace wrench {
      * @param job: the batch job
      */
     void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
+        // std::cerr << "ENTERING UPDATE: add= " << add << "start= " << start << "  end= " << end << "job = " << job->getCompoundJob()->getName() << "\n";
         auto job_set = new BatchJobSet();
         job_set->add(std::move(job));
 

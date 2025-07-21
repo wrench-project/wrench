@@ -10,7 +10,8 @@ namespace wrench {
 
     /**
      * @brief A class that implements a random scheduler to use in a
-     *        serverless compute service.
+     *        serverless compute service. Likely (hopefully?) not representative
+     *        of any real-world serverless deployment.
      */
     class RandomServerlessScheduler : public ServerlessScheduler {
     public:
@@ -23,7 +24,7 @@ namespace wrench {
 
         ~RandomServerlessScheduler() override = default;
 
-        std::shared_ptr<SchedulingDecisions> schedule(
+        std::shared_ptr<ServerlessSchedulingDecisions> schedule(
             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
             const std::shared_ptr<ServerlessStateOfTheSystem>& state
         ) override;
@@ -31,11 +32,11 @@ namespace wrench {
     private:
         std::mt19937 rng;
 
-        void makeImageDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+        void makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                 const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                 const std::shared_ptr<ServerlessStateOfTheSystem>& state);
 
-        void makeInvocationDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+        void makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                      const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                      const std::shared_ptr<ServerlessStateOfTheSystem>& state);
 

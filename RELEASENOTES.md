@@ -3,10 +3,15 @@ WRENCH Release Notes
 
 ### wrench 2.7-dev
 
-- Removed all usage of httplib in wrench-daemon (which now uses only CrowCPP)
-- Minor code/documentation cleanups
+(May 19, 2025) This release includes **a new API for simulating serverless infrastructures**, as well as **minor enhancements and updates**. More specifically:
+
+- Implementation of a `ServerlessComputeService` to simulate serverless, function-based cloud infrastructures (e.g., AWS Lambda, Google Functions, etc). Comes with a simple user-level API and a `FunctionManager` component to develop simulation controllers that place function invocations.  An example is provided in the `examples` directory. Although several unit tests have been developed, this serverless simulation feature is still experimental. It will likely evolved, along with its API, in the near future.
+- Removed all usage of `httplib` in wrench-daemon (which now uses only CrowCPP)
+- Minor bug fixes and code/documentation cleanups
 
 ### wrench 2.6
+
+(March 13, 2025) This release includes **minor enhancements and updates**, and, more importantly, an **upgrade to SimGrid 4**. More specifically:
 
 - Implementation of a "backfilling depth" feature for EASY and conservative_bf batch scheduling algorithms
 - Upgrade to SimGrid v4.0 and FSMod v0.3
@@ -14,10 +19,17 @@ WRENCH Release Notes
 
 ### wrench 2.5
 
+(December 16, 2024) This release includes **a new batch scheduling algorithm** and 
+**minor enhancements and updates**. More specifically:
+
 - Implementation of the EASY batch scheduling algorithm in BatchComputeService 
 - New command-line argument for the wrench-daemon to specify the number of commports
+- Minor code/documentation cleanups
 
 ### wrench 2.4
+
+(October 29, 2024) this release includes **the use of FSMod for all file system simulation**, as well as 
+**minor enhancements and updates**. More specifically:
 
 - Removal of all file system simulation code, which was replaced by calls to
   the [SimGrid File System Module (FSMod)](https://github.com/simgrid/file-system-module), which is now a new
@@ -60,13 +72,13 @@ WRENCH Release Notes
 
 ### wrench 2.0
 
-(april 8, 2022) this is a **major** release, which includes:
+(April 8, 2022) this is a **major** release, which includes:
 
 - created a more general developer api, called the *action api*, that makes it possible
   to simulate application workloads that are not necessarily workflow applications. examples
   are provided in the `examples/action_api` directory. 
 - minor changes to the workflow api (which is now implemented internally on top of the action api).
-- removed support for the obsolete dax xml workflow description format, which removes an external software dependency.
+- removed support for the obsolete dax XML workflow description format, which removes an external software dependency.
 - added support for the [wfcommons](https://wfcommons.org) json workflow description format.
 - many additional api functionality, typically as requested by users.
 - scalability improvements both in terms of simulation time and simulation memory footprint.

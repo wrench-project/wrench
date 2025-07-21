@@ -29,11 +29,18 @@
 #include "wrench/services/compute/serverless/ServerlessComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
+#include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 #include "wrench/services/storage/proxy/StorageServiceProxy.h"
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
+#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
+#include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"

@@ -162,7 +162,7 @@ int main(int argc, char** argv) {
         compute_nodes.push_back(compute_node_name);
     }
     const auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", compute_nodes, "/", scheduler, {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, scheduler, {}, {}));
 
     /* Instantiate an Execution Controller on UserHost */
     auto wms = simulation->add(

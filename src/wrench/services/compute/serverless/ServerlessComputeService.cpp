@@ -29,20 +29,19 @@ WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless
 
 namespace wrench {
     unsigned long ServerlessComputeService::sequence_number = 0;
-
     /**
      * @brief Constructor
      *
      * @param hostname name of the head host on which the service runs
-     * @param compute_hosts list of (homogeneous) compute node hostnames
      * @param head_node_storage_mount_point the mount point of storage at the head host (where images will be stored)
+     * @param compute_hosts list of (homogeneous) compute node hostnames
      * @param scheduler the scheduler used to decide which invocations should be executed and when
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     ServerlessComputeService::ServerlessComputeService(const std::string& hostname,
-                                                       const std::vector<std::string>& compute_hosts,
                                                        const std::string& head_node_storage_mount_point,
+                                                       const std::vector<std::string>& compute_hosts,
                                                        const std::shared_ptr<ServerlessScheduler>& scheduler,
                                                        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
                                                        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
@@ -66,6 +65,7 @@ namespace wrench {
         _scheduler = scheduler;
     }
 
+
     /**
      * @brief Helper method to check homogeneity of the compute hosts
      * @param compute_hosts a list of compute hosts
@@ -88,6 +88,8 @@ namespace wrench {
             double speed = S4U_Simulation::getHostFlopRate(hostname);
             sg_size_t ram_available = S4U_Simulation::getHostMemoryCapacity(hostname);
             sg_size_t disk_capacity;
+            sg_size_t disk_read_bandwidth;
+            sg_size_t disk_write_bandwidth;
             try {
                 disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
             }
@@ -99,26 +101,22 @@ namespace wrench {
             // Compute speed
             if (std::abs(speed - this->speed_of_compute_core) > DBL_EPSILON) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless compute service need "
-                    "to be homogeneous (different flop rates detected)");
+                    "Compute hosts for a serverless compute service need to be homogeneous (different flop rates detected)");
             }
             // RAM
             if (ram_available != this->ram_of_compute_host) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless compute service need "
-                    "to be homogeneous (different RAM capacities detected)");
+                    "Compute hosts for a serverless compute service need to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
             if (num_cores_available != this->num_cores_of_compute_host) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless service need "
-                    "to be homogeneous (different number of cores detected)");
+                    "Compute hosts for a serverless service need to be homogeneous (different number of cores detected)");
             }
             // Disk capacity
             if (disk_capacity != this->disk_space_of_compute_host) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless service need "
-                    "to be homogeneous (different disk capacities detected)");
+                    "Compute hosts for a serverless service need to be homogeneous (different disk capacities detected)");
             }
         }
     }
@@ -583,9 +581,10 @@ namespace wrench {
      * @brief Dispatches scheduled function invocations to compute hosts
      * @return true if at least one invocation was dispatched
      */
-    void ServerlessComputeService::dispatchInvocations(const std::shared_ptr<SchedulingDecisions>& decisions) {
+    void ServerlessComputeService::dispatchInvocations(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // Dispatched the invocations in the order of the schedulable list
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
+
         for (const auto& [hostname, invocations_to_place] : decisions->invocations_to_start_at_compute_node) {
             for (const auto& invocation : invocations_to_place) {
                 // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
@@ -969,7 +968,7 @@ namespace wrench {
      * @brief Helper method to invoke the scheduler
      * @return the scheduler's scheduling decisions
      */
-    std::shared_ptr<SchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
+    std::shared_ptr<ServerlessSchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
         // Invoke the scheduler so that it manages images
         auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations, _state_of_the_system);
         // std::cerr << "DECISIONS:  COPY=" <<
@@ -983,7 +982,7 @@ namespace wrench {
      * @brief Helper method to initiate image loads
      * @param decisions scheduling decisions
      */
-    void ServerlessComputeService::initiateImageLoads(const std::shared_ptr<SchedulingDecisions>& decisions) {
+    void ServerlessComputeService::initiateImageLoads(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // For each compute node, load initiate image load from disk into RAM and if space
         for (const auto& [hostname, images_to_load] : decisions->images_to_load_into_RAM_at_compute_node) {
             for (const auto& image : images_to_load) {
@@ -996,7 +995,7 @@ namespace wrench {
     * @brief Helper method to initiate image copies
     * @param decisions scheduling decisions
     */
-    void ServerlessComputeService::initiateImageCopies(const std::shared_ptr<SchedulingDecisions>& decisions) {
+    void ServerlessComputeService::initiateImageCopies(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // For each compute node, initiate image copy (from head node) if need be
         for (const auto& [hostname, image_files] : decisions->images_to_copy_to_compute_node) {
             for (const auto& image : image_files) {

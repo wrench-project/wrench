@@ -21,22 +21,26 @@ namespace wrench {
         WorkloadBalancingServerlessScheduler() = default;
 
         /***********************/
+        /** \cond DEVELOPER   **/
+        /***********************/
+        std::shared_ptr<ServerlessSchedulingDecisions> schedule(
+            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+            const std::shared_ptr<ServerlessStateOfTheSystem>& state
+        ) override;
+
+        /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
         ~WorkloadBalancingServerlessScheduler() override = default;
 
-        std::shared_ptr<SchedulingDecisions> schedule(
-            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-            const std::shared_ptr<ServerlessStateOfTheSystem>& state
-        ) override;
 
     private:
-        void makeImageDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+        void makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                 const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                 const std::shared_ptr<ServerlessStateOfTheSystem>& state);
 
-        void makeInvocationDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+        void makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                      const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                      const std::shared_ptr<ServerlessStateOfTheSystem>& state);
 
@@ -62,6 +66,7 @@ namespace wrench {
         /***********************/
         /** \endcond          **/
         /***********************/
+
     };
 } // namespace wrench
 

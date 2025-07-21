@@ -37,7 +37,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A service to manage serverless function operations including creation and registration.
+     * @brief A manager for interacting with a serverless compute service.
      */
     class FunctionManager : public Service {
     public:

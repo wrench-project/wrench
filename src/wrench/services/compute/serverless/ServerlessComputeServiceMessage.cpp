@@ -16,6 +16,7 @@ namespace wrench
 
     /**
      * @brief Constructor for ServerlessComputeServiceMessage
+     *
      * @param payload: message size in bytes
      */
     ServerlessComputeServiceMessage::ServerlessComputeServiceMessage(const sg_size_t payload)

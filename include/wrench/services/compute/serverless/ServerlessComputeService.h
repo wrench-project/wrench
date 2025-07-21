@@ -59,8 +59,8 @@ namespace wrench {
 
     public:
         ServerlessComputeService(const std::string& hostname,
-                                 const std::vector<std::string>& compute_hosts,
                                  const std::string& head_node_storage_mount_point,
+                                 const std::vector<std::string>& compute_hosts,
                                  const std::shared_ptr<ServerlessScheduler>& scheduler,
                                  const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
                                  const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
@@ -125,10 +125,10 @@ namespace wrench {
         void processInvocationCompletion(const std::shared_ptr<Invocation> &invocation, const std::shared_ptr<Action>& action);
 
         void admitInvocations();
-        std::shared_ptr<SchedulingDecisions> invokeScheduler() const;
-        void dispatchInvocations(const std::shared_ptr<SchedulingDecisions>& decisions);
-        void initiateImageLoads(const std::shared_ptr<SchedulingDecisions>& decisions);
-        void initiateImageCopies(const std::shared_ptr<SchedulingDecisions>& decisions);
+        std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
+        void dispatchInvocations(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions);
+        void initiateImageLoads(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions);
+        void initiateImageCopies(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions);
 
         bool processNextMessage(bool& do_scheduling);
 

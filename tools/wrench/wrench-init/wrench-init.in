@@ -42,11 +42,11 @@ def _create_file(content, file_path):
 def main():
     # Application's arguments
     parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based simulator source code.')
-    parser.add_argument('project_dir', metavar='PROJECT_DIR', help='Project directory name')
-    parser.add_argument('-a', '--api', action='store', metavar='API',
-                        help='Specify which API (action or workflow)', default='action')
-    parser.add_argument('-d', '--debug', action='store_true', help='Print debug messages to stderr')
-    parser.add_argument('-f', '--force', action='store_true',
+    parser.add_argument('--project_dir', action='store', metavar='PROJECT_DIR', help='Project directory name (required)', required=True)
+    parser.add_argument('--api', action='store', metavar='API',
+                        help='Specify which API (action, workflow, or function)', default='action')
+    parser.add_argument('--debug', action='store_true', help='Print debug messages to stderr')
+    parser.add_argument('--force', action='store_true',
                         help='Overwrites existing project directory (use sparingly)')
     args = parser.parse_args()
 
@@ -61,7 +61,7 @@ def main():
 
     if args.api:
         args.api = args.api.lower()
-        if args.api not in ['action', 'workflow']:
+        if args.api not in ['action', 'workflow', 'function']:
             logger.error('Invalid API specification: %s' % args.api)
             exit(1)
 
@@ -85,10 +85,14 @@ def main():
         _create_file(FILE_CONTENT_SIMULATOR_WORKFLOW_CPP, args.project_dir + "/src/Simulator.cpp")
         _create_file(FILE_CONTENT_CONTROLLER_WORKFLOW_CPP, args.project_dir + "/src/Controller.cpp")
         _create_file(FILE_CONTENT_CONTROLLER_WORKFLOW_H, args.project_dir + "/include/Controller.h")
-    else:
+    elif (args.api == "action"):
         _create_file(FILE_CONTENT_SIMULATOR_ACTION_CPP, args.project_dir + "/src/Simulator.cpp")
         _create_file(FILE_CONTENT_CONTROLLER_ACTION_CPP, args.project_dir + "/src/Controller.cpp")
         _create_file(FILE_CONTENT_CONTROLLER_ACTION_H, args.project_dir + "/include/Controller.h")
+    elif (args.api == "function"):
+        _create_file(FILE_CONTENT_SIMULATOR_FUNCTION_CPP, args.project_dir + "/src/Simulator.cpp")
+        _create_file(FILE_CONTENT_CONTROLLER_FUNCTION_CPP, args.project_dir + "/src/Controller.cpp")
+        _create_file(FILE_CONTENT_CONTROLLER_FUNCTION_H, args.project_dir + "/include/Controller.h")
 
     logger.info('A WRENCH-based skeleton project using the %s API has been created in directory %s' % (
         args.api, args.project_dir))

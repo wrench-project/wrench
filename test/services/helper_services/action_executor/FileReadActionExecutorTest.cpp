@@ -150,9 +150,9 @@ private:
 
         // coverage
         wrench::Action::getActionTypeAsString(file_read_action);
-        file_read_action->getNumBytesToRead();
-        file_read_action->getFile();
-        file_read_action->getFileLocations();
+        auto num_bytes_to_read = file_read_action->getNumBytesToRead();
+        auto file_to_read = file_read_action->getFile();
+        auto file_location_to_read = file_read_action->getFileLocations();
 
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
@@ -202,7 +202,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

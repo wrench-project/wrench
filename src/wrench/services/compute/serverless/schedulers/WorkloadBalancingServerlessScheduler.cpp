@@ -16,10 +16,10 @@ namespace wrench {
      * @param state The current system state
      * @return A SchedulingDecisions object
      */
-    std::shared_ptr<SchedulingDecisions> WorkloadBalancingServerlessScheduler::schedule(
+    std::shared_ptr<ServerlessSchedulingDecisions> WorkloadBalancingServerlessScheduler::schedule(
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
         const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
-        auto decisions = std::make_shared<SchedulingDecisions>();
+        auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
         makeImageDecisions(decisions, schedulable_invocations, state);
         makeInvocationDecisions(decisions, schedulable_invocations, state);
         return decisions;
@@ -31,7 +31,7 @@ namespace wrench {
      * @param schedulable_invocations A list of invocations whose images reside on the head node
      * @param state The current system state
      */
-    void WorkloadBalancingServerlessScheduler::makeImageDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+    void WorkloadBalancingServerlessScheduler::makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                             const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
 
@@ -70,7 +70,7 @@ namespace wrench {
      * @param schedulable_invocations A list of invocations whose images reside on the head node
      * @param state The current system state
      */
-    void WorkloadBalancingServerlessScheduler::makeInvocationDecisions(const std::shared_ptr<SchedulingDecisions>& decisions,
+    void WorkloadBalancingServerlessScheduler::makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                  const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                  const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
 

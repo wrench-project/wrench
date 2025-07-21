@@ -69,11 +69,46 @@ protected:
                 <prop id="mount" value="/"/>
             </disk>
         </host>
-    <host id="ServerlessComputeNode2" speed="50Gf" core="10">
+        <host id="ServerlessComputeNode2" speed="50Gf" core="10">
             <prop id="ram" value="64GB" />
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="HostWrongMountPoint" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/stuff"/>
+            </disk>
+        </host>
+        <host id="HostWrongSpeed" speed="5Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="HostWrongCores" speed="50Gf" core="1">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="HostWrongRAM" speed="50Gf" core="10">
+            <prop id="ram" value="32GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/stuff"/>
+            </disk>
+        </host>
+        <host id="HostWrongDiskSpace" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="50GiB"/>
+                <prop id="mount" value="/stuff"/>
             </disk>
         </host>
 
@@ -208,14 +243,20 @@ private:
         wrench::StorageService::createFileAtLocation(image_location);
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
         try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
+                                               1 * MB);
             throw std::runtime_error("Function registration should have failed due to RAM space");
-        } catch (const wrench::ExecutionException& expected) {}
+        }
+        catch (const wrench::ExecutionException& expected) {
+        }
 
         try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 20000 * GB, 8000 * MB, 10 * MB, 1 * MB);
+            function_manager->registerFunction(function1, this->compute_service, 10, 20000 * GB, 8000 * MB, 10 * MB,
+                                               1 * MB);
             throw std::runtime_error("Function registration should have failed due to disk space");
-        } catch (const wrench::ExecutionException& expected) {}
+        }
+        catch (const wrench::ExecutionException& expected) {
+        }
 
         return 0;
     }
@@ -239,18 +280,51 @@ void ServerlessBasicTest::do_SanityTest_test() {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
-    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongMountPoint"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongSpeed"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongCores"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongRAM"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongDiskSpace"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
 
-    std::string user_host = "UserHost";
-    auto wms = simulation->add(
-        new ServerlessBasicTestSanityController(this, user_host, serverless_provider, storage_service));
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
+        auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+            "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
-    ASSERT_FALSE(serverless_provider->supportsCompoundJobs());
-    ASSERT_FALSE(serverless_provider->supportsPilotJobs());
-    ASSERT_FALSE(serverless_provider->supportsStandardJobs());
-    ASSERT_TRUE(serverless_provider->supportsFunctions());
+        std::string user_host = "UserHost";
+        auto wms = simulation->add(
+            new ServerlessBasicTestSanityController(this, user_host, serverless_provider, storage_service));
+
+        ASSERT_FALSE(serverless_provider->supportsCompoundJobs());
+        ASSERT_FALSE(serverless_provider->supportsPilotJobs());
+        ASSERT_FALSE(serverless_provider->supportsStandardJobs());
+        ASSERT_TRUE(serverless_provider->supportsFunctions());
+    }
 
     simulation->launch();
 
@@ -347,7 +421,7 @@ void ServerlessBasicTest::do_FunctionRegistrationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -493,7 +567,7 @@ void ServerlessBasicTest::do_FunctionInvocationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -597,7 +671,7 @@ void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -707,7 +781,7 @@ void ServerlessBasicTest::do_FunctionErrorTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", compute_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
