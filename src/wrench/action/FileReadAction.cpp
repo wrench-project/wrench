@@ -28,7 +28,7 @@ namespace wrench {
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param file_locations: the locations to read from (will be tried in order until one succeeds)
-    * @param num_bytes_to_read: the number of bytes to read
+    * @param num_bytes_to_read: the number of bytes to read (if 0, then read the whole file!)
     */
     FileReadAction::FileReadAction(const std::string &name,
                                    const std::vector<std::shared_ptr<FileLocation>>& file_locations,
@@ -45,7 +45,11 @@ namespace wrench {
         if (num_bytes_to_read > this->file->getSize()) {
             throw std::invalid_argument("FileReadAction::FileReadAction(): cannot create a file read action that would read more bytes than the file size");
         }
-        this->num_bytes_to_read = num_bytes_to_read;
+        if (num_bytes_to_read == 0) {
+            this->num_bytes_to_read = this->file->getSize();
+        } else {
+            this->num_bytes_to_read = num_bytes_to_read;
+        }
     }
 
     /**
@@ -83,8 +87,8 @@ namespace wrench {
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             try {
                 this->used_location = this->file_locations[i];
-                StorageService::readFileAtLocation(this->file_locations[i], this->num_bytes_to_read);
-                continue;
+                    StorageService::readFileAtLocation(this->file_locations[i], this->num_bytes_to_read);
+                break;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() - 1) {
                     throw e;

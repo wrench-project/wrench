@@ -204,9 +204,9 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
 
-    std::vector<std::string> batch_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", batch_nodes, "/", std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(

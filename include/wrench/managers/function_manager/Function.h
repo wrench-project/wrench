@@ -26,7 +26,8 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief 
+     * @brief A class that implements the notion of a function that
+     *        can be invoked at a serverless compute service
      */
     class Function {
     public:

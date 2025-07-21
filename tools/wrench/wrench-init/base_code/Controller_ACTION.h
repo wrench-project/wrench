@@ -16,7 +16,7 @@
 namespace wrench {
 
     /**
-     *  @brief A Workflow Management System (WMS) implementation
+     *  @brief An Execution Controller implementation
      */
     class Controller : public ExecutionController {
 
@@ -32,7 +32,7 @@ namespace wrench {
         void processEventCompoundJobCompletion(const std::shared_ptr<CompoundJobCompletedEvent>&) override;
 
     private:
-        // main() method of the WMS
+        // main() method of the Execution Controller
         int main() override;
 
         const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;

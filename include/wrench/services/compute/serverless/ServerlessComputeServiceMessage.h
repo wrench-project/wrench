@@ -141,6 +141,9 @@ namespace wrench {
         std::shared_ptr<Invocation> _invocation;
     };
 
+    /**
+     * @brief a message sent to a ServerlessComputeService to notify it that a copy towards a compute node has completed
+     */
     class ServerlessComputeServiceNodeCopyCompleteMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceNodeCopyCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::string compute_host, sg_size_t payload);
@@ -152,6 +155,9 @@ namespace wrench {
         std::string _compute_host;
     };
 
+    /**
+     * @brief a message sent to a ServerlessComputeService to notify it that a memory load at a compute node has completed
+     */
     class ServerlessComputeServiceNodeLoadCompleteMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceNodeLoadCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::string compute_host, sg_size_t payload);

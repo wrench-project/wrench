@@ -10,9 +10,7 @@
 #include <wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.h>
 
 namespace wrench {
-
     SET_MESSAGEPAYLOAD_NAME(BareMetalComputeServiceMessagePayload, NOT_ENOUGH_CORES_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(BareMetalComputeServiceMessagePayload, FLOP_RATE_REQUEST_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(BareMetalComputeServiceMessagePayload, FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
-
-}// namespace wrench
+} // namespace wrench

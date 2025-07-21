@@ -77,7 +77,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
-set(WRENCH_VERSION_MINOR "7")
+set(WRENCH_VERSION_MINOR "8")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -113,6 +113,8 @@ set(HEADER_FILES
         include/wrench/managers/job_manager/JobManager.h
         include/wrench/managers/function_manager/FunctionManager.h
         include/wrench/managers/function_manager/FunctionManagerMessage.h
+        include/wrench/managers/function_manager/FunctionInput.h
+        include/wrench/managers/function_manager/FunctionOutput.h
         include/wrench/managers/function_manager/Function.h
         include/wrench/managers/function_manager/RegisteredFunction.h
         include/wrench/services/Service.h
@@ -296,6 +298,8 @@ set(SOURCE_FILES
         src/wrench/managers/function_manager/FunctionManager.cpp
         src/wrench/managers/function_manager/FunctionManagerMessage.cpp
         src/wrench/managers/function_manager/Function.cpp
+        src/wrench/managers/function_manager/FunctionInput.cpp
+        src/wrench/managers/function_manager/FunctionOutput.cpp
         src/wrench/managers/function_manager/RegisteredFunction.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
@@ -572,10 +576,6 @@ set(TEST_FILES
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/services/compute_services/htcondor/HTCondorServiceTest.cpp
-        src/wrench/services/metering/EnergyMeterService.cpp
-        src/wrench/services/metering/BandwidthMeterService.cpp
-        include/wrench/services/metering/EnergyMeterService.h
-        include/wrench/services/metering/BandwidthMeterService.h
         test/services/bandwidth_meter_service/BandwidthMeterServiceTest.cpp
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
@@ -616,25 +616,28 @@ add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOU
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
-
 # generate unit tests if Google Test is found
 find_library(GTEST_LIBRARY NAMES gtest)
 if(GTEST_LIBRARY)
     add_definitions(-DGTEST_USED)
-    add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
+    add_executable(unit_tests EXCLUDE_FROM_ALL  ${TEST_FILES})
+    add_executable(unit_tests_coverage EXCLUDE_FROM_ALL  ${TEST_FILES} ${SOURCE_FILES})
     if (ENABLE_BATSCHED)
         find_library(ZMQ_LIBRARY NAMES zmq)
         target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
+        target_link_libraries(unit_tests_coverage ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
     else ()
         target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
+        target_link_libraries(unit_tests_coverage ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
     endif ()
-    set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
-    set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
-    add_custom_command(TARGET unit_tests POST_BUILD COMMAND find . -name *.gcda -delete)
+    set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0")
+    set_target_properties(unit_tests PROPERTIES LINK_FLAGS "")
+    set_target_properties(unit_tests_coverage PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
+    set_target_properties(unit_tests_coverage PROPERTIES LINK_FLAGS "--coverage")
+    add_custom_command(TARGET unit_tests_coverage POST_BUILD COMMAND find . -name *.gcda -delete)
 else()
     add_custom_target(unit_tests echo "ERROR: Cannot build unit_tests because Google Test (libgtest) was not found by cmake." COMMAND echo "       If you have installed Google Test, re-run cmake." VERBATIM)
 endif()
-
 
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/DefinePackages.cmake)
