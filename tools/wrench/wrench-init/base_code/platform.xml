@@ -3,34 +3,42 @@
 <platform version="4.1">
     <zone id="AS0" routing="Full">
 
-        <!-- The host on which the WMS will run -->
+        <!-- The host on which the Execution Controller will run -->
         <host id="UserHost" speed="10Gf" core="1">
-        </host>
-
-        <!-- The host on which the WMS will run -->
-        <host id="StorageHost" speed="10Gf" core="1">
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
-                <prop id="size" value="5000GiB"/>
+                <prop id="size" value="50000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
         </host>
 
-        <!-- The host on which the bare-metal compute service will run -->
-        <host id="ComputeHost" speed="1Gf" core="10">
+        <!-- The host on which the Compute Service will run -->
+        <host id="HeadHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="50000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The compute host that the Compute Service can use -->
+        <host id="ComputeHost" speed="100Gf" core="10">
             <prop id="ram" value="16GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
        </host>
 
-        <!-- A network link that connects both hosts -->
+        <!-- A single network link that connects all hosts, which is pretty abstract -->
         <link id="shared_network" bandwidth="50MBps" latency="20us"/>
 
         <!-- Network routes -->
         <route src="UserHost" dst="ComputeHost">
             <link_ctn id="shared_network"/>
         </route>
-        <route src="UserHost" dst="StorageHost">
+        <route src="UserHost" dst="HeadHost">
             <link_ctn id="shared_network"/>
         </route>
-        <route src="StorageHost" dst="ComputeHost">
+        <route src="HeadHost" dst="ComputeHost">
             <link_ctn id="shared_network"/>
         </route>
 

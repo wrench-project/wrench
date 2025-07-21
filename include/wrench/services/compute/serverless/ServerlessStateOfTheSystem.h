@@ -27,6 +27,9 @@ namespace wrench
     /** \cond DEVELOPER    */
     /***********************/
 
+    /**
+     * @brief A class that stores the current state of a serverless compute service
+     */
     class ServerlessStateOfTheSystem {
 
     public:

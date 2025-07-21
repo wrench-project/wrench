@@ -7,10 +7,6 @@
  * (at your option) any later version.
  */
 
-#define GFLOP (1000.0 * 1000.0 * 1000.0)
-#define MBYTE (1000.0 * 1000.0)
-#define GBYTE (1000.0 * 1000.0 * 1000.0)
-
 #include <iostream>
 #include <wrench-dev.h>
 
@@ -92,6 +88,7 @@ private:
     }
 };
 
+
 /**
  * @brief The Simulator's main function
  *
@@ -121,65 +118,21 @@ int main(int argc, char **argv) {
         simulation->instantiatePlatform(argv[2]);
     }
 
-    /* Create a workflow */
-    auto workflow = wrench::Workflow::createWorkflow();
-
-    /* Add a workflow task. See examples in the examples/workflow_api/
-     * directory for examples of how to create various workflows */
-    auto task1 = workflow->addTask("task1", 10 * GFLOP, 2, 10, 2 * GBYTE);
-    auto task2 = workflow->addTask("task2", 40 * GFLOP, 2, 10, 4 * GBYTE);
-    auto task3 = workflow->addTask("task3", 30 * GFLOP, 2, 10, 4 * GBYTE);
-    auto task4 = workflow->addTask("task4", 20 * GFLOP, 2, 10, 2 * GBYTE);
-
-    /* Set a custom parallel efficiency behavior for task 2 */
-    task2->setParallelModel(wrench::ParallelModel::AMDAHL(0.8));
-
-    /* Create a couple of workflow files */
-    auto task1_input = wrench::Simulation::addFile("task1_input", 50 * MBYTE);
-    auto task1_output = wrench::Simulation::addFile("task1_output", 20 * MBYTE);
-    task1->addInputFile(task1_input);
-    task1->addOutputFile(task1_output);
-    auto task2_output = wrench::Simulation::addFile("task2_output", 30 * MBYTE);
-    task2->addOutputFile(task2_output);
-
-    /* Create data/control dependencies
-     *
-     *       task1
-     *      /     \
-     *   task2   task3
-     *      \     /
-     *       task4
-     */
-    workflow->addControlDependency(task1, task2);
-    task3->addInputFile(task1_output);
-    workflow->addControlDependency(task3, task4);
-    task4->addInputFile(task2_output);
-
-    /* Instantiate a storage service on the user's host */
+    /* Instantiate a storage service on the UserHost */
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "UserHost", {"/"}, {}, {}));
 
-    /* Instantiate a bare-metal compute service on the platform */
-    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
-            "HeadHost", {"ComputeHost"}, "", {}, {}));
+    /* Instantiate a serverless compute service service on the platform */
+    auto scheduler = std::make_shared<wrench::FCFSServerlessScheduler>();
+    auto baremetal_service = simulation->add(new wrench::ServerlessComputeService(
+            "HeadHost", {"/"}, {"ComputeHost"}, scheduler, {}, {}));
 
     /* Instantiate an execution controller */
     auto controller = simulation->add(
-            new wrench::Controller(workflow, baremetal_service, storage_service, "UserHost"));
-
-    /* Stage input files on the storage service */
-    for (auto const &f: workflow->getInputFiles()) {
-        storage_service->createFile(f);
-    }
+            new wrench::Controller(baremetal_service, storage_service, "UserHost"));
 
     /* Launch the simulation */
     simulation->launch();
-
-    /* Print task execution timelines */
-    std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = {task1, task2, task3, task4};
-    for (auto const &t: tasks) {
-        printf("Task %s: %.2fs - %.2fs\n", t->getID().c_str(), t->getStartDate(), t->getEndDate());
-    }
 
     return 0;
 }

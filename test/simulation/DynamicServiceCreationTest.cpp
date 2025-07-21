@@ -200,17 +200,19 @@ private:
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
         auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
 
-        std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
+
+        std::vector<std::shared_ptr<wrench::StandardJob>> one_task_jobs;
+        one_task_jobs.reserve(tasks.size());
         int job_index = 0;
         for (auto const &task: tasks) {
             try {
-                one_task_jobs[job_index] = job_manager->createStandardJob(
+                one_task_jobs.push_back(job_manager->createStandardJob(
                         {task},
                         {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
                         {},
                         {std::make_tuple(wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
                                          wrench::FileLocation::LOCATION(dynamically_created_storage_service, this->test->input_file))},
-                        {});
+                        {}));
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
             } catch (wrench::ExecutionException &e) {
@@ -342,19 +344,20 @@ private:
         tasks = this->test->workflow->getReadyTasks();
 //        tasks = {this->test->task1, this->test->task2};
 
-        std::shared_ptr<wrench::StandardJob> one_task_jobs[tasks.size()];
+        std::vector<std::shared_ptr<wrench::StandardJob>> one_task_jobs;
+        one_task_jobs.reserve(tasks.size());
         int job_index = 0;
         for (auto const &task: tasks) {
             try {
-                one_task_jobs[job_index] = job_manager->createStandardJob(
+                one_task_jobs.push_back(job_manager->createStandardJob(
                         {task},
                         {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file)}},
                         {},
                         {std::make_tuple(wrench::FileLocation::LOCATION(this->test->storage_service, this->test->input_file),
                                          wrench::FileLocation::LOCATION(dynamically_created_storage_service, this->test->input_file))},
-                        {});
+                        {}));
 
-                job_manager->submitJob(one_task_jobs[job_index], dynamically_created_compute_service);
+                job_manager->submitJob(one_task_jobs.at(job_index), dynamically_created_compute_service);
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }

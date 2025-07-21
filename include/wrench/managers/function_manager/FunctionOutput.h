@@ -21,11 +21,7 @@
     */
     class FunctionOutput {
     public:
-        /**
-        * @brief Default constructor
-        */
-        FunctionOutput() = default;
-
+        FunctionOutput();
         virtual ~FunctionOutput() = default;
     };
 

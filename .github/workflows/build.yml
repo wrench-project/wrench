@@ -69,22 +69,41 @@ jobs:
             BRANCH_NAME=$(echo ${GITHUB_REF} | sed 's/refs\/heads\///g');
             docker exec -w /home/wrench/wrench wrench git checkout ${BRANCH_NAME};
           fi
-          # build wrench, including unit_tests and examples
-          echo "Building wrench...";
+          # Running cmake
+          echo "Running cmake...";
           docker exec wrench mkdir wrench/build;
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-          docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples wrench-daemon;
+          # build wrench, including unit_tests and examples
+          echo "Building wrench...";
+          docker exec -w /home/wrench/wrench/build wrench make;
+          echo "Building wrench-daemon...";
+          docker exec -w /home/wrench/wrench/build wrench make wrench-daemon;
+          echo "Installing wrench...";
           docker exec -w /home/wrench/wrench/build wrench sudo make install
-          # run unit_tests
-          echo "Running tests...";
-          docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
-          # run examples
+          echo "Building examples...";
+          docker exec -w /home/wrench/wrench/build wrench make examples;
           echo "Running examples...";
-          #docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh wrench-example-batch-smpi-action;
           docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh 
+          if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
+            # With coverage
+            echo "Building and running unit tests (with coverage tracking)...";
+            docker exec -w /home/wrench/wrench/build wrench make unit_tests_coverage;
+            docker exec -w /home/wrench/wrench/build wrench ./unit_tests_coverage;
+          else
+            # Without coverage
+            echo "Building and running unit tests...";
+            docker exec -w /home/wrench/wrench/build wrench make unit_tests;
+            docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
+          fi
           # run wrench-init
           echo "Testing wrench-init...";
-          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init -a ACTION -d ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --force --api ACTION --project_dir ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --force --api WORKFLOW --project_dir ./wrench-init-generated-simulator 
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
+          docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
+          docker exec -w /home/wrench/wrench/build wrench python3 ./tools/wrench/wrench-init/wrench-init --force --api FUNCTION --project_dir ./wrench-init-generated-simulator 
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench cmake ..
           docker exec -w /home/wrench/wrench/build/wrench-init-generated-simulator/build wrench make
 
@@ -125,7 +144,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
-            docker exec -w /home/wrench/wrench/build wrench lcov --ignore-errors mismatch --directory . --capture --output-file coverage.info;
+            docker exec -w /home/wrench/wrench/build wrench lcov --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --directory . --capture --output-file coverage.info;
             docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info --ignore-errors unused,unused '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
             docker cp wrench:/home/wrench/wrench/build/coverage.info .;
             bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};

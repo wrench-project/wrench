@@ -52,6 +52,7 @@ namespace wrench {
             return;
         }
 
+
         // Update the time origin
         double now = Simulation::getCurrentSimulatedDate();
 //        std::cerr << "** [" <<  now << "] IN PROCESSING QUEUE JOB (" << this->cs->batch_queue.size() << " JOBS IN THE QUEUE)" << std::endl;
@@ -61,7 +62,6 @@ namespace wrench {
         unsigned int i;
         for (i = 0; i < this->cs->batch_queue.size(); i++) {
             auto first_job = this->cs->batch_queue.at(i);
-//            std::cerr << "SEEING IF JOB " << first_job->getCompoundJob()->getName() << " CAN BE STARTED\n";
 
             // If the job has already been allocated resources, nevermind
             if (not first_job->resources_allocated.empty()) {
@@ -81,7 +81,6 @@ namespace wrench {
             }
 
             // SCHEDULED IT!
-//            std::cerr << "SCHEDULING IT!!\n";
             this->schedule->add(this->schedule->getTimeOrigin(), this->schedule->getTimeOrigin() + first_job->getRequestedTime(),
                                 first_job);
             first_job->easy_bf_start_date = this->schedule->getTimeOrigin();
@@ -143,7 +142,8 @@ namespace wrench {
                 }
 
                 // Schedule the job
-//                std::cerr << "BACKFILLING IT!\n";
+                // std::cerr << "BACKFILLING " << candidate_job->getCompoundJob()->getName() << "\n";
+                candidate_job->easy_bf_expected_end_date = this->schedule->getTimeOrigin() + candidate_job->getRequestedTime();
                 this->schedule->add(this->schedule->getTimeOrigin(), this->schedule->getTimeOrigin() + candidate_job->getRequestedTime(), candidate_job);
 
                 num_nodes_available_now -= candidate_job->getRequestedNumNodes();
