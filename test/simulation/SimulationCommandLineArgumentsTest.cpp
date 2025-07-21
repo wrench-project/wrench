@@ -250,8 +250,8 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     }
     fclose(stdout_file);
 
-    ASSERT_GE(linecount, 100);
-    ASSERT_LE(linecount, 300);
+    ASSERT_GE(linecount, 200);
+    ASSERT_LE(linecount, 400);
 
 
     for (int i = 0; i < argc; i++)
