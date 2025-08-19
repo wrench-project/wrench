@@ -28,14 +28,14 @@ public:
 
 #define TRACK_OBJECT(name)                                                                  \
     {                                                                                       \
-        object_tracker->tracker[name]++;                                                    \
-        std::cerr << "#" << (name) << "++: " << object_tracker->tracker[name] << std::endl; \
+        TerminalOutput::object_tracker->tracker[name]++;                                                    \
+        std::cerr << "#" << (name) << "++: " << TerminalOutput::object_tracker->tracker[name] << std::endl; \
     }
 
 #define UNTRACK_OBJECT(name)                                                                \
     {                                                                                       \
-        object_tracker->tracker[name]--;                                                    \
-        std::cerr << "#" << (name) << "--: " << object_tracker->tracker[name] << std::endl; \
+        TerminalOutput::object_tracker->tracker[name]--;                                                    \
+        std::cerr << "#" << (name) << "--: " << TerminalOutput::object_tracker->tracker[name] << std::endl; \
     }
 
 // The whole point is for the map to not be a static object, but instead be inside a
