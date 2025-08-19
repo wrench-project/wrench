@@ -14,6 +14,7 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>
 #include <memory>
+#include <simgrid/version.h>
 #include <wrench/failure_causes/HostError.h>
 
 #ifdef MESSAGE_MANAGER
@@ -195,15 +196,17 @@ namespace wrench {
         this->daemonized_ = daemonized;
         this->auto_restart_ = auto_restart;
         this->has_returned_from_main_ = false;
-        //        this->commport = this->initial_commport + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
 
+
         try {
+#if (SIMGRID_VERSION_MAJOR <= 4 && SIMGRID_VERSION_MINOR <= 0 && SIMGRID_VERSION_PATCH <= 0)
             this->s4u_actor = simgrid::s4u::Engine::get_instance()->add_actor(this->process_name,
                                                            this->host,
                                                            S4U_DaemonActor(this));
-            // NON-DEPRECATED:
-	        // this->s4u_actor = this->host->add_actor(this->process_name, S4U_DaemonActor(this));
+#else
+	        this->s4u_actor = this->host->add_actor(this->process_name, S4U_DaemonActor(this));
+#endif
         } catch (simgrid::Exception &) {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
