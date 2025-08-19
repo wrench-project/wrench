@@ -18,7 +18,7 @@
 
 #include <utility>
 
-WRENCH_LOG_CATEGORY(wrench_compute_action, "Log category for Compute Action");
+WRENCH_LOG_CATEGORY(wrench_core_compute_action, "Log category for Compute Action");
 
 namespace wrench {
 

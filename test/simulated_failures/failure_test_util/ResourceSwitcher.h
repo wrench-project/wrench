@@ -39,7 +39,7 @@ namespace wrench {
         std::string resource_to_switch;
         Action action;
         ResourceType resource_type;
-        int main();
+        int main() override;
     };
 
     /***********************/

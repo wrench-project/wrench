@@ -22,6 +22,7 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include "wrench/exceptions/ExecutionException.h"
 
@@ -425,7 +426,7 @@ namespace wrench {
 
         S4U_CommPort::used_commports.insert(commport);
         commport->reset();// Just in case
-                WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
+        WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
         return commport;
     }
 
