@@ -195,10 +195,11 @@ namespace wrench {
         // Create the s4u_actor
 
         try {
-            // this->s4u_actor = simgrid::s4u::Engine::get_instance()->add_actor(this->process_name,
-            //                                               this->host,
-            //                                               S4U_DaemonActor(this));
-            this->s4u_actor = this->host->add_actor(this->process_name, S4U_DaemonActor(this));
+            this->s4u_actor = simgrid::s4u::Engine::get_instance()->add_actor(this->process_name,
+                                                           this->host,
+                                                           S4U_DaemonActor(this));
+            // NON-DEPRECATED:
+	    // this->s4u_actor = this->host->add_actor(this->process_name, S4U_DaemonActor(this));
         } catch (simgrid::Exception &) {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
