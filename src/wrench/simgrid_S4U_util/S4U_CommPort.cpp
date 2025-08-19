@@ -427,6 +427,7 @@ namespace wrench {
         S4U_CommPort::used_commports.insert(commport);
         commport->reset();// Just in case
         WRENCH_DEBUG("Gotten temporary commport %s (%p %p)", commport->name.c_str(), commport->mq_comm.get(), commport->mb_comm.get());
+        // std::cerr << "GOTTEN COMMPORT " << commport->get_cname() << std::endl;
         return commport;
     }
 
@@ -448,6 +449,7 @@ namespace wrench {
         if (S4U_CommPort::used_commports.find(commport) == S4U_CommPort::used_commports.end()) {
             return;
         }
+        // std::cerr << "RETIRING COMMPORT " << commport->get_cname() << std::endl;
         WRENCH_DEBUG("Retiring commport %s", commport->name.c_str());
         S4U_CommPort::used_commports.erase(commport);
         S4U_CommPort::free_commports.push_front(commport);//

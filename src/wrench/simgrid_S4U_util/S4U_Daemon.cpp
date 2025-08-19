@@ -128,6 +128,10 @@ namespace wrench {
         // Releasing held mutexes, if any
         //        this->release_held_mutexes();
 
+        if (not has_returned_from_main) {
+            S4U_CommPort::retireTemporaryCommPort(this->commport);
+            S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
+        }
         // Default behavior is to throw in case of any problem
         if ((not has_returned_from_main) and (not S4U_Simulation::isHostOn(hostname))) {
             throw std::runtime_error(
@@ -199,7 +203,7 @@ namespace wrench {
                                                            this->host,
                                                            S4U_DaemonActor(this));
             // NON-DEPRECATED:
-	    // this->s4u_actor = this->host->add_actor(this->process_name, S4U_DaemonActor(this));
+	        // this->s4u_actor = this->host->add_actor(this->process_name, S4U_DaemonActor(this));
         } catch (simgrid::Exception &) {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
