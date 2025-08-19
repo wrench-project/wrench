@@ -112,6 +112,7 @@ namespace wrench {
             this->getName().c_str(), has_returned_from_main, return_value,
             this->killed_on_purpose);
 
+
         // Handle brutal failure or termination
         if (not has_returned_from_main and this->action->getState() == Action::State::STARTED) {
             this->action->setEndDate(Simulation::getCurrentSimulatedDate());
@@ -126,6 +127,11 @@ namespace wrench {
                         std::make_shared<HostError>(this->hostname));
                 }
             }
+        }
+        // Retiring the commports anyway!!
+        if (not has_returned_from_main) {
+            S4U_CommPort::retireTemporaryCommPort(this->commport);
+            S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
         }
     }
 
@@ -192,7 +198,6 @@ namespace wrench {
 
         // Overhead
         if (this->action_startup_overhead > 0) {
-            WRENCH_INFO("ACTION EXECUTOR: SLEEPING %lf", this->action_startup_overhead);
             S4U_Simulation::sleep(this->action_startup_overhead);
         }
 

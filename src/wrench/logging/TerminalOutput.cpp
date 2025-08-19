@@ -15,6 +15,10 @@
 
 namespace wrench {
 
+#ifdef TRACK_OBJECTS
+    ObjectTracker *TerminalOutput::object_tracker = new ObjectTracker();
+#endif
+
     const char *TerminalOutput::color_codes[] = {
             "\033[1;30m",
             "\033[1;31m",

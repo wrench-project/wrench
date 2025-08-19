@@ -54,7 +54,7 @@ namespace wrench {
          */
         SimulationTimestamp(T *content) {
             this->content = std::unique_ptr<T>(content);
-            TRACK_OBJECT("timestamp");
+	        TRACK_OBJECT("timestamp");
         }
 
         /**
