@@ -68,12 +68,11 @@ namespace wrench {
         /* Main loop */
         int next_job_to_submit = 0;
         int num_completed_jobs = 0;
+
+        // Set a timer for the arrival of the first job
+        this->setTimer(std::get<1>(jobs.at(0)), "submit the next job");
+
         while (num_completed_jobs < _num_jobs) {
-            // Set a timer for the next job arrival time if need be
-            if (next_job_to_submit < _num_jobs) {
-                auto next_job_arrival_time = std::get<1>(jobs.at(next_job_to_submit));
-                this->setTimer(next_job_arrival_time, "submit the next job");
-            }
 
             // Wait for the next event
             auto event = this->waitForNextEvent();
@@ -84,13 +83,19 @@ namespace wrench {
                 auto target_batch_service_controller = _batch_service_controllers.at(
                     target_bath_service_controller_index);
                 auto [job_name, arrival_time, runtime, num_compute_nodes] = jobs.at(next_job_to_submit);
-                WRENCH_INFO("Sending a job request for %s to batch service controller #%d",
+                WRENCH_INFO("Sending %s to batch service controller #%d",
                             job_name.c_str(), target_bath_service_controller_index);
                 target_batch_service_controller->commport->dputMessage(
                     new JobRequestMessage(job_name, num_compute_nodes, runtime, true));
                 next_job_to_submit++;
-            }
-            else if (auto custom_event = std::dynamic_pointer_cast<CustomEvent>(event)) {
+
+                // Set the timer for the next job, if need be
+                if (next_job_to_submit < _num_jobs) {
+                    auto next_job_arrival_time = std::get<1>(jobs.at(next_job_to_submit));
+                    this->setTimer(next_job_arrival_time, "submit the next job");
+                }
+
+            } else if (auto custom_event = std::dynamic_pointer_cast<CustomEvent>(event)) {
                 // If it's a job completion notification, then we just take it into account
                 if (auto job_notification_message = std::dynamic_pointer_cast<JobNotificationMessage>(
                     custom_event->message)) {
