@@ -29,7 +29,7 @@ namespace wrench {
      * @param num_actions: the number of actions
      * @param compute_services: a set of compute services available to run actions
      * @param storage_services: a set of storage services available to store data files
-     * @param hostname: the name of the host on which to start the WMS
+     * @param hostname: the name of the host on which to start the execution controller
      */
     GreedyExecutionController::GreedyExecutionController(int num_actions,
                                                          const std::shared_ptr<BatchComputeService> compute_service,
