@@ -21,10 +21,10 @@
  **    ./wrench-example-batch-bag-of-actions 10 ./two_batch_services.xml
  **
  ** Example invocation of the simulator for 10 jobs, with only execution controller logging:
- **    ./wrench-example-batch-bag-of-actions 10 ./two_batch_services.xml --log=custom_controller.threshold=info
+ **    ./wrench-example-batch-bag-of-actions 10 ./two_batch_services.xml --log=batch_service_controller.threshold=info --log=job_generation_controller.threshold=info
  **
  ** Example invocation of the simulator for 10 jobs, with full logging:
- **    ./wrench-example-batch-bag-of-actions 6 ./two_batch_services.xml --wrench-full-log
+ **    ./wrench-example-batch-bag-of-actions 10 ./two_batch_services.xml --wrench-full-log
  **/
 
 
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <a number of jobs> <xml platform file> [--log=custom_controller.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <a number of jobs> <xml platform file> [--log=batch_service_controller.threshold=info --log=job_generation_controller.threshold=info]" << std::endl;
         exit(1);
     }
 
