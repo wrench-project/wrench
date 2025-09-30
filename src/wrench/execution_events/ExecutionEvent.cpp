@@ -99,6 +99,8 @@ namespace wrench {
 
         } else if (auto ecatm = std::dynamic_pointer_cast<ExecutionControllerAlarmTimerMessage>(message)) {
             return std::shared_ptr<TimerEvent>(new TimerEvent(ecatm->message));
+        } else if (auto eccem = std::dynamic_pointer_cast<ExecutionControllerCustomEventMessage>(message)) {
+            return std::shared_ptr<CustomEvent>(new CustomEvent(eccem));
         } else {
             throw std::runtime_error(
                     "ExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event (" +

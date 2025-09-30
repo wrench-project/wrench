@@ -200,6 +200,8 @@ namespace wrench {
             processEventFileCopyFailure(fcf_event);
         } else if (auto t_event = std::dynamic_pointer_cast<TimerEvent>(event)) {
             processEventTimer(t_event);
+        } else if (auto c_event = std::dynamic_pointer_cast<CustomEvent>(event)) {
+            processEventCustom(c_event);
         } else {
             throw std::runtime_error("SimpleExecutionController::main(): Unknown workflow execution event: " + event->toString());
         }
@@ -268,7 +270,16 @@ namespace wrench {
      * @param event: a TimerEvent
      */
     void ExecutionController::processEventTimer(const std::shared_ptr<TimerEvent> &event) {
-        WRENCH_INFO("In default event-handler: Notified that a time has gone off!");
+        WRENCH_INFO("In default event-handler: Notified that a timer has gone off!");
+    }
+
+    /**
+     * @brief Process a custom event
+     *
+     * @param event: a CustomEvent
+     */
+    void ExecutionController::processEventCustom(const std::shared_ptr<CustomEvent> &event) {
+        WRENCH_INFO("In default event-handler: Notified that a custom event has occurred");
     }
 
     /**

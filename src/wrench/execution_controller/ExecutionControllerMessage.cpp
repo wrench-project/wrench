@@ -28,5 +28,12 @@ namespace wrench {
      */
     ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, sg_size_t payload) : ExecutionControllerMessage(payload), message(std::move(message)) {}
 
+    /**
+     * @brief Constructor
+     * @param payload: message size in bytes
+     *
+     */
+    ExecutionControllerCustomEventMessage::ExecutionControllerCustomEventMessage(sg_size_t payload) : ExecutionControllerMessage(payload)  {}
+
 
 }// namespace wrench

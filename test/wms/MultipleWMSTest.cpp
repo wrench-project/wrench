@@ -21,7 +21,6 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
     void do_deferredWMSStartOneWMS_test();
-
     void do_deferredWMSStartTwoWMS_test();
 
 protected:

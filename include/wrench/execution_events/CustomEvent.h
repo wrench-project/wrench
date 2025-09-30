@@ -8,12 +8,13 @@
  */
 
 
-#ifndef WRENCH_TIMER_EVENT_H
-#define WRENCH_TIMER_EVENT_H
+#ifndef WRENCH_CUSTOM_EVENT_H
+#define WRENCH_CUSTOM_EVENT_H
 
 #include <string>
 #include <utility>
-#include "wrench/failure_causes/FailureCause.h"
+#include "wrench/execution_events/ExecutionEvent.h"
+#include "wrench/execution_controller/ExecutionControllerMessage.h"
 
 /***********************/
 /** \cond DEVELOPER    */
@@ -22,28 +23,28 @@
 namespace wrench {
 
     /**
-     * @brief A "timer went off" ExecutionEvent
+     * @brief A "Custom event went off" ExecutionEvent
      */
-    class TimerEvent : public ExecutionEvent {
+    class CustomEvent : public ExecutionEvent {
 
     private:
         friend class ExecutionEvent;
         /**
          * @brief Constructor
-         * @param message: some arbitrary message
+         * @param message: some custom message
          */
-        explicit TimerEvent(std::string message)
+        explicit CustomEvent(std::shared_ptr<ExecutionControllerCustomEventMessage> message)
             : message(std::move(message)) {}
 
     public:
         /** @brief The message */
-        std::string message;
+        std::shared_ptr<ExecutionControllerCustomEventMessage> message;
 
         /**
          * @brief Get a textual description of the event
          * @return a text string
          */
-        std::string toString() override { return "TimerEvent (message: " + this->message + ")"; }
+        std::string toString() override { return "CustomEvent"; }
     };
 
 }// namespace wrench
@@ -53,4 +54,4 @@ namespace wrench {
 /***********************/
 
 
-#endif//WRENCH_TIMER_EVENT_H
+#endif//WRENCH_CUSTOM_EVENT_H

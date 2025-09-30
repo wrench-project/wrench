@@ -37,6 +37,14 @@ namespace wrench {
         std::string message;
     };
 
+    /**
+     * @brief Message sent when a timer set by a ExecutionController goes off
+     */
+    class ExecutionControllerCustomEventMessage : public ExecutionControllerMessage {
+    public:
+        explicit ExecutionControllerCustomEventMessage(sg_size_t payload);
+    };
+
 
     /***********************/
     /** \endcond           */

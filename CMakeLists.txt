@@ -213,6 +213,7 @@ set(HEADER_FILES
         include/wrench/execution_events/ExecutionEvent.h
         include/wrench/execution_events/CompoundJobCompletedEvent.h
         include/wrench/execution_events/CompoundJobFailedEvent.h
+        include/wrench/execution_events/CustomEvent.h
         include/wrench/execution_events/StandardJobCompletedEvent.h
         include/wrench/execution_events/StandardJobFailedEvent.h
         include/wrench/execution_events/PilotJobStartedEvent.h
@@ -546,6 +547,7 @@ set(TEST_FILES
         test/services/storage_services/CompoundStorageService/CompoundStorageServiceFunctionalTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
+        test/wms/CustomEventWMSTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceResourceAllocationAlgorithmTest.cpp
         test/services/network_proximity_service/NetworkProximityTest.cpp
