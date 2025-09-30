@@ -1,0 +1,56 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the WMS will run -->
+        <host id="UserHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the first batch compute service will run -->
+        <host id="Batch1HeadNode" speed="10Gf" core="1">
+            <prop id="ram" value="16GB" />
+       </host>
+        <host id="Batch1ComputeNode1" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+        <host id="Batch1ComputeNode2" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+
+        <!-- The host on which the second batch compute service will run -->
+        <host id="Batch2HeadNode" speed="10Gf" core="1">
+            <prop id="ram" value="16GB" />
+        </host>
+        <host id="Batch2ComputeNode1" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+        <host id="Batch2ComputeNode2" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+
+        <!-- A network link that connects both hosts -->
+        <link id="network_link" bandwidth="10MBps" latency="20us"/>
+
+        <!-- Network routes -->
+        <route src="UserHost" dst="Batch1HeadNode"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="Batch1ComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="Batch1ComputeNode2"> <link_ctn id="network_link"/></route>
+        <route src="Batch1HeadNode" dst="Batch1ComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="Batch1HeadNode" dst="Batch1ComputeNode2"> <link_ctn id="network_link"/></route>
+
+        <route src="UserHost" dst="Batch2HeadNode"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="Batch2ComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="Batch2ComputeNode2"> <link_ctn id="network_link"/></route>
+        <route src="Batch2HeadNode" dst="Batch2ComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="Batch2HeadNode" dst="Batch2ComputeNode2"> <link_ctn id="network_link"/></route>
+
+        <route src="Batch1HeadNode" dst="Batch2HeadNode"> <link_ctn id="network_link"/></route>
+
+
+    </zone>
+</platform>
