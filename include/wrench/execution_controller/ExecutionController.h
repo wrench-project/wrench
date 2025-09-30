@@ -29,6 +29,7 @@
 #include "wrench/execution_events/FileWriteCompletedEvent.h"
 #include "wrench/execution_events/FileWriteFailedEvent.h"
 #include "wrench/execution_events/TimerEvent.h"
+#include "wrench/execution_events/CustomEvent.h"
 #include "wrench/workflow/Workflow.h"
 
 namespace wrench {
@@ -78,6 +79,7 @@ namespace wrench {
         virtual void processEventFileCopyFailure(const std::shared_ptr<FileCopyFailedEvent> &event);
 
         virtual void processEventTimer(const std::shared_ptr<TimerEvent> &event);
+        virtual void processEventCustom(const std::shared_ptr<CustomEvent> &event);
 
         void setDaemonized(bool daemonized);
 
