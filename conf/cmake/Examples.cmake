@@ -26,6 +26,7 @@ add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/action_api/communicating-custo
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/action_api/batch-mpi-action EXCLUDE_FROM_ALL)
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/action_api/XRootD EXCLUDE_FROM_ALL)
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/action_api/storage-service-proxy EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/action_api/batch-multi-controller EXCLUDE_FROM_ALL)
 
 add_subdirectory(${CMAKE_HOME_DIRECTORY}/examples/serverless_api/basic EXCLUDE_FROM_ALL)
 
