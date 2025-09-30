@@ -79,12 +79,16 @@ int main(int argc, char **argv) {
         new wrench::BatchServiceController("Batch1HeadNode", batch_service_1));
     auto batch_controller_2 = simulation->add(
         new wrench::BatchServiceController("Batch2HeadNode", batch_service_2));
-    batch_controller_1->set_peer(batch_controller_2);
-    batch_controller_2->set_peer(batch_controller_1);
+    batch_controller_1->setPeer(batch_controller_2);
+    batch_controller_1->setDaemonized(true);
+    batch_controller_2->setPeer(batch_controller_1);
+    batch_controller_2->setDaemonized(true);
 
     /* Instantiate an execution controller that will generate jobs */
     auto wms = simulation->add(new wrench::JobGenerationController(
         "UserHost", num_jobs, {batch_controller_1, batch_controller_2}));
+    batch_controller_1->setJobOriginator(wms);
+    batch_controller_2->setJobOriginator(wms);
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
