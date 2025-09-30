@@ -13,11 +13,9 @@
 
 #include <wrench-dev.h>
 
-#include "BatchServiceController.h"
-
 namespace wrench {
 
-    class Simulation;
+    class BatchServiceController;
 
     /**
      *  @brief An execution controller implementation
@@ -29,13 +27,13 @@ namespace wrench {
         JobGenerationController(
                 const std::string &hostname,
                 int num_jobs,
-                const std::vector<std::shared_ptr<BatchServiceController>> batch_service_controllers);
+                const std::vector<std::shared_ptr<BatchServiceController>> &batch_service_controllers);
 
     private:
         int main() override;
 
         int _num_jobs;
-        std::vector<std::shared_ptr<BatchServiceController>> _bath_service_controllers;
+        std::vector<std::shared_ptr<BatchServiceController>> _batch_service_controllers;
 
         void processEventCustom(const std::shared_ptr<CustomEvent> &event) override;
 

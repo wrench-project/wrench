@@ -13,10 +13,9 @@
 
 #include <wrench-dev.h>
 
-
 namespace wrench {
 
-    class Simulation;
+    class JobGenerationController;
 
     /**
      *  @brief An execution controller implementation
@@ -29,13 +28,17 @@ namespace wrench {
                 const std::string &hostname,
                 const std::shared_ptr<BatchComputeService>& batch_compute_service);
 
-        void set_peer(std::shared_ptr<BatchServiceController> peer) { this->_peer = peer; }
+        void setPeer(std::shared_ptr<BatchServiceController> peer) { this->_peer = peer; }
+        void setJobOriginator(std::shared_ptr<JobGenerationController> originator) { this->_originator = originator; }
 
     private:
         int main() override;
 
+        std::shared_ptr<JobManager> _job_manager;
+
         const std::shared_ptr<BatchComputeService> _batch_compute_service;
         std::shared_ptr<BatchServiceController> _peer;
+        std::shared_ptr<JobGenerationController> _originator;
 
         void processEventCustom(const std::shared_ptr<CustomEvent> &event) override;
         void processEventCompoundJobCompletion(const std::shared_ptr<CompoundJobCompletedEvent> &event) override;
