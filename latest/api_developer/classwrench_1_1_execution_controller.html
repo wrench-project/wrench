@@ -87,6 +87,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_property.html">wrench::ComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_constant_efficiency_parallel_model.html">wrench::ConstantEfficiencyParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_action.html">wrench::CustomAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_event.html">wrench::CustomEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_parallel_model.html">wrench::CustomParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager.html">wrench::DataMovementManager</a></li>
@@ -103,6 +104,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController16createJobManagerEv"><code class="docutils literal notranslate"><span class="pre">createJobManager()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController33processEventCompoundJobCompletionERKNSt10shared_ptrI25CompoundJobCompletedEventEE"><code class="docutils literal notranslate"><span class="pre">processEventCompoundJobCompletion()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController30processEventCompoundJobFailureERKNSt10shared_ptrI22CompoundJobFailedEventEE"><code class="docutils literal notranslate"><span class="pre">processEventCompoundJobFailure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController18processEventCustomERKNSt10shared_ptrI11CustomEventEE"><code class="docutils literal notranslate"><span class="pre">processEventCustom()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController30processEventFileCopyCompletionERKNSt10shared_ptrI22FileCopyCompletedEventEE"><code class="docutils literal notranslate"><span class="pre">processEventFileCopyCompletion()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController27processEventFileCopyFailureERKNSt10shared_ptrI19FileCopyFailedEventEE"><code class="docutils literal notranslate"><span class="pre">processEventFileCopyFailure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19ExecutionController30processEventPilotJobExpirationERKNSt10shared_ptrI20PilotJobExpiredEventEE"><code class="docutils literal notranslate"><span class="pre">processEventPilotJobExpiration()</span></code></a></li>
@@ -420,6 +422,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>event</strong> – a <a class="reference internal" href="../api_internal/classwrench_1_1_compound_job_failed_event.html#classwrench_1_1_compound_job_failed_event"><span class="std std-ref">CompoundJobFailedEvent</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench19ExecutionController18processEventCustomERKNSt10shared_ptrI11CustomEventEE">
+<span id="_CPPv3N6wrench19ExecutionController18processEventCustomERKNSt10shared_ptrI11CustomEventEE"></span><span id="_CPPv2N6wrench19ExecutionController18processEventCustomERKNSt10shared_ptrI11CustomEventEE"></span><span id="wrench::ExecutionController::processEventCustom__std::shared_ptr:CustomEvent:CR"></span><span class="target" id="classwrench_1_1_execution_controller_1a729bf8462e3f8e629909b7295f77561d"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">processEventCustom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_custom_event.html#_CPPv4N6wrench11CustomEventE" title="wrench::CustomEvent"><span class="n"><span class="pre">CustomEvent</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">event</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench19ExecutionController18processEventCustomERKNSt10shared_ptrI11CustomEventEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Process a custom event. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – a <a class="reference internal" href="../api_internal/classwrench_1_1_custom_event.html#classwrench_1_1_custom_event"><span class="std std-ref">CustomEvent</span></a></p>
 </dd>
 </dl>
 </dd></dl>

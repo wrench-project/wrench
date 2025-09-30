@@ -1,0 +1,8 @@
+.. _CustomEvent:
+wrench::CustomEvent
+*******************
+
+.. doxygenclass:: wrench::CustomEvent
+   :project: developer
+   :members:
+
