@@ -186,7 +186,7 @@ if [[ "${TO_EXCLUDE}" == *"wrench-example-batch-multi-controller"* ]]; then
         echo "${bold}SKIPPING: wrench-example-batch-multi-controller${normal}"
 else
 echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/batch-multi-controller/wrench-example-batch-multi-controller two_batch_services.xml${normal}"
-${INSTALL_DIR}/action_api/batch-multi-controller/wrench-example-batch-multi-controller ${INSTALL_DIR}/action_api/batch-multi-controller/two_batch_services.xml
+${INSTALL_DIR}/action_api/batch-multi-controller/wrench-example-batch-multi-controller 10 ${INSTALL_DIR}/action_api/batch-multi-controller/two_batch_services.xml
 fi
 
 if [[ "${TO_EXCLUDE}" == *"wrench-example-serverless-basic"* ]]; then
