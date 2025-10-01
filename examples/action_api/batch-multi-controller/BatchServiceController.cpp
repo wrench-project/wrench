@@ -54,7 +54,7 @@ namespace wrench {
                         job_request_message->_name.c_str(), job_request_message->_num_compute_nodes,
                         job_request_message->_runtime);
             // Decide whether to forward or not based on some random criterion
-            if (job_request_message->_can_forward && (job_request_message->_num_compute_nodes % 2)) {
+            if (job_request_message->_can_forward && (job_request_message->_runtime % 2)) {
                 // Forward the job
                 WRENCH_INFO("Decided to forward this job to my peer!");
                 this->_peer->commport->dputMessage(
