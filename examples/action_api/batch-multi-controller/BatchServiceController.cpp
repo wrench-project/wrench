@@ -68,8 +68,11 @@ namespace wrench {
                 // Do the job myself
                 WRENCH_INFO("Doing this job myself!");
                 auto job = _job_manager->createCompoundJob(job_request_message->_name);
-                job->addSleepAction("", job_request_message->_runtime);
-                job->addSleepAction("", job_request_message->_runtime);
+                // Create 10 sleep tasks (that will run each on one core)
+                for (int i=0; i < 10; i++) {
+                    job->addSleepAction("", job_request_message->_runtime);
+                }
+                // Submit the job to the batch compute service
                 std::map<string, string> job_args;
                 job_args["-N"] = std::to_string(job_request_message->_num_compute_nodes);
                 job_args["-t"] = std::to_string(job_request_message->_runtime);
