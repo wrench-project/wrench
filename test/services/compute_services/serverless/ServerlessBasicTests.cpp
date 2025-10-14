@@ -473,7 +473,7 @@ private:
 
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
 
-        // Invoking a non-registered function
+        // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
@@ -621,7 +621,7 @@ private:
 
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
 
-        // Invoking a non-registered function
+        // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
@@ -693,25 +693,34 @@ class ServerlessBasicTestFunctionErrorController : public wrench::ExecutionContr
 public:
     ServerlessBasicTestFunctionErrorController(ServerlessBasicTest* test,
                                                const std::string& hostname,
-                                               const std::shared_ptr<wrench::ServerlessComputeService>
-                                               & compute_service,
+                                               const std::shared_ptr<wrench::ServerlessComputeService>& compute_service,
+                                               const std::shared_ptr<wrench::ServerlessComputeService>& other_compute_service,
                                                const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
+        this->other_compute_service = other_compute_service;
         this->storage_service = storage_service;
     }
 
 private:
     ServerlessBasicTest* test;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::ServerlessComputeService> other_compute_service;
     std::shared_ptr<wrench::StorageService> storage_service;
     std::shared_ptr<wrench::DataFile> data_file;
 
     int main() override {
+
         // Create a datafile that's nowhere
         this->data_file = wrench::Simulation::addFile("data_file", 100 * MB);
-        // Register a function
+
+        // Create other files
+        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
+        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        wrench::StorageService::createFileAtLocation(image_location);
+
+        // Create a function code
         auto function_manager = this->createFunctionManager();
         std::function lambda = [this](const std::shared_ptr<wrench::FunctionInput>& input,
                                       const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
@@ -725,16 +734,21 @@ private:
                 MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
 
-        // Invoking a non-registered function
+        // Registering a function with BOTH SERVICES
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation to a function that's not registered to a service
+        {
+            try {
+                function_manager->invokeFunction(registered_function1, this->other_compute_service, input);
+                throw std::runtime_error("Should not be able to invoke a non-registered function");
+            } catch (wrench::ExecutionException &ignore) {
+            }
+        }
 
         // Place an invocation
         {
@@ -783,9 +797,13 @@ void ServerlessBasicTest::do_FunctionErrorTest_test() {
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
 
+    auto other_serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+       "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+
+
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessBasicTestFunctionErrorController(this, user_host, serverless_provider, storage_service));
+        new ServerlessBasicTestFunctionErrorController(this, user_host, serverless_provider, other_serverless_provider, storage_service));
 
     simulation->launch();
 
