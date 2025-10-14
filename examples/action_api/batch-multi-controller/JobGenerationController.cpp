@@ -62,8 +62,7 @@ namespace wrench {
             int num_compute_nodes = 1 + dist(rng) % 2; // 1 or 2 compute nodes
             int runtime = dist(rng);
             jobs.emplace_back(job_name, arrival_time, runtime, num_compute_nodes);
-            WRENCH_INFO("  - %s: arrival=%d compute_nodes=%d runtime=%d", job_name.c_str(), arrival_time,
-                        num_compute_nodes, runtime);
+            WRENCH_INFO("  - %s: arrival=%d compute_nodes=%d runtime=%d", job_name.c_str(), arrival_time, num_compute_nodes, runtime);
         }
 
         /* Main loop */
