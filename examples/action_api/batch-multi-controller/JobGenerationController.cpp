@@ -62,7 +62,8 @@ namespace wrench {
             int num_compute_nodes = 1 + dist(rng) % 2; // 1 or 2 compute nodes
             int runtime = dist(rng);
             jobs.emplace_back(job_name, arrival_time, runtime, num_compute_nodes);
-            WRENCH_INFO("  - %s: arrival=%d compute_nodes=%d runtime=%d", job_name.c_str(), arrival_time, num_compute_nodes, runtime);
+            WRENCH_INFO("  - %s: arrival=%d compute_nodes=%d runtime=%d", job_name.c_str(), arrival_time,
+                        num_compute_nodes, runtime);
         }
 
         /* Main loop */
@@ -73,7 +74,6 @@ namespace wrench {
         this->setTimer(std::get<1>(jobs.at(0)), "submit the next job");
 
         while (num_completed_jobs < _num_jobs) {
-
             // Wait for the next event
             auto event = this->waitForNextEvent();
 
@@ -94,13 +94,16 @@ namespace wrench {
                     auto next_job_arrival_time = std::get<1>(jobs.at(next_job_to_submit));
                     this->setTimer(next_job_arrival_time, "submit the next job");
                 }
-
-            } else if (auto custom_event = std::dynamic_pointer_cast<CustomEvent>(event)) {
+            }
+            else if (auto custom_event = std::dynamic_pointer_cast<CustomEvent>(event)) {
                 // If it's a job completion notification, then we just take it into account
-                if (auto job_notification_message = std::dynamic_pointer_cast<JobNotificationMessage>(
-                    custom_event->message)) {
-                    WRENCH_INFO("Notified that %s has completed!", job_notification_message->_name.c_str());
+                if (auto job_completion_notification_message = std::dynamic_pointer_cast<
+                    JobCompletionNotificationMessage>(custom_event->message)) {
+                    WRENCH_INFO("Notified that %s has completed!", job_completion_notification_message->_name.c_str());
                     num_completed_jobs++;
+                } else if (auto job_start_notification_message = std::dynamic_pointer_cast<
+                    JobStartNotificationMessage>(custom_event->message)) {
+                    WRENCH_INFO("Notified that %s has started!", job_start_notification_message->_name.c_str());
                 }
             }
         }

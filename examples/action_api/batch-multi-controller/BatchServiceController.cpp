@@ -68,9 +68,20 @@ namespace wrench {
                 // Do the job myself
                 WRENCH_INFO("Doing this job myself!");
                 auto job = _job_manager->createCompoundJob(job_request_message->_name);
+                // Create a custom action that will simply send back a "job started" custom event
+                // back to the job generating controller
+                auto custom_action = job->addCustomAction(
+                    "", 0, 0,
+                    [this, job](const std::shared_ptr<ActionExecutor>& action_executor) {
+                        WRENCH_INFO("Sending back a 'job has started' notification");
+                            _originator->commport->dputMessage(new JobStartNotificationMessage(job->getName()));
+                    },
+                    [](const std::shared_ptr<ActionExecutor>& action_executor) {
+                    });
                 // Create 10 sleep tasks (that will run each on one core)
-                for (int i=0; i < 10; i++) {
-                    job->addSleepAction("", job_request_message->_runtime);
+                for (int i = 0; i < 10; i++) {
+                    auto action = job->addSleepAction("", job_request_message->_runtime);
+                    job->addActionDependency(custom_action, action);
                 }
                 // Submit the job to the batch compute service
                 std::map<string, string> job_args;
@@ -88,6 +99,6 @@ namespace wrench {
         auto job_name = event->job->getName();
         WRENCH_INFO("%s, which I ran locally, has completed. Notifying the job generating controller...",
                     job_name.c_str());
-        _originator->commport->dputMessage(new JobNotificationMessage(job_name));
+        _originator->commport->dputMessage(new JobCompletionNotificationMessage(job_name));
     }
 } // namespace wrench

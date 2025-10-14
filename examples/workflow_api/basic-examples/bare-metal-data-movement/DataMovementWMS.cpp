@@ -118,8 +118,7 @@ namespace wrench {
                 throw std::runtime_error("Unexpected event (" + event->toString() + ")");
             }
         } catch (ExecutionException &e) {
-            throw std::runtime_error("Unexpected workflow execution exception (" +
-                                     std::string(e.what()) + ")");
+            throw std::runtime_error("Unexpected workflow execution exception (" + std::string(e.what()) + ")");
         }
 
         /* Delete outfile_2 on storage_service2 */

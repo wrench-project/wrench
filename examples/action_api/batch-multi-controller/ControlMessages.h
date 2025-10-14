@@ -34,13 +34,28 @@ namespace wrench {
     /**
      * Message to send a job completion notification
      */
-    class JobNotificationMessage : public ExecutionControllerCustomEventMessage {
+    class JobCompletionNotificationMessage : public ExecutionControllerCustomEventMessage {
     public:
         /**
          *
          * @param name job name
          */
-        JobNotificationMessage(const std::string& name) : ExecutionControllerCustomEventMessage(CONTROL_MESSAGE_SIZE),
+        explicit JobCompletionNotificationMessage(const std::string& name) : ExecutionControllerCustomEventMessage(CONTROL_MESSAGE_SIZE),
+                                              _name(name) {}
+
+        std::string _name;
+    };
+
+    /**
+     * Message to send a job start notification
+     */
+    class JobStartNotificationMessage : public ExecutionControllerCustomEventMessage {
+    public:
+        /**
+         *
+         * @param name job name
+         */
+        explicit JobStartNotificationMessage(const std::string& name) : ExecutionControllerCustomEventMessage(CONTROL_MESSAGE_SIZE),
                                               _name(name) {}
 
         std::string _name;
