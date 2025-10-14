@@ -246,10 +246,10 @@ namespace wrench {
             processFunctionInvocationComplete(scsfic_msg->invocation, scsfic_msg->success, scsfic_msg->failure_cause);
             return true;
         }
-        else if (auto fmfc_msg = std::dynamic_pointer_cast<FunctionManagerFunctionCompletedMessage>(message)) {
-            // Do nothing for now
-            return true;
-        }
+        // else if (auto fmfc_msg = std::dynamic_pointer_cast<FunctionManagerFunctionCompletedMessage>(message)) {
+        //     // Do nothing for now
+        //     return true;
+        // }
         else if (auto wait_one_msg = std::dynamic_pointer_cast<FunctionManagerWaitOneMessage>(message)) {
             processWaitOne(wait_one_msg->invocation, wait_one_msg->answer_commport);
             return true;

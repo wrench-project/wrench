@@ -645,6 +645,8 @@ private:
             if (not std::dynamic_pointer_cast<wrench::OperationTimeout>(invocation->getFailureCause())) {
                 throw std::runtime_error("Unexpected failure cause: " + invocation->getFailureCause()->toString());
             }
+            auto operation_timeout_failure_cause = std::dynamic_pointer_cast<wrench::OperationTimeout>(invocation->getFailureCause());
+            operation_timeout_failure_cause->toString(); // Coverage
         }
 
         return 0;

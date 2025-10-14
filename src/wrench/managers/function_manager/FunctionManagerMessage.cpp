@@ -25,22 +25,22 @@ namespace wrench {
     FunctionManagerWakeupMessage::FunctionManagerWakeupMessage() : FunctionManagerMessage() {
     }
 
-    /**
-     * @brief Constructor 
-     * @param function: the function that is invoked
-     * @param sl_compute_service: the ServerlessComputeService on which it ran 
-     */
-    FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(std::shared_ptr<Function> function,
-                                                                                     std::shared_ptr<ServerlessComputeService> sl_compute_service)
-                                                                                     : FunctionManagerMessage() {
-#ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((function == nullptr) || (sl_compute_service == nullptr)) {
-            throw std::invalid_argument("FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(): Invalid arguments");
-        }
-#endif
-        this->function = std::move(function);
-        this->sl_compute_service = std::move(sl_compute_service);
-    }
+//     /**
+//      * @brief Constructor
+//      * @param function: the function that is invoked
+//      * @param sl_compute_service: the ServerlessComputeService on which it ran
+//      */
+//     FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(std::shared_ptr<Function> function,
+//                                                                                      std::shared_ptr<ServerlessComputeService> sl_compute_service)
+//                                                                                      : FunctionManagerMessage() {
+// #ifdef WRENCH_INTERNAL_EXCEPTIONS
+//         if ((function == nullptr) || (sl_compute_service == nullptr)) {
+//             throw std::invalid_argument("FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(): Invalid arguments");
+//         }
+// #endif
+//         this->function = std::move(function);
+//         this->sl_compute_service = std::move(sl_compute_service);
+//     }
 
     /**
      * @brief Construct a new Function Manager Wait One Message:: Function Manager Wait One Message object
