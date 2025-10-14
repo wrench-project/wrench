@@ -63,7 +63,7 @@ jobs:
           echo "Downloading wrench...";
           docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
           docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
-          docker exec wrench git clone https://github.com/wrench-project/wrench;
+          docker exec wrench git clone --depth=1 https://github.com/wrench-project/wrench;
           # if not the master branch, switch to branch
           if [[ "$GITHUB_REF" != "refs/heads/master" ]]; then
             BRANCH_NAME=$(echo ${GITHUB_REF} | sed 's/refs\/heads\///g');
