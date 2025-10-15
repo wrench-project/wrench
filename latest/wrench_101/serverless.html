@@ -1,0 +1,184 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a serverless compute service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a serverless compute service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_101/serverless.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="creating-a-serverless-compute-service">
+<span id="guide-101-serverless"></span><h1>Creating a serverless compute service<a class="headerlink" href="#creating-a-serverless-compute-service" title="Link to this heading"></a></h1>
+</section>
+<section id="overview">
+<span id="guide-serverless-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>A serverless compute service provides users with a “function” abstraction,
+as done by providers such as Google Functions, AWS lambdas, etc.  The
+serverless compute service provides all necessary functions to register and
+invoke functions, which, in practice, run inside containers.</p>
+</section>
+<section id="architecture-of-a-serverless-compute-service">
+<span id="guide-serverless-architecture"></span><h1>Architecture of a serverless compute service<a class="headerlink" href="#architecture-of-a-serverless-compute-service" title="Link to this heading"></a></h1>
+<p>A serverless compute service consists of:</p>
+<ul class="simple">
+<li><p>A head node with disk storage</p></li>
+<li><p>A set of homogeneous compute nodes, each with its own local disk storage</p></li>
+</ul>
+<p>Once a function is registered at the compute service, and once it’s image is downloaded
+to the head node’s storage, then the function can be invoked.  A function invocation
+on a core of a compute node consists in:</p>
+<ul class="simple">
+<li><p>Copying the function’s image from the head node’s storage to the compute node’s storage, if not already present there</p></li>
+<li><p>Loading the function’s image from the compute node’s storage to the compute node’s RAM, if not already present there</p></li>
+<li><p>Executing the function’s code</p></li>
+</ul>
+<p>The choice of which function invocation to execute on which compute node is done by a
+<a class="reference internal" href="../api_developer/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE" title="wrench::ServerlessScheduler"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessScheduler</span></code></a> class.  A key thing to note is that each compute node’s
+storage and RAM are managed using an LRU (Least Recently Used) scheme.  That is, images
+are automatically evicted from disk or RAM.</p>
+</section>
+<section id="guide-serverless-creating">
+<span id="id1"></span><h1>Creating a serverless compute service<a class="headerlink" href="#guide-serverless-creating" title="Link to this heading"></a></h1>
+<p>In WRENCH, a serverless compute service is defined by the
+<a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE" title="wrench::ServerlessComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeService</span></code></a> class. An instantiation of a serverless
+service requires the following parameters:</p>
+<ul class="simple">
+<li><p>The name of a head host on which to start the service;</p></li>
+<li><p>A list (<code class="docutils literal notranslate"><span class="pre">std::vector</span></code>) of hostnames for homogeneous hosts. All cores and all RAM of each
+host are available to the cloud service), and each host has a disk with mount point ‘/’;</p></li>
+<li><p>A mount point (corresponding to a disk attached to the head host) for the
+storage local to the cloud service (used to
+store container images);</p></li>
+<li><p>A scheduler that defines the resource management algorithms used internally
+to decide which function invocations should be executed and when; and</p></li>
+<li><p>Maps (<code class="docutils literal notranslate"><span class="pre">std::map</span></code>) of configurable properties
+(<a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServicePropertyE" title="wrench::ServerlessComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeServiceProperty</span></code></a>) and configurable message
+payloads (<a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service_message_payload.html#_CPPv4N6wrench38ServerlessComputeServiceMessagePayloadE" title="wrench::ServerlessComputeServiceMessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeServiceMessagePayload</span></code></a>).</p></li>
+</ul>
+<p>The example below creates an instance of a serverless compute service that runs on
+host <code class="docutils literal notranslate"><span class="pre">serverless_gateway</span></code>, provides access to 4 execution hosts, and has storage
+on the disk mounted at path <code class="docutils literal notranslate"><span class="pre">/</span></code> at host
+<code class="docutils literal notranslate"><span class="pre">serverless_gateway</span></code>. The scheduler is the built-in FCFS (First Come First Serve) scheduler, and
+the container startup overhead is set to 1 second:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">serverless_cs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
+<span class="w">          </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">ServerlessComputeService</span><span class="p">(</span><span class="s">&quot;serverless_gateway&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;host1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;host2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;host3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;host4&quot;</span><span class="p">},</span><span class="w"> </span><span class="s">&quot;/&quot;</span><span class="p">,</span>
+<span class="w">                                   </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">ServerlessComputeServiceProperty</span><span class="o">::</span><span class="n">CONTAINER_STARTUP_OVERHEAD</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1s&quot;</span><span class="p">}},</span>
+<span class="w">                                   </span><span class="p">{}));</span>
+</pre></div>
+</div>
+<p>See the documentation of <a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServicePropertyE" title="wrench::ServerlessComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeServiceProperty</span></code></a> for all possible
+configuration options.   See <a class="reference internal" href="../wrench_102/serverless.html#guide-102-serverless"><span class="std std-ref">this page</span></a> for more information of how
+a serverless compute infrastructure is simulated.</p>
+<p>Also see the simulator in the <code class="docutils literal notranslate"><span class="pre">examples/serverless_api/basic/</span></code>
+directory, which uses a serverless compute service.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

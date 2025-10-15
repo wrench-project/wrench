@@ -1,0 +1,8 @@
+.. _SimpleStorageService:
+wrench::SimpleStorageService
+****************************
+
+.. doxygenclass:: wrench::SimpleStorageService
+   :project: developer
+   :members:
+

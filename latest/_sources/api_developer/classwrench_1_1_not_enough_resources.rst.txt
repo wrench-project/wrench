@@ -1,0 +1,8 @@
+.. _NotEnoughResources:
+wrench::NotEnoughResources
+**************************
+
+.. doxygenclass:: wrench::NotEnoughResources
+   :project: developer
+   :members:
+

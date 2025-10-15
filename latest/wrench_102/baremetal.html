@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interacting with a bare-metal compute service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Interacting with a bare-metal compute service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_102/baremetal.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="interacting-with-a-bare-metal-compute-service">
+<span id="guide-102-baremetal"></span><h1>Interacting with a bare-metal compute service<a class="headerlink" href="#interacting-with-a-bare-metal-compute-service" title="Link to this heading"></a></h1>
+<p>A <a class="reference internal" href="../api_developer/classwrench_1_1_standard_job.html#_CPPv4N6wrench11StandardJobE" title="wrench::StandardJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StandardJob</span></code></a> can be submitted to a bare-metal compute
+service via a job manager. For instance:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">BareMetalComputeService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">some_bare_metal_service</span><span class="p">;</span>
+
+<span class="c1">// Create a job manager</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">job_manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">createJobManager</span><span class="p">();</span>
+
+<span class="c1">// Create a standard job with 4 workflow tasks</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">job</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">createStandardJob</span><span class="p">(</span>
+<span class="w">                 </span><span class="p">{</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task&quot;</span><span class="p">),</span>
+<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task2&quot;</span><span class="p">),</span>
+<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task3&quot;</span><span class="p">),</span>
+<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task4&quot;</span><span class="p">)});</span>
+
+<span class="c1">// Submit the job to the bare-metal service</span>
+<span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">submitJob</span><span class="p">(</span><span class="n">job</span><span class="p">,</span><span class="w"> </span><span class="n">some_bare_metal_service</span><span class="p">);</span>
+
+<span class="c1">//  Wait for and process the next event (should be a standard job completion or failure)</span>
+<span class="k">this</span><span class="o">-&gt;</span><span class="n">waitForAndProcessNextEvent</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>In the above, the bare-metal service will make all decisions for
+deciding how to allocate compute resources (i.e., cores) to tasks. In
+fact, several properties (see class
+<a class="reference internal" href="../api_developer/classwrench_1_1_bare_metal_compute_service_property.html#_CPPv4N6wrench31BareMetalComputeServicePropertyE" title="wrench::BareMetalComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeServiceProperty</span></code></a>) can be set to change the
+algorithms used by the service to determine resource allocations.</p>
+<p>In some cases, the execution controller may want to influence or enforce
+resource allocations for the tasks in the jobs. For this purpose, the
+<a class="reference internal" href="../api_developer/classwrench_1_1_job_manager.html#_CPPv4N6wrench10JobManager9submitJobERKNSt10shared_ptrI11CompoundJobEERKNSt10shared_ptrI14ComputeServiceEENSt3mapINSt6stringENSt6stringEEE" title="wrench::JobManager::submitJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::JobManager::submitJob()</span></code></a> method takes an optional
+<strong>service-specific argument</strong>. This argument is a
+<code class="docutils literal notranslate"><span class="pre">std::map&lt;std::string,</span> <span class="pre">std::string&gt;</span></code> of key-value pairs. The key is a
+task ID, and the value is the service-specific argument for that task.</p>
+<p>For each task, an optional argument can be provided as a string
+formatted as “hostname:num_cores”, “hostname”, or “num_cores”, where
+“hostname” is the name of one of the service’s compute hosts and
+“num_cores” is an integer (e.g., “host1:10”, “host1”, “10”):</p>
+<ul class="simple">
+<li><p>If no value is provided for a task, or if the value is the empty
+string, then the bare-metal service will choose the host on which the
+task should be executed (typically the host with the lowest current
+load), and will execute the task with as many cores as possible on
+that host.</p></li>
+<li><p>If a “hostname” value is provided for a task, then the bare-metal
+service will execute the task on that host, and will execute the task
+with as many cores as possible on that host.</p></li>
+<li><p>If a “num_cores” value is provided for a task, then the bare-metal
+service will choose the host on which the task should be executed
+(typically the host with the lowest current load), and will execute
+the task with the specified number of cores.</p></li>
+<li><p>If a “hostname:num_cores” value is provided for a task, then the
+bare-metal service will execute the task on that host with the
+specified number of cores.</p></li>
+</ul>
+<p>In the above example, for instance, the job submission could be done as:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Create a service-specific argument</span>
+<span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">service_specific_args</span><span class="p">;</span>
+
+<span class="c1">// task will run on host Node1 with as many cores as possible</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Node1&quot;</span><span class="p">;</span>
+
+<span class="c1">// task2 will run on host Node2 with 16 cores</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task2&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Node2:16&quot;</span><span class="p">;</span>
+
+<span class="c1">// task3 will run on any host with as many cores as possible</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task3&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// could be omitted altogether</span>
+
+<span class="c1">// task4 will run on some host with 4 cores</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task4&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;4&quot;</span><span class="p">;</span>
+
+<span class="c1">// Submit the job</span>
+<span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">submitJob</span><span class="p">(</span><span class="n">job</span><span class="p">,</span><span class="w"> </span><span class="n">some_bare_metal_service</span><span class="p">,</span><span class="w"> </span><span class="n">service_specific_args</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If the service-specific arguments are invalid (e.g., invalid hostname,
+unknown task, number of cores too large), the
+<a class="reference internal" href="../api_developer/classwrench_1_1_job_manager.html#_CPPv4N6wrench10JobManager9submitJobERKNSt10shared_ptrI11CompoundJobEERKNSt10shared_ptrI14ComputeServiceEENSt3mapINSt6stringENSt6stringEEE" title="wrench::JobManager::submitJob"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::JobManager::submitJob()</span></code></a> method throws a
+<a class="reference internal" href="../api_developer/classwrench_1_1_execution_exception.html#_CPPv4N6wrench18ExecutionExceptionE" title="wrench::ExecutionException"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionException</span></code></a>.</p>
+<p>See the execution controller implementation in
+<code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp</span></code>
+for a more complete example.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

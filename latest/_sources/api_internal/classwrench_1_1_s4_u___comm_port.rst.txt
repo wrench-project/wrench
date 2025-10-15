@@ -1,0 +1,8 @@
+.. _S4U_CommPort:
+wrench::S4U_CommPort
+********************
+
+.. doxygenclass:: wrench::S4U_CommPort
+   :project: internal
+   :members:
+

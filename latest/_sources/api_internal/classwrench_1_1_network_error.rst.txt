@@ -1,0 +1,8 @@
+.. _NetworkError:
+wrench::NetworkError
+********************
+
+.. doxygenclass:: wrench::NetworkError
+   :project: internal
+   :members:
+

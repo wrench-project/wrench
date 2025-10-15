@@ -1,0 +1,8 @@
+.. _FileDeleteAction:
+wrench::FileDeleteAction
+************************
+
+.. doxygenclass:: wrench::FileDeleteAction
+   :project: internal
+   :members:
+

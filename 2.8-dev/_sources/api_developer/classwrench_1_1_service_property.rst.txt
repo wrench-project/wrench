@@ -1,0 +1,8 @@
+.. _ServiceProperty:
+wrench::ServiceProperty
+***********************
+
+.. doxygenclass:: wrench::ServiceProperty
+   :project: developer
+   :members:
+

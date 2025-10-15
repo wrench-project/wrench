@@ -1,0 +1,8 @@
+.. _Alarm:
+wrench::Alarm
+*************
+
+.. doxygenclass:: wrench::Alarm
+   :project: internal
+   :members:
+

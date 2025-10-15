@@ -1,0 +1,666 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrench::Simulation &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="wrench::SimulationOutput" href="classwrench_1_1_simulation_output.html" />
+    <link rel="prev" title="wrench::SimpleStorageServiceProperty" href="classwrench_1_1_simple_storage_service_property.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_message_payload.html">wrench::BareMetalComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_property.html">wrench::BareMetalComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service.html">wrench::BatchComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_message_payload.html">wrench::BatchComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_property.html">wrench::BatchComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service.html">wrench::CloudComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_message_payload.html">wrench::CloudComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_property.html">wrench::CloudComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_communicator.html">wrench::Communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service.html">wrench::CompoundStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_message_payload.html">wrench::CompoundStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_property.html">wrench::CompoundStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service.html">wrench::ComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_message_payload.html">wrench::ComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_property.html">wrench::ComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_constant_efficiency_parallel_model.html">wrench::ConstantEfficiencyParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_parallel_model.html">wrench::CustomParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service.html">wrench::NetworkProximityService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_property.html">wrench::ServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service.html">wrench::SimpleStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_bufferized.html">wrench::SimpleStorageServiceBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_message_payload.html">wrench::SimpleStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_non_bufferized.html">wrench::SimpleStorageServiceNonBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_property.html">wrench::SimpleStorageServiceProperty</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Simulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench10SimulationE"><code class="docutils literal notranslate"><span class="pre">wrench::Simulation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10SimulationD0Ev"><code class="docutils literal notranslate"><span class="pre">~Simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEENSt10shared_ptrI1TEE"><code class="docutils literal notranslate"><span class="pre">add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEEP1T"><code class="docutils literal notranslate"><span class="pre">add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation17getEnergyConsumedERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getEnergyConsumed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation17getEnergyConsumedERKNSt6vectorINSt6stringEEE"><code class="docutils literal notranslate"><span class="pre">getEnergyConsumed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation9getOutputEv"><code class="docutils literal notranslate"><span class="pre">getOutput()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation4initEPiPPc"><code class="docutils literal notranslate"><span class="pre">init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation19instantiatePlatformERKNSt8functionIFvvEEE"><code class="docutils literal notranslate"><span class="pre">instantiatePlatform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation19instantiatePlatformERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">instantiatePlatform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation29instantiatePlatformFromStringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">instantiatePlatformFromString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Simulation9isRunningEv"><code class="docutils literal notranslate"><span class="pre">isRunning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation6launchEv"><code class="docutils literal notranslate"><span class="pre">launch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation7addFileERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">addFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation7addFileERKNSt6stringE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">addFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation16createSimulationEv"><code class="docutils literal notranslate"><span class="pre">createSimulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation11getFileByIDERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getFileByID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation17getFileByIDOrNullERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getFileByIDOrNull()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation10getFileMapEv"><code class="docutils literal notranslate"><span class="pre">getFileMap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15getHostFlopRateERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getHostFlopRate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation21getHostMemoryCapacityERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getHostMemoryCapacity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15getHostnameListEv"><code class="docutils literal notranslate"><span class="pre">getHostnameList()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation24getHostnameListByClusterEv"><code class="docutils literal notranslate"><span class="pre">getHostnameListByCluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15getHostNumCoresERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getHostNumCores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation16getListOfPstatesERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getListOfPstates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation22getMaxPowerConsumptionERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getMaxPowerConsumption()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation22getMinPowerConsumptionERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getMinPowerConsumption()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation18getNumberOfPstatesERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getNumberOfPstates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation17hostHasMountPointERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">hostHasMountPoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation13isInitializedEv"><code class="docutils literal notranslate"><span class="pre">isInitialized()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation14removeAllFilesEv"><code class="docutils literal notranslate"><span class="pre">removeAllFiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation10removeFileERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">removeFile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_output.html">wrench::SimulationOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp.html">wrench::SimulationTimestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read.html">wrench::SimulationTimestampDiskRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_completion.html">wrench::SimulationTimestampDiskReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_failure.html">wrench::SimulationTimestampDiskReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_start.html">wrench::SimulationTimestampDiskReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write.html">wrench::SimulationTimestampDiskWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_completion.html">wrench::SimulationTimestampDiskWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_failure.html">wrench::SimulationTimestampDiskWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_start.html">wrench::SimulationTimestampDiskWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_energy_consumption.html">wrench::SimulationTimestampEnergyConsumption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy.html">wrench::SimulationTimestampFileCopy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_completion.html">wrench::SimulationTimestampFileCopyCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_failure.html">wrench::SimulationTimestampFileCopyFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_start.html">wrench::SimulationTimestampFileCopyStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read.html">wrench::SimulationTimestampFileRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_completion.html">wrench::SimulationTimestampFileReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_failure.html">wrench::SimulationTimestampFileReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_start.html">wrench::SimulationTimestampFileReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write.html">wrench::SimulationTimestampFileWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_completion.html">wrench::SimulationTimestampFileWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_failure.html">wrench::SimulationTimestampFileWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_start.html">wrench::SimulationTimestampFileWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_link_usage.html">wrench::SimulationTimestampLinkUsage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pair.html">wrench::SimulationTimestampPair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pstate_set.html">wrench::SimulationTimestampPstateSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task.html">wrench::SimulationTimestampTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_completion.html">wrench::SimulationTimestampTaskCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_failure.html">wrench::SimulationTimestampTaskFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_start.html">wrench::SimulationTimestampTaskStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_termination.html">wrench::SimulationTimestampTaskTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_type.html">wrench::SimulationTimestampType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service.html">wrench::StorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_message_payload.html">wrench::StorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_property.html">wrench::StorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_proxy_property.html">wrench::StorageServiceProxyProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_message_payload.html">wrench::VirtualizedClusterComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_property.html">wrench::VirtualizedClusterComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_wf_commons_workflow_parser.html">wrench::WfCommonsWorkflowParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow_task.html">wrench::WorkflowTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_deployment.html">wrench::XRootD::Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message_payload.html">wrench::XRootD::MessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_node.html">wrench::XRootD::Node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_property.html">wrench::XRootD::Property</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_user.html">WRENCH User C++ API</a></li>
+      <li class="breadcrumb-item active">wrench::Simulation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_user/classwrench_1_1_simulation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wrench-simulation">
+<span id="simulation"></span><h1>wrench::Simulation<a class="headerlink" href="#wrench-simulation" title="Link to this heading"></a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10SimulationE">
+<span id="_CPPv3N6wrench10SimulationE"></span><span id="_CPPv2N6wrench10SimulationE"></span><span id="wrench::Simulation"></span><span class="target" id="classwrench_1_1_simulation"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Simulation</span></span></span><br /></dt>
+<dd><p>A class that provides basic simulation methods. Once the simulation object has been explicitly or implicitly destroyed, then any call to the WRENCH APIs has undefied behavior (due to memory_manager_service being de-allocated). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10SimulationD0Ev">
+<span id="_CPPv3N6wrench10SimulationD0Ev"></span><span id="_CPPv2N6wrench10SimulationD0Ev"></span><span id="wrench::Simulation::~Simulation"></span><span class="target" id="classwrench_1_1_simulation_1a9ff9d68136e0234eab82592290b7f459"></span><span class="sig-name descname"><span class="n"><span class="pre">~Simulation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Destructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEENSt10shared_ptrI1TEE">
+<span id="_CPPv3I0EN6wrench10Simulation3addENSt10shared_ptrI1TEE"></span><span id="_CPPv2I0EN6wrench10Simulation3addENSt10shared_ptrI1TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classwrench_1_1_simulation_1a7c0404a8f96b24492b13a575ae7ada6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_simulation.html#_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEENSt10shared_ptrI1TEE" title="wrench::Simulation::add::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">add</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_simulation.html#_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEENSt10shared_ptrI1TEE" title="wrench::Simulation::add::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Method to add a service to the simulation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – The service class (base class is <a class="reference internal" href="classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a>) </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>t</strong> – the service object (shared ptr) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a shared_ptr to the service object </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEEP1T">
+<span id="_CPPv3I0EN6wrench10Simulation3addEP1T"></span><span id="_CPPv2I0EN6wrench10Simulation3addEP1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classwrench_1_1_simulation_1a7de0edba272756815cfdce099560e523"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_simulation.html#_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEEP1T" title="wrench::Simulation::add::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../api_developer/classwrench_1_1_simulation.html#_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEEP1T" title="wrench::Simulation::add::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Method to add a service to the simulation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – The service class (base class is <a class="reference internal" href="classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a>) </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>t</strong> – the service object </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a shared_ptr to the service object </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation17getEnergyConsumedERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation17getEnergyConsumedERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation17getEnergyConsumedERKNSt6stringE"></span><span id="wrench::Simulation::getEnergyConsumed__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a3cdd71513430193f62d51f16b0b024db"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getEnergyConsumed</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Obtains the current energy consumption of a host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the host name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>current energy consumption in joules </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation17getEnergyConsumedERKNSt6vectorINSt6stringEEE">
+<span id="_CPPv3N6wrench10Simulation17getEnergyConsumedERKNSt6vectorINSt6stringEEE"></span><span id="_CPPv2N6wrench10Simulation17getEnergyConsumedERKNSt6vectorINSt6stringEEE"></span><span id="wrench::Simulation::getEnergyConsumed__std::vector:ss:CR"></span><span class="target" id="classwrench_1_1_simulation_1a872e01c310b838146257000f4cf073c8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getEnergyConsumed</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostnames</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Obtains the current energy consumption of a host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostnames</strong> – the list of hostnames </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>current energy consumption in joules for each host, as a map indexed by hostnames </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation9getOutputEv">
+<span id="_CPPv3N6wrench10Simulation9getOutputEv"></span><span id="_CPPv2N6wrench10Simulation9getOutputEv"></span><span id="wrench::Simulation::getOutput"></span><span class="target" id="classwrench_1_1_simulation_1aff0338aa6831c6ac252cf0673fe68f44"></span><a class="reference internal" href="../api_developer/classwrench_1_1_simulation_output.html#_CPPv4N6wrench16SimulationOutputE" title="wrench::SimulationOutput"><span class="n"><span class="pre">SimulationOutput</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getOutput</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the simulation output object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>simulation output object </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation4initEPiPPc">
+<span id="_CPPv3N6wrench10Simulation4initEPiPPc"></span><span id="_CPPv2N6wrench10Simulation4initEPiPPc"></span><span id="wrench::Simulation::init__iP.cPP"></span><span class="target" id="classwrench_1_1_simulation_1a3c6d35f1f77f35cbc727ce31e5689992"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span>, <span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Initialize the simulation, which parses out WRENCH-specific and SimGrid-specific command-line arguments, if any. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>argc</strong> – main()’s argument count </p></li>
+<li><p><strong>argv</strong> – main()’s argument list </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation19instantiatePlatformERKNSt8functionIFvvEEE">
+<span id="_CPPv3N6wrench10Simulation19instantiatePlatformERKNSt8functionIFvvEEE"></span><span id="_CPPv2N6wrench10Simulation19instantiatePlatformERKNSt8functionIFvvEEE"></span><span class="target" id="classwrench_1_1_simulation_1abd47288a02e96c0eb11e61d9518f369c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">instantiatePlatform</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Instantiate a simulated platform. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>creation_function</strong> – void() function to create the platform </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation19instantiatePlatformERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation19instantiatePlatformERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation19instantiatePlatformERKNSt6stringE"></span><span id="wrench::Simulation::instantiatePlatform__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1ad50c2a6661711a24325d538bcc0d5a00"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">instantiatePlatform</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Instantiate a simulated platform. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – the path to a SimGrid XML platform description file (.xml) or shared object platform file (.so/.dylib) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation29instantiatePlatformFromStringERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation29instantiatePlatformFromStringERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation29instantiatePlatformFromStringERKNSt6stringE"></span><span id="wrench::Simulation::instantiatePlatformFromString__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a17484d5c46b8edec09f92315b5137599"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">instantiatePlatformFromString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">platform</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Instantiate a simulated platform. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>platform</strong> – the string representation of a SimGrid XML platform description </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Simulation9isRunningEv">
+<span id="_CPPv3NK6wrench10Simulation9isRunningEv"></span><span id="_CPPv2NK6wrench10Simulation9isRunningEv"></span><span id="wrench::Simulation::isRunningC"></span><span class="target" id="classwrench_1_1_simulation_1a5c7c96149a85d8e9a821047e7a971112"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRunning</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Checks whether the simulation is running or not. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation6launchEv">
+<span id="_CPPv3N6wrench10Simulation6launchEv"></span><span id="_CPPv2N6wrench10Simulation6launchEv"></span><span id="wrench::Simulation::launch"></span><span class="target" id="classwrench_1_1_simulation_1ae9589632de9a2311ed1d7f7747478985"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">launch</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Launch the simulation. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation7addFileERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation7addFileERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation7addFileERKNSt6stringERKNSt6stringE"></span><span id="wrench::Simulation::addFile__ssCR.ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a82b5038aae4ffb8402e7be14c80fc819"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a new file to the simulation (use at your own peril if you’re using the workflow API - use Workflow::addFile() instead) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – a unique string id </p></li>
+<li><p><strong>size</strong> – a size as a unit string (e.g., “10MB”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <a class="reference internal" href="classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> instance </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation7addFileERKNSt6stringE9sg_size_t">
+<span id="_CPPv3N6wrench10Simulation7addFileERKNSt6stringE9sg_size_t"></span><span id="_CPPv2N6wrench10Simulation7addFileERKNSt6stringE9sg_size_t"></span><span id="wrench::Simulation::addFile__ssCR.sg_size_t"></span><span class="target" id="classwrench_1_1_simulation_1af23034ed89a1369ba66fc225a913453c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a new file to the simulation (use at your own peril if you’re using the workflow API - use Workflow::addFile() instead) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – a unique string id </p></li>
+<li><p><strong>size</strong> – a file size in bytes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <a class="reference internal" href="classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> instance </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation16createSimulationEv">
+<span id="_CPPv3N6wrench10Simulation16createSimulationEv"></span><span id="_CPPv2N6wrench10Simulation16createSimulationEv"></span><span id="wrench::Simulation::createSimulation"></span><span class="target" id="classwrench_1_1_simulation_1a097bd998f4f43f8ce859ac864a463e07"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10SimulationE" title="wrench::Simulation"><span class="n"><span class="pre">Simulation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createSimulation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Create a simulation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a simulation </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation11getFileByIDERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation11getFileByIDERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation11getFileByIDERKNSt6stringE"></span><span id="wrench::Simulation::getFileByID__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1aa38f90928a201eb476c1b5fbd5d9ec61"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFileByID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Find a <a class="reference internal" href="classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> based on its ID. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> – a string id</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <a class="reference internal" href="classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> instance (or throws a std::invalid_argument if not found) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation17getFileByIDOrNullERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation17getFileByIDOrNullERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation17getFileByIDOrNullERKNSt6stringE"></span><span id="wrench::Simulation::getFileByIDOrNull__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a5c7d9502724fa5ece65e5f89b29040dc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFileByIDOrNull</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Find a <a class="reference internal" href="classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> based on its ID. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> – a string id</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <a class="reference internal" href="classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> instance (or nullptr if not found) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation10getFileMapEv">
+<span id="_CPPv3N6wrench10Simulation10getFileMapEv"></span><span id="_CPPv2N6wrench10Simulation10getFileMapEv"></span><span id="wrench::Simulation::getFileMap"></span><span class="target" id="classwrench_1_1_simulation_1ac0b0a63dcccaf0a068563cc32ad908af"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getFileMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the list of all files in the simulation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a reference to the map of files in the simulation, indexed by file ID </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation15getHostFlopRateERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation15getHostFlopRateERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation15getHostFlopRateERKNSt6stringE"></span><span id="wrench::Simulation::getHostFlopRate__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1aa3b2c026b0f3e2c2c34d1f9be139ca06"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHostFlopRate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the flop rate of one core of a host given a hostname. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the hostname </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a flop rate (flop / sec) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation21getHostMemoryCapacityERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation21getHostMemoryCapacityERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation21getHostMemoryCapacityERKNSt6stringE"></span><span id="wrench::Simulation::getHostMemoryCapacity__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1afcadcdeb995c6618b25a415b48fd9d5a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHostMemoryCapacity</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the memory_manager_service capacity of a host given a hostname. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the hostname </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a memory_manager_service capacity in bytes </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation15getHostnameListEv">
+<span id="_CPPv3N6wrench10Simulation15getHostnameListEv"></span><span id="_CPPv2N6wrench10Simulation15getHostnameListEv"></span><span id="wrench::Simulation::getHostnameList"></span><span class="target" id="classwrench_1_1_simulation_1a15b4a28cfb0391525f3dba70317189be"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHostnameList</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the list of names of all the physical hosts in the platform. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a vector of hostnames </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation24getHostnameListByClusterEv">
+<span id="_CPPv3N6wrench10Simulation24getHostnameListByClusterEv"></span><span id="_CPPv2N6wrench10Simulation24getHostnameListByClusterEv"></span><span id="wrench::Simulation::getHostnameListByCluster"></span><span class="target" id="classwrench_1_1_simulation_1a3f4f62572877f3621bac3752839df6a2"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHostnameListByCluster</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>** </p>
+<p>Get the list of names of all the hosts in each cluster composing the platform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a map of lists of hosts, indexed by cluster name </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation15getHostNumCoresERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation15getHostNumCoresERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation15getHostNumCoresERKNSt6stringE"></span><span id="wrench::Simulation::getHostNumCores__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a11feb9b0df0f0fcde22063b9d4722548"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHostNumCores</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the number of cores of a host given a hostname. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the hostname </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation16getListOfPstatesERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation16getListOfPstatesERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation16getListOfPstatesERKNSt6stringE"></span><span id="wrench::Simulation::getListOfPstates__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1abb75fd040236995186d9ad45434fe069"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getListOfPstates</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the list of power states available for a host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the host name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of power states available for the host (as specified in the platform xml description file) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation22getMaxPowerConsumptionERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation22getMaxPowerConsumptionERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation22getMaxPowerConsumptionERKNSt6stringE"></span><span id="wrench::Simulation::getMaxPowerConsumption__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1ae76b92ce868c6e6c1683377d869a5b34"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMaxPowerConsumption</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the maximum power consumption for the host (i.e., 100% utilization) at its current pstate. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the host name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The “100% used” power consumption (as specified in the platform xml description file) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation22getMinPowerConsumptionERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation22getMinPowerConsumptionERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation22getMinPowerConsumptionERKNSt6stringE"></span><span id="wrench::Simulation::getMinPowerConsumption__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1afdf2ae84f6b3c8b51c5189199bebb52e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMinPowerConsumption</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the minimum power consumption for the host (i.e., idling) at its current pstate. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the host name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The “idling” power consumption (as specified in the platform xml description file) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation18getNumberOfPstatesERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation18getNumberOfPstatesERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation18getNumberOfPstatesERKNSt6stringE"></span><span id="wrench::Simulation::getNumberOfPstates__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a18b126da572dd5bc64ab7f53e08c35e7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumberOfPstates</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the total number of power states of a host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostname</strong> – the host name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of power states available for the host (as specified in the platform xml description file) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation17hostHasMountPointERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation17hostHasMountPointERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation17hostHasMountPointERKNSt6stringERKNSt6stringE"></span><span id="wrench::Simulation::hostHasMountPoint__ssCR.ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a3674468a5ab4ed2a216acb55826d1068"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hostHasMountPoint</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mount_point</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Determine if a host has a disk mounted at some mount point. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hostname</strong> – the hostname </p></li>
+<li><p><strong>mount_point</strong> – the mount point </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation13isInitializedEv">
+<span id="_CPPv3N6wrench10Simulation13isInitializedEv"></span><span id="_CPPv2N6wrench10Simulation13isInitializedEv"></span><span id="wrench::Simulation::isInitialized"></span><span class="target" id="classwrench_1_1_simulation_1af7ef29fe89c0a2b3a7379da1af721fdc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isInitialized</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Determine if the simulation has been initialized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation14removeAllFilesEv">
+<span id="_CPPv3N6wrench10Simulation14removeAllFilesEv"></span><span id="_CPPv2N6wrench10Simulation14removeAllFilesEv"></span><span id="wrench::Simulation::removeAllFiles"></span><span class="target" id="classwrench_1_1_simulation_1a5dea0ed25c7126ca177efe0083c63d18"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">removeAllFiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Remove all files from the simulation (use at your own peril if you’re using the workflow API) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation10removeFileERKNSt10shared_ptrI8DataFileEE">
+<span id="_CPPv3N6wrench10Simulation10removeFileERKNSt10shared_ptrI8DataFileEE"></span><span id="_CPPv2N6wrench10Simulation10removeFileERKNSt10shared_ptrI8DataFileEE"></span><span id="wrench::Simulation::removeFile__std::shared_ptr:DataFile:CR"></span><span class="target" id="classwrench_1_1_simulation_1ae794111b821af223352e789828d81613"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">removeFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Remove a file from the simulation (use at your own peril if you’re using the workflow API - use <a class="reference internal" href="classwrench_1_1_workflow.html#classwrench_1_1_workflow_1ab17bb2e9b2bb40c2c1d302979a64c846"><span class="std std-ref">Workflow::removeFile()</span></a> instead) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> – : file to remove </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="classwrench_1_1_simple_storage_service_property.html" class="btn btn-neutral float-left" title="wrench::SimpleStorageServiceProperty" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_simulation_output.html" class="btn btn-neutral float-right" title="wrench::SimulationOutput" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

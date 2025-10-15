@@ -1,0 +1,8 @@
+.. _CompoundStorageServiceProperty:
+wrench::CompoundStorageServiceProperty
+**************************************
+
+.. doxygenclass:: wrench::CompoundStorageServiceProperty
+   :project: internal
+   :members:
+

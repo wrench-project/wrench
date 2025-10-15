@@ -1,0 +1,8 @@
+.. _FunctionInput:
+wrench::FunctionInput
+*********************
+
+.. doxygenclass:: wrench::FunctionInput
+   :project: developer
+   :members:
+

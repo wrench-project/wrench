@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating an XRootD storage service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating an XRootD storage service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_101/xrootd.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="creating-an-xrootd-storage-service">
+<span id="guide-101-xrootd"></span><h1>Creating an XRootD storage service<a class="headerlink" href="#creating-an-xrootd-storage-service" title="Link to this heading"></a></h1>
+</section>
+<section id="overview">
+<span id="guide-xrootd-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>An XRootD storage service is a distributed file system that is
+composed of individual storage services arranged in a tree of arity at most 64. There are two kinds of
+nodes, <em>storage nodes</em> and <em>supervisor nodes</em>.
+A storage node internally uses a <a class="reference internal" href="simplestorage.html#guide-101-simplestorage"><span class="std std-ref">Simple Storage Service</span></a>
+and supports all the Simple Storage Service operations. A supervisor node is always the root of a
+sub-tree and can perform file searches in that sub-tree, all the while maintaining a cache
+of recent file search results (with a time-to-live for remembering these results).</p>
+</section>
+<section id="guide-xrootd-creating">
+<span id="id1"></span><h1>Creating an XRootD storage service<a class="headerlink" href="#guide-xrootd-creating" title="Link to this heading"></a></h1>
+<p>An XRootD storage service is described by specifying the deployment of the nodes in the XRootD tree
+on hardware resources (i.e., hosts where individual nodes in the tree will execute and access disks available at these hosts).
+To this end, a <a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_deployment.html#_CPPv4N6wrench6XRootD10DeploymentE" title="wrench::XRootD::Deployment"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::Deployment</span></code></a> object must be created first, before the
+simulation is launched. An instance of a Deployment is constructed based on:</p>
+<ul class="simple">
+<li><p>A <a class="reference internal" href="../api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10SimulationE" title="wrench::Simulation"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation</span></code></a> object;</p></li>
+<li><p>Optional Maps (<code class="docutils literal notranslate"><span class="pre">std::map</span></code>) of configurable default properties
+(<a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_property.html#_CPPv4N6wrench6XRootD8PropertyE" title="wrench::XRootD::Property"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::Property</span></code></a>) and configurable default message
+payloads (<a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_message_payload.html#_CPPv4N6wrench6XRootD14MessagePayloadE" title="wrench::XRootD::MessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::MessagePayload</span></code></a>).</p></li>
+</ul>
+<p>Once the deployment object is created, it can be used to add nodes to the tree, i.e., instances
+of the <a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_node.html#_CPPv4N6wrench6XRootD4NodeE" title="wrench::XRootD::Node"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::Node</span></code></a> class.  First a root node must be instantiated by calling the
+<a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_deployment.html#_CPPv4N6wrench6XRootD10Deployment20createRootSupervisorERKNSt6stringE31WRENCH_PROPERTY_COLLECTION_TYPE38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE" title="wrench::XRootD::Deployment::createRootSupervisor"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::Deployment::createRootSupervisor()</span></code></a> method.</p>
+<p>Once the root node has been instantiated, it can be used to build the rest of XRootD tree. Some nodes
+in the trees are <em>supervisors</em>, i.e., they know about all other nodes in the subtree of which they are the root and can direct
+searches for files down this subtree. Creating a new supervisor node in the tree is simply done
+by calling the <a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_node.html#_CPPv4N6wrench6XRootD4Node18addChildSupervisorERKNSt6stringE" title="wrench::XRootD::Node::addChildSupervisor"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::Node::addChildSupervisor()</span></code></a> method on the
+node that will be the new node’s parent.</p>
+<p>The other kind of node is a <em>storage node</em>, which can store files.
+A storage node has an underlying <a class="reference internal" href="simplestorage.html#guide-101-simplestorage"><span class="std std-ref">Simple Storage Service</span></a>
+that stores the files.
+Creating a storage node is done by calling the <a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_node.html#_CPPv4N6wrench6XRootD4Node21addChildStorageServerERKNSt6stringERKNSt6stringE31WRENCH_PROPERTY_COLLECTION_TYPE38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE31WRENCH_PROPERTY_COLLECTION_TYPE38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE" title="wrench::XRootD::Node::addChildStorageServer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::Node::addChildStorageServer()</span></code></a> on the
+node that will be the new node’s parent.</p>
+<p>The example below creates a small XRootD deployment of 3 nodes, a root on host <code class="docutils literal notranslate"><span class="pre">Root</span></code>, a supervisor node
+on host <code class="docutils literal notranslate"><span class="pre">Super</span></code>, and a Storage node on <code class="docutils literal notranslate"><span class="pre">Storage</span></code>. The nodes are arranged in a tree of arity 1 as follows <code class="docutils literal notranslate"><span class="pre">Root-&gt;Super-&gt;Storage</span></code>.
+The XRootD deployment is configured to simulate all underlying communications involved during a search
+(the <code class="docutils literal notranslate"><span class="pre">REDUCED_SIMULATION</span></code> property). The cache lifetime is at most to 1 hour (the <code class="docutils literal notranslate"><span class="pre">CACHE_MAX_LIFETIME</span></code> property). The cache is where a supervisor keeps
+the locations of files that it has previous found via searches. The storage node running on
+<code class="docutils literal notranslate"><span class="pre">Storage</span></code> is created with parameters similar to that used to create a SimpleStorageService instance. In
+this example, it has mountpoint <code class="docutils literal notranslate"><span class="pre">/</span></code>, can support up to 8 concurrent data connections, and the size of the
+control message that is sent to it to request a file read is 2KiB.  Finally, in this example, a copy of file
+<code class="docutils literal notranslate"><span class="pre">someFile</span></code> is created ab initio on the storage node.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">wrench</span><span class="o">::</span><span class="n">XRootD</span><span class="o">::</span><span class="n">Deployment</span><span class="w"> </span><span class="n">xrootd_deployment</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span>
+<span class="w">                                                  </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">XRootD</span><span class="o">::</span><span class="n">Property</span><span class="o">::</span><span class="n">CACHE_MAX_LIFETIME</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;3600&quot;</span><span class="p">},</span>
+<span class="w">                                                   </span><span class="p">{</span><span class="n">wrench</span><span class="o">::</span><span class="n">XRootD</span><span class="o">::</span><span class="n">Property</span><span class="o">::</span><span class="n">REDUCED_SIMULATION</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;false&quot;</span><span class="p">}},</span>
+<span class="w">                                                  </span><span class="p">{});</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xrootd_deployment</span><span class="p">.</span><span class="n">createRootSupervisor</span><span class="p">(</span><span class="s">&quot;Root&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">super</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">root</span><span class="o">-&gt;</span><span class="n">addChildSupervisor</span><span class="p">(</span><span class="s">&quot;Super&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">storage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">super</span><span class="o">-&gt;</span><span class="n">addChildStorageServer</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;Storage&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">{},</span>
+<span class="w">    </span><span class="p">{},</span>
+<span class="w">    </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageServiceProperty</span><span class="o">::</span><span class="n">MAX_NUM_CONCURRENT_DATA_CONNECTIONS</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;8&quot;</span><span class="p">}},</span>
+<span class="w">    </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageServiceMessagePayload</span><span class="o">::</span><span class="n">FILE_READ_REQUEST_MESSAGE_PAYLOAD</span><span class="p">,</span><span class="w"> </span><span class="mi">2048</span><span class="p">}});</span>
+
+<span class="n">storage</span><span class="o">-&gt;</span><span class="n">createFile</span><span class="p">(</span><span class="n">someFile</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>See the documentation of <a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_property.html#_CPPv4N6wrench6XRootD8PropertyE" title="wrench::XRootD::Property"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::Property</span></code></a> and
+<a class="reference internal" href="../api_developer/classwrench_1_1_x_root_d_1_1_message_payload.html#_CPPv4N6wrench6XRootD14MessagePayloadE" title="wrench::XRootD::MessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::XRootD::MessagePayload</span></code></a> for all possible
+configuration options.</p>
+<p>See the example simulator in the <code class="docutils literal notranslate"><span class="pre">examples/action_api/XRootD</span></code> directory for a more complex XRootD
+deployment.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+.. _StandardJob:
+wrench::StandardJob
+*******************
+
+.. doxygenclass:: wrench::StandardJob
+   :project: developer
+   :members:
+

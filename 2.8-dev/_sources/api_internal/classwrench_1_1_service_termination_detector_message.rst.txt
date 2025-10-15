@@ -1,0 +1,8 @@
+.. _ServiceTerminationDetectorMessage:
+wrench::ServiceTerminationDetectorMessage
+*****************************************
+
+.. doxygenclass:: wrench::ServiceTerminationDetectorMessage
+   :project: internal
+   :members:
+

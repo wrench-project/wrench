@@ -1,0 +1,8 @@
+.. _FileRegistryFileLookupByProximityAnswerMessage:
+wrench::FileRegistryFileLookupByProximityAnswerMessage
+******************************************************
+
+.. doxygenclass:: wrench::FileRegistryFileLookupByProximityAnswerMessage
+   :project: internal
+   :members:
+

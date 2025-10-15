@@ -1,0 +1,8 @@
+.. _FileRegistryAddEntryAction:
+wrench::FileRegistryAddEntryAction
+**********************************
+
+.. doxygenclass:: wrench::FileRegistryAddEntryAction
+   :project: developer
+   :members:
+

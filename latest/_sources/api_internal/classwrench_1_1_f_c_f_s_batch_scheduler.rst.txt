@@ -1,0 +1,8 @@
+.. _FCFSBatchScheduler:
+wrench::FCFSBatchScheduler
+**************************
+
+.. doxygenclass:: wrench::FCFSBatchScheduler
+   :project: internal
+   :members:
+

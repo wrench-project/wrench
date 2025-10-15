@@ -1,0 +1,8 @@
+.. _FileCopyAction:
+wrench::FileCopyAction
+**********************
+
+.. doxygenclass:: wrench::FileCopyAction
+   :project: developer
+   :members:
+

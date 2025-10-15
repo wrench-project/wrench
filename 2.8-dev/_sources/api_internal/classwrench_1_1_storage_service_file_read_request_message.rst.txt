@@ -1,0 +1,8 @@
+.. _StorageServiceFileReadRequestMessage:
+wrench::StorageServiceFileReadRequestMessage
+********************************************
+
+.. doxygenclass:: wrench::StorageServiceFileReadRequestMessage
+   :project: internal
+   :members:
+

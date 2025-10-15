@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StorageServiceProxy &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">StorageServiceProxy</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_102/storageserviceproxy.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="storageserviceproxy">
+<span id="guide-102-storageserviceproxy"></span><h1>StorageServiceProxy<a class="headerlink" href="#storageserviceproxy" title="Link to this heading"></a></h1>
+<p>There are cases in which a Controller may not want to talk directly to the <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a>
+that is known to have a particular file: there is a cache that should be used first in case
+if happens to hold that file.  For making the simulation of such a scenario straightforward,
+WRENCH provides a <a class="reference internal" href="../api_internal/classwrench_1_1_storage_service_proxy.html#_CPPv4N6wrench19StorageServiceProxyE" title="wrench::StorageServiceProxy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageServiceProxy</span></code></a> abstraction.</p>
+<section id="creating-a-proxy">
+<h2>Creating a Proxy<a class="headerlink" href="#creating-a-proxy" title="Link to this heading"></a></h2>
+<p>To create a <a class="reference internal" href="../api_internal/classwrench_1_1_storage_service_proxy.html#_CPPv4N6wrench19StorageServiceProxyE" title="wrench::StorageServiceProxy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageServiceProxy</span></code></a> use the <a class="reference internal" href="../api_internal/classwrench_1_1_storage_service_proxy.html#_CPPv4N6wrench19StorageServiceProxy19createRedirectProxyERKNSt6stringERKNSt10shared_ptrI14StorageServiceEERKNSt10shared_ptrI14StorageServiceEE31WRENCH_PROPERTY_COLLECTION_TYPE38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE" title="wrench::StorageServiceProxy::createRedirectProxy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageServiceProxy::createRedirectProxy()</span></code></a> method,
+which takes the name of a host on which the proxy should be running,
+a <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a> to use as <strong>local cache</strong> (this should be on the same host, otherwise simulation may not be accurate),
+and an <strong>optional default remote</strong> <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a>, as well as the usual property and message payloads lists.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cache</span><span class="p">;</span><span class="w">      </span><span class="c1">// The storage service to use as a cache</span>
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageService</span><span class="o">&gt;</span><span class="w"> </span><span class="k">default</span><span class="p">;</span><span class="w">    </span><span class="c1">// The storage server to be used as a remote default</span>
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">remote</span><span class="p">;</span><span class="w">     </span><span class="c1">// Another potential remote storage server</span>
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageServiceProxy</span><span class="o">&gt;</span><span class="w"> </span><span class="n">proxy</span><span class="p">;</span><span class="w"> </span><span class="c1">// The proxy</span>
+
+<span class="p">[...]</span>
+
+<span class="c1">// Create all storage services as SimpleStorageService</span>
+<span class="n">remote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageService</span><span class="o">::</span><span class="n">createSimpleStorageService</span><span class="p">(</span><span class="s">&quot;Remote&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">...));</span>
+<span class="n">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageService</span><span class="o">::</span><span class="n">createSimpleStorageService</span><span class="p">(</span><span class="s">&quot;Proxy&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">...));</span>
+<span class="k">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageService</span><span class="o">::</span><span class="n">createSimpleStorageService</span><span class="p">(</span><span class="s">&quot;Default&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">...));</span>
+
+<span class="c1">//create a Proxy using the cache and default as a default</span>
+<span class="n">proxy</span><span class="o">=</span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
+<span class="w">                     </span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageServiceProxy</span><span class="o">::</span><span class="n">createRedirectProxy</span><span class="p">(</span>
+<span class="w">                     </span><span class="s">&quot;Proxy&quot;</span><span class="p">,</span>
+<span class="w">                     </span><span class="n">cache</span><span class="p">,</span>
+<span class="w">                     </span><span class="n">remote</span><span class="p">,</span>
+<span class="w">                     </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageServiceProxyProperty</span><span class="o">::</span><span class="n">UNCACHED_READ_METHOD</span><span class="p">,</span><span class="s">&quot;CopyThenRead&quot;</span><span class="p">}},</span>
+<span class="w">                     </span><span class="p">{}</span>
+<span class="w">             </span><span class="p">)</span>
+<span class="w">             </span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service_proxy_property.html#_CPPv4N6wrench27StorageServiceProxyProperty20UNCACHED_READ_METHODE" title="wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">wrench::StorageServiceProxyProperty::UNCACHED_READ_METHOD</span></code></a> property is important.
+In WRENCH, at least for the time being, a file can not be read while it is still being written to a disk.
+As such, there is no efficient way to say “As the file is being copied to the cache, send the available bytes to
+anyone waiting on the file.” Since this is the desired behavior of a cache, some work-arounds have been implemented.
+Each one has specific advantages and drawbacks, so consider which is best in your specific case.
+Once the file has been written/copied to the cache completely, there is no difference.</p>
+<ul class="simple">
+<li><p><em>CopyThenRead</em> copies the file to the cache and then reads the file from the cache to any waiting hosts. This option offers the best file-to-cache time, and stresses the network the most realistically, but the file will arrive “late” at the actual waiting clients.</p></li>
+<li><p><em>MagicRead</em> assumes the time to read the file from the cache can be completely amortized while coping the file to the cache, and will copy the file to the cache, then magically send it to anyone waiting. If this assumption is correct, MagicRead allows the file-to-cache and time-to-host time to be accurate.  However,  this does not stress the internal network as much as would be the case in reality.</p></li>
+<li><p><em>ReadThrough</em> reads the file directly to the host and once the read has finished, it instantly creates the file on the cache.  This assumes the route between the host and the remote server goes through the proxy.For single client reads, this is the best option offering the best file-to-host accuracy, and correct network stress.  However, the file-to-cache time is slower, and any additional clients waiting on the file will have to wait until the ache gets it before reading.</p></li>
+</ul>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Comparison of the three UNCACHED_READ_METHOD options</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Scheme</p></th>
+<th class="head"><p>File-to-Cache Time</p></th>
+<th class="head"><p>File-to-Host Time</p></th>
+<th class="head"><p>Internal Network Congestion</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>CopyThenRead</strong></p></td>
+<td><p>Accurate</p></td>
+<td><p>Accurate</p></td>
+<td><p>Overestimated</p></td>
+</tr>
+<tr class="row-odd"><td><p>MagicRead</p></td>
+<td><p>Overestimated</p></td>
+<td><p>Probably Accurate</p></td>
+<td><p>Accurate</p></td>
+</tr>
+<tr class="row-even"><td><p>ReadThrough</p></td>
+<td><p>Accurate</p></td>
+<td><p>Underestimated</p></td>
+<td><p>Accurate</p></td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="../api_internal/classwrench_1_1_storage_service_proxy.html#_CPPv4N6wrench19StorageServiceProxyE" title="wrench::StorageServiceProxy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageServiceProxy</span></code></a> does not support <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageService10createFileERKNSt10shared_ptrI8DataFileEE" title="wrench::StorageService::createFile"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService::createFile</span></code></a> due to it being ambiguous in the case of a proxy. If you wish to create a file on the remote use <cite>remote-&gt;createFile()</cite>.  If you wish to create a file in the cache, use <cite>cache-&gt;createFile()</cite> or <cite>proxy-&gt;getCache()-&gt;createFile()</cite></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">cache</span><span class="o">-&gt;</span><span class="n">createFile</span><span class="p">(</span><span class="n">someFile</span><span class="p">);</span><span class="c1">//create a file on the cache</span>
+<span class="n">proxy</span><span class="o">-&gt;</span><span class="n">getCache</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">createFile</span><span class="p">(</span><span class="n">someOtherFile</span><span class="p">);</span><span class="c1">//create a file on the cache</span>
+
+<span class="n">remote</span><span class="o">-&gt;</span><span class="n">createFile</span><span class="p">(</span><span class="n">someFile</span><span class="p">);</span><span class="c1">//create a file on the remote</span>
+</pre></div>
+</div>
+</section>
+<section id="using-a-proxy">
+<h2>Using a Proxy<a class="headerlink" href="#using-a-proxy" title="Link to this heading"></a></h2>
+<p>If proxy is given a default remote location, it can be used exactly like a normal storage service, it will simply use the cache
+and default  to the default remote file server if the cache doesn’t have the desired file.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">proxy</span><span class="o">-&gt;</span><span class="n">readFile</span><span class="p">(</span><span class="n">someDataFile</span><span class="p">);</span><span class="w"> </span><span class="c1">// Checks the cache for someDataFile, if it does not exist, checks default</span>
+<span class="n">readFile</span><span class="p">(</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span><span class="n">someDataFile</span><span class="p">));</span><span class="w"> </span><span class="c1">// Same, but presumably the file is now cached</span>
+<span class="n">proxy</span><span class="o">-&gt;</span><span class="n">writeFile</span><span class="p">(</span><span class="n">someDataFile</span><span class="p">);</span><span class="w"> </span><span class="c1">// Write a file to the default remote and the cache</span>
+</pre></div>
+</div>
+<p>If no default location is given, or the file is on a different remote <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a> either <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageServiceProxy::readFile(wrench::StorageService,wrench::DataFile)</span></code> must be used, or the <a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FileLocation</span></code></a> used to locate the file must be a <a class="reference internal" href="../api_internal/classwrench_1_1_proxy_location.html#_CPPv4N6wrench13ProxyLocationE" title="wrench::ProxyLocation"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ProxyLocation</span></code></a>.</p>
+<p><a class="reference internal" href="../api_internal/classwrench_1_1_proxy_location.html#_CPPv4N6wrench13ProxyLocationE" title="wrench::ProxyLocation"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ProxyLocation</span></code></a> has the same factories as a normal <a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FileLocation</span></code></a>, except they take an extra <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a> <cite>target</cite> to use as a remote <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a>.  There is also a factory that takes any existing location and the <cite>target</cite>.
+For this proxy location <cite>ss</cite> should be the proxy to access.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">proxy</span><span class="o">-&gt;</span><span class="n">readFile</span><span class="p">(</span><span class="n">remote</span><span class="p">,</span><span class="n">someOtherDataFile</span><span class="p">);</span>
+<span class="n">readFile</span><span class="p">(</span><span class="n">ProxyFileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span>
+<span class="w">        </span><span class="n">remote</span><span class="p">,</span><span class="c1">//target a location other than default</span>
+<span class="w">        </span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="c1">//the expected location of the file</span>
+<span class="w">                </span><span class="n">proxy</span><span class="p">,</span><span class="w"> </span><span class="c1">//on the proxy</span>
+<span class="w">                </span><span class="n">someOtherDataFile</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="p">);</span><span class="c1">//read the file from the cache, or remote, not default</span>
+
+<span class="n">proxy</span><span class="p">.</span><span class="n">writeFile</span><span class="p">(</span><span class="n">remote</span><span class="p">,</span><span class="n">someDataFile</span><span class="p">);</span><span class="c1">//Write a file to the remote</span>
+</pre></div>
+</div>
+<p>Proxies do not support file copies for now, and copies have to be done directly using the underlying storage services.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

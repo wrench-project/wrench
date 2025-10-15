@@ -1,0 +1,8 @@
+.. _VirtualizedClusterComputeService:
+wrench::VirtualizedClusterComputeService
+****************************************
+
+.. doxygenclass:: wrench::VirtualizedClusterComputeService
+   :project: user
+   :members:
+

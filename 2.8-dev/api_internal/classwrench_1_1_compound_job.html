@@ -1,0 +1,1092 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrench::CompoundJob &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="wrench::CompoundJobCompletedEvent" href="classwrench_1_1_compound_job_completed_event.html" />
+    <link rel="prev" title="wrench::Communicator" href="classwrench_1_1_communicator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action.html">wrench::Action</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service.html">wrench::ActionExecutionService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_action_done_message.html">wrench::ActionExecutionServiceActionDoneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_message.html">wrench::ActionExecutionServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_property.html">wrench::ActionExecutionServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_submit_action_answer_message.html">wrench::ActionExecutionServiceSubmitActionAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_submit_action_request_message.html">wrench::ActionExecutionServiceSubmitActionRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_terminate_action_answer_message.html">wrench::ActionExecutionServiceTerminateActionAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_terminate_action_request_message.html">wrench::ActionExecutionServiceTerminateActionRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor.html">wrench::ActionExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_actor_with_timeout.html">wrench::ActionExecutorActorWithTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_done_message.html">wrench::ActionExecutorDoneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_message.html">wrench::ActionExecutorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm.html">wrench::Alarm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm_job_time_out_message.html">wrench::AlarmJobTimeOutMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_message_payload.html">wrench::BareMetalComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_one_shot.html">wrench::BareMetalComputeServiceOneShot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_property.html">wrench::BareMetalComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service.html">wrench::BatchComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_job_request_message.html">wrench::BatchComputeServiceJobRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_message.html">wrench::BatchComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_message_payload.html">wrench::BatchComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_property.html">wrench::BatchComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_execute_job_from_bat_sched_message.html">wrench::BatchExecuteJobFromBatSchedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_job.html">wrench::BatchJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_query_answer_message.html">wrench::BatchQueryAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_scheduler.html">wrench::BatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batsched_network_listener.html">wrench::BatschedNetworkListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_block.html">wrench::Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_central_manager_wake_up_message.html">wrench::CentralManagerWakeUpMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service.html">wrench::CloudComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_create_v_m_answer_message.html">wrench::CloudComputeServiceCreateVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_create_v_m_request_message.html">wrench::CloudComputeServiceCreateVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_destroy_v_m_answer_message.html">wrench::CloudComputeServiceDestroyVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_destroy_v_m_request_message.html">wrench::CloudComputeServiceDestroyVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_get_execution_hosts_answer_message.html">wrench::CloudComputeServiceGetExecutionHostsAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_get_execution_hosts_request_message.html">wrench::CloudComputeServiceGetExecutionHostsRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_message.html">wrench::CloudComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_message_payload.html">wrench::CloudComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_property.html">wrench::CloudComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_resume_v_m_answer_message.html">wrench::CloudComputeServiceResumeVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_resume_v_m_request_message.html">wrench::CloudComputeServiceResumeVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_shutdown_v_m_answer_message.html">wrench::CloudComputeServiceShutdownVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_shutdown_v_m_request_message.html">wrench::CloudComputeServiceShutdownVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_start_v_m_answer_message.html">wrench::CloudComputeServiceStartVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_start_v_m_request_message.html">wrench::CloudComputeServiceStartVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_suspend_v_m_answer_message.html">wrench::CloudComputeServiceSuspendVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_suspend_v_m_request_message.html">wrench::CloudComputeServiceSuspendVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_communicator.html">wrench::Communicator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::CompoundJob</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJobE"><code class="docutils literal notranslate"><span class="pre">wrench::CompoundJob</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob5StateE"><code class="docutils literal notranslate"><span class="pre">State</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob19addActionDependencyERKNSt10shared_ptrI6ActionEERKNSt10shared_ptrI6ActionEE"><code class="docutils literal notranslate"><span class="pre">addActionDependency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob11addChildJobERKNSt10shared_ptrI11CompoundJobEE"><code class="docutils literal notranslate"><span class="pre">addChildJob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob16addComputeActionERKNSt6stringEd9sg_size_tmmRKNSt10shared_ptrI13ParallelModelEE"><code class="docutils literal notranslate"><span class="pre">addComputeAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob15addCustomActionENSt10shared_ptrI12CustomActionEE"><code class="docutils literal notranslate"><span class="pre">addCustomAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEERKNSt10shared_ptrI14StorageServiceEE"><code class="docutils literal notranslate"><span class="pre">addFileCopyAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">addFileCopyAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"><code class="docutils literal notranslate"><span class="pre">addFileDeleteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">addFileDeleteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"><code class="docutils literal notranslate"><span class="pre">addFileReadAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">addFileReadAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">addFileReadAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">addFileReadAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE"><code class="docutils literal notranslate"><span class="pre">addFileReadAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">addFileReadAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob29addFileRegistryAddEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">addFileRegistryAddEntryAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob32addFileRegistryDeleteEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">addFileRegistryDeleteEntryAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"><code class="docutils literal notranslate"><span class="pre">addFileWriteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">addFileWriteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob12addMPIActionERKNSt6stringERKNSt8functionIFvRKNSt10shared_ptrI19ExecutionControllerEEEEEmm"><code class="docutils literal notranslate"><span class="pre">addMPIAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob12addParentJobERKNSt10shared_ptrI11CompoundJobEE"><code class="docutils literal notranslate"><span class="pre">addParentJob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob14addSleepActionERKNSt6stringEd"><code class="docutils literal notranslate"><span class="pre">addSleepAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench11CompoundJob15getActionByNameERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getActionByName()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob10getActionsEv"><code class="docutils literal notranslate"><span class="pre">getActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob15getChildrenJobsEv"><code class="docutils literal notranslate"><span class="pre">getChildrenJobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench11CompoundJob24getMinimumRequiredMemoryEv"><code class="docutils literal notranslate"><span class="pre">getMinimumRequiredMemory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench11CompoundJob26getMinimumRequiredNumCoresEv"><code class="docutils literal notranslate"><span class="pre">getMinimumRequiredNumCores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob13getParentJobsEv"><code class="docutils literal notranslate"><span class="pre">getParentJobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob12getSharedPtrEv"><code class="docutils literal notranslate"><span class="pre">getSharedPtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench11CompoundJob8getStateEv"><code class="docutils literal notranslate"><span class="pre">getState()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench11CompoundJob16getStateAsStringEv"><code class="docutils literal notranslate"><span class="pre">getStateAsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob9hasFailedEv"><code class="docutils literal notranslate"><span class="pre">hasFailed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob24hasSuccessfullyCompletedEv"><code class="docutils literal notranslate"><span class="pre">hasSuccessfullyCompleted()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench11CompoundJob23printActionDependenciesEv"><code class="docutils literal notranslate"><span class="pre">printActionDependencies()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob12printTaskMapEv"><code class="docutils literal notranslate"><span class="pre">printTaskMap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob12removeActionERKNSt10shared_ptrI6ActionEE"><code class="docutils literal notranslate"><span class="pre">removeAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob11setPriorityEd"><code class="docutils literal notranslate"><span class="pre">setPriority()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob11usesScratchEv"><code class="docutils literal notranslate"><span class="pre">usesScratch()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job_completed_event.html">wrench::CompoundJobCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job_failed_event.html">wrench::CompoundJobFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_allocation_answer_message.html">wrench::CompoundStorageAllocationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_allocation_request_message.html">wrench::CompoundStorageAllocationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_lookup_answer_message.html">wrench::CompoundStorageLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_lookup_request_message.html">wrench::CompoundStorageLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service.html">wrench::CompoundStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_message.html">wrench::CompoundStorageServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_message_payload.html">wrench::CompoundStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_property.html">wrench::CompoundStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_computation_has_died.html">wrench::ComputationHasDied</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_action.html">wrench::ComputeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service.html">wrench::ComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_compound_job_done_message.html">wrench::ComputeServiceCompoundJobDoneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_compound_job_failed_message.html">wrench::ComputeServiceCompoundJobFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_is_there_at_least_one_host_with_available_resources_answer_message.html">wrench::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_is_there_at_least_one_host_with_available_resources_request_message.html">wrench::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_message.html">wrench::ComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_message_payload.html">wrench::ComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_pilot_job_expired_message.html">wrench::ComputeServicePilotJobExpiredMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_pilot_job_started_message.html">wrench::ComputeServicePilotJobStartedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_property.html">wrench::ComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_resource_information_answer_message.html">wrench::ComputeServiceResourceInformationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_resource_information_request_message.html">wrench::ComputeServiceResourceInformationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_submit_compound_job_answer_message.html">wrench::ComputeServiceSubmitCompoundJobAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_submit_compound_job_request_message.html">wrench::ComputeServiceSubmitCompoundJobRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_terminate_compound_job_answer_message.html">wrench::ComputeServiceTerminateCompoundJobAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_terminate_compound_job_request_message.html">wrench::ComputeServiceTerminateCompoundJobRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_conservative_backfilling_batch_scheduler.html">wrench::ConservativeBackfillingBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_conservative_backfilling_batch_scheduler_core_level.html">wrench::ConservativeBackfillingBatchSchedulerCoreLevel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_constant_efficiency_parallel_model.html">wrench::ConstantEfficiencyParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_coordinate_lookup_answer_message.html">wrench::CoordinateLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_coordinate_lookup_request_message.html">wrench::CoordinateLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_action.html">wrench::CustomAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_event.html">wrench::CustomEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_parallel_model.html">wrench::CustomParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_dag_of_tasks.html">wrench::DagOfTasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_dag_of_tasks_1_1custom__bfs__visitor.html">wrench::DagOfTasks::custom_bfs_visitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_manager_file_copy_answer_message.html">wrench::DataManagerFileCopyAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_manager_file_read_answer_message.html">wrench::DataManagerFileReadAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_manager_file_write_answer_message.html">wrench::DataManagerFileWriteAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager.html">wrench::DataMovementManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager_file_reader_thread_message.html">wrench::DataMovementManagerFileReaderThreadMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager_file_writer_thread_message.html">wrench::DataMovementManagerFileWriterThreadMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager_message.html">wrench::DataMovementManagerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_easy_backfilling_batch_scheduler.html">wrench::EasyBackfillingBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller.html">wrench::ExecutionController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_alarm_timer_message.html">wrench::ExecutionControllerAlarmTimerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_custom_event_message.html">wrench::ExecutionControllerCustomEventMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_message.html">wrench::ExecutionControllerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_event.html">wrench::ExecutionEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_exception.html">wrench::ExecutionException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_batch_scheduler.html">wrench::FCFSBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_failure_cause.html">wrench::FailureCause</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fatal_failure.html">wrench::FatalFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_copied.html">wrench::FileAlreadyBeingCopied</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_read.html">wrench::FileAlreadyBeingRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_written.html">wrench::FileAlreadyBeingWritten</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_action.html">wrench::FileCopyAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_completed_event.html">wrench::FileCopyCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_failed_event.html">wrench::FileCopyFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_delete_action.html">wrench::FileDeleteAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_location.html">wrench::FileLocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_not_found.html">wrench::FileNotFound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_action.html">wrench::FileReadAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_completed_event.html">wrench::FileReadCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_failed_event.html">wrench::FileReadFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_reader_thread.html">wrench::FileReaderThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_action.html">wrench::FileRegistryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_add_entry_action.html">wrench::FileRegistryAddEntryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_add_entry_answer_message.html">wrench::FileRegistryAddEntryAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_add_entry_request_message.html">wrench::FileRegistryAddEntryRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_delete_entry_action.html">wrench::FileRegistryDeleteEntryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_answer_message.html">wrench::FileRegistryFileLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_by_proximity_answer_message.html">wrench::FileRegistryFileLookupByProximityAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_by_proximity_request_message.html">wrench::FileRegistryFileLookupByProximityRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_request_message.html">wrench::FileRegistryFileLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_message.html">wrench::FileRegistryMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_remove_entry_answer_message.html">wrench::FileRegistryRemoveEntryAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_remove_entry_request_message.html">wrench::FileRegistryRemoveEntryRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_transfer_thread.html">wrench::FileTransferThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_transfer_thread_message.html">wrench::FileTransferThreadMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_transfer_thread_notification_message.html">wrench::FileTransferThreadNotificationMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_action.html">wrench::FileWriteAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_completed_event.html">wrench::FileWriteCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_failed_event.html">wrench::FileWriteFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_writer_thread.html">wrench::FileWriterThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager.html">wrench::FunctionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_completed_message.html">wrench::FunctionManagerFunctionCompletedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_failed_message.html">wrench::FunctionManagerFunctionFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_answer_message.html">wrench::FunctionManagerFunctionInvocationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_request_message.html">wrench::FunctionManagerFunctionInvocationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_message.html">wrench::FunctionManagerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_wait_all_message.html">wrench::FunctionManagerWaitAllMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_wait_one_message.html">wrench::FunctionManagerWaitOneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_wakeup_message.html">wrench::FunctionManagerWakeupMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_not_found.html">wrench::FunctionNotFound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_functionality_not_available.html">wrench::FunctionalityNotAvailable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service.html">wrench::HTCondorCentralManagerService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service_message.html">wrench::HTCondorCentralManagerServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service_message_payload.html">wrench::HTCondorCentralManagerServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_negotiator_service.html">wrench::HTCondorNegotiatorService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_homegrown_batch_scheduler.html">wrench::HomegrownBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_error.html">wrench::HostError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_has_changed_speed_message.html">wrench::HostHasChangedSpeedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_has_turned_off_message.html">wrench::HostHasTurnedOffMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_has_turned_on_message.html">wrench::HostHasTurnedOnMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector.html">wrench::HostStateChangeDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_message.html">wrench::HostStateChangeDetectorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_property.html">wrench::HostStateChangeDetectorProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_killed.html">wrench::JobKilled</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager.html">wrench::JobManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_compound_job_completed_message.html">wrench::JobManagerCompoundJobCompletedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_compound_job_failed_message.html">wrench::JobManagerCompoundJobFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_message.html">wrench::JobManagerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_standard_job_completed_message.html">wrench::JobManagerStandardJobCompletedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_standard_job_failed_message.html">wrench::JobManagerStandardJobFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_wakeup_message.html">wrench::JobManagerWakeupMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_timeout.html">wrench::JobTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action.html">wrench::MPIAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action_1_1_m_p_i_private_execution_controller.html">wrench::MPIAction::MPIPrivateExecutionController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action_1_1_m_p_i_process.html">wrench::MPIAction::MPIProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_memory_manager.html">wrench::MemoryManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_negotiator_completion_message.html">wrench::NegotiatorCompletionMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_error.html">wrench::NetworkError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_compute_answer_message.html">wrench::NetworkProximityComputeAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_lookup_answer_message.html">wrench::NetworkProximityLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_lookup_request_message.html">wrench::NetworkProximityLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_message.html">wrench::NetworkProximityMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_receiver_daemon.html">wrench::NetworkProximityReceiverDaemon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_sender_daemon.html">wrench::NetworkProximitySenderDaemon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service.html">wrench::NetworkProximityService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_transfer_message.html">wrench::NetworkProximityTransferMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_answer_message.html">wrench::NextContactDaemonAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_request_message.html">wrench::NextContactDaemonRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_expired_event.html">wrench::PilotJobExpiredEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_started_event.html">wrench::PilotJobStartedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pointer_util.html">wrench::PointerUtil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_proxy_location.html">wrench::ProxyLocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_registered_function.html">wrench::RegisteredFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html">wrench::S4U_CommPort</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon.html">wrench::S4U_Daemon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon_1_1_life_saver.html">wrench::S4U_Daemon::LifeSaver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon_actor.html">wrench::S4U_DaemonActor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___pending_communication.html">wrench::S4U_PendingCommunication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___simulation.html">wrench::S4U_Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___virtual_machine.html">wrench::S4U_VirtualMachine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_request_message.html">wrench::ServerlessComputeServiceFunctionInvocationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_answer_message.html">wrench::ServerlessComputeServiceFunctionRegisterAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_request_message.html">wrench::ServerlessComputeServiceFunctionRegisterRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_invocation_execution_complete_message.html">wrench::ServerlessComputeServiceInvocationExecutionCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message.html">wrench::ServerlessComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_state_of_the_system.html">wrench::ServerlessStateOfTheSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_daemon_stopped_message.html">wrench::ServiceDaemonStoppedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_has_crashed_message.html">wrench::ServiceHasCrashedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_has_terminated_message.html">wrench::ServiceHasTerminatedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_down.html">wrench::ServiceIsDown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_suspended.html">wrench::ServiceIsSuspended</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message.html">wrench::ServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_property.html">wrench::ServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_stop_daemon_message.html">wrench::ServiceStopDaemonMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_termination_detector.html">wrench::ServiceTerminationDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_termination_detector_message.html">wrench::ServiceTerminationDetectorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service.html">wrench::SimpleStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_bufferized.html">wrench::SimpleStorageServiceBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_message_payload.html">wrench::SimpleStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_non_bufferized.html">wrench::SimpleStorageServiceNonBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_property.html">wrench::SimpleStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation.html">wrench::Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_message.html">wrench::SimulationMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_output.html">wrench::SimulationOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp.html">wrench::SimulationTimestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read.html">wrench::SimulationTimestampDiskRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_completion.html">wrench::SimulationTimestampDiskReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_failure.html">wrench::SimulationTimestampDiskReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_start.html">wrench::SimulationTimestampDiskReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write.html">wrench::SimulationTimestampDiskWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_completion.html">wrench::SimulationTimestampDiskWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_failure.html">wrench::SimulationTimestampDiskWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_start.html">wrench::SimulationTimestampDiskWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_energy_consumption.html">wrench::SimulationTimestampEnergyConsumption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy.html">wrench::SimulationTimestampFileCopy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_completion.html">wrench::SimulationTimestampFileCopyCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_failure.html">wrench::SimulationTimestampFileCopyFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_start.html">wrench::SimulationTimestampFileCopyStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read.html">wrench::SimulationTimestampFileRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_completion.html">wrench::SimulationTimestampFileReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_failure.html">wrench::SimulationTimestampFileReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_start.html">wrench::SimulationTimestampFileReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write.html">wrench::SimulationTimestampFileWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_completion.html">wrench::SimulationTimestampFileWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_failure.html">wrench::SimulationTimestampFileWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_start.html">wrench::SimulationTimestampFileWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_link_usage.html">wrench::SimulationTimestampLinkUsage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pair.html">wrench::SimulationTimestampPair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pstate_set.html">wrench::SimulationTimestampPstateSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task.html">wrench::SimulationTimestampTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_completion.html">wrench::SimulationTimestampTaskCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_failure.html">wrench::SimulationTimestampTaskFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_start.html">wrench::SimulationTimestampTaskStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_termination.html">wrench::SimulationTimestampTaskTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_type.html">wrench::SimulationTimestampType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_trace.html">wrench::SimulationTrace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_trace_3_01_simulation_timestamp_pstate_set_01_4.html">wrench::SimulationTrace&lt; SimulationTimestampPstateSet &gt;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_sleep_action.html">wrench::SleepAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_some_actions_have_failed.html">wrench::SomeActionsHaveFailed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job.html">wrench::StandardJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job_completed_event.html">wrench::StandardJobCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job_failed_event.html">wrench::StandardJobFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service.html">wrench::StorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_ack_message.html">wrench::StorageServiceAckMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_content_chunk_message.html">wrench::StorageServiceFileContentChunkMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_copy_answer_message.html">wrench::StorageServiceFileCopyAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_copy_request_message.html">wrench::StorageServiceFileCopyRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_delete_answer_message.html">wrench::StorageServiceFileDeleteAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_delete_request_message.html">wrench::StorageServiceFileDeleteRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_lookup_answer_message.html">wrench::StorageServiceFileLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_lookup_request_message.html">wrench::StorageServiceFileLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_read_answer_message.html">wrench::StorageServiceFileReadAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_read_request_message.html">wrench::StorageServiceFileReadRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_write_answer_message.html">wrench::StorageServiceFileWriteAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_write_request_message.html">wrench::StorageServiceFileWriteRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_free_space_answer_message.html">wrench::StorageServiceFreeSpaceAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_free_space_request_message.html">wrench::StorageServiceFreeSpaceRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_message.html">wrench::StorageServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_message_payload.html">wrench::StorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_not_enough_space.html">wrench::StorageServiceNotEnoughSpace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_property.html">wrench::StorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_proxy.html">wrench::StorageServiceProxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_proxy_property.html">wrench::StorageServiceProxyProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_terminal_output.html">wrench::TerminalOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_timer_event.html">wrench::TimerEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_trace_file_loader.html">wrench::TraceFileLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser.html">wrench::UnitParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser_1_1unit__scale.html">wrench::UnitParser::unit_scale</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_message.html">wrench::VirtualizedClusterComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_message_payload.html">wrench::VirtualizedClusterComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_migrate_v_m_answer_message.html">wrench::VirtualizedClusterComputeServiceMigrateVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_migrate_v_m_request_message.html">wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_property.html">wrench::VirtualizedClusterComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_wf_commons_workflow_parser.html">wrench::WfCommonsWorkflowParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow_task.html">wrench::WorkflowTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html">wrench::WorkloadBalancingServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_trace_file_replayer.html">wrench::WorkloadTraceFileReplayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_trace_file_replayer_event_receiver.html">wrench::WorkloadTraceFileReplayerEventReceiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_advanced_continue_search_message.html">wrench::XRootD::AdvancedContinueSearchMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_advanced_ripple_delete.html">wrench::XRootD::AdvancedRippleDelete</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_cache.html">wrench::XRootD::Cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_continue_search_message.html">wrench::XRootD::ContinueSearchMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_deployment.html">wrench::XRootD::Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_file_not_found_alarm.html">wrench::XRootD::FileNotFoundAlarm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message.html">wrench::XRootD::Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message_payload.html">wrench::XRootD::MessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_node.html">wrench::XRootD::Node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_property.html">wrench::XRootD::Property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_ripple_delete.html">wrench::XRootD::RippleDelete</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_update_cache_message.html">wrench::XRootD::UpdateCacheMessage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_internal.html">WRENCH Internal C++ API</a></li>
+      <li class="breadcrumb-item active">wrench::CompoundJob</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_internal/classwrench_1_1_compound_job.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wrench-compoundjob">
+<span id="compoundjob"></span><h1>wrench::CompoundJob<a class="headerlink" href="#wrench-compoundjob" title="Link to this heading"></a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJobE">
+<span id="_CPPv3N6wrench11CompoundJobE"></span><span id="_CPPv2N6wrench11CompoundJobE"></span><span id="wrench::CompoundJob"></span><span class="target" id="classwrench_1_1_compound_job"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompoundJob</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_job.html#_CPPv4N6wrench3JobE" title="wrench::Job"><span class="n"><span class="pre">Job</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_shared_from_this</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><span class="n"><span class="pre">CompoundJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><p>A compound job class. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob5StateE">
+<span id="_CPPv3N6wrench11CompoundJob5StateE"></span><span id="_CPPv2N6wrench11CompoundJob5StateE"></span><span class="target" id="classwrench_1_1_compound_job_1abd9194d84b704e30370b51db1737fe01"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">State</span></span></span><br /></dt>
+<dd><p>Compound job states. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob5State13NOT_SUBMITTEDE">
+<span id="_CPPv3N6wrench11CompoundJob5State13NOT_SUBMITTEDE"></span><span id="_CPPv2N6wrench11CompoundJob5State13NOT_SUBMITTEDE"></span><span class="target" id="classwrench_1_1_compound_job_1abd9194d84b704e30370b51db1737fe01ac04a91a64b809ae1ab6c108fe2cbb4e5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOT_SUBMITTED</span></span></span><br /></dt>
+<dd><p><a class="reference internal" href="classwrench_1_1_job.html#classwrench_1_1_job"><span class="std std-ref">Job</span></a> hasn’t been submitted yet. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob5State9SUBMITTEDE">
+<span id="_CPPv3N6wrench11CompoundJob5State9SUBMITTEDE"></span><span id="_CPPv2N6wrench11CompoundJob5State9SUBMITTEDE"></span><span class="target" id="classwrench_1_1_compound_job_1abd9194d84b704e30370b51db1737fe01a910a2dddc1564cb4fef3d28b4bb1a99b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SUBMITTED</span></span></span><br /></dt>
+<dd><p><a class="reference internal" href="classwrench_1_1_job.html#classwrench_1_1_job"><span class="std std-ref">Job</span></a> has been submitted to a <a class="reference internal" href="classwrench_1_1_job_manager.html#classwrench_1_1_job_manager"><span class="std std-ref">JobManager</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob5State9COMPLETEDE">
+<span id="_CPPv3N6wrench11CompoundJob5State9COMPLETEDE"></span><span id="_CPPv2N6wrench11CompoundJob5State9COMPLETEDE"></span><span class="target" id="classwrench_1_1_compound_job_1abd9194d84b704e30370b51db1737fe01adff763d235f2044813c742eadf2cbee2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPLETED</span></span></span><br /></dt>
+<dd><p><a class="reference internal" href="classwrench_1_1_job.html#classwrench_1_1_job"><span class="std std-ref">Job</span></a> has finished executing and all actions were successfully completed. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob5State12DISCONTINUEDE">
+<span id="_CPPv3N6wrench11CompoundJob5State12DISCONTINUEDE"></span><span id="_CPPv2N6wrench11CompoundJob5State12DISCONTINUEDE"></span><span class="target" id="classwrench_1_1_compound_job_1abd9194d84b704e30370b51db1737fe01a9352a053a632186c7eb9b4d9d9210559"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DISCONTINUED</span></span></span><br /></dt>
+<dd><p><a class="reference internal" href="classwrench_1_1_job.html#classwrench_1_1_job"><span class="std std-ref">Job</span></a> has finished executing but not all actions were successfully completed. Actions may have failed, the job may have been terminated/killed, or parent jobs may have been discontinued. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob19addActionDependencyERKNSt10shared_ptrI6ActionEERKNSt10shared_ptrI6ActionEE">
+<span id="_CPPv3N6wrench11CompoundJob19addActionDependencyERKNSt10shared_ptrI6ActionEERKNSt10shared_ptrI6ActionEE"></span><span id="_CPPv2N6wrench11CompoundJob19addActionDependencyERKNSt10shared_ptrI6ActionEERKNSt10shared_ptrI6ActionEE"></span><span id="wrench::CompoundJob::addActionDependency__std::shared_ptr:Action:CR.std::shared_ptr:Action:CR"></span><span class="target" id="classwrench_1_1_compound_job_1a7bb882561a324048959e8c955343a379"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addActionDependency</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_action.html#_CPPv4N6wrench6ActionE" title="wrench::Action"><span class="n"><span class="pre">Action</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">parent</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_action.html#_CPPv4N6wrench6ActionE" title="wrench::Action"><span class="n"><span class="pre">Action</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">child</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a dependency between two actions (does nothing if dependency already exists) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> – the parent action </p></li>
+<li><p><strong>child</strong> – the child action </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob11addChildJobERKNSt10shared_ptrI11CompoundJobEE">
+<span id="_CPPv3N6wrench11CompoundJob11addChildJobERKNSt10shared_ptrI11CompoundJobEE"></span><span id="_CPPv2N6wrench11CompoundJob11addChildJobERKNSt10shared_ptrI11CompoundJobEE"></span><span id="wrench::CompoundJob::addChildJob__std::shared_ptr:CompoundJob:CR"></span><span class="target" id="classwrench_1_1_compound_job_1ae7410193dc27d902295e664f36a6040a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addChildJob</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><span class="n"><span class="pre">CompoundJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">child</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a child job to this job (be careful not to add circular dependencies, which may lead to deadlocks) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>child</strong> – the child job </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob16addComputeActionERKNSt6stringEd9sg_size_tmmRKNSt10shared_ptrI13ParallelModelEE">
+<span id="_CPPv3N6wrench11CompoundJob16addComputeActionERKNSt6stringEd9sg_size_tmmRKNSt10shared_ptrI13ParallelModelEE"></span><span id="_CPPv2N6wrench11CompoundJob16addComputeActionERKNSt6stringEd9sg_size_tmmRKNSt10shared_ptrI13ParallelModelEE"></span><span id="wrench::CompoundJob::addComputeAction__ssCR.double.sg_size_t.unsigned-l.unsigned-l.std::shared_ptr:ParallelModel:CR"></span><span class="target" id="classwrench_1_1_compound_job_1af82e4b6f019601fa48b5eb98605c137f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compute_action.html#_CPPv4N6wrench13ComputeActionE" title="wrench::ComputeAction"><span class="n"><span class="pre">ComputeAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addComputeAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flops</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ram</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">min_num_cores</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_num_cores</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_parallel_model.html#_CPPv4N6wrench13ParallelModelE" title="wrench::ParallelModel"><span class="n"><span class="pre">ParallelModel</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">parallel_model</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a compute action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>flops</strong> – the number of flops to perform </p></li>
+<li><p><strong>ram</strong> – the amount of RAM required </p></li>
+<li><p><strong>min_num_cores</strong> – the minimum number of cores needed </p></li>
+<li><p><strong>max_num_cores</strong> – the maximum number of cores allowed </p></li>
+<li><p><strong>parallel_model</strong> – the parallel speedup model </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a compute action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob15addCustomActionENSt10shared_ptrI12CustomActionEE">
+<span id="_CPPv3N6wrench11CompoundJob15addCustomActionENSt10shared_ptrI12CustomActionEE"></span><span id="_CPPv2N6wrench11CompoundJob15addCustomActionENSt10shared_ptrI12CustomActionEE"></span><span id="wrench::CompoundJob::addCustomAction__std::shared_ptr:CustomAction:"></span><span class="target" id="classwrench_1_1_compound_job_1afd8a093182c5b674507027c1ed2b84a2"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_custom_action.html#_CPPv4N6wrench12CustomActionE" title="wrench::CustomAction"><span class="n"><span class="pre">CustomAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addCustomAction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_custom_action.html#_CPPv4N6wrench12CustomActionE" title="wrench::CustomAction"><span class="n"><span class="pre">CustomAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">custom_action</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a custom action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>custom_action</strong> – a custom action </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the custom action that was passed in </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEERKNSt10shared_ptrI14StorageServiceEE">
+<span id="_CPPv3N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="_CPPv2N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="wrench::CompoundJob::addFileCopyAction__ssCR.std::shared_ptr:DataFile:CR.std::shared_ptr:StorageService:CR.std::shared_ptr:StorageService:CR"></span><span class="target" id="classwrench_1_1_compound_job_1a75d5fe95d5c289d1dbb2fbf8b83b05f7"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_copy_action.html#_CPPv4N6wrench14FileCopyActionE" title="wrench::FileCopyAction"><span class="n"><span class="pre">FileCopyAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileCopyAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">src_storage_service</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dst_storage_service</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file copy action to a job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file</strong> – the file to copy </p></li>
+<li><p><strong>src_storage_service</strong> – the source storage service </p></li>
+<li><p><strong>dst_storage_service</strong> – the destination storage service </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file copy action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI12FileLocationEE">
+<span id="_CPPv3N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench11CompoundJob17addFileCopyActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI12FileLocationEE"></span><span id="wrench::CompoundJob::addFileCopyAction__ssCR.std::shared_ptr:FileLocation:CR.std::shared_ptr:FileLocation:CR"></span><span class="target" id="classwrench_1_1_compound_job_1af9d344234ff20fd457885d7ce6f73f62"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_copy_action.html#_CPPv4N6wrench14FileCopyActionE" title="wrench::FileCopyAction"><span class="n"><span class="pre">FileCopyAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileCopyAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">src_file_location</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dst_file_location</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file copy action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>src_file_location</strong> – the file’s location where it should be read </p></li>
+<li><p><strong>dst_file_location</strong> – the file’s location where it should be written </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file copy action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE">
+<span id="_CPPv3N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="_CPPv2N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="wrench::CompoundJob::addFileDeleteAction__ssCR.std::shared_ptr:DataFile:CR.std::shared_ptr:StorageService:CR"></span><span class="target" id="classwrench_1_1_compound_job_1aaeb03e92ebd84e724ed467a4c894a525"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_delete_action.html#_CPPv4N6wrench16FileDeleteActionE" title="wrench::FileDeleteAction"><span class="n"><span class="pre">FileDeleteAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileDeleteAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">storage_service</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file delete action to a job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file</strong> – the file to delete </p></li>
+<li><p><strong>storage_service</strong> – the storage service on which the file is </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file delete action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE">
+<span id="_CPPv3N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench11CompoundJob19addFileDeleteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"></span><span id="wrench::CompoundJob::addFileDeleteAction__ssCR.std::shared_ptr:FileLocation:CR"></span><span class="target" id="classwrench_1_1_compound_job_1abe8e8fda882178b34353c9fcb4cfd43b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_delete_action.html#_CPPv4N6wrench16FileDeleteActionE" title="wrench::FileDeleteAction"><span class="n"><span class="pre">FileDeleteAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileDeleteAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_location</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file delete action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file_location</strong> – the location from which to delete the file </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file delete action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE">
+<span id="_CPPv3N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="_CPPv2N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="wrench::CompoundJob::addFileReadAction__ssCR.std::shared_ptr:DataFile:CR.std::shared_ptr:StorageService:CR"></span><span class="target" id="classwrench_1_1_compound_job_1a1db3d41c429d52af0e284820ac7f68c8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_read_action.html#_CPPv4N6wrench14FileReadActionE" title="wrench::FileReadAction"><span class="n"><span class="pre">FileReadAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileReadAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">storage_service</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file read action to a job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file</strong> – the file to read </p></li>
+<li><p><strong>storage_service</strong> – the storage service to read the file from </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file read action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE9sg_size_t">
+<span id="_CPPv3N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE9sg_size_t"></span><span id="_CPPv2N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE9sg_size_t"></span><span id="wrench::CompoundJob::addFileReadAction__ssCR.std::shared_ptr:DataFile:CR.std::shared_ptr:StorageService:CR.sg_size_t"></span><span class="target" id="classwrench_1_1_compound_job_1aa2cc48922705c0afe5608e9cea9f03de"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_read_action.html#_CPPv4N6wrench14FileReadActionE" title="wrench::FileReadAction"><span class="n"><span class="pre">FileReadAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileReadAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">storage_service</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes_to_read</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file read action to a job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file</strong> – the file to read </p></li>
+<li><p><strong>storage_service</strong> – the storage service to read the file from </p></li>
+<li><p><strong>num_bytes_to_read</strong> – the number of bytes to read </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file read action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE">
+<span id="_CPPv3N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"></span><span id="wrench::CompoundJob::addFileReadAction__ssCR.std::shared_ptr:FileLocation:CR"></span><span class="target" id="classwrench_1_1_compound_job_1a74c41dd611e683254061d7bb3a80fd69"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_read_action.html#_CPPv4N6wrench14FileReadActionE" title="wrench::FileReadAction"><span class="n"><span class="pre">FileReadAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileReadAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_location</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file read action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file_location</strong> – the file’s location </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file read action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t">
+<span id="_CPPv3N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"></span><span id="_CPPv2N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"></span><span id="wrench::CompoundJob::addFileReadAction__ssCR.std::shared_ptr:FileLocation:CR.sg_size_t"></span><span class="target" id="classwrench_1_1_compound_job_1abb490f10e0aca019746be666c5d61c39"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_read_action.html#_CPPv4N6wrench14FileReadActionE" title="wrench::FileReadAction"><span class="n"><span class="pre">FileReadAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileReadAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_location</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes_to_read</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file read action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file_location</strong> – the file’s location </p></li>
+<li><p><strong>num_bytes_to_read</strong> – the number of bytes to read (if 0, read the whole file) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file read action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE">
+<span id="_CPPv3N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE"></span><span id="_CPPv2N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE"></span><span id="wrench::CompoundJob::addFileReadAction__ssCR.std::vector:std::shared_ptr:FileLocation::CR"></span><span class="target" id="classwrench_1_1_compound_job_1a026191e609ba847a10ad092b563cb181"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_read_action.html#_CPPv4N6wrench14FileReadActionE" title="wrench::FileReadAction"><span class="n"><span class="pre">FileReadAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileReadAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_locations</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file read action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file_locations</strong> – the locations to read the file from (will be tried in order until one succeeds) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file read action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE9sg_size_t">
+<span id="_CPPv3N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE9sg_size_t"></span><span id="_CPPv2N6wrench11CompoundJob17addFileReadActionERKNSt6stringERKNSt6vectorINSt10shared_ptrI12FileLocationEEEE9sg_size_t"></span><span id="wrench::CompoundJob::addFileReadAction__ssCR.std::vector:std::shared_ptr:FileLocation::CR.sg_size_t"></span><span class="target" id="classwrench_1_1_compound_job_1ad779f3eea54e504faf4bdd9db9f7f53b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_read_action.html#_CPPv4N6wrench14FileReadActionE" title="wrench::FileReadAction"><span class="n"><span class="pre">FileReadAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileReadAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_locations</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes_to_read</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file read action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file_locations</strong> – the locations to read the file from (will be tried in order until one succeeds) </p></li>
+<li><p><strong>num_bytes_to_read</strong> – number of bytes to read (if 0, read the whole file) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file read action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob29addFileRegistryAddEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE">
+<span id="_CPPv3N6wrench11CompoundJob29addFileRegistryAddEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench11CompoundJob29addFileRegistryAddEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE"></span><span id="wrench::CompoundJob::addFileRegistryAddEntryAction__ssCR.std::shared_ptr:FileRegistryService:CR.std::shared_ptr:FileLocation:CR"></span><span class="target" id="classwrench_1_1_compound_job_1a67874d0c42914b5d5b09ff0b19c61596"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_registry_add_entry_action.html#_CPPv4N6wrench26FileRegistryAddEntryActionE" title="wrench::FileRegistryAddEntryAction"><span class="n"><span class="pre">FileRegistryAddEntryAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileRegistryAddEntryAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_registry_service.html#_CPPv4N6wrench19FileRegistryServiceE" title="wrench::FileRegistryService"><span class="n"><span class="pre">FileRegistryService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_registry</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_location</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file registry add entry action. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name </p></li>
+<li><p><strong>file_registry</strong> – the file registry </p></li>
+<li><p><strong>file_location</strong> – the file location </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob32addFileRegistryDeleteEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE">
+<span id="_CPPv3N6wrench11CompoundJob32addFileRegistryDeleteEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench11CompoundJob32addFileRegistryDeleteEntryActionERKNSt6stringERKNSt10shared_ptrI19FileRegistryServiceEERKNSt10shared_ptrI12FileLocationEE"></span><span id="wrench::CompoundJob::addFileRegistryDeleteEntryAction__ssCR.std::shared_ptr:FileRegistryService:CR.std::shared_ptr:FileLocation:CR"></span><span class="target" id="classwrench_1_1_compound_job_1afff15bbb904eb6f94c4661e99d050cd1"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_registry_delete_entry_action.html#_CPPv4N6wrench29FileRegistryDeleteEntryActionE" title="wrench::FileRegistryDeleteEntryAction"><span class="n"><span class="pre">FileRegistryDeleteEntryAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileRegistryDeleteEntryAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_registry_service.html#_CPPv4N6wrench19FileRegistryServiceE" title="wrench::FileRegistryService"><span class="n"><span class="pre">FileRegistryService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_registry</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_location</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file registry delete entry action. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name </p></li>
+<li><p><strong>file_registry</strong> – the file registry </p></li>
+<li><p><strong>file_location</strong> – the file location </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE">
+<span id="_CPPv3N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="_CPPv2N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI8DataFileEERKNSt10shared_ptrI14StorageServiceEE"></span><span id="wrench::CompoundJob::addFileWriteAction__ssCR.std::shared_ptr:DataFile:CR.std::shared_ptr:StorageService:CR"></span><span class="target" id="classwrench_1_1_compound_job_1a410c2a7285fc2aad5ff33dc522666ee3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_write_action.html#_CPPv4N6wrench15FileWriteActionE" title="wrench::FileWriteAction"><span class="n"><span class="pre">FileWriteAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileWriteAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">storage_service</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file write action to a job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file</strong> – the file to write </p></li>
+<li><p><strong>storage_service</strong> – the storage service to write the file to </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file write action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE">
+<span id="_CPPv3N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench11CompoundJob18addFileWriteActionERKNSt6stringERKNSt10shared_ptrI12FileLocationEE"></span><span id="wrench::CompoundJob::addFileWriteAction__ssCR.std::shared_ptr:FileLocation:CR"></span><span class="target" id="classwrench_1_1_compound_job_1aa61948053fffd39fb7d0bf5789a395ab"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_write_action.html#_CPPv4N6wrench15FileWriteActionE" title="wrench::FileWriteAction"><span class="n"><span class="pre">FileWriteAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFileWriteAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_location</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a file write action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>file_location</strong> – the file’s location where it should be written </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a file write action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob12addMPIActionERKNSt6stringERKNSt8functionIFvRKNSt10shared_ptrI19ExecutionControllerEEEEEmm">
+<span id="_CPPv3N6wrench11CompoundJob12addMPIActionERKNSt6stringERKNSt8functionIFvRKNSt10shared_ptrI19ExecutionControllerEEEEEmm"></span><span id="_CPPv2N6wrench11CompoundJob12addMPIActionERKNSt6stringERKNSt8functionIFvRKNSt10shared_ptrI19ExecutionControllerEEEEEmm"></span><span class="target" id="classwrench_1_1_compound_job_1a3fa146cecbeb365afeae8cf392581722"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_m_p_i_action.html#_CPPv4N6wrench9MPIActionE" title="wrench::MPIAction"><span class="n"><span class="pre">MPIAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addMPIAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionControllerE" title="wrench::ExecutionController"><span class="n"><span class="pre">ExecutionController</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n"><span class="pre">controller</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mpi_code</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_processes</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_cores_per_process</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add an MPI action to the job. The intended use-case for an MPI action is that never runs concurrently with other actions within its job, and that that job is submitted to a <a class="reference internal" href="../api_user/classwrench_1_1_batch_compute_service.html#classwrench_1_1_batch_compute_service"><span class="std std-ref">BatchComputeService</span></a>, so that it has a set of resources dedicated to it. If the job is submitted to a <a class="reference internal" href="../api_user/classwrench_1_1_bare_metal_compute_service.html#classwrench_1_1_bare_metal_compute_service"><span class="std std-ref">BareMetalComputeService</span></a>, this action will use all of that service’s resources, regardless of other running actions/jobs on that service. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>mpi_code</strong> – a lambda/function that implements the MPI code that MPI processes should execute </p></li>
+<li><p><strong>num_processes</strong> – the number of MPI processes that will be started. </p></li>
+<li><p><strong>num_cores_per_process</strong> – the number of core that each MPI process should use. Note that this is not enforced by the runtime system. If the processes compute with more cores, then they will cause time-sharing on cores. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an MPI action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob12addParentJobERKNSt10shared_ptrI11CompoundJobEE">
+<span id="_CPPv3N6wrench11CompoundJob12addParentJobERKNSt10shared_ptrI11CompoundJobEE"></span><span id="_CPPv2N6wrench11CompoundJob12addParentJobERKNSt10shared_ptrI11CompoundJobEE"></span><span id="wrench::CompoundJob::addParentJob__std::shared_ptr:CompoundJob:CR"></span><span class="target" id="classwrench_1_1_compound_job_1ad507c942b3d75a54ea5275495134499c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addParentJob</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><span class="n"><span class="pre">CompoundJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">parent</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a parent job to this job (be careful not to add circular dependencies, which may lead to deadlocks) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> – the parent job </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob14addSleepActionERKNSt6stringEd">
+<span id="_CPPv3N6wrench11CompoundJob14addSleepActionERKNSt6stringEd"></span><span id="_CPPv2N6wrench11CompoundJob14addSleepActionERKNSt6stringEd"></span><span id="wrench::CompoundJob::addSleepAction__ssCR.double"></span><span class="target" id="classwrench_1_1_compound_job_1a1e29d28a69a423d79c6cc33722806f3c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_sleep_action.html#_CPPv4N6wrench11SleepActionE" title="wrench::SleepAction"><span class="n"><span class="pre">SleepAction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addSleepAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sleep_time</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Add a sleep action to the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the action’s name (if empty, a unique name will be picked for you) </p></li>
+<li><p><strong>sleep_time</strong> – the time to sleep, in seconds </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a sleep action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench11CompoundJob15getActionByNameERKNSt6stringE">
+<span id="_CPPv3NK6wrench11CompoundJob15getActionByNameERKNSt6stringE"></span><span id="_CPPv2NK6wrench11CompoundJob15getActionByNameERKNSt6stringE"></span><span id="wrench::CompoundJob::getActionByName__ssCRC"></span><span class="target" id="classwrench_1_1_compound_job_1afa0ccc889339316e568d2f62e9307f5c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_action.html#_CPPv4N6wrench6ActionE" title="wrench::Action"><span class="n"><span class="pre">Action</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getActionByName</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Returns an action in the job’s given its name (or throws std::invalid_argument) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – an action name </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an action </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob10getActionsEv">
+<span id="_CPPv3N6wrench11CompoundJob10getActionsEv"></span><span id="_CPPv2N6wrench11CompoundJob10getActionsEv"></span><span id="wrench::CompoundJob::getActions"></span><span class="target" id="classwrench_1_1_compound_job_1a0c90cff1ee3a7ff0a8fec8d4af2e864e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_action.html#_CPPv4N6wrench6ActionE" title="wrench::Action"><span class="n"><span class="pre">Action</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getActions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the job’s actions. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the set of actions in the job </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob15getChildrenJobsEv">
+<span id="_CPPv3N6wrench11CompoundJob15getChildrenJobsEv"></span><span id="_CPPv2N6wrench11CompoundJob15getChildrenJobsEv"></span><span id="wrench::CompoundJob::getChildrenJobs"></span><span class="target" id="classwrench_1_1_compound_job_1ab12ecb7b2cd80a6d85d12d8de1762cc9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><span class="n"><span class="pre">CompoundJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getChildrenJobs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the job’s children. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the (possibly empty) set of children jobs </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench11CompoundJob24getMinimumRequiredMemoryEv">
+<span id="_CPPv3NK6wrench11CompoundJob24getMinimumRequiredMemoryEv"></span><span id="_CPPv2NK6wrench11CompoundJob24getMinimumRequiredMemoryEv"></span><span id="wrench::CompoundJob::getMinimumRequiredMemoryC"></span><span class="target" id="classwrench_1_1_compound_job_1ac81261f9f176d2da249afed0833f1fea"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMinimumRequiredMemory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the minimum required amount of memory to run the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of bytes </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench11CompoundJob26getMinimumRequiredNumCoresEv">
+<span id="_CPPv3NK6wrench11CompoundJob26getMinimumRequiredNumCoresEv"></span><span id="_CPPv2NK6wrench11CompoundJob26getMinimumRequiredNumCoresEv"></span><span id="wrench::CompoundJob::getMinimumRequiredNumCoresC"></span><span class="target" id="classwrench_1_1_compound_job_1a8717ab45e4678bf86b87f46b69b14582"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMinimumRequiredNumCores</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the minimum required num cores to run the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob13getParentJobsEv">
+<span id="_CPPv3N6wrench11CompoundJob13getParentJobsEv"></span><span id="_CPPv2N6wrench11CompoundJob13getParentJobsEv"></span><span id="wrench::CompoundJob::getParentJobs"></span><span class="target" id="classwrench_1_1_compound_job_1a139aece339e8696aab474d5a33e0011b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><span class="n"><span class="pre">CompoundJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getParentJobs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the job’s parents. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the (possibly empty) set of parent jobs </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob12getSharedPtrEv">
+<span id="_CPPv3N6wrench11CompoundJob12getSharedPtrEv"></span><span id="_CPPv2N6wrench11CompoundJob12getSharedPtrEv"></span><span id="wrench::CompoundJob::getSharedPtr"></span><span class="target" id="classwrench_1_1_compound_job_1a8066bc40b59cd3aff4c89429e5848874"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><span class="n"><span class="pre">CompoundJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getSharedPtr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the shared pointer for this object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a shared pointer to the object </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench11CompoundJob8getStateEv">
+<span id="_CPPv3NK6wrench11CompoundJob8getStateEv"></span><span id="_CPPv2NK6wrench11CompoundJob8getStateEv"></span><span id="wrench::CompoundJob::getStateC"></span><span class="target" id="classwrench_1_1_compound_job_1a48e28f1fa3c0ad92d058308550216bcc"></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJobE" title="wrench::CompoundJob"><span class="n"><span class="pre">CompoundJob</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_compound_job.html#_CPPv4N6wrench11CompoundJob5StateE" title="wrench::CompoundJob::State"><span class="n"><span class="pre">State</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the state of the standard job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the state </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench11CompoundJob16getStateAsStringEv">
+<span id="_CPPv3NK6wrench11CompoundJob16getStateAsStringEv"></span><span id="_CPPv2NK6wrench11CompoundJob16getStateAsStringEv"></span><span id="wrench::CompoundJob::getStateAsStringC"></span><span class="target" id="classwrench_1_1_compound_job_1a8d4e2735f524f192217567bf0a2406b9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getStateAsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the state of the standard job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the state </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob9hasFailedEv">
+<span id="_CPPv3N6wrench11CompoundJob9hasFailedEv"></span><span id="_CPPv2N6wrench11CompoundJob9hasFailedEv"></span><span id="wrench::CompoundJob::hasFailed"></span><span class="target" id="classwrench_1_1_compound_job_1aac15e446631f6222304471da9217f1d1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasFailed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Return whether the job has terminated and has done so with some tasks having failed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob24hasSuccessfullyCompletedEv">
+<span id="_CPPv3N6wrench11CompoundJob24hasSuccessfullyCompletedEv"></span><span id="_CPPv2N6wrench11CompoundJob24hasSuccessfullyCompletedEv"></span><span id="wrench::CompoundJob::hasSuccessfullyCompleted"></span><span class="target" id="classwrench_1_1_compound_job_1a6adf149ba0742faa82ba57ea9f3d0c96"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasSuccessfullyCompleted</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Return whether the job has terminated and has done so successfully. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench11CompoundJob23printActionDependenciesEv">
+<span id="_CPPv3NK6wrench11CompoundJob23printActionDependenciesEv"></span><span id="_CPPv2NK6wrench11CompoundJob23printActionDependenciesEv"></span><span id="wrench::CompoundJob::printActionDependenciesC"></span><span class="target" id="classwrench_1_1_compound_job_1ae73053b96c0c5f6d5f0afeccd266163e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">printActionDependencies</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench11CompoundJob23printActionDependenciesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Print the list of actions with their children and parents. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob12printTaskMapEv">
+<span id="_CPPv3N6wrench11CompoundJob12printTaskMapEv"></span><span id="_CPPv2N6wrench11CompoundJob12printTaskMapEv"></span><span id="wrench::CompoundJob::printTaskMap"></span><span class="target" id="classwrench_1_1_compound_job_1a43bb8d7ee0d7ffd9cc8c5301b03b9ded"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">printTaskMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench11CompoundJob12printTaskMapEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Print the task map. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob12removeActionERKNSt10shared_ptrI6ActionEE">
+<span id="_CPPv3N6wrench11CompoundJob12removeActionERKNSt10shared_ptrI6ActionEE"></span><span id="_CPPv2N6wrench11CompoundJob12removeActionERKNSt10shared_ptrI6ActionEE"></span><span id="wrench::CompoundJob::removeAction__std::shared_ptr:Action:CR"></span><span class="target" id="classwrench_1_1_compound_job_1ad34096e0f90646cac00ed7e47ceffc98"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">removeAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_action.html#_CPPv4N6wrench6ActionE" title="wrench::Action"><span class="n"><span class="pre">Action</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">action</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Remove an action from the job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>action</strong> – the action to remove </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob11setPriorityEd">
+<span id="_CPPv3N6wrench11CompoundJob11setPriorityEd"></span><span id="_CPPv2N6wrench11CompoundJob11setPriorityEd"></span><span id="wrench::CompoundJob::setPriority__double"></span><span class="target" id="classwrench_1_1_compound_job_1a5500e81885d9f42a4ce2c24e7d8a487c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPriority</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
+<dd><p>Set the job’s priority (the higher the value, the higher the priority) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> – a priority </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob11usesScratchEv">
+<span id="_CPPv3N6wrench11CompoundJob11usesScratchEv"></span><span id="_CPPv2N6wrench11CompoundJob11usesScratchEv"></span><span id="wrench::CompoundJob::usesScratch"></span><span class="target" id="classwrench_1_1_compound_job_1a77fda3cc27df6c3aca4d3d8ce58a40dd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">usesScratch</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench11CompoundJob11usesScratchEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine whether the job uses scratch. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if the job uses scratch, false otherwise </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="classwrench_1_1_communicator.html" class="btn btn-neutral float-left" title="wrench::Communicator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_compound_job_completed_event.html" class="btn btn-neutral float-right" title="wrench::CompoundJobCompletedEvent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

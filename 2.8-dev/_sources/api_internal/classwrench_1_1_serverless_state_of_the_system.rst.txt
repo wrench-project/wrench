@@ -1,0 +1,8 @@
+.. _ServerlessStateOfTheSystem:
+wrench::ServerlessStateOfTheSystem
+**********************************
+
+.. doxygenclass:: wrench::ServerlessStateOfTheSystem
+   :project: internal
+   :members:
+

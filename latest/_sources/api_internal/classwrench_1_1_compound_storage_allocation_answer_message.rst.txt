@@ -1,0 +1,8 @@
+.. _CompoundStorageAllocationAnswerMessage:
+wrench::CompoundStorageAllocationAnswerMessage
+**********************************************
+
+.. doxygenclass:: wrench::CompoundStorageAllocationAnswerMessage
+   :project: internal
+   :members:
+

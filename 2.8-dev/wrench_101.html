@@ -1,0 +1,615 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WRENCH 101 &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=14e8207d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="WRENCH 102" href="wrench_102.html" />
+    <link rel="prev" title="Simulation 101" href="simulation_101.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">WRENCH 101</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ft-view-of-a-wrench-simulator">10,000-ft view of a WRENCH simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrench-101-simulator-1000ft">1,000-ft view of a WRENCH simulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-0-include-wrench-h">Step 0: Include wrench.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-create-and-initialize-a-simulation">Step 1: Create and initialize a simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-instantiate-a-simulated-platform">Step 2: Instantiate a simulated platform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-instantiate-services-on-the-platform">Step 3: Instantiate services on the platform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-instantiate-at-least-one-execution-controller">Step 4: Instantiate at least one Execution controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5-launch-the-simulation">Step 5: Launch the simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-6-process-simulation-output">Step 6: Process simulation output</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#available-services">Available services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#customizing-services">Customizing services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#customizing-logging">Customizing logging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">WRENCH 101</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/wrench_101.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wrench-101">
+<span id="wrench-101-header"></span><h1>WRENCH 101<a class="headerlink" href="#wrench-101" title="Link to this heading"></a></h1>
+<p>This page provides high-level and detailed information about what WRENCH
+simulators can simulate and how they do it. Full API details are
+provided in the <a class="reference internal" href="api_user.html#user-api"><span class="std std-ref">User API Reference</span></a>. See the
+relevant pages for instructions on how to <a class="reference internal" href="installation.html#install"><span class="std std-ref">install
+WRENCH</span></a> and how to <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">setup a simulator
+project</span></a>.</p>
+<section id="ft-view-of-a-wrench-simulator">
+<span id="wrench-101-simulator-10000ft"></span><h2>10,000-ft view of a WRENCH simulator<a class="headerlink" href="#ft-view-of-a-wrench-simulator" title="Link to this heading"></a></h2>
+<p>A WRENCH simulator can be as simple as a single <code class="docutils literal notranslate"><span class="pre">main()</span></code> function that
+creates a platform to be simulated (the hardware) and a set of services
+that run on the platform (the software). These services correspond to
+software that knows how to store data, perform computation, and many
+other useful things that real-world cyberinfrastructure services can do.</p>
+<p>The simulator then creates a special (simulated) process called an
+<em>execution controller</em>. An execution controller interacts with the
+services running on the platform to execute some application workload of
+interest, whatever that workflow is. The execution controller is
+implemented using the <a class="reference internal" href="api_developer.html#developer-api"><span class="std std-ref">WRENCH Developer
+API</span></a>, as discussed in the <a class="reference internal" href="wrench_102.html#wrench-102-header"><span class="std std-ref">WRENCH
+102</span></a> page.</p>
+<p>The simulation is then launched via a single call
+(<a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation6launchEv" title="wrench::Simulation::launch"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::launch()</span></code></a>), and returns only once the execution
+controller has terminated (after completing or failing to complete
+whatever it wanted to accomplish).</p>
+</section>
+<section id="wrench-101-simulator-1000ft">
+<span id="id1"></span><h2>1,000-ft view of a WRENCH simulator<a class="headerlink" href="#wrench-101-simulator-1000ft" title="Link to this heading"></a></h2>
+<p>In this section, we dive deeper into what it takes to implement a WRENCH
+simulator. <em>To provide context, we refer to the example simulator in
+the</em> <code class="docutils literal notranslate"><span class="pre">examples/action_api/multi-action-multi-job</span></code>
+<em>directory of the WRENCH distribution</em>. This simulator simulates the
+execution of a few jobs, each of which consists of one or more actions,
+on a 4-host platform that runs a couple of compute services and storage
+services. Although other examples are available (see
+<code class="docutils literal notranslate"><span class="pre">examples/README.md</span></code>), this simple example is sufficient to showcase
+most of what a WRENCH simulator does, which consists in going through
+the steps below. Note that all simulator codes in the <code class="docutils literal notranslate"><span class="pre">examples</span></code>
+directory contain extensive comments.</p>
+<section id="step-0-include-wrench-h">
+<span id="wrench-101-simulator-1000ft-step-0"></span><h3>Step 0: Include wrench.h<a class="headerlink" href="#step-0-include-wrench-h" title="Link to this heading"></a></h3>
+<p>For ease of use, all WRENCH abstractions in the <a class="reference internal" href="api_user.html#user-api"><span class="std std-ref">WRENCH User
+API</span></a> are available through a single header file:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;wrench.h&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="step-1-create-and-initialize-a-simulation">
+<span id="wrench-101-simulator-1000ft-step-1"></span><h3>Step 1: Create and initialize a simulation<a class="headerlink" href="#step-1-create-and-initialize-a-simulation" title="Link to this heading"></a></h3>
+<p>The state of a WRENCH simulation is defined by the
+<a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10SimulationE" title="wrench::Simulation"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation</span></code></a> class. A simulator must create an instance of
+this class by calling <a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation16createSimulationEv" title="wrench::Simulation::createSimulation"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::createSimulation()</span></code></a> and
+initialize it with the <a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation4initEPiPPc" title="wrench::Simulation::init"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::init()</span></code></a> member function.
+The <code class="docutils literal notranslate"><span class="pre">multi-action-multi-job</span></code> simulator does this as follows:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">simulation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">Simulation</span><span class="o">::</span><span class="n">createSimulation</span><span class="p">();</span>
+<span class="w">    </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that this member function takes in the command-line arguments
+passed to the main function of the simulator. This is so that it can
+parse WRENCH-specific and
+<span class="xref std std-ref">SimGrid-specific</span>
+command-line arguments. (Recall that WRENCH is based on
+<span class="xref std std-ref">SimGrid</span>.) Two useful such arguments are
+<code class="docutils literal notranslate"><span class="pre">--wrench-help</span></code>, which displays a WRENCH help message, and
+<code class="docutils literal notranslate"><span class="pre">--help-simgrid</span></code>, which displays an extensive SimGrid help message.
+Another one is <code class="docutils literal notranslate"><span class="pre">--wrench-full-log</span></code>, which displays full simulation
+logs (see below for more details).</p>
+</section>
+<section id="step-2-instantiate-a-simulated-platform">
+<span id="wrench-101-simulator-1000ft-step-2"></span><h3>Step 2: Instantiate a simulated platform<a class="headerlink" href="#step-2-instantiate-a-simulated-platform" title="Link to this heading"></a></h3>
+<p>This is done with the <a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation19instantiatePlatformERKNSt8functionIFvvEEE" title="wrench::Simulation::instantiatePlatform"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::instantiatePlatform()</span></code></a>
+method. There are two versions of this method. The <strong>first version</strong>
+takes as argument a <span class="xref std std-ref">SimGrid virtual platform description
+file</span>, we defines all
+the simulated hardware (compute hosts, clusters of hosts, storage
+resources, network links, routers, routes between hosts, etc.). The
+bare-metal-chain simulator comes with a platform description file,
+<code class="docutils literal notranslate"><span class="pre">examples/action_api/multi-action-multi-job/four_hosts.xml</span></code>, which we
+include here:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&#39;1.0&#39;?&gt;</span>
+<span class="cp">&lt;!DOCTYPE platform SYSTEM &quot;https://simgrid.org/simgrid.dtd&quot;&gt;</span>
+<span class="nt">&lt;platform</span><span class="w"> </span><span class="na">version=</span><span class="s">&quot;4.1&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;zone</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;AS0&quot;</span><span class="w"> </span><span class="na">routing=</span><span class="s">&quot;Full&quot;</span><span class="nt">&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- The host on which the Controller will run --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;host</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;UserHost&quot;</span><span class="w"> </span><span class="na">speed=</span><span class="s">&quot;10Gf&quot;</span><span class="w"> </span><span class="na">core=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/host&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- The host on which the bare-metal compute service will run and also run jobs--&gt;</span>
+<span class="w">        </span><span class="nt">&lt;host</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;ComputeHost1&quot;</span><span class="w"> </span><span class="na">speed=</span><span class="s">&quot;35Gf&quot;</span><span class="w"> </span><span class="na">core=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;ram&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;16GB&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/host&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- Another host on which the bare-metal compute service will be able to run jobs --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;host</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;ComputeHost2&quot;</span><span class="w"> </span><span class="na">speed=</span><span class="s">&quot;35Gf&quot;</span><span class="w"> </span><span class="na">core=</span><span class="s">&quot;10&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;ram&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;16GB&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/host&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- The host on which the first storage service will run --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;host</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;StorageHost1&quot;</span><span class="w"> </span><span class="na">speed=</span><span class="s">&quot;10Gf&quot;</span><span class="w"> </span><span class="na">core=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;disk</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;hard_drive&quot;</span><span class="w"> </span><span class="na">read_bw=</span><span class="s">&quot;100MBps&quot;</span><span class="w"> </span><span class="na">write_bw=</span><span class="s">&quot;100MBps&quot;</span><span class="nt">&gt;</span>
+<span class="w">                </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;size&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;5000GiB&quot;</span><span class="nt">/&gt;</span>
+<span class="w">                </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;mount&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;/&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/disk&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/host&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- The host on which the second storage service will run --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;host</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;StorageHost2&quot;</span><span class="w"> </span><span class="na">speed=</span><span class="s">&quot;10Gf&quot;</span><span class="w"> </span><span class="na">core=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;disk</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;hard_drive&quot;</span><span class="w"> </span><span class="na">read_bw=</span><span class="s">&quot;200MBps&quot;</span><span class="w"> </span><span class="na">write_bw=</span><span class="s">&quot;200MBps&quot;</span><span class="nt">&gt;</span>
+<span class="w">                </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;size&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;5000GiB&quot;</span><span class="nt">/&gt;</span>
+<span class="w">                </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;mount&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;/&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/disk&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/host&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- The host on which the cloud compute service will run --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;host</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;CloudHeadHost&quot;</span><span class="w"> </span><span class="na">speed=</span><span class="s">&quot;10Gf&quot;</span><span class="w"> </span><span class="na">core=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;disk</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;hard_drive&quot;</span><span class="w"> </span><span class="na">read_bw=</span><span class="s">&quot;100MBps&quot;</span><span class="w"> </span><span class="na">write_bw=</span><span class="s">&quot;100MBps&quot;</span><span class="nt">&gt;</span>
+<span class="w">                </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;size&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;5000GiB&quot;</span><span class="nt">/&gt;</span>
+<span class="w">                </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;mount&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;/scratch/&quot;</span><span class="nt">/&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/disk&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/host&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- The host on which the cloud compute service will start VMs --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;host</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;CloudHost&quot;</span><span class="w"> </span><span class="na">speed=</span><span class="s">&quot;25Gf&quot;</span><span class="w"> </span><span class="na">core=</span><span class="s">&quot;8&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;prop</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;ram&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;16GB&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/host&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- A network link shared by EVERY ONE--&gt;</span>
+<span class="w">        </span><span class="nt">&lt;link</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="w"> </span><span class="na">bandwidth=</span><span class="s">&quot;50MBps&quot;</span><span class="w"> </span><span class="na">latency=</span><span class="s">&quot;1ms&quot;</span><span class="nt">/&gt;</span>
+
+<span class="w">        </span><span class="cm">&lt;!-- The same network link connects all hosts together --&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;UserHost&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;ComputeHost1&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;UserHost&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;ComputeHost2&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;UserHost&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;StorageHost1&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;UserHost&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;StorageHost2&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;UserHost&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;CloudHeadHost&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;ComputeHost1&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;StorageHost1&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;ComputeHost2&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;StorageHost2&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;CloudHeadHost&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;CloudHost&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;StorageHost1&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;CloudHost&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+<span class="w">        </span><span class="nt">&lt;route</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;StorageHost2&quot;</span><span class="w"> </span><span class="na">dst=</span><span class="s">&quot;CloudHost&quot;</span><span class="nt">&gt;</span><span class="w"> </span><span class="nt">&lt;link_ctn</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;network_link&quot;</span><span class="nt">/&gt;</span><span class="w"> </span><span class="nt">&lt;/route&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;/zone&gt;</span>
+<span class="nt">&lt;/platform&gt;</span>
+</pre></div>
+</div>
+<p>This file defines a platform with several hosts, each with some number
+of cores and a core speed. Some hosts have a disk attached to them, some
+declare a RAM capacity. The platform also declares a single network link
+with a particular latency and bandwidth, and routes between some of the
+hosts (over that one link). We refer the reader to platform description
+files in other examples in the <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory and to the
+<span class="xref std std-ref">SimGrid documentation</span>
+for more information on how to create platform description files. There
+are many possibilities for defining complex platforms at will. The
+bare-metal-chain simulator takes the path to the platform description as
+its 1st (and only) command-line argument and thus instantiates the
+simulated platform as:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="p">.</span><span class="n">instantiatePlatform</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>The <strong>second version</strong> of the
+<a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation19instantiatePlatformERKNSt8functionIFvvEEE" title="wrench::Simulation::instantiatePlatform"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::instantiatePlatform()</span></code></a> method takes as input a
+function that creates the platform description programmatically using
+the <span class="xref std std-ref">SimGrid platform description
+API</span>. The example
+in
+<code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform</span></code>
+shows how the XML platform description in
+<code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/two_hosts.xml</span></code>
+can be implemented programmatically. (Note that this example passes a
+functor to <a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation19instantiatePlatformERKNSt8functionIFvvEEE" title="wrench::Simulation::instantiatePlatform"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::instantiatePlatform()</span></code></a> rather than a
+plain lambda.)</p>
+</section>
+<section id="step-3-instantiate-services-on-the-platform">
+<span id="wrench-101-simulator-1000ft-step-3"></span><h3>Step 3: Instantiate services on the platform<a class="headerlink" href="#step-3-instantiate-services-on-the-platform" title="Link to this heading"></a></h3>
+<p>While the previous step defines the hardware platform, this step defines
+what software services run on that hardware. The
+<a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4I0EN6wrench10Simulation3addENSt10shared_ptrI1TEENSt10shared_ptrI1TEE" title="wrench::Simulation::add"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::add()</span></code></a> member function is used to add services to
+the simulation. Each class of service is created with a particular
+constructor, which also specifies host(s) on which the service is to be
+started. Typical kinds of services include compute services, storage
+services, and file registry services (see
+<a class="reference internal" href="#wrench-101-simulator-services"><span class="std std-ref">below</span></a> for more details).</p>
+<dl class="simple">
+<dt>The multi-action-multi-job simulator instantiates four services. The first one</dt><dd><p>is a storage service:</p>
+</dd>
+</dl>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">storage_service_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageService</span><span class="p">(</span><span class="s">&quot;StorageHost1&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;/&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageServiceProperty</span><span class="o">::</span><span class="n">BUFFER_SIZE</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;50MB&quot;</span><span class="p">}},</span><span class="w"> </span><span class="p">{}));</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="api_developer/classwrench_1_1_simple_storage_service.html#_CPPv4N6wrench20SimpleStorageServiceE" title="wrench::SimpleStorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimpleStorageService</span></code></a> class implements a simulation of a
+remotely-accessible storage service on which files can be stored,
+copied, deleted, read, and written. In this particular case, the storage
+service is started on host <code class="docutils literal notranslate"><span class="pre">StorageHost1</span></code>. It uses storage mounted at
+<code class="docutils literal notranslate"><span class="pre">/</span></code> on that host (which corresponds to the mount path of a disk, as
+seen in the XML platform description). The last two arguments, as for
+the compute services, are used to configure particular properties of the
+service. In this case, the service is configured to use a 50-MB buffer
+size to pipeline network and disk accesses (see details in <a class="reference internal" href="#wrench-101-customizing-services"><span class="std std-ref">this section
+below</span></a>).</p>
+<p>The second service is a another storage service that runs on host
+<code class="docutils literal notranslate"><span class="pre">StorageHost2</span></code>.</p>
+<p id="wrench-101-simulator-1000ft-step-4">The third service is a compute service:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">baremetal_service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">BareMetalComputeService</span><span class="p">(</span><span class="s">&quot;ComputeHost1&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">&quot;ComputeHost1&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;ComputeHost2&quot;</span><span class="p">}},</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="p">{}));</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="api_developer/classwrench_1_1_bare_metal_compute_service.html#_CPPv4N6wrench23BareMetalComputeServiceE" title="wrench::BareMetalComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeService</span></code></a> class implements a simulation of
+a compute service that greedily runs jobs submitted to it. You can think
+of it as a compute server that simply fork-execs (possibly
+multi-threaded) processes upon request, only ensuring that physical RAM
+capacity is not exceeded. In this particular case, the compute service
+is started on host <code class="docutils literal notranslate"><span class="pre">ComputeHost1</span></code>. It has access to the compute
+resources of that same host as well as that of a second host
+<code class="docutils literal notranslate"><span class="pre">ComputeHost2</span></code> (2nd argument is a list of available compute hosts).
+The third argument corresponds to the path of some scratch storage,
+i.e., storage in which data can be stored temporarily while a job runs.
+In this case, the scratch storage specification is empty as host
+<code class="docutils literal notranslate"><span class="pre">ComputeHost1</span></code> has no disk attached to it. The last two arguments are
+<code class="docutils literal notranslate"><span class="pre">std::map</span></code> objects (in this case both empty), that are used to
+configure properties of the service (see details in <a class="reference internal" href="#wrench-101-customizing-services"><span class="std std-ref">this section
+below</span></a>).</p>
+<p>The fourth service is a cloud compute service:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">cloud_service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">CloudComputeService</span><span class="p">(</span><span class="s">&quot;CloudHeadHost&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;CloudHost&quot;</span><span class="p">},</span><span class="w"> </span><span class="s">&quot;/scratch/&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="p">{}));</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="api_developer/classwrench_1_1_cloud_compute_service.html#_CPPv4N6wrench19CloudComputeServiceE" title="wrench::CloudComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::CloudComputeService</span></code></a> implements a simulation of a cloud
+platform on which virtual machine (VM) instances can be created,
+started, used, and shutdown. The service runs on host <code class="docutils literal notranslate"><span class="pre">CloudHeadHost</span></code>
+and has access to the compute resources on host <code class="docutils literal notranslate"><span class="pre">CloudHost</span></code>. Unlike
+the previous service, this service has scratch space, at path <code class="docutils literal notranslate"><span class="pre">/scratch</span></code>
+on the disk attached to host <code class="docutils literal notranslate"><span class="pre">CloudHost</span></code> (as seen in the XML platform
+description). Here again, the last two arguments are used to configure
+properties of the service.</p>
+</section>
+<section id="step-4-instantiate-at-least-one-execution-controller">
+<h3>Step 4: Instantiate at least one Execution controller<a class="headerlink" href="#step-4-instantiate-at-least-one-execution-controller" title="Link to this heading"></a></h3>
+<p>At least one <em>execution controller</em> must be created and added to the
+simulation. This is a special service that is in charge of executing an
+application workload on the platform. It is implemented as a class that
+derives from <a class="reference internal" href="api_developer/classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionControllerE" title="wrench::ExecutionController"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ExecutionController</span></code></a> and override its
+constructor as well as its <code class="docutils literal notranslate"><span class="pre">main()</span></code> method. This method is
+implementing using the <a class="reference internal" href="api_developer.html#developer-api"><span class="std std-ref">WRENCH Developer
+API</span></a>.</p>
+<p>The example in <code class="docutils literal notranslate"><span class="pre">examples/action_api/multi-action-multi-job</span></code> does
+this as follows:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">wms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">MultiActionMultiJobController</span><span class="p">(</span><span class="n">baremetal_service</span><span class="p">,</span><span class="w"> </span><span class="n">cloud_service</span><span class="p">,</span><span class="w"> </span><span class="n">storage_service_1</span><span class="p">,</span><span class="w"> </span><span class="n">storage_service_2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UserHost&quot;</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>This creates an execution controller and passes to its constructor the
+services created before, and the host on which it is supposed to execute.
+Class <code class="docutils literal notranslate"><span class="pre">wrench::MultiActionMultiJobController</span></code> is of course provided
+with the example. See the <a class="reference internal" href="wrench_102.html#wrench-102-header"><span class="std std-ref">WRENCH 102</span></a> page for
+information on how to implement an execution controller.</p>
+<p>One important question is how to specify an <em>application workload</em> and
+tell the execution controller to execute it. This is completely up to
+the developer, and in this example the execution controller creates a
+different number of tasks to creates files, file read actions,
+file write actions, and compute actions to be executed as part of various
+jobs (see the implementation of
+<code class="docutils literal notranslate"><span class="pre">wrench::MultiActionMultiJobController</span></code>). All the examples in the
+<code class="docutils literal notranslate"><span class="pre">examples/action_api</span></code> directory do this in different ways. <em>However</em>,
+many users are interested in <strong>workflow applications</strong>, for this reason,
+WRENCH provides a <a class="reference internal" href="api_developer/classwrench_1_1_workflow.html#_CPPv4N6wrench8WorkflowE" title="wrench::Workflow"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Workflow</span></code></a> class that has member functions
+to manually create tasks and files and add them to a workflow. The use
+of this class is shown in all the examples in directory
+<code class="docutils literal notranslate"><span class="pre">examples/workflow_api</span></code>. The <a class="reference internal" href="api_developer/classwrench_1_1_workflow.html#_CPPv4N6wrench8WorkflowE" title="wrench::Workflow"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Workflow</span></code></a> class also provides
+member functions to import workflows from workflow description files in
+standard <span class="xref std std-ref">JSON format</span>. Note
+that an execution controller that executes a workflow is often called a
+Workflow Management System (WMS). This is why many execution controllers
+in the examples in directory <code class="docutils literal notranslate"><span class="pre">examples/workflow_api</span></code> have WMS in their
+class names.</p>
+</section>
+<section id="step-5-launch-the-simulation">
+<span id="wrench-101-simulator-1000ft-step-5"></span><h3>Step 5: Launch the simulation<a class="headerlink" href="#step-5-launch-the-simulation" title="Link to this heading"></a></h3>
+<p>This is the easiest step, and is done by simply calling
+<a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation6launchEv" title="wrench::Simulation::launch"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::launch()</span></code></a>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="p">.</span><span class="n">launch</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This call checks the simulation setup and blocks until the execution
+controller terminates.</p>
+</section>
+<section id="step-6-process-simulation-output">
+<span id="wrench-101-simulator-1000ft-step-6"></span><h3>Step 6: Process simulation output<a class="headerlink" href="#step-6-process-simulation-output" title="Link to this heading"></a></h3>
+<p>The processing of simulation output is up to the user as different users
+are interested in different output. For instance, the examples in
+directory <code class="docutils literal notranslate"><span class="pre">examples/action_api</span></code> merely print some information to the
+terminal. But this information could be collected in data structures,
+output to files, etc. This said, WRENCH provides a
+<a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation9getOutputEv" title="wrench::Simulation::getOutput"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::getOutput()</span></code></a> member function that returns an
+instance of class <a class="reference internal" href="api_developer/classwrench_1_1_simulation_output.html#_CPPv4N6wrench16SimulationOutputE" title="wrench::SimulationOutput"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimulationOutput</span></code></a>. Note that there are
+member functions to configure the type and amount of output generated
+(see the <code class="docutils literal notranslate"><span class="pre">wrench::SimulationOutput::enable*Timestamps()</span></code> member
+functions). <a class="reference internal" href="api_developer/classwrench_1_1_simulation_output.html#_CPPv4N6wrench16SimulationOutputE" title="wrench::SimulationOutput"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimulationOutput</span></code></a> has a templated
+<a class="reference internal" href="api_developer/classwrench_1_1_simulation_output.html#_CPPv4I0EN6wrench16SimulationOutput8getTraceENSt6vectorIP19SimulationTimestampI1TEEEv" title="wrench::SimulationOutput::getTrace"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimulationOutput::getTrace()</span></code></a> member function to retrieve
+traces for various information types. This is exemplified in several of
+the example simulators in the <code class="docutils literal notranslate"><span class="pre">examples/workflow_api</span></code> directory. Note
+that many of the timestamp types have to do with the execution of
+workflow tasks, as defined using the <a class="reference internal" href="api_developer/classwrench_1_1_workflow.html#_CPPv4N6wrench8WorkflowE" title="wrench::Workflow"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Workflow</span></code></a> class.</p>
+<p>Another kind of output is (simulated) energy consumption. WRENCH
+leverages <span class="xref std std-ref">SimGrid’s energy
+plugin</span>,
+which provides accounting for computing time and dissipated energy in
+the simulated platform. SimGrid’s energy plugin requires host <code class="docutils literal notranslate"><span class="pre">pstate</span></code>
+definitions (levels of performance, CPU frequency) in the <span class="xref std std-ref">XML platform
+description file</span>. The
+<a class="reference internal" href="api_developer/classwrench_1_1_simulation.html#_CPPv4N6wrench10Simulation17getEnergyConsumedERKNSt6stringE" title="wrench::Simulation::getEnergyConsumed"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Simulation::getEnergyConsumed()</span></code></a> member function returns
+energy consumed by all hosts in the platform. <strong>Important:</strong> The energy
+plugin is NOT enabled by default in WRENCH simulations. To enable it,
+pass the <code class="docutils literal notranslate"><span class="pre">--wrench-energy-simulation</span></code> command line option to the
+simulator. See <code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/cloud-bag-of-tasks-energy</span></code> for
+an example simulator that makes use of this plugin (and an example
+platform description file that defines host power consumption profiles).</p>
+<p>It is also possible to dump all simulation output to a JSON file. This
+is done with the <code class="docutils literal notranslate"><span class="pre">wrench::SimulationOutput::dump*JSON()</span></code> member
+functions. The documentation of each member function details the
+structure of the JSON output, in case you want to parse/process the JSON
+by hand. See the API documentation of the <a class="reference internal" href="api_developer/classwrench_1_1_simulation_output.html#_CPPv4N6wrench16SimulationOutputE" title="wrench::SimulationOutput"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimulationOutput</span></code></a>
+class for all details.</p>
+<p>Alternatively, you can run the installed <code class="docutils literal notranslate"><span class="pre">wrench-dashboard</span></code> tool,
+which provides interactive visualization/inspection of the generated
+JSON simulation output. You can run the dashboard for the JSON output
+generated by the example simulators in
+<code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/bare-metal-bag-of-task</span></code> and
+<code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/cloud-bag-of-task</span></code>. These
+simulators produce a JSON file in <code class="docutils literal notranslate"><span class="pre">/tmp/wrench.json</span></code>. Simply run the
+command <code class="docutils literal notranslate"><span class="pre">wrench-dashboard</span></code>, which pops up a Web browser window in
+which you simply upload the <code class="docutils literal notranslate"><span class="pre">/tmp/wrench.json</span></code> file.</p>
+<p>We find that most users end up doing their own, custom simulation output
+generation since they are the ones who know what they are interested in.</p>
+</section>
+</section>
+<section id="available-services">
+<span id="wrench-101-simulator-services"></span><h2>Available services<a class="headerlink" href="#available-services" title="Link to this heading"></a></h2>
+<p>Below is the list of services available to-date in WRENCH. Click on the
+corresponding links for more information on what these services are and
+on how to create them.</p>
+<ul class="simple">
+<li><p><strong>Compute Services</strong>: These are services that know how to compute
+workflow tasks:</p>
+<ul>
+<li><p><a class="reference internal" href="wrench_101/baremetal.html#guide-101-baremetal"><span class="std std-ref">Bare-metal Servers</span></a></p></li>
+<li><p><a class="reference internal" href="wrench_101/cloud.html#guide-101-cloud"><span class="std std-ref">Cloud Platforms</span></a></p></li>
+<li><p><a class="reference internal" href="wrench_101/virtualizedcluster.html#guide-101-virtualizedcluster"><span class="std std-ref">Virtualized Cluster
+Platforms</span></a></p></li>
+<li><p><a class="reference internal" href="wrench_101/batch.html#guide-101-batch"><span class="std std-ref">Batch-scheduled Clusters</span></a></p></li>
+<li><p><a class="reference internal" href="wrench_101/htcondor.html#guide-101-htcondor"><span class="std std-ref">HTCondor</span></a></p></li>
+<li><p><a class="reference internal" href="wrench_101/serverless.html#guide-101-serverless"><span class="std std-ref">Serverless Providers</span></a></p></li>
+</ul>
+</li>
+<li><p><strong>Storage Services</strong>: These are services that know how to store and
+give access to workflow files:</p>
+<ul>
+<li><p><a class="reference internal" href="wrench_101/simplestorage.html#guide-101-simplestorage"><span class="std std-ref">Simple Storage Service</span></a></p></li>
+<li><p><a class="reference internal" href="wrench_101/xrootd.html#guide-101-xrootd"><span class="std std-ref">XRootD Storage Service</span></a></p></li>
+</ul>
+</li>
+<li><p><strong>File Registry Services</strong>: These services, also known as <em>replica
+catalogs</em>, are simply databases of <code class="docutils literal notranslate"><span class="pre">&lt;filename,</span> <span class="pre">list</span> <span class="pre">of</span> <span class="pre">locations&gt;</span></code>
+key-values pairs of the storage services on which copies of files are
+available.</p>
+<ul>
+<li><p><a class="reference internal" href="wrench_101/fileregistry.html#guide-101-fileregistry"><span class="std std-ref">File Registry Service</span></a></p></li>
+</ul>
+</li>
+<li><p><strong>Network Proximity Services</strong>: These are services that monitor the
+network and maintain a database of host-to-host network distances:</p>
+<ul>
+<li><p><a class="reference internal" href="wrench_101/networkproximity.html#guide-101-networkproximity"><span class="std std-ref">Network Proximity Service</span></a></p></li>
+</ul>
+</li>
+<li><p><strong>EnergyMeter Services</strong>: These services are used to periodically
+measure host energy consumption and include these measurements in the
+simulation output:</p>
+<ul>
+<li><p><a class="reference internal" href="wrench_101/energymeter.html#guide-101-energymeter"><span class="std std-ref">Energy Meter Service</span></a></p></li>
+</ul>
+</li>
+<li><p><strong>BandwidthMeter Services</strong>: These services are used to periodically
+measure network links’ bandwidth usage and include these measurements
+in the simulation output:</p>
+<ul>
+<li><p><a class="reference internal" href="wrench_101/bandwidthmeter.html#guide-101-bandwidthmeter"><span class="std std-ref">Bandwidth Meter Service</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="customizing-services">
+<span id="wrench-101-customizing-services"></span><h2>Customizing services<a class="headerlink" href="#customizing-services" title="Link to this heading"></a></h2>
+<p>Each service is customizable by passing to its constructor a <em>property
+list</em>, i.e., a key-value map where each key is a property and each value
+is a string. Each service defines a property class. For instance, the
+<a class="reference internal" href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7ServiceE" title="wrench::Service"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::Service</span></code></a> class has an associated <a class="reference internal" href="api_developer/classwrench_1_1_service_property.html#_CPPv4N6wrench15ServicePropertyE" title="wrench::ServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServiceProperty</span></code></a>
+class, the <a class="reference internal" href="api_developer/classwrench_1_1_compute_service.html#_CPPv4N6wrench14ComputeServiceE" title="wrench::ComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ComputeService</span></code></a> class has an associated
+<a class="reference internal" href="api_developer/classwrench_1_1_compute_service_property.html#_CPPv4N6wrench22ComputeServicePropertyE" title="wrench::ComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ComputeServiceProperty</span></code></a> class, and so on at all levels of the
+service class hierarchy.</p>
+<p><strong>The API documentation for these property classes explains what each
+property means, what possible values are, and what default values are.</strong>
+Other properties have more to do with what the service can or should do
+when in operation. For instance, the
+<a class="reference internal" href="api_developer/classwrench_1_1_batch_compute_service_property.html#_CPPv4N6wrench27BatchComputeServicePropertyE" title="wrench::BatchComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BatchComputeServiceProperty</span></code></a> class defines a
+<a class="reference internal" href="api_developer/classwrench_1_1_batch_compute_service_property.html#_CPPv4N6wrench27BatchComputeServiceProperty26BATCH_SCHEDULING_ALGORITHME" title="wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM</span></code></a>
+which specifies what scheduling algorithm a batch service should use for
+prioritizing jobs. All property classes inherit from the
+<a class="reference internal" href="api_developer/classwrench_1_1_service_property.html#_CPPv4N6wrench15ServicePropertyE" title="wrench::ServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServiceProperty</span></code></a> class, and one can explore that hierarchy to
+discover all possible (and there are many) service customization
+opportunities.</p>
+<p>Finally, each service exchanges messages on the network with other
+services (e.g., an execution controller sends a “do some work for me”
+messages to compute services). The size in bytes, or payload, of all
+messages can be customized similarly to the properties, i.e., by passing
+a key-value map to the service’s constructor. For instance, the
+<a class="reference internal" href="api_developer/classwrench_1_1_service_message_payload.html#_CPPv4N6wrench21ServiceMessagePayloadE" title="wrench::ServiceMessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServiceMessagePayload</span></code></a> class defines a
+<a class="reference internal" href="api_developer/classwrench_1_1_service_message_payload.html#_CPPv4N6wrench21ServiceMessagePayload27STOP_DAEMON_MESSAGE_PAYLOADE" title="wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD</span></code></a> property
+which can be used to customize the size, in bytes, of the control
+message sent to the service daemon (that is the entry point to the
+service) to tell it to terminate. Each service class has a corresponding
+message payload class, and the API documentation for these message
+payload classes details all messages whose payload can be customized.</p>
+</section>
+<section id="customizing-logging">
+<span id="wrench-101-logging"></span><h2>Customizing logging<a class="headerlink" href="#customizing-logging" title="Link to this heading"></a></h2>
+<p>When running a WRENCH simulator you may notice that there is no logging
+output. By default logging output is disabled, but it is often useful to
+enable it (remembering that it can slow down the simulation). WRENCH’s
+logging system is a thin layer on top of SimGrid’s logging system, and
+as such is controlled via command-line arguments.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">bare-metal-chain</span></code> example simulator can be executed as follows in
+the <code class="docutils literal notranslate"><span class="pre">examples/action_api/bare-metal-bag-of-actions</span></code> subdirectory of
+the build directory (after typing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">examples</span></code> in the build
+directory):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./wrench-example-bare-metal-bag-of-tasks<span class="w"> </span><span class="m">10</span><span class="w"> </span>./four_hosts.xml
+</pre></div>
+</div>
+<p>The above generates almost no output to the terminal whatsoever. It is
+possible to enable some logging to the terminal. It turns out the
+execution controller class in that example
+(<code class="docutils literal notranslate"><span class="pre">TwoTasksAtATimeExecutionController.cpp</span></code>) defines a logging category
+named <code class="docutils literal notranslate"><span class="pre">custom_controller</span></code> (see one of the first lines of
+<code class="docutils literal notranslate"><span class="pre">examples/action_api/bare-metal-bag-of-actions/TwoActionsAtATimeExecutionController.cpp</span></code>),
+which can be enabled as:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="p">.</span><span class="o">/</span><span class="n">wrench</span><span class="o">-</span><span class="n">example</span><span class="o">-</span><span class="n">bare</span><span class="o">-</span><span class="n">metal</span><span class="o">-</span><span class="n">bag</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">tasks</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">four_hosts</span><span class="p">.</span><span class="n">xml</span><span class="w"> </span><span class="o">--</span><span class="n">log</span><span class="o">=</span><span class="n">custom_controller</span><span class="p">.</span><span class="n">threshold</span><span class="o">=</span><span class="n">info</span>
+</pre></div>
+</div>
+<p>You will now see some (green) logging output that is generated by the
+execution controller implementation. It is typical to want to see these
+messages as the controller is the brain of the application workload
+execution.</p>
+<p>One can disable the coloring of the logging output with the
+<code class="docutils literal notranslate"><span class="pre">--wrench-no-color</span></code> argument:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="p">.</span><span class="o">/</span><span class="n">wrench</span><span class="o">-</span><span class="n">example</span><span class="o">-</span><span class="n">bare</span><span class="o">-</span><span class="n">metal</span><span class="o">-</span><span class="n">bag</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">tasks</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">four_hosts</span><span class="p">.</span><span class="n">xml</span><span class="w"> </span><span class="o">--</span><span class="n">log</span><span class="o">=</span><span class="n">custom_controller</span><span class="p">.</span><span class="n">threshold</span><span class="o">=</span><span class="n">info</span><span class="w"> </span><span class="o">--</span><span class="n">wrench</span><span class="o">-</span><span class="n">no</span><span class="o">-</span><span class="n">color</span>
+</pre></div>
+</div>
+<p>Disabling color can be useful when redirecting the logging output to a
+file.</p>
+<p>Enabling all logging is done with the argument <code class="docutils literal notranslate"><span class="pre">--wrench-full-log</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="p">.</span><span class="o">/</span><span class="n">wrench</span><span class="o">-</span><span class="n">example</span><span class="o">-</span><span class="n">bare</span><span class="o">-</span><span class="n">metal</span><span class="o">-</span><span class="n">bag</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">tasks</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">four_hosts</span><span class="p">.</span><span class="n">xml</span><span class="w"> </span><span class="o">--</span><span class="n">wrench</span><span class="o">-</span><span class="n">full</span><span class="o">-</span><span class="n">log</span>
+</pre></div>
+</div>
+<p>The logging output now contains output produced by all the simulated
+running processed. More details on logging capabilities are displayed
+when passing the <code class="docutils literal notranslate"><span class="pre">--help-logs</span></code> command-line argument to your
+simulator. Log category names are attached to <code class="docutils literal notranslate"><span class="pre">*.cpp</span></code> files in the
+simulator code, the WRENCH code, and the SimGrid code. Using the
+<code class="docutils literal notranslate"><span class="pre">--help-log-categories</span></code> command-line argument shows the entire log
+category hierarchy (which is huge).</p>
+<p>See the <span class="xref std std-ref">Simgrid logging
+documentation</span> for all
+details.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simulation_101.html" class="btn btn-neutral float-left" title="Simulation 101" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="wrench_102.html" class="btn btn-neutral float-right" title="WRENCH 102" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

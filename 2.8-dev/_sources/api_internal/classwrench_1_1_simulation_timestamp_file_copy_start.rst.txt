@@ -1,0 +1,8 @@
+.. _SimulationTimestampFileCopyStart:
+wrench::SimulationTimestampFileCopyStart
+****************************************
+
+.. doxygenclass:: wrench::SimulationTimestampFileCopyStart
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _FunctionOutput:
+wrench::FunctionOutput
+**********************
+
+.. doxygenclass:: wrench::FunctionOutput
+   :project: internal
+   :members:
+

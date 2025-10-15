@@ -1,0 +1,8 @@
+.. _FunctionManagerMessage:
+wrench::FunctionManagerMessage
+******************************
+
+.. doxygenclass:: wrench::FunctionManagerMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,206 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interacting with a simple storage service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Interacting with a simple storage service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_102/simplestorage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="interacting-with-a-simple-storage-service">
+<span id="guide-102-simplestorage"></span><h1>Interacting with a simple storage service<a class="headerlink" href="#interacting-with-a-simple-storage-service" title="Link to this heading"></a></h1>
+<p>The following operations are supported by an instance of
+<a class="reference internal" href="../api_developer/classwrench_1_1_simple_storage_service.html#_CPPv4N6wrench20SimpleStorageServiceE" title="wrench::SimpleStorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimpleStorageService</span></code></a>:</p>
+<ul class="simple">
+<li><p>Synchronously check that a file exists</p></li>
+<li><p>Synchronously read a file (rarely used by an execution controller but
+included for completeness)</p></li>
+<li><p>Synchronously write a file (rarely used by an execution controller
+but included for completeness)</p></li>
+<li><p>Synchronously delete a file</p></li>
+<li><p>Synchronously copy a file from one storage service to another</p></li>
+<li><p>Asynchronously copy a file from one storage service to another</p></li>
+</ul>
+<p>The first 4 interactions above are done by calling member functions of
+the <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a> class. The last two are done via a Data
+Movement Manager, i.e., by calling member functions of the
+<a class="reference internal" href="../api_developer/classwrench_1_1_data_movement_manager.html#_CPPv4N6wrench19DataMovementManagerE" title="wrench::DataMovementManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::DataMovementManager</span></code></a> class. Some of these member functions
+take an optional <a class="reference internal" href="../api_developer/classwrench_1_1_file_registry_service.html#_CPPv4N6wrench19FileRegistryServiceE" title="wrench::FileRegistryService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FileRegistryService</span></code></a> argument, in which case
+they will also update entries in a file registry service (e.g., removing
+an entry when a file is deleted).</p>
+<p>Several interactions with a simple storage service are done simple by calling
+<strong>static methods</strong> of the <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a> class. These make
+it possible to lookup, delete, read, and write files. For instance:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimpleStorageService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">storage_service</span><span class="p">;</span>
+<span class="c1">// Get the file registry service</span>
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">FileRegistryService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">file_registry</span><span class="p">;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">DataFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">some_file</span><span class="p">;</span>
+
+<span class="p">[...]</span>
+
+<span class="c1">// Check whether the storage service holds the file at path /data/ and delete it if so</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">file_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">storage_service</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/data/&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageService</span><span class="o">::</span><span class="n">lookupFile</span><span class="p">(</span><span class="n">file_location</span><span class="p">))</span>
+<span class="p">{</span>
+<span class="w">   </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;File found!&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">   </span><span class="n">wrench</span><span class="o">::</span><span class="n">StorageService</span><span class="o">::</span><span class="n">deleteFile</span><span class="p">(</span><span class="n">file_location</span><span class="p">,</span><span class="w"> </span><span class="n">file_registry</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that the file registry service is passed to the
+<a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageService10deleteFileERKNSt10shared_ptrI8DataFileEE" title="wrench::StorageService::deleteFile"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService::deleteFile()</span></code></a> method since the file deletion
+should cause the file registry to remove one of its entries.</p>
+<p>Reading and writing files is something an execution controller typically
+does not do directly (instead, jobs created by the controller contain
+actions/tasks  that read and write files as
+they execute). But, if for some reason an execution controller needs to
+spend time doing file I/O, it is easily done:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Read some file from the &quot;/&quot; path at some storage service.</span>
+<span class="c1">// This does not change the simulation state besides simulating a time overhead during which the execution controller is busy</span>
+<span class="n">wrench</span><span class="o">::</span><span class="n">StorageService</span><span class="o">::</span><span class="n">readFile</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">storage_service</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">));</span>
+
+<span class="c1">// Write some file to the &quot;/stuff/&quot; path at some storage service.</span>
+<span class="c1">// This simulates a time overhead after which the storage service will host the file. It</span>
+<span class="c1">// is a good idea to then add an entry to the file registry service</span>
+<span class="n">wrench</span><span class="o">::</span><span class="n">StorageService</span><span class="o">::</span><span class="n">writeFile</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">storage_service</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/stuff/&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>An operation commonly performed by an execution controller is copying
+files between storage services (e.g., to enforce some data locality).
+This is typically done by <a class="reference internal" href="../wrench_102.html#wrench-102-controller-services-compute-job"><span class="std std-ref">specifying file copy operations as part of
+standard jobs</span></a>.
+But it can also be done manually by the execution controller via the
+data movement manager’s methods
+<a class="reference internal" href="../api_developer/classwrench_1_1_data_movement_manager.html#_CPPv4N6wrench19DataMovementManager21doSynchronousFileCopyERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI19FileRegistryServiceEE" title="wrench::DataMovementManager::doSynchronousFileCopy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::DataMovementManager::doSynchronousFileCopy()</span></code></a> and
+<a class="reference internal" href="../api_developer/classwrench_1_1_data_movement_manager.html#_CPPv4N6wrench19DataMovementManager28initiateAsynchronousFileCopyERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI12FileLocationEERKNSt10shared_ptrI19FileRegistryServiceEE" title="wrench::DataMovementManager::initiateAsynchronousFileCopy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::DataMovementManager::initiateAsynchronousFileCopy()</span></code></a>. Here is
+an example in which a file is copied between storage services:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Create a data movement manager</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">data_movement_manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">createDataMovementManager</span><span class="p">();</span>
+
+<span class="c1">// Synchronously copy some_file from storage_service1 to storage_service2</span>
+<span class="c1">// While this is taking place, the execution controller is busy</span>
+<span class="n">data_movement_manager</span><span class="o">-&gt;</span><span class="n">doSynchronousFileCopy</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">storage_service1</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">),</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">storage_service2</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">));</span>
+
+<span class="c1">// Asynchronously copy some_file from storage_service2 to storage_service3</span>
+<span class="n">data_movement_manager</span><span class="o">-&gt;</span><span class="n">initiateAsynchronousFileCopy</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">storage_service2</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">),</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">storage_service3</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">));</span>
+
+
+<span class="c1">// Wait for and process the next event (may be a file copy completion or failure)</span>
+<span class="k">this</span><span class="o">-&gt;</span><span class="n">waitForAndProcessNextEvent</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>See the execution controller implementation in
+<code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp</span></code>
+for a more complete example.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

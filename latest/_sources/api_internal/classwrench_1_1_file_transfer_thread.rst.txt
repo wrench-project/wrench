@@ -1,0 +1,8 @@
+.. _FileTransferThread:
+wrench::FileTransferThread
+**************************
+
+.. doxygenclass:: wrench::FileTransferThread
+   :project: internal
+   :members:
+

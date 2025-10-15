@@ -1,0 +1,8 @@
+.. _DataMovementManagerMessage:
+wrench::DataMovementManagerMessage
+**********************************
+
+.. doxygenclass:: wrench::DataMovementManagerMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _StorageServiceAckMessage:
+wrench::StorageServiceAckMessage
+********************************
+
+.. doxygenclass:: wrench::StorageServiceAckMessage
+   :project: internal
+   :members:
+

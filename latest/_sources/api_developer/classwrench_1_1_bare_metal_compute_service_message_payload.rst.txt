@@ -1,0 +1,8 @@
+.. _BareMetalComputeServiceMessagePayload:
+wrench::BareMetalComputeServiceMessagePayload
+*********************************************
+
+.. doxygenclass:: wrench::BareMetalComputeServiceMessagePayload
+   :project: developer
+   :members:
+

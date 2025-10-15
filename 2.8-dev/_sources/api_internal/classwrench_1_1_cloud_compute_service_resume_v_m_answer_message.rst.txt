@@ -1,0 +1,8 @@
+.. _CloudComputeServiceResumeVMAnswerMessage:
+wrench::CloudComputeServiceResumeVMAnswerMessage
+************************************************
+
+.. doxygenclass:: wrench::CloudComputeServiceResumeVMAnswerMessage
+   :project: internal
+   :members:
+

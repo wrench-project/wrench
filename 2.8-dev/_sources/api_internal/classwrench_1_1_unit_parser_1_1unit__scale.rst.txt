@@ -1,0 +1,8 @@
+.. _UnitParser::unit_scale:
+wrench::UnitParser::unit_scale
+******************************
+
+.. doxygenclass:: wrench::UnitParser::unit_scale
+   :project: internal
+   :members:
+

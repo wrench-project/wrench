@@ -1,0 +1,8 @@
+.. _SimulationOutput:
+wrench::SimulationOutput
+************************
+
+.. doxygenclass:: wrench::SimulationOutput
+   :project: internal
+   :members:
+

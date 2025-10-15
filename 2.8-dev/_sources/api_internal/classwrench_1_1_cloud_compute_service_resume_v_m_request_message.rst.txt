@@ -1,0 +1,8 @@
+.. _CloudComputeServiceResumeVMRequestMessage:
+wrench::CloudComputeServiceResumeVMRequestMessage
+*************************************************
+
+.. doxygenclass:: wrench::CloudComputeServiceResumeVMRequestMessage
+   :project: internal
+   :members:
+

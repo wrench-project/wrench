@@ -1,0 +1,8 @@
+.. _Workflow:
+wrench::Workflow
+****************
+
+.. doxygenclass:: wrench::Workflow
+   :project: user
+   :members:
+

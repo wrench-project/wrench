@@ -1,0 +1,8 @@
+.. _NetworkProximityComputeAnswerMessage:
+wrench::NetworkProximityComputeAnswerMessage
+********************************************
+
+.. doxygenclass:: wrench::NetworkProximityComputeAnswerMessage
+   :project: internal
+   :members:
+

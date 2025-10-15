@@ -1,0 +1,8 @@
+.. _HTCondorNegotiatorService:
+wrench::HTCondorNegotiatorService
+*********************************
+
+.. doxygenclass:: wrench::HTCondorNegotiatorService
+   :project: internal
+   :members:
+

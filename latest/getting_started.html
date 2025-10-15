@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=14e8207d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Simulation 101" href="simulation_101.html" />
+    <link rel="prev" title="Installing WRENCH" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-wrench-initialization-tool">Using the WRENCH initialization tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-wrench-simulators">Example WRENCH simulators</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<span id="id1"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<p>Once you have installed the WRENCH library, following the instructions
+on the <a class="reference internal" href="installation.html#install"><span class="std std-ref">installation page</span></a>, you are ready to create a
+WRENCH simulator. <strong>Information on what can be simulated and how to do
+it are provided in the</strong> <a class="reference internal" href="wrench_101.html#wrench-101-header"><span class="std std-ref">WRENCH 101</span></a> <strong>and</strong>
+<a class="reference internal" href="wrench_102.html#wrench-102-header"><span class="std std-ref">WRENCH 102</span></a> <strong>pages. This page is only about the
+logistics of setting up a simulator project.</strong></p>
+<section id="using-the-wrench-initialization-tool">
+<span id="getting-started-wrench-init"></span><h2>Using the WRENCH initialization tool<a class="headerlink" href="#using-the-wrench-initialization-tool" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">wrench-init</span></code> tool is a project generator built with WRENCH, which
+creates a simple project structure as follows:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>project-folder/
+├──<span class="w"> </span>CMakeLists.txt
+├──<span class="w"> </span>CMakeModules
+│<span class="w">   </span>└──<span class="w"> </span>FindSimGrid.cmake
+│<span class="w">   </span>└──<span class="w"> </span>FindWRENCH.cmake
+├──<span class="w"> </span>src/
+│<span class="w">   </span>├──<span class="w"> </span>Simulator.cpp
+│<span class="w">   </span>├──<span class="w"> </span>Controller.cpp
+├──<span class="w"> </span>include/
+│<span class="w">   </span>└──<span class="w"> </span>Controller.h
+├──<span class="w"> </span>build/
+└──<span class="w"> </span>data/
+<span class="w">    </span>└──<span class="w"> </span>platform.xml
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Simulator.cpp</span></code> source file contains the <code class="docutils literal notranslate"><span class="pre">main()</span></code> function of
+the simulator, which initializes a simulated platform and services
+running on this platform; <code class="docutils literal notranslate"><span class="pre">Controller.h</span></code> and <code class="docutils literal notranslate"><span class="pre">Controller.cpp</span></code>
+contain the implementation of an execution controller, which executes a
+workflow on the available services. The simulator takes as command-line
+argument a path to a platform description file in XML, which is
+available in <code class="docutils literal notranslate"><span class="pre">data/platform.xml</span></code>. These files provide the minimum
+necessary implementation for a WRENCH-enabled simulator.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">wrench-init</span></code> tool only requires a single argument, the name of
+the folder where the project skeleton will be generated:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wrench-init<span class="w"> </span>&lt;project_folder&gt;
+</pre></div>
+</div>
+<p>Additional options supported by the tool can be found by using the
+<code class="docutils literal notranslate"><span class="pre">wrench-init</span> <span class="pre">--help</span></code> command.</p>
+<p>Of course, you do not have to use <code class="docutils literal notranslate"><span class="pre">wrench-init</span></code>, especially if you are
+used to creating your own CMake projects. But you still may want to look
+at the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file generated by <code class="docutils literal notranslate"><span class="pre">wrench-init</span></code>. In
+particular, note that <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> uses the <code class="docutils literal notranslate"><span class="pre">FindSimgrid.cmake</span></code>
+and <code class="docutils literal notranslate"><span class="pre">FindWRENCH.cmake</span></code> files, which are placed by <code class="docutils literal notranslate"><span class="pre">wrench-init</span></code> in
+the <code class="docutils literal notranslate"><span class="pre">CMakeModules</span></code> directory.</p>
+</section>
+<section id="example-wrench-simulators">
+<span id="getting-started-example"></span><h2>Example WRENCH simulators<a class="headerlink" href="#example-wrench-simulators" title="Link to this heading"></a></h2>
+<p>The examples in the <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory provide good starting points
+for developing your own simulators. Examples are provided for the
+generic “action” API as well as for the “workflow” API, and are built
+along with the WRENCH library and tools. See the <code class="docutils literal notranslate"><span class="pre">examples/README.md</span></code>
+file for a brief description of all examples. Examples can be built by
+typing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">examples</span></code> in the build directory.</p>
+<p>For instance, the
+<code class="docutils literal notranslate"><span class="pre">examples/action_api/bare-metal-bag-of-actions</span></code> example
+can be executed as:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wrench-example-bare-metal-bag-of-actions<span class="w"> </span><span class="m">6</span><span class="w"> </span>two_hosts.xml<span class="w"> </span>--log<span class="o">=</span>custom_wms.threshold<span class="o">=</span>info
+</pre></div>
+</div>
+<p>(File <code class="docutils literal notranslate"><span class="pre">two_hosts.xml</span></code> is in the
+<code class="docutils literal notranslate"><span class="pre">examples/action_api/bare-metal-bag-of-actions</span></code>
+directory.) You should see some output in the terminal. The output in
+white is produced by the simulator’s main function. The output in green
+is produced by the execution controller implemented with the WRENCH
+developer API.</p>
+<p>Although you can inspect the codes of the examples on your own, we
+highly recommend that you go through the <a class="reference internal" href="simulation_101.html#simulation-101"><span class="std std-ref">Simulation
+101</span></a>, <a class="reference internal" href="wrench_101.html#wrench-101-header"><span class="std std-ref">WRENCH 101</span></a>, and
+<a class="reference internal" href="wrench_102.html#wrench-102-header"><span class="std std-ref">WRENCH 102</span></a> pages first. These pages make direct
+references to the examples, a description of which is available in
+<code class="docutils literal notranslate"><span class="pre">examples/README.md</span></code> in the WRENCH distribution.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installing WRENCH" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simulation_101.html" class="btn btn-neutral float-right" title="Simulation 101" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceMessagePayload:
+wrench::ServerlessComputeServiceMessagePayload
+**********************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceMessagePayload
+   :project: internal
+   :members:
+

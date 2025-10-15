@@ -1,0 +1,152 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating an energy-meter service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating an energy-meter service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_101/energymeter.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="creating-an-energy-meter-service">
+<span id="guide-101-energymeter"></span><h1>Creating an energy-meter service<a class="headerlink" href="#creating-an-energy-meter-service" title="Link to this heading"></a></h1>
+</section>
+<section id="overview">
+<span id="guide-energymeter-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>An energy-meter service simply measures, at regular intervals, the
+energy consumed by one or more hosts, making measurement traces
+available as part of the simulation output.</p>
+</section>
+<section id="guide-energymeter-creating">
+<span id="id1"></span><h1>Creating an energy-meter service<a class="headerlink" href="#guide-energymeter-creating" title="Link to this heading"></a></h1>
+<p>In WRENCH, an energy-meter service is defined by the
+<a class="reference internal" href="../api_developer/classwrench_1_1_energy_meter_service.html#_CPPv4N6wrench18EnergyMeterServiceE" title="wrench::EnergyMeterService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::EnergyMeterService</span></code></a> class, an instantiation of which requires
+the following parameters:</p>
+<ul class="simple">
+<li><p>The name of a host on which to start the service;</p></li>
+<li><p>A map (<code class="docutils literal notranslate"><span class="pre">std::map</span></code>) of key-value pairs, where the keys are hostnames and the values
+are measurement periods in seconds.</p></li>
+</ul>
+<p>The example below creates an instance that runs on host
+<code class="docutils literal notranslate"><span class="pre">MeasurerHost</span></code>, and measures the energy consumed on host <code class="docutils literal notranslate"><span class="pre">Host1</span></code>
+every second and the energy consumed on host <code class="docutils literal notranslate"><span class="pre">Host2</span></code> every 10 seconds:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">em_service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
+<span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">EnergyMeterService</span><span class="p">(</span><span class="s">&quot;MeasurerHost&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">&quot;Host1&quot;</span><span class="p">,</span><span class="mf">1.0</span><span class="p">},{</span><span class="s">&quot;Host2&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">}}));</span>
+</pre></div>
+</div>
+<p>One the simulation is completed, energy measurement time stamps can be
+accessed as follows:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">energy_consumption_timestamps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">getOutput</span><span class="p">().</span><span class="n">getTrace</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">SimulationTimestampEnergyConsumption</span><span class="o">&gt;</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>See the documentation of <a class="reference internal" href="../api_developer/classwrench_1_1_simulation_output.html#_CPPv4N6wrench16SimulationOutputE" title="wrench::SimulationOutput"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimulationOutput</span></code></a> for more details.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

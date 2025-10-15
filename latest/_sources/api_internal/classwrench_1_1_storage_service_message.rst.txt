@@ -1,0 +1,8 @@
+.. _StorageServiceMessage:
+wrench::StorageServiceMessage
+*****************************
+
+.. doxygenclass:: wrench::StorageServiceMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a HTCondor compute service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a HTCondor compute service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_101/htcondor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="creating-a-htcondor-compute-service">
+<span id="guide-101-htcondor"></span><h1>Creating a HTCondor compute service<a class="headerlink" href="#creating-a-htcondor-compute-service" title="Link to this heading"></a></h1>
+</section>
+<section id="overview">
+<span id="guide-htcondor-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p><span class="xref std std-ref">HTCondor</span> is a workload management framework
+that supervises task executions on various sets of resources. HTCondor
+is composed of six main service daemons (<code class="docutils literal notranslate"><span class="pre">startd</span></code>, <code class="docutils literal notranslate"><span class="pre">starter</span></code>,
+<code class="docutils literal notranslate"><span class="pre">schedd</span></code>, <code class="docutils literal notranslate"><span class="pre">shadow</span></code>, <code class="docutils literal notranslate"><span class="pre">negotiator</span></code>, and <code class="docutils literal notranslate"><span class="pre">collector</span></code>). In addition,
+each host on which one or more of these daemons is spawned must also run
+a <code class="docutils literal notranslate"><span class="pre">master</span></code> daemon, which controls the execution of all other daemons
+(including initialization and completion).</p>
+</section>
+<section id="creating-an-htcondor-service">
+<span id="guide-htcondor-creating"></span><h1>Creating an HTCondor Service<a class="headerlink" href="#creating-an-htcondor-service" title="Link to this heading"></a></h1>
+<p>HTCondor is composed of a pool of resources in which jobs are submitted
+to perform their computation. In WRENCH, an HTCondor service represents
+a compute service (<a class="reference internal" href="../api_developer/classwrench_1_1_compute_service.html#_CPPv4N6wrench14ComputeServiceE" title="wrench::ComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ComputeService</span></code></a>), which is defined by the
+<a class="reference internal" href="../api_developer/classwrench_1_1_h_t_condor_compute_service.html#_CPPv4N6wrench22HTCondorComputeServiceE" title="wrench::HTCondorComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::HTCondorComputeService</span></code></a> class. An instantiation of an
+HTCondor service requires the following parameters:</p>
+<ul class="simple">
+<li><p>The name of a host on which to start the service;</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">std::set</span></code> of ‘child’ <a class="reference internal" href="../api_developer/classwrench_1_1_compute_service.html#_CPPv4N6wrench14ComputeServiceE" title="wrench::ComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ComputeService</span></code></a> instances
+available to the HTCondor pool; and</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">std::map</span></code> of properties
+(<a class="reference internal" href="../api_developer/classwrench_1_1_h_t_condor_compute_service_property.html#_CPPv4N6wrench30HTCondorComputeServicePropertyE" title="wrench::HTCondorComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::HTCondorComputeServiceProperty</span></code></a>) and message payloads
+(<a class="reference internal" href="../api_developer/classwrench_1_1_h_t_condor_compute_service_message_payload.html#_CPPv4N6wrench36HTCondorComputeServiceMessagePayloadE" title="wrench::HTCondorComputeServiceMessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::HTCondorComputeServiceMessagePayload</span></code></a>).</p></li>
+</ul>
+<p>The set of compute services may include compute service instances that
+are either <a class="reference internal" href="../api_developer/classwrench_1_1_bare_metal_compute_service.html#_CPPv4N6wrench23BareMetalComputeServiceE" title="wrench::BareMetalComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeService</span></code></a> or
+<a class="reference internal" href="../api_developer/classwrench_1_1_batch_compute_service.html#_CPPv4N6wrench19BatchComputeServiceE" title="wrench::BatchComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BatchComputeService</span></code></a> instances. The example below creates an
+instance of an HTCondor service with a pool of resources containing a
+<a class="reference internal" href="baremetal.html#guide-101-baremetal"><span class="std std-ref">Bare-metal</span></a> server:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Simulation</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">simulation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">Simulation</span><span class="o">::</span><span class="n">createSimulation</span><span class="p">();</span>
+<span class="n">simulation</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span>
+
+<span class="c1">// Create a bare-metal service</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">baremetal_service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">BareMetalComputeService</span><span class="p">(</span><span class="s">&quot;execution_hostname&quot;</span><span class="p">,</span>
+<span class="w">                                          </span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">make_pair</span><span class="p">(</span>
+<span class="w">                                          </span><span class="s">&quot;execution_hostname&quot;</span><span class="p">,</span>
+<span class="w">                                          </span><span class="n">std</span><span class="o">::</span><span class="n">make_tuple</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">Simulation</span><span class="o">::</span><span class="n">getHostNumCores</span><span class="p">(</span><span class="s">&quot;execution_hostname&quot;</span><span class="p">),</span>
+<span class="w">                                                          </span><span class="n">wrench</span><span class="o">::</span><span class="n">Simulation</span><span class="o">::</span><span class="n">getHostMemoryCapacity</span><span class="p">(</span><span class="s">&quot;execution_hostname&quot;</span><span class="p">)))},</span>
+<span class="w">                                          </span><span class="s">&quot;/scratch/&quot;</span><span class="p">));</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">set</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">ComputeService</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">compute_services</span><span class="p">;</span>
+<span class="n">compute_services</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">baremetal_service</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">htcondor_compute_service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">HTCondorComputeService</span><span class="p">(</span><span class="s">&quot;htc_gateway&quot;</span><span class="p">,</span>
+<span class="w">                                         </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">compute_services</span><span class="p">),</span>
+<span class="w">                                         </span><span class="p">{}));</span>
+</pre></div>
+</div>
+<p>Jobs submitted to the <a class="reference internal" href="../api_developer/classwrench_1_1_h_t_condor_compute_service.html#_CPPv4N6wrench22HTCondorComputeServiceE" title="wrench::HTCondorComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::HTCondorComputeService</span></code></a> instance will
+be dispatched automatically to one of the ‘child’ compute services
+available to that instance (only one in the above example).</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

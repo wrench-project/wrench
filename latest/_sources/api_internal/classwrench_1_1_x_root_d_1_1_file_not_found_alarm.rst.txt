@@ -1,0 +1,8 @@
+.. _XRootD::FileNotFoundAlarm:
+wrench::XRootD::FileNotFoundAlarm
+*********************************
+
+.. doxygenclass:: wrench::XRootD::FileNotFoundAlarm
+   :project: internal
+   :members:
+

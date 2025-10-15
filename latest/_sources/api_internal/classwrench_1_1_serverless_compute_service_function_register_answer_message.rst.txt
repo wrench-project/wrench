@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceFunctionRegisterAnswerMessage:
+wrench::ServerlessComputeServiceFunctionRegisterAnswerMessage
+*************************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceFunctionRegisterAnswerMessage
+   :project: internal
+   :members:
+

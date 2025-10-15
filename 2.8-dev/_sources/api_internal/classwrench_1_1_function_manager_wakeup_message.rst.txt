@@ -1,0 +1,8 @@
+.. _FunctionManagerWakeupMessage:
+wrench::FunctionManagerWakeupMessage
+************************************
+
+.. doxygenclass:: wrench::FunctionManagerWakeupMessage
+   :project: internal
+   :members:
+

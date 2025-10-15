@@ -1,0 +1,8 @@
+.. _FileAlreadyBeingCopied:
+wrench::FileAlreadyBeingCopied
+******************************
+
+.. doxygenclass:: wrench::FileAlreadyBeingCopied
+   :project: developer
+   :members:
+

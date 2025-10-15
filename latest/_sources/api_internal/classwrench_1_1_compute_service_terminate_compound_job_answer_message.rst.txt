@@ -1,0 +1,8 @@
+.. _ComputeServiceTerminateCompoundJobAnswerMessage:
+wrench::ComputeServiceTerminateCompoundJobAnswerMessage
+*******************************************************
+
+.. doxygenclass:: wrench::ComputeServiceTerminateCompoundJobAnswerMessage
+   :project: internal
+   :members:
+

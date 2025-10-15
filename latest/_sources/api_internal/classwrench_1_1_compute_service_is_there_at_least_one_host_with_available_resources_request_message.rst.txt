@@ -1,0 +1,8 @@
+.. _ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage:
+wrench::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage
+*******************************************************************************
+
+.. doxygenclass:: wrench::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage
+   :project: internal
+   :members:
+

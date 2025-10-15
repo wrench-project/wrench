@@ -1,0 +1,8 @@
+.. _XRootD::Property:
+wrench::XRootD::Property
+************************
+
+.. doxygenclass:: wrench::XRootD::Property
+   :project: developer
+   :members:
+

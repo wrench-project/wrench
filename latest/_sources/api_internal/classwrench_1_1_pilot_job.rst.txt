@@ -1,0 +1,8 @@
+.. _PilotJob:
+wrench::PilotJob
+****************
+
+.. doxygenclass:: wrench::PilotJob
+   :project: internal
+   :members:
+

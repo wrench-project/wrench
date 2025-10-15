@@ -1,0 +1,8 @@
+.. _UnitParser:
+wrench::UnitParser
+******************
+
+.. doxygenclass:: wrench::UnitParser
+   :project: internal
+   :members:
+

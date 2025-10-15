@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a network proximity service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a network proximity service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_101/networkproximity.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="creating-a-network-proximity-service">
+<span id="guide-101-networkproximity"></span><h1>Creating a network proximity service<a class="headerlink" href="#creating-a-network-proximity-service" title="Link to this heading"></a></h1>
+</section>
+<section id="overview">
+<span id="guide-networkproximity-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>A network proximity service answers queries regarding the network
+proximity between hosts. The service accomplishes this by periodically
+performing round-trip network transfer experiments between hosts,
+keeping a record of observed network transfer times, and computing
+network distances.</p>
+</section>
+<section id="guide-networkproximity-creating">
+<span id="id1"></span><h1>Creating a network proximity service<a class="headerlink" href="#guide-networkproximity-creating" title="Link to this heading"></a></h1>
+<p>In WRENCH, a network proximity service is defined by the
+<a class="reference internal" href="../api_developer/classwrench_1_1_network_proximity_service.html#_CPPv4N6wrench23NetworkProximityServiceE" title="wrench::NetworkProximityService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::NetworkProximityService</span></code></a> class, an instantiation of which
+requires the following parameters:</p>
+<ul class="simple">
+<li><p>The name of a host on which to start the service;</p></li>
+<li><p>A set of hosts names in a vector (<code class="docutils literal notranslate"><span class="pre">std::vector</span></code>), which define
+which hosts are monitored by the service; and</p></li>
+<li><p>Maps (<code class="docutils literal notranslate"><span class="pre">std::map</span></code>) of configurable properties
+(<a class="reference internal" href="../api_developer/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServicePropertyE" title="wrench::NetworkProximityServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::NetworkProximityServiceProperty</span></code></a>) and configurable
+message payloads (<a class="reference internal" href="../api_developer/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayloadE" title="wrench::NetworkProximityServiceMessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::NetworkProximityServiceMessagePayload</span></code></a>).</p></li>
+</ul>
+<p>The example below creates an instance that runs on host
+<code class="docutils literal notranslate"><span class="pre">Networkcentral</span></code>, and can answer network distance queries about hosts
+<code class="docutils literal notranslate"><span class="pre">Host1</span></code>, <code class="docutils literal notranslate"><span class="pre">Host2</span></code>, <code class="docutils literal notranslate"><span class="pre">Host3</span></code>, and <code class="docutils literal notranslate"><span class="pre">Host4</span></code>. The service’s properties
+are customized to specify that the service performs network transfer
+experiments on average every 60 seconds, that the Vivaldi algorithm is
+used to compute network coordinates, and that the message sent to the
+service to lookup an entry is configured to be 1KiB:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">np_service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
+<span class="w">      </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">NetworkProximityService</span><span class="p">(</span><span class="s">&quot;Networkcentral&quot;</span><span class="p">,</span>
+<span class="w">                                          </span><span class="p">{</span><span class="s">&quot;Host1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Host2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Host3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Host4&quot;</span><span class="p">},</span>
+<span class="w">                                          </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">NetworkProximityServiceProperty</span><span class="o">::</span><span class="n">NETWORK_PROXIMITY_MEASUREMENT_PERIOD</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;60&quot;</span><span class="p">},</span>
+<span class="w">                                           </span><span class="p">{</span><span class="n">wrench</span><span class="o">::</span><span class="n">NetworkProximityServiceProperty</span><span class="o">::</span><span class="n">NETWORK_PROXIMITY_SERVICE_TYPE</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;VIVALDI&quot;</span><span class="p">}},</span>
+<span class="w">                                          </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">NetworkProximityServiceMessagePayload</span><span class="o">::</span><span class="n">NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="p">}}));</span>
+</pre></div>
+</div>
+<p>See the documentation of <a class="reference internal" href="../api_developer/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServicePropertyE" title="wrench::NetworkProximityServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::NetworkProximityServiceProperty</span></code></a> and
+<a class="reference internal" href="../api_developer/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayloadE" title="wrench::NetworkProximityServiceMessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::NetworkProximityServiceMessagePayload</span></code></a> for all possible
+configuration options.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

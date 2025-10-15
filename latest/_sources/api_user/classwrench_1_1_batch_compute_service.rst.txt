@@ -1,0 +1,8 @@
+.. _BatchComputeService:
+wrench::BatchComputeService
+***************************
+
+.. doxygenclass:: wrench::BatchComputeService
+   :project: user
+   :members:
+

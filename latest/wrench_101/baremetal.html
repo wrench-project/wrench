@@ -1,0 +1,180 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a bare-metal compute service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a bare-metal compute service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_101/baremetal.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="creating-a-bare-metal-compute-service">
+<span id="guide-101-baremetal"></span><h1>Creating a bare-metal compute service<a class="headerlink" href="#creating-a-bare-metal-compute-service" title="Link to this heading"></a></h1>
+</section>
+<section id="overview">
+<span id="guide-baremetal-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>A bare-metal compute service makes it possible to run tasks directly on
+hardware resources. Think of it as a set of multi-core hosts on which
+multi-threaded processes can be started using something like Ssh. The
+service does not perform any space-sharing among the jobs. In other
+words, jobs submitted to the service execute concurrently in a
+time-shared manner. It is the responsibility of the job submitter to
+pick hosts and/or numbers of cores for each task, e.g., to enforce
+space-sharing of cores. But by default the compute service operates as a
+“jungle” in which tasks share cores at will. The only resource
+allocation performed by the service is that it ensures that the RAM
+capacity of a hosts are not exceeded. Tasks that have non-zero RAM
+requirements are queued in FCFS fashion at each host until there is
+enough RAM to execute them (think of this as each host running an OS
+that disallows swapping and implements a FCFS access policy for RAM
+allocation).</p>
+</section>
+<section id="guide-baremetal-creating">
+<span id="id1"></span><h1>Creating a bare-metal compute service<a class="headerlink" href="#guide-baremetal-creating" title="Link to this heading"></a></h1>
+<p>In WRENCH, a bare-metal service is defined in the
+<a class="reference internal" href="../api_developer/classwrench_1_1_bare_metal_compute_service.html#_CPPv4N6wrench23BareMetalComputeServiceE" title="wrench::BareMetalComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeService</span></code></a> class. An instantiation of a
+bare-metal service requires the following parameters:</p>
+<ul class="simple">
+<li><p>The name of a host on which to start the service;</p></li>
+<li><p>A set of compute hosts in a map (<code class="docutils literal notranslate"><span class="pre">std::map</span></code>), where each key is a
+hostname and each value is a tuple (<code class="docutils literal notranslate"><span class="pre">std::tuple</span></code>) with a number of
+cores and a RAM capacity;</p></li>
+<li><p>A mount point (corresponding to a disk attached to the host) for the
+scratch space, i.e., storage local to the bare-metal service (used to
+store workflow files, as needed, during job executions); and</p></li>
+<li><p>Maps (<code class="docutils literal notranslate"><span class="pre">std::map</span></code>) of configurable properties
+(<a class="reference internal" href="../api_developer/classwrench_1_1_bare_metal_compute_service_property.html#_CPPv4N6wrench31BareMetalComputeServicePropertyE" title="wrench::BareMetalComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeServiceProperty</span></code></a>) and configurable
+message payloads (<a class="reference internal" href="../api_developer/classwrench_1_1_bare_metal_compute_service_message_payload.html#_CPPv4N6wrench37BareMetalComputeServiceMessagePayloadE" title="wrench::BareMetalComputeServiceMessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeServiceMessagePayload</span></code></a>).</p></li>
+</ul>
+<p>The example below creates an instance of a bare-metal service that runs
+on host <code class="docutils literal notranslate"><span class="pre">Gateway</span></code>, provides access to all cores and 1GiB of RAM on
+host <code class="docutils literal notranslate"><span class="pre">Node1</span></code> and to 8 cores and all RAM on host <code class="docutils literal notranslate"><span class="pre">Node2</span></code>, and has a
+scratch space on the disk mounted at path <code class="docutils literal notranslate"><span class="pre">/scratch</span></code> on host
+<code class="docutils literal notranslate"><span class="pre">Gateway</span></code>. Furthermore, the thread startup overhead is configured to
+be one hundredth of a second, and the message with which the service
+answers resource request description requests is configured to be 1KiB:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">baremetal_cs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
+<span class="w">          </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">BareMetalComputeService</span><span class="p">(</span><span class="s">&quot;Gateway&quot;</span><span class="p">,</span>
+<span class="w">                                       </span><span class="p">{{</span><span class="s">&quot;Node1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_tuple</span><span class="p">(</span><span class="n">wrench</span><span class="o">::</span><span class="n">ComputeService</span><span class="o">::</span><span class="n">ALL_CORES</span><span class="p">,</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">30</span><span class="p">))},</span>
+<span class="w">                                       </span><span class="p">{</span><span class="s">&quot;Node2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_tuple</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">ComputeService</span><span class="o">::</span><span class="n">ALL_RAM</span><span class="p">)}},</span>
+<span class="w">                                       </span><span class="s">&quot;/scratch/&quot;</span><span class="p">,</span>
+<span class="w">                                       </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">BareMetalComputeServiceProperty</span><span class="o">::</span><span class="n">THREAD_STARTUP_OVERHEAD</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;0.01&quot;</span><span class="p">}},</span>
+<span class="w">                                       </span><span class="p">{{</span><span class="n">wrench</span><span class="o">::</span><span class="n">BareMetalComputeServiceMessagePayload</span><span class="o">::</span><span class="n">RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="p">}}));</span>
+</pre></div>
+</div>
+<p>See the documentation of <a class="reference internal" href="../api_developer/classwrench_1_1_bare_metal_compute_service_property.html#_CPPv4N6wrench31BareMetalComputeServicePropertyE" title="wrench::BareMetalComputeServiceProperty"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeServiceProperty</span></code></a> and
+<a class="reference internal" href="../api_developer/classwrench_1_1_bare_metal_compute_service_message_payload.html#_CPPv4N6wrench37BareMetalComputeServiceMessagePayloadE" title="wrench::BareMetalComputeServiceMessagePayload"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BareMetalComputeServiceMessagePayload</span></code></a> for all possible
+configuration options.</p>
+<p>Also see the simulators in the <code class="docutils literal notranslate"><span class="pre">examples/workflow_api/basic-examples/bare-metal-*/</span></code> and
+<code class="docutils literal notranslate"><span class="pre">examples/action_api/bare-metal-*/</span></code>
+directories, which use bare-metal compute services.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

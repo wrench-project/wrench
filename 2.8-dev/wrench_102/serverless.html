@@ -1,0 +1,182 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interacting with a serverless compute service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Interacting with a serverless compute service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_102/serverless.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="interacting-with-a-serverless-compute-service">
+<span id="guide-102-serverless"></span><h1>Interacting with a serverless compute service<a class="headerlink" href="#interacting-with-a-serverless-compute-service" title="Link to this heading"></a></h1>
+<p>A serverless service provides simply user-level mechanisms to register and
+invoke functions, all of which is done via a
+<a class="reference internal" href="../api_developer/classwrench_1_1_function_manager.html#_CPPv4N6wrench15FunctionManagerE" title="wrench::FunctionManager"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FunctionManager</span></code></a>.</p>
+<p>Here is an example interaction with a <a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE" title="wrench::ServerlessComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessComputeService</span></code></a>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="nl">std</span><span class="p">:</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">ServerlessComputeService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">some_serverless_cs</span><span class="p">;</span>
+
+<span class="c1">// Start a function manager</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">function_manager</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">createFunctionManager</span><span class="p">();</span>
+
+<span class="c1">// Define the code of a function as a lambda, that takes in some user-specified</span>
+<span class="c1">// input object and a storage service that will be allocated specifically for each function execution, and</span>
+<span class="c1">// that produces some user-specified output object</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">function_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">FunctionInput</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">input</span><span class="p">,</span>
+<span class="w">                        </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">StorageService</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">my_storage_service</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">FunctionOutput</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// This function just sleeps 10 seconds, but it could do absolutely anything</span>
+<span class="w">            </span><span class="n">Simulation</span><span class="o">::</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">FunctionOutput</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="p">};</span>
+
+<span class="c1">// Create an image file on some storage service (e.g., the Docker image for the function environment)</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">image_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Simulation</span><span class="o">::</span><span class="n">addFile</span><span class="p">(</span><span class="s">&quot;image_file&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">250</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">MB</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">image_file_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileLocation</span><span class="o">::</span><span class="n">LOCATION</span><span class="p">(</span><span class="n">some_storage_service</span><span class="p">,</span><span class="w"> </span><span class="n">image_file</span><span class="p">);</span>
+<span class="n">StorageService</span><span class="o">::</span><span class="n">createFileAtLocation</span><span class="p">(</span><span class="n">image_file_location</span><span class="p">);</span>
+
+<span class="c1">// Create the function object</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">function</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">FunctionManager</span><span class="o">::</span><span class="n">createFunction</span><span class="p">(</span><span class="s">&quot;my_function&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">function_code</span><span class="p">,</span><span class="w"> </span><span class="n">image_file_location</span><span class="p">);</span>
+
+<span class="c1">// Define execution limits for the function execution</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">time_limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">60.0</span><span class="p">;</span>
+<span class="n">sg_size_t</span><span class="w"> </span><span class="n">disk_space_limit_in_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">500</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="n">sg_size_t</span><span class="w"> </span><span class="n">RAM_limit_in_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="n">sg_size_t</span><span class="w"> </span><span class="n">ingress_in_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="n">sg_size_t</span><span class="w"> </span><span class="n">egress_in_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">40</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+
+<span class="c1">// Register the function to the serverless compute service, via the function manager</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">registered_function</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">function_manager</span><span class="o">-&gt;</span><span class="n">registerFunction</span><span class="p">(</span><span class="n">function</span><span class="p">,</span><span class="w"> </span><span class="n">compute_service</span><span class="p">,</span>
+<span class="w">                                                              </span><span class="n">time_limit</span><span class="p">,</span>
+<span class="w">                                                              </span><span class="n">disk_space_limit_in_bytes</span><span class="p">,</span>
+<span class="w">                                                              </span><span class="n">RAM_limit_in_bytes</span><span class="p">,</span>
+<span class="w">                                                              </span><span class="n">ingress_in_bytes</span><span class="p">,</span>
+<span class="w">                                                              </span><span class="n">egress_in_bytes</span><span class="p">);</span>
+
+<span class="c1">// Invoke the function</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">inv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">function_manager</span><span class="o">-&gt;</span><span class="n">invokeFunction</span><span class="p">(</span><span class="n">registered_function</span><span class="p">,</span><span class="w"> </span><span class="n">compute_service</span><span class="p">,</span>
+<span class="w">                                            </span><span class="n">function_input</span><span class="p">);</span>
+
+<span class="c1">// Wait for the invocation to complete</span>
+<span class="n">function_manager</span><span class="o">-&gt;</span><span class="n">wait_one</span><span class="p">(</span><span class="n">inv</span><span class="p">);</span>
+
+<span class="c1">// Retrieve information, output, etc.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">function_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inv</span><span class="o">-&gt;</span><span class="n">getOutput</span><span class="p">();</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">start_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inv</span><span class="o">-&gt;</span><span class="n">getStartDate</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Note that the serverless compute service will decide on which physical resources
+function invocations are placed. The underlying physical resources are
+completely hidden.</p>
+<p>See the execution controller implementation in
+<code class="docutils literal notranslate"><span class="pre">examples/serverless_api/basic/ServerlessExampleExecutionController.cpp</span></code>
+for a more complete example.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation 101 &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=14e8207d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="WRENCH 101" href="wrench_101.html" />
+    <link rel="prev" title="Getting started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Simulation 101</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-overview">Simulation Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulated-platform">Simulated Platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulated-processes">Simulated Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulated-services">Simulated Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulated-controller">Simulated Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-s-next">What’s next</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Simulation 101</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simulation_101.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simulation-101">
+<span id="id1"></span><h1>Simulation 101<a class="headerlink" href="#simulation-101" title="Link to this heading"></a></h1>
+<p>This page provides a gentle introduction to the simulation of parallel
+and distributed executions, as enabled by WRENCH. This content is
+intended for users who have never implemented (or even thought of
+implementing) a simulator.</p>
+<section id="simulation-overview">
+<h2>Simulation Overview<a class="headerlink" href="#simulation-overview" title="Link to this heading"></a></h2>
+<p>A simulator is a software artifact that mimics the behavior of some
+system of interest. In the context of the WRENCH project, the systems of
+interest are parallel and distributed platforms on which various
+software runtime systems are deployed by which some application workload
+is to be executed. For instance, the platform could be a homogeneous
+cluster with some network attached storage, the software runtime systems
+could be a batch scheduler and a file server that controls access to the
+network attached storage, and the application workload could be a
+scientific workflow. The system could be much more complex, with
+different kinds of runtime systems running on hardware or virtualized
+resources connected over a wide-area network.</p>
+</section>
+<section id="simulated-platform">
+<h2>Simulated Platform<a class="headerlink" href="#simulated-platform" title="Link to this heading"></a></h2>
+<p>A simulated platform consists of a set of computers, or, <strong>hosts</strong>.
+These hosts can have various characteristics (e.g., number of cores,
+clock rate). Each host can have one or more <strong>disks</strong> attached to it, on
+which data can be stored and accessed. The hosts are interconnected with
+each other over a network (otherwise this would not be parallel and
+distributed computing). The network is a set of network <strong>links</strong>, each
+with some latency and bandwidth specification. Two hosts are connected
+via a network path, which is simply a sequence of links through which
+messages between the two hosts are routed.</p>
+<p>The above concepts allow us to describe a simulated platform that can
+resemble real-world, either current or upcoming, platforms. Many more
+details and features of the platform can be described, but the above
+concepts gives us enough of a basis for everything that follows.
+Platform description in WRENCH is based on the platform description
+capabilities in <span class="xref std std-ref">SimGrid</span>: a platform can be
+described in an XML file or programmatically (see more details on the
+<a class="reference internal" href="wrench_101.html#wrench-101-header"><span class="std std-ref">WRENCH 101</span></a> page).</p>
+</section>
+<section id="simulated-processes">
+<h2>Simulated Processes<a class="headerlink" href="#simulated-processes" title="Link to this heading"></a></h2>
+<p>The execution of processes (i.e., running programs) can be simulated on
+the hosts of the simulated platform. These processes can execute
+arbitrary (C++) code and also place calls to WRENCH to simulate usage of
+the platform resources (i.e., now I am computing, now I am sending data
+to the network, now I am reading data from disk, now I am creating a new
+process, etc.). As a result, the speed of the execution of these
+processes is limited by the characteristics of the hardware resources in
+the platform, and their usage by other processes. Process executions
+proceed through simulated time until the end of the simulation, e.g.,
+when the application workload of interest has completed. At that point,
+the simulator can, for instance, print the simulated time.</p>
+<p>At this point, you may be thinking: “Are you telling me that I need to
+implement a bunch of simulated processes that do things and talk to each
+other? My system is complicated and do not even know all the processes
+I would need to simulate! There is no way I can do this!”. <strong>And you would be
+right.</strong> It is true that any parallel and distributed system of interest
+is, at its most basic level, just a set of processes that compute,
+read/write data, and send/receive messages. But it is a lot of work to
+implement a simulator of a complex system at such a low level. This is
+where WRENCH comes in.</p>
+</section>
+<section id="simulated-services">
+<h2>Simulated Services<a class="headerlink" href="#simulated-services" title="Link to this heading"></a></h2>
+<p>WRENCH comes with a large set of already-implemented <strong>services</strong>. A
+service is a set of one or more running simulated processes that
+simulate a software runtime system that is commonly useful and used for
+parallel and distributed computing. The two main kinds of services are
+<em>compute services</em> and <em>storage services</em>, but there are others (all
+detailed on the <a class="reference internal" href="wrench_101.html#wrench-101-header"><span class="std std-ref">WRENCH 101</span></a> page).</p>
+<p>A compute service is a runtime system to which you can say “run this
+computation” and it replies either “ok, I will run it” or “I cannot”. If it
+can run it, then later on it will tell you either “It is done” or “It is
+failed”. And that is it. Underneath, this entails all kinds of processes
+that compute, communicate with each other, and start other processes.
+This complexity is all abstracted away by the service, which exposes a
+simple, high-level, easy-to-understand API. For instance, in our example
+earlier we mentioned a batch scheduler. For HPC (High Performance
+Computing), this is popular runtime system that manages the execution of
+jobs on a set of compute nodes on some fast local network, i.e., a
+cluster. In the real-world, a batch scheduler consists of many running
+processes (a.k.a. daemons) running on the cluster, implements
+sophisticated algorithms to decide which job should run next, makes sure
+jobs do not run on the same cores, etc. WRENCH provides an
+already-implemented compute service called a
+<a class="reference internal" href="api_developer/classwrench_1_1_batch_compute_service.html#_CPPv4N6wrench19BatchComputeServiceE" title="wrench::BatchComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BatchComputeService</span></code></a> that does all this for you,
+under the cover.</p>
+<p>For example, the well-known batch scheduler
+<span class="xref std std-ref">Slurm</span> uses several daemons to schedule
+and manage jobs(e.g., the process <strong>slurmd</strong> runs on each compute node
+and one <strong>slurmctld</strong> daemon controls everything). In this example, an
+instance of <a class="reference internal" href="api_developer/classwrench_1_1_batch_compute_service.html#_CPPv4N6wrench19BatchComputeServiceE" title="wrench::BatchComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BatchComputeService</span></code></a> could represent
+one Slurm cluster with one <strong>slurmctld</strong> process and
+multiple <strong>slurmd</strong> processes.</p>
+<p>A storage service is a runtime system to which you can say “here is some
+data I want you to store”, “I want to read some bytes from that data I
+stored before”, “Do you have this data?”, etc. A storage service in the
+real world consists of several processes (e.g., to handle bounded
+numbers of concurrent reads/writes from different clients) and can use
+non-trivial algorithms (e.g., for overlapping network communication and
+disk accesses). Here again, WRENCH comes with an already-implemented
+storage service called <a class="reference internal" href="api_developer/classwrench_1_1_simple_storage_service.html#_CPPv4N6wrench20SimpleStorageServiceE" title="wrench::SimpleStorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimpleStorageService</span></code></a> that does all
+this for you and comes with a straightforward, high-level API.
+Note that a storage service does not provide by default capabilities
+traditionally offered by parallel file systems such as
+<span class="xref std std-ref">Lustre</span>
+(i.e., no stripping among storage nodes, no dedicated metadata servers).
+If you want to model such storage back-end, you can do it by extending
+the <a class="reference internal" href="api_developer/classwrench_1_1_simple_storage_service.html#_CPPv4N6wrench20SimpleStorageServiceE" title="wrench::SimpleStorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::SimpleStorageService</span></code></a>.</p>
+<p>Each service in WRENCH comes with configurable <em>properties</em>, that are
+well-documented and can be used to specify particular features and/or
+behaviors (e.g., a specific scheduling algorithm for a
+given <a class="reference internal" href="api_developer/classwrench_1_1_batch_compute_service.html#_CPPv4N6wrench19BatchComputeServiceE" title="wrench::BatchComputeService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::BatchComputeService</span></code></a>).
+Each service also comes with <em>configurable message payloads</em>,
+which specify the size in bytes of the control messages that underlying
+processes exchange with each other to implement the service’s
+functionality. In the real-world, the processes that comprise a service
+exchange various messages, and in WRENCH you get to specify the size of
+all these messages (the larger the sizes the longer the simulated
+communication times). See more about <a class="reference internal" href="wrench_101.html#wrench-101-customizing-services"><span class="std std-ref">Service
+Customization</span></a> on the <a class="reference internal" href="wrench_101.html#wrench-101-header"><span class="std std-ref">WRENCH
+101</span></a> page.</p>
+<p>When the simulator is done, the <strong>calibration</strong> phase begins.
+The <strong>calibration</strong> step is crucial to ensure that your simulator
+accurately approximate the performance of the application you study
+on the target platform. Basically, calibrating a simulator implies
+that you fine-tune the simulator to approximate the real performance
+of the target application when running on the modeled platform.
+<em>Payloads</em> and <em>properties</em> play a central role in this calibration
+step as they control the weight of many important actions (for example,
+how much overhead when reading a file from a storage service?).</p>
+</section>
+<section id="simulated-controller">
+<h2>Simulated Controller<a class="headerlink" href="#simulated-controller" title="Link to this heading"></a></h2>
+<p>As you recall, the goal of a WRENCH simulator is to simulate the
+execution of some application workload. And so far, we have not said much
+about this workload or about how one goes about simulating its
+execution. So let’s…</p>
+<p>An application workload is executed using the services deployed on the
+platform. To do so, you need to implement one process called an
+<strong>execution controller</strong>. This process invokes the services to execute
+the application workload, whatever that workload is. Say, for instance,
+that your application workload consists in performing some amount of
+computation based on data in some input file. The controller should ask
+a compute service to start a job to perform the computation, while
+reading the input from some storage service that stores the input file.
+Whenever the compute service replies that the computation has finished,
+then the execution controller’s work is done.</p>
+<p>The execution controller is the core of the simulator, as it is where
+you implement whatever algorithm/strategy you wish to simulate for
+executing the application workload. At this point the execution
+controller likely seems a bit abstract. But we would not say more about it
+until you get to the <a class="reference internal" href="wrench_102.html#wrench-102-header"><span class="std std-ref">WRENCH 102</span></a> page, which is
+exclusively about the controller.</p>
+</section>
+<section id="what-s-next">
+<h2>What’s next<a class="headerlink" href="#what-s-next" title="Link to this heading"></a></h2>
+<p>At this point, you should be able to jump into <a class="reference internal" href="wrench_101.html#wrench-101-header"><span class="std std-ref">WRENCH 101</span></a>!</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="wrench_101.html" class="btn btn-neutral float-right" title="WRENCH 101" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

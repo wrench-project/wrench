@@ -1,0 +1,8 @@
+.. _BatchComputeServiceProperty:
+wrench::BatchComputeServiceProperty
+***********************************
+
+.. doxygenclass:: wrench::BatchComputeServiceProperty
+   :project: developer
+   :members:
+

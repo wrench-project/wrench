@@ -1,0 +1,8 @@
+.. _CloudComputeServiceCreateVMRequestMessage:
+wrench::CloudComputeServiceCreateVMRequestMessage
+*************************************************
+
+.. doxygenclass:: wrench::CloudComputeServiceCreateVMRequestMessage
+   :project: internal
+   :members:
+

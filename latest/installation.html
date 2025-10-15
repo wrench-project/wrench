@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installing WRENCH &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=14e8207d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting started" href="getting_started.html" />
+    <link rel="prev" title="Architecture" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installing WRENCH</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#required-dependencies">Required Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-dependencies">Optional Dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#source-install">Source Install</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-wrench">Building WRENCH</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compiling-and-running-unit-tests">Compiling and running unit tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compiling-and-running-examples">Compiling and running examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation-troubleshooting">Installation Troubleshooting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#could-not-find-pkgconfig-missing-pkg-config-executable">Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#could-not-find-libgfortran-when-building-the-simgrid-dependency">Could not find libgfortran when building the SimGrid dependency</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-containers">Docker Containers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installing WRENCH</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installing-wrench">
+<span id="install"></span><h1>Installing WRENCH<a class="headerlink" href="#installing-wrench" title="Link to this heading"></a></h1>
+<section id="prerequisites">
+<span id="install-prerequisites"></span><h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>WRENCH is developed in <code class="docutils literal notranslate"><span class="pre">C++</span></code>. The code follows the C++14 standard, and
+thus older compilers may fail to compile it. Therefore, we strongly
+recommend users to satisfy the following requirements:</p>
+<ul class="simple">
+<li><p><strong>CMake</strong> - version 3.10 or higher</p></li>
+</ul>
+<p>And, one of the following: - <strong>g++</strong> - version 7.5 or higher - <strong>clang</strong>
+- version 9.0 or higher</p>
+<section id="required-dependencies">
+<span id="install-prerequisites-dependencies"></span><h3>Required Dependencies<a class="headerlink" href="#required-dependencies" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://simgrid.org/">SimGrid</a> ??? version 4.0</p></li>
+<li><p><a class="reference external" href="https://github.com/simgrid/file-system-module">SimGrid File System Module</a> ??? version 0.3 or higher</p></li>
+<li><p><a class="reference external" href="https://github.com/nlohmann/json">JSON for Modern C++</a> ??? version
+3.11.0 or higher</p></li>
+</ul>
+<p>(See the <a class="reference internal" href="#install-troubleshooting"><span class="std std-ref">Installation Troubleshooting</span></a> section below if encountering difficulties
+installing dependencies)</p>
+</section>
+<section id="optional-dependencies">
+<span id="install-prerequisites-opt-dependencies"></span><h3>Optional Dependencies<a class="headerlink" href="#optional-dependencies" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/google/googletest">Google Test</a> ??? version 1.8
+or higher (only required for running tests)</p></li>
+<li><p><a class="reference external" href="http://www.doxygen.org">Doxygen</a> ??? version 1.8 or higher (only
+required for generating documentation)</p></li>
+<li><p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/installation.html">Sphinx</a> -
+version 4.5 or higher along with the following Python packages:
+<code class="docutils literal notranslate"><span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">sphinx-rtd-theme</span> <span class="pre">breathe</span> <span class="pre">recommonmark</span></code>  (only required
+for generating documentation)</p></li>
+<li><p><a class="reference external" href="https://gitlab.inria.fr/batsim/batsched">Batsched</a> ??? version 1.4
+- useful for expanded batch-scheduled resource simulation
+capabilities</p></li>
+<li><p><a class="reference external" href="https://github.com/chriskohlhoff/asio/">Asio</a> - tag 1.28.0 or later (only required for building <cite>wrench-daemon</cite>, WRENCH’s REST API daemon)</p></li>
+</ul>
+</section>
+</section>
+<section id="source-install">
+<span id="install-source"></span><h2>Source Install<a class="headerlink" href="#source-install" title="Link to this heading"></a></h2>
+<section id="building-wrench">
+<span id="install-source-build"></span><h3>Building WRENCH<a class="headerlink" href="#building-wrench" title="Link to this heading"></a></h3>
+<p>You can download the <code class="docutils literal notranslate"><span class="pre">wrench-&lt;version&gt;.tar.gz</span></code> archive from the <a class="reference external" href="https://github.com/wrench-project/wrench/releases">GitHub
+releases</a> page.
+Once you have installed dependencies (see above), you can install WRENCH
+as follows:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>tar<span class="w"> </span>xf<span class="w"> </span>wrench-&lt;version&gt;.tar.gz
+<span class="nb">cd</span><span class="w"> </span>wrench-&lt;version&gt;
+mkdir<span class="w"> </span>build
+<span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w"> </span>..
+make<span class="w"> </span>-j8
+make<span class="w"> </span>install<span class="w"> </span><span class="c1"># try &quot;sudo make install&quot; if you do not have write privileges</span>
+</pre></div>
+</div>
+<p>If you want to see actual compiler and linker invocations, add
+<code class="docutils literal notranslate"><span class="pre">VERBOSE=1</span></code> to the compilation command:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-j8<span class="w"> </span><span class="nv">VERBOSE</span><span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+<p>To enable the use of Batsched (provided you have installed that package,
+see above):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-DENABLE_BATSCHED<span class="o">=</span>on<span class="w"> </span>.
+</pre></div>
+</div>
+<p>If you want to stay on the bleeding edge, you should get the latest git
+version, and recompile it as you would do for an official archive:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/wrench-project/wrench
+</pre></div>
+</div>
+</section>
+<section id="compiling-and-running-unit-tests">
+<span id="install-unit-tests"></span><h3>Compiling and running unit tests<a class="headerlink" href="#compiling-and-running-unit-tests" title="Link to this heading"></a></h3>
+<p>Building and running the unit tests, which requires Google Test, is done
+as:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-j8<span class="w"> </span>unit_tests
+./unit_tests
+</pre></div>
+</div>
+</section>
+<section id="compiling-and-running-examples">
+<span id="install-examples"></span><h3>Compiling and running examples<a class="headerlink" href="#compiling-and-running-examples" title="Link to this heading"></a></h3>
+<p>Building the examples is done as:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-j8<span class="w"> </span>examples
+</pre></div>
+</div>
+<p>All binaries for the examples are then created in subdirectories of
+<code class="docutils literal notranslate"><span class="pre">build/examples/</span></code></p>
+</section>
+<section id="installation-troubleshooting">
+<span id="install-troubleshooting"></span><h3>Installation Troubleshooting<a class="headerlink" href="#installation-troubleshooting" title="Link to this heading"></a></h3>
+<section id="could-not-find-pkgconfig-missing-pkg-config-executable">
+<h4>Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)<a class="headerlink" href="#could-not-find-pkgconfig-missing-pkg-config-executable" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>This error on MacOS is because the <code class="docutils literal notranslate"><span class="pre">pkg-config</span></code> package is not
+installed</p></li>
+<li><p>Solution: install this package</p>
+<ul>
+<li><p>MacPorts: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">port</span> <span class="pre">install</span> <span class="pre">pkg-config</span></code></p></li>
+<li><p>Brew: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">brew</span> <span class="pre">install</span> <span class="pre">pkg-config</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="could-not-find-libgfortran-when-building-the-simgrid-dependency">
+<h4>Could not find libgfortran when building the SimGrid dependency<a class="headerlink" href="#could-not-find-libgfortran-when-building-the-simgrid-dependency" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>This is an error that sometimes occurs on MacOS</p></li>
+<li><p>A quick fix is to disable the SMPI feature of SimGrid when
+configuring it: <code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">-Denable_smpi=off</span> <span class="pre">.</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="docker-containers">
+<span id="install-docker"></span><h2>Docker Containers<a class="headerlink" href="#docker-containers" title="Link to this heading"></a></h2>
+<p>WRENCH is also distributed in Docker containers. Please, visit the
+<a class="reference external" href="https://hub.docker.com/r/wrenchproject/wrench/">WRENCH Repository on Docker
+Hub</a> to pull WRENCH???s
+Docker images.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">latest</span></code> tag provides a container with the latest <a class="reference external" href="https://github.com/wrench-project/wrench/releases">WRENCH
+release</a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>wrenchproject/wrench
+<span class="c1"># or</span>
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>wrenchproject/wrench<span class="w"> </span>/bin/bash
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">unstable</span></code> tag provides a container with the (almost) current code
+in the GitHub???s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>wrenchproject/wrench:unstable
+<span class="c1"># or</span>
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>wrenchproject/wrench:unstable<span class="w"> </span>/bin/bash
+</pre></div>
+</div>
+<p>Additional tags are available for all WRENCH releases.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Architecture" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

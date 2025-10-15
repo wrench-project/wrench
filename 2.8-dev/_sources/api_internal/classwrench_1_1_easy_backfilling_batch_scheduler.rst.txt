@@ -1,0 +1,8 @@
+.. _EasyBackfillingBatchScheduler:
+wrench::EasyBackfillingBatchScheduler
+*************************************
+
+.. doxygenclass:: wrench::EasyBackfillingBatchScheduler
+   :project: internal
+   :members:
+

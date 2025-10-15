@@ -1,0 +1,8 @@
+.. _JobManagerWakeupMessage:
+wrench::JobManagerWakeupMessage
+*******************************
+
+.. doxygenclass:: wrench::JobManagerWakeupMessage
+   :project: internal
+   :members:
+

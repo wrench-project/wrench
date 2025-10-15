@@ -1,0 +1,8 @@
+.. _CoordinateLookupAnswerMessage:
+wrench::CoordinateLookupAnswerMessage
+*************************************
+
+.. doxygenclass:: wrench::CoordinateLookupAnswerMessage
+   :project: internal
+   :members:
+

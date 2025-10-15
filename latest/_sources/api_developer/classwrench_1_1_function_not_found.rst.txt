@@ -1,0 +1,8 @@
+.. _FunctionNotFound:
+wrench::FunctionNotFound
+************************
+
+.. doxygenclass:: wrench::FunctionNotFound
+   :project: developer
+   :members:
+

@@ -1,0 +1,185 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interacting with an XRootD deployment &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Interacting with an XRootD deployment</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wrench_102/xrootd.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="interacting-with-an-xrootd-deployment">
+<span id="guide-102-xrootd"></span><h1>Interacting with an XRootD deployment<a class="headerlink" href="#interacting-with-an-xrootd-deployment" title="Link to this heading"></a></h1>
+<p>Recall that an XRootD deployment consists of a tree of instances
+of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::xrootd::Node</span></code>, with some of these nodes
+being <em>supervisors nodes</em> and others being <em>storage nodes</em>.
+The following operations are supported by a supervisor node
+(and are accomplished by the supervisor
+interacting with the nodes that are in the subtree of which it is the root):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Synchronously reading a file (rarely used by an execution controller but included for completeness); and</p></li>
+<li><p>Semi-Synchronously deleting a file (execution waits for supervisor to acknowledge delete request, but does not wait for the full XRootD subtree to be purged)</p></li>
+</ul>
+</div></blockquote>
+<p>In addition, all storage nodes in an XRootD tree support all operations that an instance of <a class="reference internal" href="simplestorage.html#guide-102-simplestorage"><span class="std std-ref">Simple Storage Service</span></a> does (which must be invoked directory on that node).</p>
+<p>All interactions above are done by calling member functions of
+the <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a> class. Some of these member functions
+take an optional <a class="reference internal" href="../api_developer/classwrench_1_1_file_registry_service.html#_CPPv4N6wrench19FileRegistryServiceE" title="wrench::FileRegistryService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::FileRegistryService</span></code></a> argument, in which case
+they will also update entries in a file registry service (e.g., removing
+an entry when a file is deleted).</p>
+<p>The following operations:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Writing to a file; and</p></li>
+<li><p>Creating a file</p></li>
+</ul>
+</div></blockquote>
+<p>are intentionally only implemented for storage nodes and not supervisor
+nodes (i.e., subtrees), due to the ambiguity of which storage node in the
+subtree rooted at the supervisor should storage the newly created data.</p>
+<p>Several interactions with an XRootD Deployment are done simply by calling <strong>virtual</strong> methods of the <a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::StorageService</span></code></a> class, but it is also
+possible to call directly methods of these <a class="reference internal" href="simplestorage.html#guide-102-simplestorage"><span class="std std-ref">Simple Storage Service</span></a> class for XRootD storage nodes. This is because, in the XRootD distributed
+file systems, some notions (such as the location of a file) are different than in a non-distributed file system. For instance:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">XRootD</span><span class="o">::</span><span class="n">Deployment</span><span class="o">&gt;</span><span class="w"> </span><span class="n">deployment</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">DataFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">some_file</span><span class="p">;</span>
+
+<span class="p">[...]</span>
+
+<span class="c1">// Read a file from one specific storage node</span>
+<span class="n">deployment</span><span class="o">-&gt;</span><span class="n">getRootSupervisor</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getChild</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">readFile</span><span class="p">(</span><span class="n">some_file</span><span class="p">);</span>
+
+<span class="c1">// Delete a file from the whole subtree, which may</span>
+<span class="c1">// delete the file at multiple storage nodes</span>
+<span class="n">deployment</span><span class="o">-&gt;</span><span class="n">getRootSupervisor</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">deleteFile</span><span class="p">(</span><span class="n">some_file</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that file deletion from an XRootD (sub)tree  will not return an error
+even if the file does not exist. This is because the delete operation is
+only semi-synchronous and XRootD does not
+propagate “file not found” errors up the tree.  Similarly, the only indication that
+a file read operation has failed is a network timeout while searching.</p>
+<p>Note that reading and writing files is something an execution controller typically
+does not do directly. Instead, jobs created by the execution controller contain
+actions/tasks that read and write files as
+they execute.  A XRootD supervisor node can then be passed to these tasks/actions
+exactly as one would pass a <a class="reference internal" href="simplestorage.html#guide-102-simplestorage"><span class="std std-ref">Simple Storage Service</span></a> instance. For instance:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Create a job</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">job</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">createCompoundJob</span><span class="p">(</span><span class="s">&quot;some_job&quot;</span><span class="p">);</span>
+<span class="c1">// Add a file read action that will read from an XRootD supervisor node</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">job</span><span class="o">-&gt;</span><span class="n">addFileReadAction</span><span class="p">(</span><span class="s">&quot;file_read&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">some_file</span><span class="p">,</span><span class="w"> </span><span class="n">deployment</span><span class="o">-&gt;</span><span class="n">getRootSupervisor</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>See the execution controller implementation in
+<code class="docutils literal notranslate"><span class="pre">examples/action-api/XRootD/Controller.cpp</span></code>
+for a more complete example.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

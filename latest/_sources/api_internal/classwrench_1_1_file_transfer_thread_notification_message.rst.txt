@@ -1,0 +1,8 @@
+.. _FileTransferThreadNotificationMessage:
+wrench::FileTransferThreadNotificationMessage
+*********************************************
+
+.. doxygenclass:: wrench::FileTransferThreadNotificationMessage
+   :project: internal
+   :members:
+

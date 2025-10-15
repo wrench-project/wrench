@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrench::ComputeServiceMessagePayload &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="wrench::ComputeServiceProperty" href="classwrench_1_1_compute_service_property.html" />
+    <link rel="prev" title="wrench::ComputeService" href="classwrench_1_1_compute_service.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_message_payload.html">wrench::BareMetalComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_property.html">wrench::BareMetalComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service.html">wrench::BatchComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_message_payload.html">wrench::BatchComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_property.html">wrench::BatchComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service.html">wrench::CloudComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_message_payload.html">wrench::CloudComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_property.html">wrench::CloudComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_communicator.html">wrench::Communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service.html">wrench::CompoundStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_message_payload.html">wrench::CompoundStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_property.html">wrench::CompoundStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service.html">wrench::ComputeService</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ComputeServiceMessagePayload</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayloadE"><code class="docutils literal notranslate"><span class="pre">wrench::ComputeServiceMessagePayload</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload33COMPOUND_JOB_DONE_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">COMPOUND_JOB_DONE_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload35COMPOUND_JOB_FAILED_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload74IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload75IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload38JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload33PILOT_JOB_EXPIRED_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload32PILOT_JOB_FAILED_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">PILOT_JOB_FAILED_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload33PILOT_JOB_STARTED_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">PILOT_JOB_STARTED_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload43RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload44RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload33STANDARD_JOB_DONE_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">STANDARD_JOB_DONE_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload35STANDARD_JOB_FAILED_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">STANDARD_JOB_FAILED_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload42SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload43SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload39SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload40SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload42SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload43SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload45TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload46TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload42TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload43TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload45TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench28ComputeServiceMessagePayload46TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE"><code class="docutils literal notranslate"><span class="pre">TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_property.html">wrench::ComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_constant_efficiency_parallel_model.html">wrench::ConstantEfficiencyParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_parallel_model.html">wrench::CustomParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service.html">wrench::NetworkProximityService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_property.html">wrench::ServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service.html">wrench::SimpleStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_bufferized.html">wrench::SimpleStorageServiceBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_message_payload.html">wrench::SimpleStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_non_bufferized.html">wrench::SimpleStorageServiceNonBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_property.html">wrench::SimpleStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation.html">wrench::Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_output.html">wrench::SimulationOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp.html">wrench::SimulationTimestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read.html">wrench::SimulationTimestampDiskRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_completion.html">wrench::SimulationTimestampDiskReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_failure.html">wrench::SimulationTimestampDiskReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_start.html">wrench::SimulationTimestampDiskReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write.html">wrench::SimulationTimestampDiskWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_completion.html">wrench::SimulationTimestampDiskWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_failure.html">wrench::SimulationTimestampDiskWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_start.html">wrench::SimulationTimestampDiskWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_energy_consumption.html">wrench::SimulationTimestampEnergyConsumption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy.html">wrench::SimulationTimestampFileCopy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_completion.html">wrench::SimulationTimestampFileCopyCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_failure.html">wrench::SimulationTimestampFileCopyFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_start.html">wrench::SimulationTimestampFileCopyStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read.html">wrench::SimulationTimestampFileRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_completion.html">wrench::SimulationTimestampFileReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_failure.html">wrench::SimulationTimestampFileReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_start.html">wrench::SimulationTimestampFileReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write.html">wrench::SimulationTimestampFileWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_completion.html">wrench::SimulationTimestampFileWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_failure.html">wrench::SimulationTimestampFileWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_start.html">wrench::SimulationTimestampFileWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_link_usage.html">wrench::SimulationTimestampLinkUsage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pair.html">wrench::SimulationTimestampPair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pstate_set.html">wrench::SimulationTimestampPstateSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task.html">wrench::SimulationTimestampTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_completion.html">wrench::SimulationTimestampTaskCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_failure.html">wrench::SimulationTimestampTaskFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_start.html">wrench::SimulationTimestampTaskStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_termination.html">wrench::SimulationTimestampTaskTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_type.html">wrench::SimulationTimestampType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service.html">wrench::StorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_message_payload.html">wrench::StorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_property.html">wrench::StorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_proxy_property.html">wrench::StorageServiceProxyProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_message_payload.html">wrench::VirtualizedClusterComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_property.html">wrench::VirtualizedClusterComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_wf_commons_workflow_parser.html">wrench::WfCommonsWorkflowParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow_task.html">wrench::WorkflowTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_deployment.html">wrench::XRootD::Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message_payload.html">wrench::XRootD::MessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_node.html">wrench::XRootD::Node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_property.html">wrench::XRootD::Property</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_user.html">WRENCH User C++ API</a></li>
+      <li class="breadcrumb-item active">wrench::ComputeServiceMessagePayload</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_user/classwrench_1_1_compute_service_message_payload.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wrench-computeservicemessagepayload">
+<span id="computeservicemessagepayload"></span><h1>wrench::ComputeServiceMessagePayload<a class="headerlink" href="#wrench-computeservicemessagepayload" title="Link to this heading"></a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayloadE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayloadE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayloadE"></span><span id="wrench::ComputeServiceMessagePayload"></span><span class="target" id="classwrench_1_1_compute_service_message_payload"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComputeServiceMessagePayload</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_service_message_payload.html#_CPPv4N6wrench21ServiceMessagePayloadE" title="wrench::ServiceMessagePayload"><span class="n"><span class="pre">ServiceMessagePayload</span></span></a><br /></dt>
+<dd><p>Configurable message payloads for a <a class="reference internal" href="classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a>. </p>
+<p>Subclassed by <a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_message_payload.html#classwrench_1_1_bare_metal_compute_service_message_payload"><span class="std std-ref">wrench::BareMetalComputeServiceMessagePayload</span></a>, <a class="reference internal" href="classwrench_1_1_batch_compute_service_message_payload.html#classwrench_1_1_batch_compute_service_message_payload"><span class="std std-ref">wrench::BatchComputeServiceMessagePayload</span></a>, <a class="reference internal" href="classwrench_1_1_cloud_compute_service_message_payload.html#classwrench_1_1_cloud_compute_service_message_payload"><span class="std std-ref">wrench::CloudComputeServiceMessagePayload</span></a>, <a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html#classwrench_1_1_h_t_condor_compute_service_message_payload"><span class="std std-ref">wrench::HTCondorComputeServiceMessagePayload</span></a>, <a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html#classwrench_1_1_serverless_compute_service_message_payload"><span class="std std-ref">wrench::ServerlessComputeServiceMessagePayload</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload33COMPOUND_JOB_DONE_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload33COMPOUND_JOB_DONE_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload33COMPOUND_JOB_DONE_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a80902dbaba0f390c4d3e97c3e1b53400"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPOUND_JOB_DONE_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that it has completed a compound job. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload35COMPOUND_JOB_FAILED_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload35COMPOUND_JOB_FAILED_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload35COMPOUND_JOB_FAILED_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a2249f61e2193366465243bb6231b4abe"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that a running compound job has failed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload74IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload74IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload74IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a59d94ad63ac707456dcc912b41126533"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to ask is one host has some resources available. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload75IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload75IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload75IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a1c03cdb03428444638353c221e1df9a7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message by the the daemon to state whether one host has some resources available. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload38JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload38JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload38JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1af1dc4d2c2f784a5b2a29034567254ba7"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that it does not support the type of a submitted job. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload33PILOT_JOB_EXPIRED_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload33PILOT_JOB_EXPIRED_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload33PILOT_JOB_EXPIRED_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a1f5b40748d7fe90fb682d735395de3af"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that a pilot job has expired. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload32PILOT_JOB_FAILED_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload32PILOT_JOB_FAILED_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload32PILOT_JOB_FAILED_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a6b614da3139f4735421ed8e918556c0c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PILOT_JOB_FAILED_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that a pilot job has failed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload33PILOT_JOB_STARTED_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload33PILOT_JOB_STARTED_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload33PILOT_JOB_STARTED_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a0a91a957ed0eeba0bb35daea55b25fa5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PILOT_JOB_STARTED_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that a pilot job has started. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload43RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload43RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload43RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a110f501ef6361a70627833e8ab5ab511"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state information on its resources. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload44RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload44RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload44RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1abfd5cdb62efb21fb3ebf7764b9c7ad47"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to ask it for information on its resources. </p>
+<p>The number of bytes in the control message sent to the daemon to request information on its resources </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload33STANDARD_JOB_DONE_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload33STANDARD_JOB_DONE_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload33STANDARD_JOB_DONE_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a3ba0560d8901349f0fbd2ab7e6eb3862"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STANDARD_JOB_DONE_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that it has completed a standard job. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload35STANDARD_JOB_FAILED_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload35STANDARD_JOB_FAILED_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload35STANDARD_JOB_FAILED_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1aafb88e732f10b7e26bd1fe39356457bf"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STANDARD_JOB_FAILED_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to state that a running standard job has failed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload42SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload42SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload42SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1ac76447f222124633082cc820706ed557"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to acknowledge a compound job submission. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload43SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload43SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload43SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a575d4c76575bd6623bbc7f8a235ef9d5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to submit a pilot job. </p>
+<p>The number of bytes in the control message sent to the daemon to submit a compound job </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload39SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload39SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload39SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a421715521f0d2837e24e9e150da0de4a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent from the daemon to acknowledge a pilot job submission. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload40SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload40SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload40SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1aae15472660475257104b6717902fbffb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to submit a pilot job. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload42SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload42SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload42SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a1c23509b24aee6ea4e71b28497d659ba"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to acknowledge a standard job submission. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload43SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload43SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload43SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a86cb39a4741f03121d6c8254d8cbaf1c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to submit a standard job. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload45TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload45TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload45TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a5b36b5e4e676431b443a1629fc5b148e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to acknowledge a compound job termination. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload46TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload46TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload46TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a28fe167820a9383562e56df3a30a92c5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to terminate a compound job. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload42TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload42TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload42TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1ad0bf94135d0c642785f4ce490a0dde0b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to acknowledge a pilot job termination. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload43TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload43TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload43TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a6d80bf772eba3b8eb7224dc73e370cd0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to terminate a pilot job. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload45TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload45TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload45TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a734ce7db76ab5ec58a6c692ce4b8e18f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent by the daemon to acknowledge a standard job termination. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench28ComputeServiceMessagePayload46TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE">
+<span id="_CPPv3N6wrench28ComputeServiceMessagePayload46TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="_CPPv2N6wrench28ComputeServiceMessagePayload46TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOADE"></span><span id="wrench::ComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD__ssC"></span><span class="target" id="classwrench_1_1_compute_service_message_payload_1a24f99e315abb2e89e666e719af98d4dc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD</span></span></span><br /></dt>
+<dd><p>The number of bytes in the control message sent to the daemon to terminate a standard job. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="classwrench_1_1_compute_service.html" class="btn btn-neutral float-left" title="wrench::ComputeService" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_compute_service_property.html" class="btn btn-neutral float-right" title="wrench::ComputeServiceProperty" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

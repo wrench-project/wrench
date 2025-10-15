@@ -1,0 +1,8 @@
+.. _HTCondorComputeServiceProperty:
+wrench::HTCondorComputeServiceProperty
+**************************************
+
+.. doxygenclass:: wrench::HTCondorComputeServiceProperty
+   :project: developer
+   :members:
+

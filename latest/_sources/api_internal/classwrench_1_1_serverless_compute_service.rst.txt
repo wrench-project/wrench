@@ -1,0 +1,8 @@
+.. _ServerlessComputeService:
+wrench::ServerlessComputeService
+********************************
+
+.. doxygenclass:: wrench::ServerlessComputeService
+   :project: internal
+   :members:
+

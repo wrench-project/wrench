@@ -1,0 +1,8 @@
+.. _SimulationTrace< SimulationTimestampPstateSet >:
+wrench::SimulationTrace< SimulationTimestampPstateSet >
+*******************************************************
+
+.. doxygenclass:: wrench::SimulationTrace< SimulationTimestampPstateSet >
+   :project: internal
+   :members:
+

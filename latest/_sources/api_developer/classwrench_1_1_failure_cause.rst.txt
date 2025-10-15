@@ -1,0 +1,8 @@
+.. _FailureCause:
+wrench::FailureCause
+********************
+
+.. doxygenclass:: wrench::FailureCause
+   :project: developer
+   :members:
+

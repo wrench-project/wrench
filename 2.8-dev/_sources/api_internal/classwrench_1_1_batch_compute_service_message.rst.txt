@@ -1,0 +1,8 @@
+.. _BatchComputeServiceMessage:
+wrench::BatchComputeServiceMessage
+**********************************
+
+.. doxygenclass:: wrench::BatchComputeServiceMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,762 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrench::Service &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="wrench::ServiceDaemonStoppedMessage" href="classwrench_1_1_service_daemon_stopped_message.html" />
+    <link rel="prev" title="wrench::ServerlessStateOfTheSystem" href="classwrench_1_1_serverless_state_of_the_system.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action.html">wrench::Action</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service.html">wrench::ActionExecutionService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_action_done_message.html">wrench::ActionExecutionServiceActionDoneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_message.html">wrench::ActionExecutionServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_property.html">wrench::ActionExecutionServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_submit_action_answer_message.html">wrench::ActionExecutionServiceSubmitActionAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_submit_action_request_message.html">wrench::ActionExecutionServiceSubmitActionRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_terminate_action_answer_message.html">wrench::ActionExecutionServiceTerminateActionAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_execution_service_terminate_action_request_message.html">wrench::ActionExecutionServiceTerminateActionRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor.html">wrench::ActionExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_actor_with_timeout.html">wrench::ActionExecutorActorWithTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_done_message.html">wrench::ActionExecutorDoneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_message.html">wrench::ActionExecutorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm.html">wrench::Alarm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm_job_time_out_message.html">wrench::AlarmJobTimeOutMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_message_payload.html">wrench::BareMetalComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_one_shot.html">wrench::BareMetalComputeServiceOneShot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_property.html">wrench::BareMetalComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service.html">wrench::BatchComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_job_request_message.html">wrench::BatchComputeServiceJobRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_message.html">wrench::BatchComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_message_payload.html">wrench::BatchComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_property.html">wrench::BatchComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_execute_job_from_bat_sched_message.html">wrench::BatchExecuteJobFromBatSchedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_job.html">wrench::BatchJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_query_answer_message.html">wrench::BatchQueryAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_scheduler.html">wrench::BatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batsched_network_listener.html">wrench::BatschedNetworkListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_block.html">wrench::Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_central_manager_wake_up_message.html">wrench::CentralManagerWakeUpMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service.html">wrench::CloudComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_create_v_m_answer_message.html">wrench::CloudComputeServiceCreateVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_create_v_m_request_message.html">wrench::CloudComputeServiceCreateVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_destroy_v_m_answer_message.html">wrench::CloudComputeServiceDestroyVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_destroy_v_m_request_message.html">wrench::CloudComputeServiceDestroyVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_get_execution_hosts_answer_message.html">wrench::CloudComputeServiceGetExecutionHostsAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_get_execution_hosts_request_message.html">wrench::CloudComputeServiceGetExecutionHostsRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_message.html">wrench::CloudComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_message_payload.html">wrench::CloudComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_property.html">wrench::CloudComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_resume_v_m_answer_message.html">wrench::CloudComputeServiceResumeVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_resume_v_m_request_message.html">wrench::CloudComputeServiceResumeVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_shutdown_v_m_answer_message.html">wrench::CloudComputeServiceShutdownVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_shutdown_v_m_request_message.html">wrench::CloudComputeServiceShutdownVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_start_v_m_answer_message.html">wrench::CloudComputeServiceStartVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_start_v_m_request_message.html">wrench::CloudComputeServiceStartVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_suspend_v_m_answer_message.html">wrench::CloudComputeServiceSuspendVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_suspend_v_m_request_message.html">wrench::CloudComputeServiceSuspendVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_communicator.html">wrench::Communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job.html">wrench::CompoundJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job_completed_event.html">wrench::CompoundJobCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job_failed_event.html">wrench::CompoundJobFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_allocation_answer_message.html">wrench::CompoundStorageAllocationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_allocation_request_message.html">wrench::CompoundStorageAllocationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_lookup_answer_message.html">wrench::CompoundStorageLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_lookup_request_message.html">wrench::CompoundStorageLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service.html">wrench::CompoundStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_message.html">wrench::CompoundStorageServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_message_payload.html">wrench::CompoundStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_property.html">wrench::CompoundStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_computation_has_died.html">wrench::ComputationHasDied</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_action.html">wrench::ComputeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service.html">wrench::ComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_compound_job_done_message.html">wrench::ComputeServiceCompoundJobDoneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_compound_job_failed_message.html">wrench::ComputeServiceCompoundJobFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_is_there_at_least_one_host_with_available_resources_answer_message.html">wrench::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_is_there_at_least_one_host_with_available_resources_request_message.html">wrench::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_message.html">wrench::ComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_message_payload.html">wrench::ComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_pilot_job_expired_message.html">wrench::ComputeServicePilotJobExpiredMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_pilot_job_started_message.html">wrench::ComputeServicePilotJobStartedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_property.html">wrench::ComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_resource_information_answer_message.html">wrench::ComputeServiceResourceInformationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_resource_information_request_message.html">wrench::ComputeServiceResourceInformationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_submit_compound_job_answer_message.html">wrench::ComputeServiceSubmitCompoundJobAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_submit_compound_job_request_message.html">wrench::ComputeServiceSubmitCompoundJobRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_terminate_compound_job_answer_message.html">wrench::ComputeServiceTerminateCompoundJobAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_terminate_compound_job_request_message.html">wrench::ComputeServiceTerminateCompoundJobRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_conservative_backfilling_batch_scheduler.html">wrench::ConservativeBackfillingBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_conservative_backfilling_batch_scheduler_core_level.html">wrench::ConservativeBackfillingBatchSchedulerCoreLevel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_constant_efficiency_parallel_model.html">wrench::ConstantEfficiencyParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_coordinate_lookup_answer_message.html">wrench::CoordinateLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_coordinate_lookup_request_message.html">wrench::CoordinateLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_action.html">wrench::CustomAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_event.html">wrench::CustomEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_parallel_model.html">wrench::CustomParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_dag_of_tasks.html">wrench::DagOfTasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_dag_of_tasks_1_1custom__bfs__visitor.html">wrench::DagOfTasks::custom_bfs_visitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_manager_file_copy_answer_message.html">wrench::DataManagerFileCopyAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_manager_file_read_answer_message.html">wrench::DataManagerFileReadAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_manager_file_write_answer_message.html">wrench::DataManagerFileWriteAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager.html">wrench::DataMovementManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager_file_reader_thread_message.html">wrench::DataMovementManagerFileReaderThreadMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager_file_writer_thread_message.html">wrench::DataMovementManagerFileWriterThreadMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager_message.html">wrench::DataMovementManagerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_easy_backfilling_batch_scheduler.html">wrench::EasyBackfillingBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller.html">wrench::ExecutionController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_alarm_timer_message.html">wrench::ExecutionControllerAlarmTimerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_custom_event_message.html">wrench::ExecutionControllerCustomEventMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_message.html">wrench::ExecutionControllerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_event.html">wrench::ExecutionEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_exception.html">wrench::ExecutionException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_batch_scheduler.html">wrench::FCFSBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_failure_cause.html">wrench::FailureCause</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fatal_failure.html">wrench::FatalFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_copied.html">wrench::FileAlreadyBeingCopied</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_read.html">wrench::FileAlreadyBeingRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_written.html">wrench::FileAlreadyBeingWritten</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_action.html">wrench::FileCopyAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_completed_event.html">wrench::FileCopyCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_failed_event.html">wrench::FileCopyFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_delete_action.html">wrench::FileDeleteAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_location.html">wrench::FileLocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_not_found.html">wrench::FileNotFound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_action.html">wrench::FileReadAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_completed_event.html">wrench::FileReadCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_failed_event.html">wrench::FileReadFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_reader_thread.html">wrench::FileReaderThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_action.html">wrench::FileRegistryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_add_entry_action.html">wrench::FileRegistryAddEntryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_add_entry_answer_message.html">wrench::FileRegistryAddEntryAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_add_entry_request_message.html">wrench::FileRegistryAddEntryRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_delete_entry_action.html">wrench::FileRegistryDeleteEntryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_answer_message.html">wrench::FileRegistryFileLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_by_proximity_answer_message.html">wrench::FileRegistryFileLookupByProximityAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_by_proximity_request_message.html">wrench::FileRegistryFileLookupByProximityRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_file_lookup_request_message.html">wrench::FileRegistryFileLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_message.html">wrench::FileRegistryMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_remove_entry_answer_message.html">wrench::FileRegistryRemoveEntryAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_remove_entry_request_message.html">wrench::FileRegistryRemoveEntryRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_transfer_thread.html">wrench::FileTransferThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_transfer_thread_message.html">wrench::FileTransferThreadMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_transfer_thread_notification_message.html">wrench::FileTransferThreadNotificationMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_action.html">wrench::FileWriteAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_completed_event.html">wrench::FileWriteCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_failed_event.html">wrench::FileWriteFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_writer_thread.html">wrench::FileWriterThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager.html">wrench::FunctionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_completed_message.html">wrench::FunctionManagerFunctionCompletedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_failed_message.html">wrench::FunctionManagerFunctionFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_answer_message.html">wrench::FunctionManagerFunctionInvocationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_request_message.html">wrench::FunctionManagerFunctionInvocationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_message.html">wrench::FunctionManagerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_wait_all_message.html">wrench::FunctionManagerWaitAllMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_wait_one_message.html">wrench::FunctionManagerWaitOneMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_wakeup_message.html">wrench::FunctionManagerWakeupMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_not_found.html">wrench::FunctionNotFound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_functionality_not_available.html">wrench::FunctionalityNotAvailable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service.html">wrench::HTCondorCentralManagerService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service_message.html">wrench::HTCondorCentralManagerServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service_message_payload.html">wrench::HTCondorCentralManagerServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_negotiator_service.html">wrench::HTCondorNegotiatorService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_homegrown_batch_scheduler.html">wrench::HomegrownBatchScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_error.html">wrench::HostError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_has_changed_speed_message.html">wrench::HostHasChangedSpeedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_has_turned_off_message.html">wrench::HostHasTurnedOffMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_has_turned_on_message.html">wrench::HostHasTurnedOnMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector.html">wrench::HostStateChangeDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_message.html">wrench::HostStateChangeDetectorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_property.html">wrench::HostStateChangeDetectorProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_killed.html">wrench::JobKilled</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager.html">wrench::JobManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_compound_job_completed_message.html">wrench::JobManagerCompoundJobCompletedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_compound_job_failed_message.html">wrench::JobManagerCompoundJobFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_message.html">wrench::JobManagerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_standard_job_completed_message.html">wrench::JobManagerStandardJobCompletedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_standard_job_failed_message.html">wrench::JobManagerStandardJobFailedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_wakeup_message.html">wrench::JobManagerWakeupMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_timeout.html">wrench::JobTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action.html">wrench::MPIAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action_1_1_m_p_i_private_execution_controller.html">wrench::MPIAction::MPIPrivateExecutionController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action_1_1_m_p_i_process.html">wrench::MPIAction::MPIProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_memory_manager.html">wrench::MemoryManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_negotiator_completion_message.html">wrench::NegotiatorCompletionMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_error.html">wrench::NetworkError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_compute_answer_message.html">wrench::NetworkProximityComputeAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_lookup_answer_message.html">wrench::NetworkProximityLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_lookup_request_message.html">wrench::NetworkProximityLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_message.html">wrench::NetworkProximityMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_receiver_daemon.html">wrench::NetworkProximityReceiverDaemon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_sender_daemon.html">wrench::NetworkProximitySenderDaemon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service.html">wrench::NetworkProximityService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_transfer_message.html">wrench::NetworkProximityTransferMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_answer_message.html">wrench::NextContactDaemonAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_request_message.html">wrench::NextContactDaemonRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_expired_event.html">wrench::PilotJobExpiredEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_started_event.html">wrench::PilotJobStartedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pointer_util.html">wrench::PointerUtil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_proxy_location.html">wrench::ProxyLocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_registered_function.html">wrench::RegisteredFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html">wrench::S4U_CommPort</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon.html">wrench::S4U_Daemon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon_1_1_life_saver.html">wrench::S4U_Daemon::LifeSaver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon_actor.html">wrench::S4U_DaemonActor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___pending_communication.html">wrench::S4U_PendingCommunication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___simulation.html">wrench::S4U_Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___virtual_machine.html">wrench::S4U_VirtualMachine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_request_message.html">wrench::ServerlessComputeServiceFunctionInvocationRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_answer_message.html">wrench::ServerlessComputeServiceFunctionRegisterAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_request_message.html">wrench::ServerlessComputeServiceFunctionRegisterRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_invocation_execution_complete_message.html">wrench::ServerlessComputeServiceInvocationExecutionCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message.html">wrench::ServerlessComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_state_of_the_system.html">wrench::ServerlessStateOfTheSystem</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench7ServiceE"><code class="docutils literal notranslate"><span class="pre">wrench::Service</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service17assertServiceIsUpEv"><code class="docutils literal notranslate"><span class="pre">assertServiceIsUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service7getHostEv"><code class="docutils literal notranslate"><span class="pre">getHost()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service11getHostnameEv"><code class="docutils literal notranslate"><span class="pre">getHostname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service21getMessagePayloadListEv"><code class="docutils literal notranslate"><span class="pre">getMessagePayloadList()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"><code class="docutils literal notranslate"><span class="pre">getMessagePayloadValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service22getNetworkTimeoutValueEv"><code class="docutils literal notranslate"><span class="pre">getNetworkTimeoutValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service19getPhysicalHostnameEv"><code class="docutils literal notranslate"><span class="pre">getPhysicalHostname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service15getPropertyListEv"><code class="docutils literal notranslate"><span class="pre">getPropertyList()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsBandwidthInBytePerSecond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsBoolean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsDouble()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsSizeInByte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsTimeInSecond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsUnsignedLong()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service4isUpEv"><code class="docutils literal notranslate"><span class="pre">isUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service6resumeEv"><code class="docutils literal notranslate"><span class="pre">resume()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service22setNetworkTimeoutValueEd"><code class="docutils literal notranslate"><span class="pre">setNetworkTimeoutValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service14setStateToDownEv"><code class="docutils literal notranslate"><span class="pre">setStateToDown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service5startERKNSt10shared_ptrI7ServiceEEbb"><code class="docutils literal notranslate"><span class="pre">start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service4stopEv"><code class="docutils literal notranslate"><span class="pre">stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service7suspendEv"><code class="docutils literal notranslate"><span class="pre">suspend()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_daemon_stopped_message.html">wrench::ServiceDaemonStoppedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_has_crashed_message.html">wrench::ServiceHasCrashedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_has_terminated_message.html">wrench::ServiceHasTerminatedMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_down.html">wrench::ServiceIsDown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_suspended.html">wrench::ServiceIsSuspended</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message.html">wrench::ServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_property.html">wrench::ServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_stop_daemon_message.html">wrench::ServiceStopDaemonMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_termination_detector.html">wrench::ServiceTerminationDetector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_termination_detector_message.html">wrench::ServiceTerminationDetectorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service.html">wrench::SimpleStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_bufferized.html">wrench::SimpleStorageServiceBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_message_payload.html">wrench::SimpleStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_non_bufferized.html">wrench::SimpleStorageServiceNonBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_property.html">wrench::SimpleStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation.html">wrench::Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_message.html">wrench::SimulationMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_output.html">wrench::SimulationOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp.html">wrench::SimulationTimestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read.html">wrench::SimulationTimestampDiskRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_completion.html">wrench::SimulationTimestampDiskReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_failure.html">wrench::SimulationTimestampDiskReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_start.html">wrench::SimulationTimestampDiskReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write.html">wrench::SimulationTimestampDiskWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_completion.html">wrench::SimulationTimestampDiskWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_failure.html">wrench::SimulationTimestampDiskWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_start.html">wrench::SimulationTimestampDiskWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_energy_consumption.html">wrench::SimulationTimestampEnergyConsumption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy.html">wrench::SimulationTimestampFileCopy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_completion.html">wrench::SimulationTimestampFileCopyCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_failure.html">wrench::SimulationTimestampFileCopyFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_start.html">wrench::SimulationTimestampFileCopyStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read.html">wrench::SimulationTimestampFileRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_completion.html">wrench::SimulationTimestampFileReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_failure.html">wrench::SimulationTimestampFileReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_start.html">wrench::SimulationTimestampFileReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write.html">wrench::SimulationTimestampFileWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_completion.html">wrench::SimulationTimestampFileWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_failure.html">wrench::SimulationTimestampFileWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_start.html">wrench::SimulationTimestampFileWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_link_usage.html">wrench::SimulationTimestampLinkUsage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pair.html">wrench::SimulationTimestampPair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pstate_set.html">wrench::SimulationTimestampPstateSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task.html">wrench::SimulationTimestampTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_completion.html">wrench::SimulationTimestampTaskCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_failure.html">wrench::SimulationTimestampTaskFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_start.html">wrench::SimulationTimestampTaskStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_termination.html">wrench::SimulationTimestampTaskTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_type.html">wrench::SimulationTimestampType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_trace.html">wrench::SimulationTrace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_trace_3_01_simulation_timestamp_pstate_set_01_4.html">wrench::SimulationTrace&lt; SimulationTimestampPstateSet &gt;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_sleep_action.html">wrench::SleepAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_some_actions_have_failed.html">wrench::SomeActionsHaveFailed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job.html">wrench::StandardJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job_completed_event.html">wrench::StandardJobCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job_failed_event.html">wrench::StandardJobFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service.html">wrench::StorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_ack_message.html">wrench::StorageServiceAckMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_content_chunk_message.html">wrench::StorageServiceFileContentChunkMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_copy_answer_message.html">wrench::StorageServiceFileCopyAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_copy_request_message.html">wrench::StorageServiceFileCopyRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_delete_answer_message.html">wrench::StorageServiceFileDeleteAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_delete_request_message.html">wrench::StorageServiceFileDeleteRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_lookup_answer_message.html">wrench::StorageServiceFileLookupAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_lookup_request_message.html">wrench::StorageServiceFileLookupRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_read_answer_message.html">wrench::StorageServiceFileReadAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_read_request_message.html">wrench::StorageServiceFileReadRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_write_answer_message.html">wrench::StorageServiceFileWriteAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_file_write_request_message.html">wrench::StorageServiceFileWriteRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_free_space_answer_message.html">wrench::StorageServiceFreeSpaceAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_free_space_request_message.html">wrench::StorageServiceFreeSpaceRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_message.html">wrench::StorageServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_message_payload.html">wrench::StorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_not_enough_space.html">wrench::StorageServiceNotEnoughSpace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_property.html">wrench::StorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_proxy.html">wrench::StorageServiceProxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_proxy_property.html">wrench::StorageServiceProxyProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_terminal_output.html">wrench::TerminalOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_timer_event.html">wrench::TimerEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_trace_file_loader.html">wrench::TraceFileLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser.html">wrench::UnitParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser_1_1unit__scale.html">wrench::UnitParser::unit_scale</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_message.html">wrench::VirtualizedClusterComputeServiceMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_message_payload.html">wrench::VirtualizedClusterComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_migrate_v_m_answer_message.html">wrench::VirtualizedClusterComputeServiceMigrateVMAnswerMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_migrate_v_m_request_message.html">wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_property.html">wrench::VirtualizedClusterComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_wf_commons_workflow_parser.html">wrench::WfCommonsWorkflowParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow_task.html">wrench::WorkflowTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html">wrench::WorkloadBalancingServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_trace_file_replayer.html">wrench::WorkloadTraceFileReplayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_trace_file_replayer_event_receiver.html">wrench::WorkloadTraceFileReplayerEventReceiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_advanced_continue_search_message.html">wrench::XRootD::AdvancedContinueSearchMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_advanced_ripple_delete.html">wrench::XRootD::AdvancedRippleDelete</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_cache.html">wrench::XRootD::Cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_continue_search_message.html">wrench::XRootD::ContinueSearchMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_deployment.html">wrench::XRootD::Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_file_not_found_alarm.html">wrench::XRootD::FileNotFoundAlarm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message.html">wrench::XRootD::Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message_payload.html">wrench::XRootD::MessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_node.html">wrench::XRootD::Node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_property.html">wrench::XRootD::Property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_ripple_delete.html">wrench::XRootD::RippleDelete</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_update_cache_message.html">wrench::XRootD::UpdateCacheMessage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_internal.html">WRENCH Internal C++ API</a></li>
+      <li class="breadcrumb-item active">wrench::Service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_internal/classwrench_1_1_service.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wrench-service">
+<span id="service"></span><h1>wrench::Service<a class="headerlink" href="#wrench-service" title="Link to this heading"></a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7ServiceE">
+<span id="_CPPv3N6wrench7ServiceE"></span><span id="_CPPv2N6wrench7ServiceE"></span><span id="wrench::Service"></span><span class="target" id="classwrench_1_1_service"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Service</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_DaemonE" title="wrench::S4U_Daemon"><span class="n"><span class="pre">S4U_Daemon</span></span></a><br /></dt>
+<dd><p>A service that can be added to the simulation and that can be used by a WMS when executing a workflow. </p>
+<p>Subclassed by <a class="reference internal" href="classwrench_1_1_action_execution_service.html#classwrench_1_1_action_execution_service"><span class="std std-ref">wrench::ActionExecutionService</span></a>, <a class="reference internal" href="classwrench_1_1_alarm.html#classwrench_1_1_alarm"><span class="std std-ref">wrench::Alarm</span></a>, <a class="reference internal" href="../api_user/classwrench_1_1_bandwidth_meter_service.html#classwrench_1_1_bandwidth_meter_service"><span class="std std-ref">wrench::BandwidthMeterService</span></a>, <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">wrench::ComputeService</span></a>, <a class="reference internal" href="classwrench_1_1_data_movement_manager.html#classwrench_1_1_data_movement_manager"><span class="std std-ref">wrench::DataMovementManager</span></a>, <a class="reference internal" href="../api_user/classwrench_1_1_energy_meter_service.html#classwrench_1_1_energy_meter_service"><span class="std std-ref">wrench::EnergyMeterService</span></a>, <a class="reference internal" href="classwrench_1_1_execution_controller.html#classwrench_1_1_execution_controller"><span class="std std-ref">wrench::ExecutionController</span></a>, <a class="reference internal" href="classwrench_1_1_file_reader_thread.html#classwrench_1_1_file_reader_thread"><span class="std std-ref">wrench::FileReaderThread</span></a>, <a class="reference internal" href="../api_user/classwrench_1_1_file_registry_service.html#classwrench_1_1_file_registry_service"><span class="std std-ref">wrench::FileRegistryService</span></a>, <a class="reference internal" href="classwrench_1_1_file_transfer_thread.html#classwrench_1_1_file_transfer_thread"><span class="std std-ref">wrench::FileTransferThread</span></a>, <a class="reference internal" href="classwrench_1_1_file_writer_thread.html#classwrench_1_1_file_writer_thread"><span class="std std-ref">wrench::FileWriterThread</span></a>, <a class="reference internal" href="classwrench_1_1_function_manager.html#classwrench_1_1_function_manager"><span class="std std-ref">wrench::FunctionManager</span></a>, <a class="reference internal" href="classwrench_1_1_h_t_condor_negotiator_service.html#classwrench_1_1_h_t_condor_negotiator_service"><span class="std std-ref">wrench::HTCondorNegotiatorService</span></a>, <a class="reference internal" href="classwrench_1_1_host_state_change_detector.html#classwrench_1_1_host_state_change_detector"><span class="std std-ref">wrench::HostStateChangeDetector</span></a>, <a class="reference internal" href="classwrench_1_1_job_manager.html#classwrench_1_1_job_manager"><span class="std std-ref">wrench::JobManager</span></a>, <a class="reference internal" href="classwrench_1_1_memory_manager.html#classwrench_1_1_memory_manager"><span class="std std-ref">wrench::MemoryManager</span></a>, <a class="reference internal" href="classwrench_1_1_network_proximity_receiver_daemon.html#classwrench_1_1_network_proximity_receiver_daemon"><span class="std std-ref">wrench::NetworkProximityReceiverDaemon</span></a>, <a class="reference internal" href="classwrench_1_1_network_proximity_sender_daemon.html#classwrench_1_1_network_proximity_sender_daemon"><span class="std std-ref">wrench::NetworkProximitySenderDaemon</span></a>, <a class="reference internal" href="../api_user/classwrench_1_1_network_proximity_service.html#classwrench_1_1_network_proximity_service"><span class="std std-ref">wrench::NetworkProximityService</span></a>, <a class="reference internal" href="classwrench_1_1_service_termination_detector.html#classwrench_1_1_service_termination_detector"><span class="std std-ref">wrench::ServiceTerminationDetector</span></a>, <a class="reference internal" href="../api_user/classwrench_1_1_storage_service.html#classwrench_1_1_storage_service"><span class="std std-ref">wrench::StorageService</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service17assertServiceIsUpEv">
+<span id="_CPPv3N6wrench7Service17assertServiceIsUpEv"></span><span id="_CPPv2N6wrench7Service17assertServiceIsUpEv"></span><span id="wrench::Service::assertServiceIsUp"></span><span class="target" id="classwrench_1_1_service_1a7d7280ca209668863c3f82bd40a94439"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">assertServiceIsUp</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Throws an exception if the service is not up. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service7getHostEv">
+<span id="_CPPv3N6wrench7Service7getHostEv"></span><span id="_CPPv2N6wrench7Service7getHostEv"></span><span id="wrench::Service::getHost"></span><span class="target" id="classwrench_1_1_service_1adbcd893080796e7f66eacc0089073557"></span><span class="n"><span class="pre">simgrid</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">s4u</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Host</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getHost</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench7Service7getHostEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the the host on which the service is / will be running. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the hostname </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service11getHostnameEv">
+<span id="_CPPv3N6wrench7Service11getHostnameEv"></span><span id="_CPPv2N6wrench7Service11getHostnameEv"></span><span id="wrench::Service::getHostname"></span><span class="target" id="classwrench_1_1_service_1a0b129fca804f421faba9445832a9cb48"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHostname</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the name of the host on which the service is / will be running. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the hostname </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service21getMessagePayloadListEv">
+<span id="_CPPv3NK6wrench7Service21getMessagePayloadListEv"></span><span id="_CPPv2NK6wrench7Service21getMessagePayloadListEv"></span><span id="wrench::Service::getMessagePayloadListC"></span><span class="target" id="classwrench_1_1_service_1a749394c8403e1e8861aebb8536840c12"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getMessagePayloadList</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench7Service21getMessagePayloadListEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get all message payloads and their values of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the message payload map </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE">
+<span id="_CPPv3N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"></span><span id="_CPPv2N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"></span><span id="wrench::Service::getMessagePayloadValue__WRENCH_MESSAGEPAYLOAD_TYPE"></span><span class="target" id="classwrench_1_1_service_1a77abd63c5c02e684ef3f8dfbc03333d0"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMessagePayloadValue</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_MESSAGEPAYLOAD_TYPE</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a message payload of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a double. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message_payload</strong> – the message payload </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the message payload value as a double </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service22getNetworkTimeoutValueEv">
+<span id="_CPPv3NK6wrench7Service22getNetworkTimeoutValueEv"></span><span id="_CPPv2NK6wrench7Service22getNetworkTimeoutValueEv"></span><span id="wrench::Service::getNetworkTimeoutValueC"></span><span class="target" id="classwrench_1_1_service_1ae831f3ee962e9e75fde98cfbed2cdb16"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNetworkTimeoutValue</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Returns the service’s network timeout value. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a duration in seconds </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service19getPhysicalHostnameEv">
+<span id="_CPPv3N6wrench7Service19getPhysicalHostnameEv"></span><span id="_CPPv2N6wrench7Service19getPhysicalHostnameEv"></span><span id="wrench::Service::getPhysicalHostname"></span><span class="target" id="classwrench_1_1_service_1a4f69d7d244b3662bf67866f78673799f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPhysicalHostname</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the physical name of the host on which the service is / will be running. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the physical hostname </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service15getPropertyListEv">
+<span id="_CPPv3NK6wrench7Service15getPropertyListEv"></span><span id="_CPPv2NK6wrench7Service15getPropertyListEv"></span><span id="wrench::Service::getPropertyListC"></span><span class="target" id="classwrench_1_1_service_1a6d86c01016f0b8010a9046701604a2a7"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">WRENCH_PROPERTY_COLLECTION_TYPE</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyList</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get all properties attached to this service. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the property list </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsBandwidthInBytePerSecond__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1a22687fa1fafca2b9431398d04255bc28"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsBandwidthInBytePerSecond</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Method to parse a property value that is a bandwidth with (optional) units. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – the property </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the bandwidth in byte/sec </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsBoolean__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1a36ba97418f788522484c0909674eb7c0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsBoolean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a boolean. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – the property </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the property value as a boolean </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsDouble__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1af18638d4222d036ed84347412616b8c0"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsDouble</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a double. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – the property </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the property value as a double </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsSizeInByte__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1ababbe8fae7d1fac1da588686936d4b2b"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsSizeInByte</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Method to parse a property value that is a date size with (optional) units. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – the property </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the size in byte </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsString__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1afa9e6582b11ada0a1c118922143a3990"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – the property </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the property value as a string </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsTimeInSecond__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1abe29df374cdd83b09c68dfe14e5684db"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsTimeInSecond</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Method to parse a property value that is a time with (optional) units. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – the property </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the time in second </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsUnsignedLong__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1ac00d55c518314c0b66776ef486356e04"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsUnsignedLong</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as an unsigned long. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> – the property </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the property value as an unsigned long </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service4isUpEv">
+<span id="_CPPv3NK6wrench7Service4isUpEv"></span><span id="_CPPv2NK6wrench7Service4isUpEv"></span><span id="wrench::Service::isUpC"></span><span class="target" id="classwrench_1_1_service_1a1e8eab8ed24d0882251863d15d447f13"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isUp</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Returns true if the service is UP, false otherwise. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true or false </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service6resumeEv">
+<span id="_CPPv3N6wrench7Service6resumeEv"></span><span id="_CPPv2N6wrench7Service6resumeEv"></span><span id="wrench::Service::resume"></span><span class="target" id="classwrench_1_1_service_1ae88d4368c4b08ae2142d03cdea3694fb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resume</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Resume the service. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service22setNetworkTimeoutValueEd">
+<span id="_CPPv3N6wrench7Service22setNetworkTimeoutValueEd"></span><span id="_CPPv2N6wrench7Service22setNetworkTimeoutValueEd"></span><span id="wrench::Service::setNetworkTimeoutValue__double"></span><span class="target" id="classwrench_1_1_service_1a2bdf99201280d83b44a03c0b78ebdf90"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setNetworkTimeoutValue</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Sets the service’s network timeout value. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – a duration in seconds (&lt;0 means: never timeout) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service14setStateToDownEv">
+<span id="_CPPv3N6wrench7Service14setStateToDownEv"></span><span id="_CPPv2N6wrench7Service14setStateToDownEv"></span><span id="wrench::Service::setStateToDown"></span><span class="target" id="classwrench_1_1_service_1a730c3eb13321940c6c831dbb605d1824"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setStateToDown</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench7Service14setStateToDownEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the state of the service to DOWN. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service5startERKNSt10shared_ptrI7ServiceEEbb">
+<span id="_CPPv3N6wrench7Service5startERKNSt10shared_ptrI7ServiceEEbb"></span><span id="_CPPv2N6wrench7Service5startERKNSt10shared_ptrI7ServiceEEbb"></span><span id="wrench::Service::start__std::shared_ptr:Service:CR.b.b"></span><span class="target" id="classwrench_1_1_service_1aa9bae28814cf33eb48d2251ee5430ddd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">start</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7ServiceE" title="wrench::Service"><span class="n"><span class="pre">Service</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">this_service</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">daemonize</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">auto_restart</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Start the service. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>this_service</strong> – a shared pointer to the service </p></li>
+<li><p><strong>daemonize</strong> – true if the daemon is to be daemonized, false otherwise </p></li>
+<li><p><strong>auto_restart</strong> – true if the daemon should restart automatically after a reboot or not </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service4stopEv">
+<span id="_CPPv3N6wrench7Service4stopEv"></span><span id="_CPPv2N6wrench7Service4stopEv"></span><span id="wrench::Service::stop"></span><span class="target" id="classwrench_1_1_service_1ac33a32f4758c6f51b27d2cfb9b46efda"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stop</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Synchronously stop the service (does nothing if the service is already stopped) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service7suspendEv">
+<span id="_CPPv3N6wrench7Service7suspendEv"></span><span id="_CPPv2N6wrench7Service7suspendEv"></span><span id="wrench::Service::suspend"></span><span class="target" id="classwrench_1_1_service_1a109d72a3528bae253804ef12a7ffa202"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">suspend</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Suspend the service. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="classwrench_1_1_serverless_state_of_the_system.html" class="btn btn-neutral float-left" title="wrench::ServerlessStateOfTheSystem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_service_daemon_stopped_message.html" class="btn btn-neutral float-right" title="wrench::ServiceDaemonStoppedMessage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

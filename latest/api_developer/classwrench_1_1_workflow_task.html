@@ -1,0 +1,999 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrench::WorkflowTask &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=14e8207d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="wrench::WorkloadBalancingServerlessScheduler" href="classwrench_1_1_workload_balancing_serverless_scheduler.html" />
+    <link rel="prev" title="wrench::Workflow" href="classwrench_1_1_workflow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_developer.html">WRENCH Developer C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action.html">wrench::Action</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor.html">wrench::ActionExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_message_payload.html">wrench::BareMetalComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service_property.html">wrench::BareMetalComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service.html">wrench::BatchComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_message_payload.html">wrench::BatchComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_batch_compute_service_property.html">wrench::BatchComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service.html">wrench::CloudComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_message_payload.html">wrench::CloudComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_cloud_compute_service_property.html">wrench::CloudComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_communicator.html">wrench::Communicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job.html">wrench::CompoundJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job_completed_event.html">wrench::CompoundJobCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_job_failed_event.html">wrench::CompoundJobFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service.html">wrench::CompoundStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_message_payload.html">wrench::CompoundStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compound_storage_service_property.html">wrench::CompoundStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_computation_has_died.html">wrench::ComputationHasDied</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_action.html">wrench::ComputeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service.html">wrench::ComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_message_payload.html">wrench::ComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_compute_service_property.html">wrench::ComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_constant_efficiency_parallel_model.html">wrench::ConstantEfficiencyParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_action.html">wrench::CustomAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_event.html">wrench::CustomEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_parallel_model.html">wrench::CustomParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager.html">wrench::DataMovementManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller.html">wrench::ExecutionController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_event.html">wrench::ExecutionEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_exception.html">wrench::ExecutionException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_failure_cause.html">wrench::FailureCause</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fatal_failure.html">wrench::FatalFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_copied.html">wrench::FileAlreadyBeingCopied</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_read.html">wrench::FileAlreadyBeingRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_written.html">wrench::FileAlreadyBeingWritten</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_action.html">wrench::FileCopyAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_completed_event.html">wrench::FileCopyCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_copy_failed_event.html">wrench::FileCopyFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_delete_action.html">wrench::FileDeleteAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_location.html">wrench::FileLocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_not_found.html">wrench::FileNotFound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_action.html">wrench::FileReadAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_completed_event.html">wrench::FileReadCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_read_failed_event.html">wrench::FileReadFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_action.html">wrench::FileRegistryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_add_entry_action.html">wrench::FileRegistryAddEntryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_delete_entry_action.html">wrench::FileRegistryDeleteEntryAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_action.html">wrench::FileWriteAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_completed_event.html">wrench::FileWriteCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_write_failed_event.html">wrench::FileWriteFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager.html">wrench::FunctionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_not_found.html">wrench::FunctionNotFound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_functionality_not_available.html">wrench::FunctionalityNotAvailable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_error.html">wrench::HostError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_killed.html">wrench::JobKilled</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager.html">wrench::JobManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_timeout.html">wrench::JobTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action.html">wrench::MPIAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action_1_1_m_p_i_private_execution_controller.html">wrench::MPIAction::MPIPrivateExecutionController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i_action_1_1_m_p_i_process.html">wrench::MPIAction::MPIProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_error.html">wrench::NetworkError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service.html">wrench::NetworkProximityService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_expired_event.html">wrench::PilotJobExpiredEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_started_event.html">wrench::PilotJobStartedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_registered_function.html">wrench::RegisteredFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_state_of_the_system.html">wrench::ServerlessStateOfTheSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_down.html">wrench::ServiceIsDown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_suspended.html">wrench::ServiceIsSuspended</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_property.html">wrench::ServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service.html">wrench::SimpleStorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_bufferized.html">wrench::SimpleStorageServiceBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_message_payload.html">wrench::SimpleStorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_non_bufferized.html">wrench::SimpleStorageServiceNonBufferized</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simple_storage_service_property.html">wrench::SimpleStorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation.html">wrench::Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_output.html">wrench::SimulationOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp.html">wrench::SimulationTimestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read.html">wrench::SimulationTimestampDiskRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_completion.html">wrench::SimulationTimestampDiskReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_failure.html">wrench::SimulationTimestampDiskReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_read_start.html">wrench::SimulationTimestampDiskReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write.html">wrench::SimulationTimestampDiskWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_completion.html">wrench::SimulationTimestampDiskWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_failure.html">wrench::SimulationTimestampDiskWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_disk_write_start.html">wrench::SimulationTimestampDiskWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_energy_consumption.html">wrench::SimulationTimestampEnergyConsumption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy.html">wrench::SimulationTimestampFileCopy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_completion.html">wrench::SimulationTimestampFileCopyCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_failure.html">wrench::SimulationTimestampFileCopyFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_copy_start.html">wrench::SimulationTimestampFileCopyStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read.html">wrench::SimulationTimestampFileRead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_completion.html">wrench::SimulationTimestampFileReadCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_failure.html">wrench::SimulationTimestampFileReadFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_read_start.html">wrench::SimulationTimestampFileReadStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write.html">wrench::SimulationTimestampFileWrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_completion.html">wrench::SimulationTimestampFileWriteCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_failure.html">wrench::SimulationTimestampFileWriteFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_file_write_start.html">wrench::SimulationTimestampFileWriteStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_link_usage.html">wrench::SimulationTimestampLinkUsage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pair.html">wrench::SimulationTimestampPair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_pstate_set.html">wrench::SimulationTimestampPstateSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task.html">wrench::SimulationTimestampTask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_completion.html">wrench::SimulationTimestampTaskCompletion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_failure.html">wrench::SimulationTimestampTaskFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_start.html">wrench::SimulationTimestampTaskStart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_task_termination.html">wrench::SimulationTimestampTaskTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_simulation_timestamp_type.html">wrench::SimulationTimestampType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_sleep_action.html">wrench::SleepAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_some_actions_have_failed.html">wrench::SomeActionsHaveFailed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job.html">wrench::StandardJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job_completed_event.html">wrench::StandardJobCompletedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_standard_job_failed_event.html">wrench::StandardJobFailedEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service.html">wrench::StorageService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_message_payload.html">wrench::StorageServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_not_enough_space.html">wrench::StorageServiceNotEnoughSpace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_property.html">wrench::StorageServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service_proxy_property.html">wrench::StorageServiceProxyProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_terminal_output.html">wrench::TerminalOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_timer_event.html">wrench::TimerEvent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_message_payload.html">wrench::VirtualizedClusterComputeServiceMessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service_property.html">wrench::VirtualizedClusterComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_wf_commons_workflow_parser.html">wrench::WfCommonsWorkflowParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::WorkflowTask</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTaskE"><code class="docutils literal notranslate"><span class="pre">wrench::WorkflowTask</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask5StateE"><code class="docutils literal notranslate"><span class="pre">State</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask12addInputFileERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">addInputFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask13addOutputFileERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">addOutputFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask14getBottomLevelEv"><code class="docutils literal notranslate"><span class="pre">getBottomLevel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask12getBytesReadEv"><code class="docutils literal notranslate"><span class="pre">getBytesRead()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask15getBytesWrittenEv"><code class="docutils literal notranslate"><span class="pre">getBytesWritten()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask11getChildrenEv"><code class="docutils literal notranslate"><span class="pre">getChildren()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask12getClusterIDEv"><code class="docutils literal notranslate"><span class="pre">getClusterID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask8getColorEv"><code class="docutils literal notranslate"><span class="pre">getColor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask21getComputationEndDateEv"><code class="docutils literal notranslate"><span class="pre">getComputationEndDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask23getComputationStartDateEv"><code class="docutils literal notranslate"><span class="pre">getComputationStartDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask10getEndDateEv"><code class="docutils literal notranslate"><span class="pre">getEndDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask19getExecutionHistoryEv"><code class="docutils literal notranslate"><span class="pre">getExecutionHistory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask16getExecutionHostEv"><code class="docutils literal notranslate"><span class="pre">getExecutionHost()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask15getFailureCountEv"><code class="docutils literal notranslate"><span class="pre">getFailureCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask14getFailureDateEv"><code class="docutils literal notranslate"><span class="pre">getFailureDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask8getFlopsEv"><code class="docutils literal notranslate"><span class="pre">getFlops()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask5getIDEv"><code class="docutils literal notranslate"><span class="pre">getID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask13getInputFilesEv"><code class="docutils literal notranslate"><span class="pre">getInputFiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask6getJobEv"><code class="docutils literal notranslate"><span class="pre">getJob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask14getMaxNumCoresEv"><code class="docutils literal notranslate"><span class="pre">getMaxNumCores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask20getMemoryRequirementEv"><code class="docutils literal notranslate"><span class="pre">getMemoryRequirement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask14getMinNumCoresEv"><code class="docutils literal notranslate"><span class="pre">getMinNumCores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask19getNumberOfChildrenEv"><code class="docutils literal notranslate"><span class="pre">getNumberOfChildren()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask18getNumberOfParentsEv"><code class="docutils literal notranslate"><span class="pre">getNumberOfParents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask20getNumCoresAllocatedEv"><code class="docutils literal notranslate"><span class="pre">getNumCoresAllocated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask14getOutputFilesEv"><code class="docutils literal notranslate"><span class="pre">getOutputFiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask16getParallelModelEv"><code class="docutils literal notranslate"><span class="pre">getParallelModel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask10getParentsEv"><code class="docutils literal notranslate"><span class="pre">getParents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask24getPhysicalExecutionHostEv"><code class="docutils literal notranslate"><span class="pre">getPhysicalExecutionHost()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask11getPriorityEv"><code class="docutils literal notranslate"><span class="pre">getPriority()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask19getReadInputEndDateEv"><code class="docutils literal notranslate"><span class="pre">getReadInputEndDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask21getReadInputStartDateEv"><code class="docutils literal notranslate"><span class="pre">getReadInputStartDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask12getReadyDateEv"><code class="docutils literal notranslate"><span class="pre">getReadyDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask12getSharedPtrEv"><code class="docutils literal notranslate"><span class="pre">getSharedPtr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask12getStartDateEv"><code class="docutils literal notranslate"><span class="pre">getStartDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask8getStateEv"><code class="docutils literal notranslate"><span class="pre">getState()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask16getStateAsStringEv"><code class="docutils literal notranslate"><span class="pre">getStateAsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask18getTerminationDateEv"><code class="docutils literal notranslate"><span class="pre">getTerminationDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask11getTopLevelEv"><code class="docutils literal notranslate"><span class="pre">getTopLevel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask11getWorkflowEv"><code class="docutils literal notranslate"><span class="pre">getWorkflow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask21getWriteOutputEndDateEv"><code class="docutils literal notranslate"><span class="pre">getWriteOutputEndDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench12WorkflowTask23getWriteOutputStartDateEv"><code class="docutils literal notranslate"><span class="pre">getWriteOutputStartDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask12setBytesReadEm"><code class="docutils literal notranslate"><span class="pre">setBytesRead()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask15setBytesWrittenEm"><code class="docutils literal notranslate"><span class="pre">setBytesWritten()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask12setClusterIDERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">setClusterID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask8setColorERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">setColor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask8setFlopsEd"><code class="docutils literal notranslate"><span class="pre">setFlops()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask14setMaxNumCoresEm"><code class="docutils literal notranslate"><span class="pre">setMaxNumCores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask20setMemoryRequirementE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">setMemoryRequirement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask14setMinNumCoresEm"><code class="docutils literal notranslate"><span class="pre">setMinNumCores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask16setParallelModelENSt10shared_ptrI13ParallelModelEE"><code class="docutils literal notranslate"><span class="pre">setParallelModel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask11setPriorityEl"><code class="docutils literal notranslate"><span class="pre">setPriority()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask13stateToStringE5State"><code class="docutils literal notranslate"><span class="pre">stateToString()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html">wrench::WorkloadBalancingServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_deployment.html">wrench::XRootD::Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_message_payload.html">wrench::XRootD::MessagePayload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_node.html">wrench::XRootD::Node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_property.html">wrench::XRootD::Property</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_developer.html">WRENCH Developer C++ API</a></li>
+      <li class="breadcrumb-item active">wrench::WorkflowTask</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_developer/classwrench_1_1_workflow_task.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wrench-workflowtask">
+<span id="workflowtask"></span><h1>wrench::WorkflowTask<a class="headerlink" href="#wrench-workflowtask" title="Link to this heading"></a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTaskE">
+<span id="_CPPv3N6wrench12WorkflowTaskE"></span><span id="_CPPv2N6wrench12WorkflowTaskE"></span><span id="wrench::WorkflowTask"></span><span class="target" id="classwrench_1_1_workflow_task"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WorkflowTask</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_shared_from_this</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTaskE" title="wrench::WorkflowTask"><span class="n"><span class="pre">WorkflowTask</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTaskE" title="Link to this definition"></a><br /></dt>
+<dd><p>A computational task in a <a class="reference internal" href="../api_user/classwrench_1_1_workflow.html#classwrench_1_1_workflow"><span class="std std-ref">Workflow</span></a>. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask5StateE">
+<span id="_CPPv3N6wrench12WorkflowTask5StateE"></span><span id="_CPPv2N6wrench12WorkflowTask5StateE"></span><span class="target" id="classwrench_1_1_workflow_task_1a1184f3d7aea21e1c87a9b17e84f1f92a"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">State</span></span></span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask5StateE" title="Link to this definition"></a><br /></dt>
+<dd><p>Task states. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask5State9NOT_READYE">
+<span id="_CPPv3N6wrench12WorkflowTask5State9NOT_READYE"></span><span id="_CPPv2N6wrench12WorkflowTask5State9NOT_READYE"></span><span class="target" id="classwrench_1_1_workflow_task_1a1184f3d7aea21e1c87a9b17e84f1f92aa2fbcca8f5a8c10675c9036c61826e6bc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOT_READY</span></span></span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask5State9NOT_READYE" title="Link to this definition"></a><br /></dt>
+<dd><p>Not ready (parents have not completed) </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask5State5READYE">
+<span id="_CPPv3N6wrench12WorkflowTask5State5READYE"></span><span id="_CPPv2N6wrench12WorkflowTask5State5READYE"></span><span class="target" id="classwrench_1_1_workflow_task_1a1184f3d7aea21e1c87a9b17e84f1f92aae983a946ee97e094f18524d6b392d2f9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">READY</span></span></span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask5State5READYE" title="Link to this definition"></a><br /></dt>
+<dd><p>Ready (parents have completed) </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask5State7PENDINGE">
+<span id="_CPPv3N6wrench12WorkflowTask5State7PENDINGE"></span><span id="_CPPv2N6wrench12WorkflowTask5State7PENDINGE"></span><span class="target" id="classwrench_1_1_workflow_task_1a1184f3d7aea21e1c87a9b17e84f1f92aaa5207e01401874a04d2ddae6191fd9af"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PENDING</span></span></span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask5State7PENDINGE" title="Link to this definition"></a><br /></dt>
+<dd><p>Pending (has been submitted to a compute service) </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask5State9COMPLETEDE">
+<span id="_CPPv3N6wrench12WorkflowTask5State9COMPLETEDE"></span><span id="_CPPv2N6wrench12WorkflowTask5State9COMPLETEDE"></span><span class="target" id="classwrench_1_1_workflow_task_1a1184f3d7aea21e1c87a9b17e84f1f92aa5f1f15812ee2b25d3b4f5229b283fc5c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPLETED</span></span></span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask5State9COMPLETEDE" title="Link to this definition"></a><br /></dt>
+<dd><p>Completed (successfully completed) </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask5State7UNKNOWNE">
+<span id="_CPPv3N6wrench12WorkflowTask5State7UNKNOWNE"></span><span id="_CPPv2N6wrench12WorkflowTask5State7UNKNOWNE"></span><span class="target" id="classwrench_1_1_workflow_task_1a1184f3d7aea21e1c87a9b17e84f1f92aa1229246389ad56793373ebd4384ee05d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">UNKNOWN</span></span></span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask5State7UNKNOWNE" title="Link to this definition"></a><br /></dt>
+<dd><p>Some Unknown state (should not happen) </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask12addInputFileERKNSt10shared_ptrI8DataFileEE">
+<span id="_CPPv3N6wrench12WorkflowTask12addInputFileERKNSt10shared_ptrI8DataFileEE"></span><span id="_CPPv2N6wrench12WorkflowTask12addInputFileERKNSt10shared_ptrI8DataFileEE"></span><span id="wrench::WorkflowTask::addInputFile__std::shared_ptr:DataFile:CR"></span><span class="target" id="classwrench_1_1_workflow_task_1aa230c3432949312b503c303c37d64c1d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addInputFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask12addInputFileERKNSt10shared_ptrI8DataFileEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an input file to the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> – the file </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask13addOutputFileERKNSt10shared_ptrI8DataFileEE">
+<span id="_CPPv3N6wrench12WorkflowTask13addOutputFileERKNSt10shared_ptrI8DataFileEE"></span><span id="_CPPv2N6wrench12WorkflowTask13addOutputFileERKNSt10shared_ptrI8DataFileEE"></span><span id="wrench::WorkflowTask::addOutputFile__std::shared_ptr:DataFile:CR"></span><span class="target" id="classwrench_1_1_workflow_task_1a3f459dd774d6cbf950303ff76da66887"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addOutputFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask13addOutputFileERKNSt10shared_ptrI8DataFileEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add an output file to the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> – the file </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask14getBottomLevelEv">
+<span id="_CPPv3NK6wrench12WorkflowTask14getBottomLevelEv"></span><span id="_CPPv2NK6wrench12WorkflowTask14getBottomLevelEv"></span><span id="wrench::WorkflowTask::getBottomLevelC"></span><span class="target" id="classwrench_1_1_workflow_task_1ac3726c5576c6159f6fe553fc3bf56735"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getBottomLevel</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask14getBottomLevelEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the task’s bottom level (max number of hops on a path down to an exit task. Exit tasks have a bottom-level of 0) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask12getBytesReadEv">
+<span id="_CPPv3NK6wrench12WorkflowTask12getBytesReadEv"></span><span id="_CPPv2NK6wrench12WorkflowTask12getBytesReadEv"></span><span id="wrench::WorkflowTask::getBytesReadC"></span><span class="target" id="classwrench_1_1_workflow_task_1aa058314eed75bf58cbfc86441c9e75cc"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getBytesRead</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask12getBytesReadEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of bytes read by the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of bytes read by the task </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask15getBytesWrittenEv">
+<span id="_CPPv3NK6wrench12WorkflowTask15getBytesWrittenEv"></span><span id="_CPPv2NK6wrench12WorkflowTask15getBytesWrittenEv"></span><span id="wrench::WorkflowTask::getBytesWrittenC"></span><span class="target" id="classwrench_1_1_workflow_task_1afe222b599fa4ba072aa6162d9c8287ab"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getBytesWritten</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask15getBytesWrittenEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of bytes written by the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of bytes written by the task </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask11getChildrenEv">
+<span id="_CPPv3N6wrench12WorkflowTask11getChildrenEv"></span><span id="_CPPv2N6wrench12WorkflowTask11getChildrenEv"></span><span id="wrench::WorkflowTask::getChildren"></span><span class="target" id="classwrench_1_1_workflow_task_1ac9a9d97c9b01445228d5c2f1a2900d6d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTaskE" title="wrench::WorkflowTask"><span class="n"><span class="pre">WorkflowTask</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getChildren</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask11getChildrenEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the children of a task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of workflow tasks </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask12getClusterIDEv">
+<span id="_CPPv3NK6wrench12WorkflowTask12getClusterIDEv"></span><span id="_CPPv2NK6wrench12WorkflowTask12getClusterIDEv"></span><span id="wrench::WorkflowTask::getClusterIDC"></span><span class="target" id="classwrench_1_1_workflow_task_1a46ed2cbccf91f55c73fb99900a953d60"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getClusterID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask12getClusterIDEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the cluster Id for the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a cluster id, or an empty string </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask8getColorEv">
+<span id="_CPPv3NK6wrench12WorkflowTask8getColorEv"></span><span id="_CPPv2NK6wrench12WorkflowTask8getColorEv"></span><span id="wrench::WorkflowTask::getColorC"></span><span class="target" id="classwrench_1_1_workflow_task_1abbd94f1e2c3fb91ade126500a78974f9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getColor</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask8getColorEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s color (”” if none) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A color string in “#rrggbb” format </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask21getComputationEndDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask21getComputationEndDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask21getComputationEndDateEv"></span><span id="wrench::WorkflowTask::getComputationEndDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a4a7fc6c5aa9b27be22a08f842506c0d4"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getComputationEndDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask21getComputationEndDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent computation end date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the computation portion of a task ended (-1 if computation has not ended yet or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask23getComputationStartDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask23getComputationStartDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask23getComputationStartDateEv"></span><span id="wrench::WorkflowTask::getComputationStartDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a8f7a5743d4e90ca817546939027bd9dd"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getComputationStartDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask23getComputationStartDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent computation start date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the computation portion of a task started (-1 if computation has not started yet or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask10getEndDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask10getEndDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask10getEndDateEv"></span><span id="wrench::WorkflowTask::getEndDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a11cb2bb2b4944900042f5fffe3037dee"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getEndDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask10getEndDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent end date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a end date (-1 if task has not completed yet or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask19getExecutionHistoryEv">
+<span id="_CPPv3NK6wrench12WorkflowTask19getExecutionHistoryEv"></span><span id="_CPPv2NK6wrench12WorkflowTask19getExecutionHistoryEv"></span><span id="wrench::WorkflowTask::getExecutionHistoryC"></span><span class="target" id="classwrench_1_1_workflow_task_1ac4e914eedc427fbb4a967c168167ea64"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_internal/classwrench_1_1_workflow_task.html#_CPPv4N6wrench12WorkflowTask21WorkflowTaskExecutionE" title="wrench::WorkflowTask::WorkflowTaskExecution"><span class="n"><span class="pre">WorkflowTaskExecution</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getExecutionHistory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask19getExecutionHistoryEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the execution history of this task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a stack of WorkflowTaskExecution objects, one for each attempted execution of the task </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask16getExecutionHostEv">
+<span id="_CPPv3NK6wrench12WorkflowTask16getExecutionHostEv"></span><span id="_CPPv2NK6wrench12WorkflowTask16getExecutionHostEv"></span><span id="wrench::WorkflowTask::getExecutionHostC"></span><span class="target" id="classwrench_1_1_workflow_task_1aa5e83ec68d1d70a7f0b97ee1ae82a430"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getExecutionHost</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask16getExecutionHostEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the name of the host on which the task has most recently been executed, or “” if the task has never been executed yet. Could be a virtual hostname. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>hostname </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask15getFailureCountEv">
+<span id="_CPPv3NK6wrench12WorkflowTask15getFailureCountEv"></span><span id="_CPPv2NK6wrench12WorkflowTask15getFailureCountEv"></span><span id="wrench::WorkflowTask::getFailureCountC"></span><span class="target" id="classwrench_1_1_workflow_task_1a2969f3aa181ceb76726e686c3ba8e54f"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFailureCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask15getFailureCountEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of times a task has failed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a failure count </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask14getFailureDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask14getFailureDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask14getFailureDateEv"></span><span id="wrench::WorkflowTask::getFailureDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a715b36bc3b40d7c40a1edea115c6527f"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFailureDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask14getFailureDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent failure date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the task failed (-1 if it didn’t fail or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask8getFlopsEv">
+<span id="_CPPv3NK6wrench12WorkflowTask8getFlopsEv"></span><span id="_CPPv2NK6wrench12WorkflowTask8getFlopsEv"></span><span id="wrench::WorkflowTask::getFlopsC"></span><span class="target" id="classwrench_1_1_workflow_task_1aec0aab3ed552960729a60d1d3c4a3de2"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFlops</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask8getFlopsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of flops of the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of flops </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask5getIDEv">
+<span id="_CPPv3NK6wrench12WorkflowTask5getIDEv"></span><span id="_CPPv2NK6wrench12WorkflowTask5getIDEv"></span><span id="wrench::WorkflowTask::getIDC"></span><span class="target" id="classwrench_1_1_workflow_task_1a612c91e6334afddd5dc5525ed8d525ff"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getID</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask5getIDEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the id of the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>an id as a string </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask13getInputFilesEv">
+<span id="_CPPv3NK6wrench12WorkflowTask13getInputFilesEv"></span><span id="_CPPv2NK6wrench12WorkflowTask13getInputFilesEv"></span><span id="wrench::WorkflowTask::getInputFilesC"></span><span class="target" id="classwrench_1_1_workflow_task_1aab95deda56a9f65c8f17e1839ef9c85b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getInputFiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask13getInputFilesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the list of input <a class="reference internal" href="../api_user/classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> objects for the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list workflow files </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask6getJobEv">
+<span id="_CPPv3NK6wrench12WorkflowTask6getJobEv"></span><span id="_CPPv2NK6wrench12WorkflowTask6getJobEv"></span><span id="wrench::WorkflowTask::getJobC"></span><span class="target" id="classwrench_1_1_workflow_task_1aaba1ecf3def4b130eb4ea9c1078eae20"></span><a class="reference internal" href="classwrench_1_1_job.html#_CPPv4N6wrench3JobE" title="wrench::Job"><span class="n"><span class="pre">Job</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getJob</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask6getJobEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s containing job. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>job: the job </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask14getMaxNumCoresEv">
+<span id="_CPPv3NK6wrench12WorkflowTask14getMaxNumCoresEv"></span><span id="_CPPv2NK6wrench12WorkflowTask14getMaxNumCoresEv"></span><span id="wrench::WorkflowTask::getMaxNumCoresC"></span><span class="target" id="classwrench_1_1_workflow_task_1aa470fe4c0a34211165989afabcba795f"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMaxNumCores</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask14getMaxNumCoresEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the maximum number of cores that the task can use. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask20getMemoryRequirementEv">
+<span id="_CPPv3NK6wrench12WorkflowTask20getMemoryRequirementEv"></span><span id="_CPPv2NK6wrench12WorkflowTask20getMemoryRequirementEv"></span><span id="wrench::WorkflowTask::getMemoryRequirementC"></span><span class="target" id="classwrench_1_1_workflow_task_1af155306199b34f0c995d03bbbaf363df"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMemoryRequirement</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask20getMemoryRequirementEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the memory requirement of the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a memory requirement (in bytes) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask14getMinNumCoresEv">
+<span id="_CPPv3NK6wrench12WorkflowTask14getMinNumCoresEv"></span><span id="_CPPv2NK6wrench12WorkflowTask14getMinNumCoresEv"></span><span id="wrench::WorkflowTask::getMinNumCoresC"></span><span class="target" id="classwrench_1_1_workflow_task_1a05d06d1988745735016dcf19d38e2398"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMinNumCores</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask14getMinNumCoresEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the minimum number of cores required for running the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask19getNumberOfChildrenEv">
+<span id="_CPPv3N6wrench12WorkflowTask19getNumberOfChildrenEv"></span><span id="_CPPv2N6wrench12WorkflowTask19getNumberOfChildrenEv"></span><span id="wrench::WorkflowTask::getNumberOfChildren"></span><span class="target" id="classwrench_1_1_workflow_task_1a52f15cc7714c8697b369243e52d5b372"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumberOfChildren</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask19getNumberOfChildrenEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of children of a task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of children </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask18getNumberOfParentsEv">
+<span id="_CPPv3N6wrench12WorkflowTask18getNumberOfParentsEv"></span><span id="_CPPv2N6wrench12WorkflowTask18getNumberOfParentsEv"></span><span id="wrench::WorkflowTask::getNumberOfParents"></span><span class="target" id="classwrench_1_1_workflow_task_1a3bd5bc525e878eb1b16142d9ffa08b1f"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumberOfParents</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask18getNumberOfParentsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the number of parents of a task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of parents </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask20getNumCoresAllocatedEv">
+<span id="_CPPv3NK6wrench12WorkflowTask20getNumCoresAllocatedEv"></span><span id="_CPPv2NK6wrench12WorkflowTask20getNumCoresAllocatedEv"></span><span id="wrench::WorkflowTask::getNumCoresAllocatedC"></span><span class="target" id="classwrench_1_1_workflow_task_1ab5c57825e1fc6bde1d430a4e8a79eae4"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumCoresAllocated</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask20getNumCoresAllocatedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the number of cores allocated for this task’s most recent execution or 0 if an execution attempt was never made. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask14getOutputFilesEv">
+<span id="_CPPv3NK6wrench12WorkflowTask14getOutputFilesEv"></span><span id="_CPPv2NK6wrench12WorkflowTask14getOutputFilesEv"></span><span id="wrench::WorkflowTask::getOutputFilesC"></span><span class="target" id="classwrench_1_1_workflow_task_1af74baec4da0aff5bde3c4d938bb2a83e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getOutputFiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask14getOutputFilesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the list of output <a class="reference internal" href="../api_user/classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> objects for the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of workflow files </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask16getParallelModelEv">
+<span id="_CPPv3NK6wrench12WorkflowTask16getParallelModelEv"></span><span id="_CPPv2NK6wrench12WorkflowTask16getParallelModelEv"></span><span id="wrench::WorkflowTask::getParallelModelC"></span><span class="target" id="classwrench_1_1_workflow_task_1abae833e97264899fc61bf8f18b46ef47"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_parallel_model.html#_CPPv4N6wrench13ParallelModelE" title="wrench::ParallelModel"><span class="n"><span class="pre">ParallelModel</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getParallelModel</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask16getParallelModelEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s parallel model. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the parallel model </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask10getParentsEv">
+<span id="_CPPv3N6wrench12WorkflowTask10getParentsEv"></span><span id="_CPPv2N6wrench12WorkflowTask10getParentsEv"></span><span id="wrench::WorkflowTask::getParents"></span><span class="target" id="classwrench_1_1_workflow_task_1a499318562dd2dc67234ee9281390b5e9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTaskE" title="wrench::WorkflowTask"><span class="n"><span class="pre">WorkflowTask</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getParents</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask10getParentsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the parents of a task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of workflow tasks </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask24getPhysicalExecutionHostEv">
+<span id="_CPPv3NK6wrench12WorkflowTask24getPhysicalExecutionHostEv"></span><span id="_CPPv2NK6wrench12WorkflowTask24getPhysicalExecutionHostEv"></span><span id="wrench::WorkflowTask::getPhysicalExecutionHostC"></span><span class="target" id="classwrench_1_1_workflow_task_1adc55398d8d9beef5066155398c65102c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPhysicalExecutionHost</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask24getPhysicalExecutionHostEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the name of the PHYSICAL host on which the task has most recently been executed, or “” if the task has never been executed yet. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>hostname </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask11getPriorityEv">
+<span id="_CPPv3NK6wrench12WorkflowTask11getPriorityEv"></span><span id="_CPPv2NK6wrench12WorkflowTask11getPriorityEv"></span><span id="wrench::WorkflowTask::getPriorityC"></span><span class="target" id="classwrench_1_1_workflow_task_1af2bf4cb0ae629478351f9e4ccd6e2bf6"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPriority</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask11getPriorityEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task priority. By default, priority is 0. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the task priority </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask19getReadInputEndDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask19getReadInputEndDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask19getReadInputEndDateEv"></span><span id="wrench::WorkflowTask::getReadInputEndDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1aef883ebf2fb9a5526e812be426dcf036"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getReadInputEndDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask19getReadInputEndDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent read input end date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the read input portion of the task has completed (-1 if it has not begun or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask21getReadInputStartDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask21getReadInputStartDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask21getReadInputStartDateEv"></span><span id="wrench::WorkflowTask::getReadInputStartDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1ae8a63521ff435723e0a9f23f9cac8e3c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getReadInputStartDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask21getReadInputStartDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent read input start date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask12getReadyDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask12getReadyDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask12getReadyDateEv"></span><span id="wrench::WorkflowTask::getReadyDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a3c12441213bf188058c4320a0111ef39"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getReadyDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask12getReadyDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s ready date (the last time it became ready after being not ready) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a date (-1 if task has not become ready yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask12getSharedPtrEv">
+<span id="_CPPv3N6wrench12WorkflowTask12getSharedPtrEv"></span><span id="_CPPv2N6wrench12WorkflowTask12getSharedPtrEv"></span><span id="wrench::WorkflowTask::getSharedPtr"></span><span class="target" id="classwrench_1_1_workflow_task_1adb16762ce2eb2d09ff94f18f169264db"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTaskE" title="wrench::WorkflowTask"><span class="n"><span class="pre">WorkflowTask</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getSharedPtr</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask12getSharedPtrEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieved the official shared pointer for this object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a shared pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask12getStartDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask12getStartDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask12getStartDateEv"></span><span id="wrench::WorkflowTask::getStartDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a238a1588d33e959a4379f8f26db2a727"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getStartDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask12getStartDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent start date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a start date (-1 if task has not started yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask8getStateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask8getStateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask8getStateEv"></span><span id="wrench::WorkflowTask::getStateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a990a3e96d944c37cb896a7ca0d84a4db"></span><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTaskE" title="wrench::WorkflowTask"><span class="n"><span class="pre">WorkflowTask</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask5StateE" title="wrench::WorkflowTask::State"><span class="n"><span class="pre">State</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getState</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask8getStateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the state of the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a task state </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask16getStateAsStringEv">
+<span id="_CPPv3NK6wrench12WorkflowTask16getStateAsStringEv"></span><span id="_CPPv2NK6wrench12WorkflowTask16getStateAsStringEv"></span><span id="wrench::WorkflowTask::getStateAsStringC"></span><span class="target" id="classwrench_1_1_workflow_task_1ab62b12ea4a4fbfe50c0bc7901aafa705"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getStateAsString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask16getStateAsStringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the state of the task as a string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a string </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask18getTerminationDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask18getTerminationDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask18getTerminationDateEv"></span><span id="wrench::WorkflowTask::getTerminationDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a9d8cdc6d5428c7fe9144b0c0d1c984c2"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getTerminationDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask18getTerminationDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent termination date (when it was explicitly requested to be terminated by the execution controller) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the task was terminated (-1 if it wasn’t terminated or if not execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask11getTopLevelEv">
+<span id="_CPPv3NK6wrench12WorkflowTask11getTopLevelEv"></span><span id="_CPPv2NK6wrench12WorkflowTask11getTopLevelEv"></span><span id="wrench::WorkflowTask::getTopLevelC"></span><span class="target" id="classwrench_1_1_workflow_task_1a49c09e99628b6241a2b269bb7f62cc5a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getTopLevel</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask11getTopLevelEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Returns the task’s top level (max number of hops on a reverse path up to an entry task. Entry tasks have a top-level of 0) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask11getWorkflowEv">
+<span id="_CPPv3NK6wrench12WorkflowTask11getWorkflowEv"></span><span id="_CPPv2NK6wrench12WorkflowTask11getWorkflowEv"></span><span id="wrench::WorkflowTask::getWorkflowC"></span><span class="target" id="classwrench_1_1_workflow_task_1aea29ebd47e1e3a1b955fafc0e72dff50"></span><a class="reference internal" href="classwrench_1_1_workflow.html#_CPPv4N6wrench8WorkflowE" title="wrench::Workflow"><span class="n"><span class="pre">Workflow</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getWorkflow</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask11getWorkflowEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the workflow that contains the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a workflow </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask21getWriteOutputEndDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask21getWriteOutputEndDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask21getWriteOutputEndDateEv"></span><span id="wrench::WorkflowTask::getWriteOutputEndDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1a4617193361ed1db1eb87bd1c0bce557c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getWriteOutputEndDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask21getWriteOutputEndDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent write output end date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the write output portion of a task has completed (-1 if it has not completed yet or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench12WorkflowTask23getWriteOutputStartDateEv">
+<span id="_CPPv3NK6wrench12WorkflowTask23getWriteOutputStartDateEv"></span><span id="_CPPv2NK6wrench12WorkflowTask23getWriteOutputStartDateEv"></span><span id="wrench::WorkflowTask::getWriteOutputStartDateC"></span><span class="target" id="classwrench_1_1_workflow_task_1af05f2bb0e320a5accbad07a45ed7b589"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getWriteOutputStartDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench12WorkflowTask23getWriteOutputStartDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the task’s most recent write output start date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the date when the write output portion of a task has begun (-1 if it has not yet started or if no execution history exists for this task yet) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask12setBytesReadEm">
+<span id="_CPPv3N6wrench12WorkflowTask12setBytesReadEm"></span><span id="_CPPv2N6wrench12WorkflowTask12setBytesReadEm"></span><span id="wrench::WorkflowTask::setBytesRead__unsigned-l"></span><span class="target" id="classwrench_1_1_workflow_task_1ab438ab4409f1ddcb423c90577a611fe6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBytesRead</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask12setBytesReadEm" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the number of bytes read by the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b_read</strong> – number of bytes read by the task </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask15setBytesWrittenEm">
+<span id="_CPPv3N6wrench12WorkflowTask15setBytesWrittenEm"></span><span id="_CPPv2N6wrench12WorkflowTask15setBytesWrittenEm"></span><span id="wrench::WorkflowTask::setBytesWritten__unsigned-l"></span><span class="target" id="classwrench_1_1_workflow_task_1a8291e3248b7246eab498fc0378199b76"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setBytesWritten</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask15setBytesWrittenEm" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the number of bytes written by the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b_written</strong> – number of bytes written by the task </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask12setClusterIDERKNSt6stringE">
+<span id="_CPPv3N6wrench12WorkflowTask12setClusterIDERKNSt6stringE"></span><span id="_CPPv2N6wrench12WorkflowTask12setClusterIDERKNSt6stringE"></span><span id="wrench::WorkflowTask::setClusterID__ssCR"></span><span class="target" id="classwrench_1_1_workflow_task_1a8e2579e57c6671c82c68f507b4af256e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setClusterID</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask12setClusterIDERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the cluster c_id for the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c_id</strong> – cluster c_id the task belongs to </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask8setColorERKNSt6stringE">
+<span id="_CPPv3N6wrench12WorkflowTask8setColorERKNSt6stringE"></span><span id="_CPPv2N6wrench12WorkflowTask8setColorERKNSt6stringE"></span><span id="wrench::WorkflowTask::setColor__ssCR"></span><span class="target" id="classwrench_1_1_workflow_task_1ab88e43679fffbb351020bc5437d91f7d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setColor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask8setColorERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the task’s color. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> – A color string in “#rrggbb” format </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask8setFlopsEd">
+<span id="_CPPv3N6wrench12WorkflowTask8setFlopsEd"></span><span id="_CPPv2N6wrench12WorkflowTask8setFlopsEd"></span><span id="wrench::WorkflowTask::setFlops__double"></span><span class="target" id="classwrench_1_1_workflow_task_1ac4af40bcc14f860419c3cbee6177c68b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setFlops</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask8setFlopsEd" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the number of flops of the task (to be used only in very specific cases in which it is guaranteed that changing a task’s work after that task has been created is a valid thing to do) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – the number of flops </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask14setMaxNumCoresEm">
+<span id="_CPPv3N6wrench12WorkflowTask14setMaxNumCoresEm"></span><span id="_CPPv2N6wrench12WorkflowTask14setMaxNumCoresEm"></span><span id="wrench::WorkflowTask::setMaxNumCores__unsigned-l"></span><span class="target" id="classwrench_1_1_workflow_task_1a6e929dfb2550ebd72e8e85f8cbc6584c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMaxNumCores</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_cores</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask14setMaxNumCoresEm" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the maximum number of cores that the task can use (to be used only in very specific cases in which it is guaranteed that changing a task’s maximum number of cores after that task has been created is a valid thing to do) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_cores</strong> – a number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask20setMemoryRequirementE9sg_size_t">
+<span id="_CPPv3N6wrench12WorkflowTask20setMemoryRequirementE9sg_size_t"></span><span id="_CPPv2N6wrench12WorkflowTask20setMemoryRequirementE9sg_size_t"></span><span id="wrench::WorkflowTask::setMemoryRequirement__sg_size_t"></span><span class="target" id="classwrench_1_1_workflow_task_1af53814e030b0ba34797458732f3c2138"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMemoryRequirement</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask20setMemoryRequirementE9sg_size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the memory requirement of the task. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_bytes</strong> – a number of bytes </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask14setMinNumCoresEm">
+<span id="_CPPv3N6wrench12WorkflowTask14setMinNumCoresEm"></span><span id="_CPPv2N6wrench12WorkflowTask14setMinNumCoresEm"></span><span id="wrench::WorkflowTask::setMinNumCores__unsigned-l"></span><span class="target" id="classwrench_1_1_workflow_task_1aa35bcae29b6930e26e94da75005a62ae"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMinNumCores</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_cores</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask14setMinNumCoresEm" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the minimum number of cores required for running the task (to be used only in very specific cases in which it is guaranteed that changing a task’s minimum number of cores after that task has been created is a valid thing to do) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_cores</strong> – a number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask16setParallelModelENSt10shared_ptrI13ParallelModelEE">
+<span id="_CPPv3N6wrench12WorkflowTask16setParallelModelENSt10shared_ptrI13ParallelModelEE"></span><span id="_CPPv2N6wrench12WorkflowTask16setParallelModelENSt10shared_ptrI13ParallelModelEE"></span><span id="wrench::WorkflowTask::setParallelModel__std::shared_ptr:ParallelModel:"></span><span class="target" id="classwrench_1_1_workflow_task_1a789d01615f762cca3d1da32ac6b3d725"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setParallelModel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_parallel_model.html#_CPPv4N6wrench13ParallelModelE" title="wrench::ParallelModel"><span class="n"><span class="pre">ParallelModel</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">model</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask16setParallelModelENSt10shared_ptrI13ParallelModelEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the task’s parallel model. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> – a parallel model </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask11setPriorityEl">
+<span id="_CPPv3N6wrench12WorkflowTask11setPriorityEl"></span><span id="_CPPv2N6wrench12WorkflowTask11setPriorityEl"></span><span id="wrench::WorkflowTask::setPriority__l"></span><span class="target" id="classwrench_1_1_workflow_task_1ae5101ae5e4e386705a549e4e91432049"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPriority</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">long</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask11setPriorityEl" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the task p. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> – task p </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench12WorkflowTask13stateToStringE5State">
+<span id="_CPPv3N6wrench12WorkflowTask13stateToStringE5State"></span><span id="_CPPv2N6wrench12WorkflowTask13stateToStringE5State"></span><span id="wrench::WorkflowTask::stateToString__State"></span><span class="target" id="classwrench_1_1_workflow_task_1a753aeeb3dc680f5c57eec3dec03ca3cc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stateToString</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6wrench12WorkflowTask5StateE" title="wrench::WorkflowTask::State"><span class="n"><span class="pre">State</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench12WorkflowTask13stateToStringE5State" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert task state to a string (useful for output, debugging, logging, etc.) </p>
+<p>Get a task internal state as a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – task state </p></li>
+<li><p><strong>internal_state</strong> – the internal state </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a string</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>an internal state as a string </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="classwrench_1_1_workflow.html" class="btn btn-neutral float-left" title="wrench::Workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_workload_balancing_serverless_scheduler.html" class="btn btn-neutral float-right" title="wrench::WorkloadBalancingServerlessScheduler" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

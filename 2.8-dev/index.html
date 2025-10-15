@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecture &mdash; WRENCH 2.8-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8b628ae0" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=14e8207d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installing WRENCH" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#">
+            
+              <img src="_static/wrench-dark-theme-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing WRENCH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simulation_101.html">Simulation 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_101.html">WRENCH 101</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrench_102.html">WRENCH 102</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_user.html">WRENCH User C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_developer.html">WRENCH Developer C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_internal.html">WRENCH Internal C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">WRENCH REST API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_api.html">WRENCH Python API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">WRENCH</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Architecture</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <figure class="align-default" id="mainpage">
+<a class="reference internal image-reference" href="_images/logo-horizontal.png"><img alt="_images/logo-horizontal.png" src="_images/logo-horizontal.png" style="width: 392.0px; height: 78.0px;" />
+</a>
+</figure>
+<p><a class="reference external" href="http://wrench-project.org">WRENCH</a> is an open-source framework
+designed to make it easy for users to develop accurate and scalable
+simulators of distributed computing applications, systems, and
+platforms. It has been used for research, development, and education.
+WRENCH capitalizes on recent and critical advances in the state of the
+art of simulation of distributed computing scenarios. Specifically,
+WRENCH builds on top of the open-source
+<a class="reference external" href="https://simgrid.org">SimGrid</a> simulation framework. SimGrid enables
+the simulation of distributed computing scenarios in a way that is
+accurate (via validated simulation models), scalable (low ratio of
+simulation time to simulated time, ability to run large simulations on a
+single computer with low compute, memory, and energy footprints), and
+expressive (ability to simulate arbitrary platform, application, and
+execution scenarios). WRENCH provides directly usable high-level
+simulation abstractions, which all use SimGrid as a foundation, to make
+it possible to implement simulators of complex scenarios with minimal
+development effort.</p>
+<p>In a nutshell, WRENCH makes it possible to:</p>
+<ul class="simple">
+<li><p>Develop in-simulation implementations of runtime systems that execute
+application workloads on distributed hardware platforms managed by
+various software services commonly known as Cyberinfrastructure (CI)
+services.</p></li>
+<li><p>Quickly, scalably, and accurately simulate arbitrary application and
+platform scenarios for these runtime system implementation.</p></li>
+</ul>
+<section id="architecture">
+<span id="overview-architecture"></span><h1>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h1>
+<p>WRENCH is an <em>open-source C++ library</em> for developing simulators. It is
+neither a graphical interface nor a stand-alone simulator. WRENCH
+exposes several high-level simulation abstractions to provide high-level
+<strong>building blocks</strong> for developing custom simulators.</p>
+<p>WRENCH comprises four distinct layers:</p>
+<ul class="simple">
+<li><p><strong>Top-Level Simulation:</strong> A top-level set of abstractions to
+instantiate a simulator that simulates the execution of a runtime
+system that executes some application workload on some distributed
+hardware platform whose resources are accessible via various
+services.</p></li>
+<li><p><strong>Simulated Execution Controller:</strong> An in-simulation implementation
+of a runtime system designed to execute some application workload.</p></li>
+<li><p><strong>Simulated Core Services:</strong> Abstractions for simulated
+cyberinfrastructure (CI) components that can be used by the runtime
+system to execute application workloads (compute services, storage
+services, network proximity services, data location services, etc.).</p></li>
+<li><p><strong>Simulation Core:</strong> All necessary simulation models and base
+abstractions (computing, communicating, storing), provided by
+<a class="reference external" href="https://simgrid.org">SimGrid</a>.</p></li>
+</ul>
+<figure class="align-center">
+<a class="reference internal image-reference" href="_images/wrench-architecture.png"><img alt="_images/wrench-architecture.png" src="_images/wrench-architecture.png" style="width: 541.5px; height: 490.79999999999995px;" />
+</a>
+</figure>
+</section>
+<section id="three-classes-of-users">
+<span id="overview-users"></span><h1>Three Classes of Users<a class="headerlink" href="#three-classes-of-users" title="Link to this heading"></a></h1>
+<p>On can distinguish three kinds of WRENCH users:</p>
+<ul class="simple">
+<li><p><strong>Runtime System Users</strong> use WRENCH to simulate application workload
+executions using an already available, in-simulation implementation
+of a runtime system that uses Core Services to execution that
+workload.</p></li>
+<li><p><strong>Runtime System Developers/Researchers</strong> use WRENCH to prototype and
+evaluate runtime system designs and/or to investigate and evaluate
+novel algorithms to be implemented in a runtime system.</p></li>
+<li><p><strong>Internal Developers</strong> contribute to the WRENCH code, typically by
+implementing new Core Services.</p></li>
+</ul>
+<section id="three-levels-of-api-documentation">
+<span id="overview-users-levels"></span><h2>Three Levels of API Documentation<a class="headerlink" href="#three-levels-of-api-documentation" title="Link to this heading"></a></h2>
+<p>The WRENCH library provides three <em>incremental</em> levels of documentation,
+each targeting an API level:</p>
+<p><strong>User:</strong> This level targets users who want to use WRENCH for simulating
+the execution of application workloads using already implemented runtime
+systems. <em>Users</em> are NOT expected to develop new simulation abstractions
+or algorithms. Instead, they only use available simulation components as
+high-level building blocks to quickly build simulators. These simulators
+can involve as few as a 50-line of C++ code.</p>
+<p><strong>Developer:</strong> This level targets <em>runtime system developers and
+researchers</em> who work on developing novel runtime system designs and
+algorithms. In addition to documentation for all simulation components
+provided at the <em>User</em> level, the <em>Developer</em> documentation includes
+detailed documentation for interacting with simulated Core Services.
+There are <strong>two Developer APIs</strong>. The most generic API is called the
+<em>Action API</em>, and allows developers to describe and execution
+application workloads that consist of arbitrary “actions”. The
+<em>Workflow API</em> is specifically designed for those developers that
+implement workflow runtime systems (also known as Workflow Management
+Systems, or WMSs), and as such is provides a Workflow abstraction that
+these developers will find convenient. All details are provided in the
+rest of the documentation.</p>
+<p><strong>Internal:</strong> This level targets those users who want to contribute code
+to WRENCH. It provides, in addition to both levels above, detailed
+documentation for all WRENCH classes including binders to SimGrid. This
+is the API needed to, for instance, implement new Core Services.</p>
+</section>
+</section>
+<section id="get-in-touch">
+<span id="overview-contact"></span><h1>Get in Touch<a class="headerlink" href="#get-in-touch" title="Link to this heading"></a></h1>
+<p>The main channel to reach the WRENCH team is via the support email:
+<a class="reference external" href="mailto:support&#37;&#52;&#48;wrench-project&#46;org?subject=WRENCH%20Support%20Contact:%20Your%20Topic">support<span>&#64;</span>wrench-project<span>&#46;</span>org</a>.</p>
+<div class="line-block">
+<div class="line"><strong>Bug Report / Feature Request:</strong> our preferred channel to report a
+bug or request a feature is via</div>
+<div class="line">WRENCH’s <a class="reference external" href="https://github.com/wrench-project/wrench/issues">Github Issues
+Track</a>.</div>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installing WRENCH" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017-2022, WRENCH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
