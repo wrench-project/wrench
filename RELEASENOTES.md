@@ -1,7 +1,11 @@
 WRENCH Release Notes
 ------
+### wrench 2.8-dev
 
-### wrench 2.7-dev
+  - Implementation of `CustomEvent` and `CustomMessage` classes so that Controllers can trigger an event in another controller
+  - Minor bug fixes and code/documentation cleanups
+
+### wrench 2.7
 
 (May 19, 2025) This release includes **a new API for simulating serverless infrastructures**, as well as **minor enhancements and updates**. More specifically:
 
