@@ -77,9 +77,6 @@ find_package(nlohmann_json)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")
 set(WRENCH_VERSION_MINOR "8")
