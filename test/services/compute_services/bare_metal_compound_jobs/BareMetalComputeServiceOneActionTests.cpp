@@ -952,16 +952,13 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
-        std::cerr << "TEST ==== " << job.use_count() << std::endl;
         if (job->getState() != wrench::CompoundJob::State::NOT_SUBMITTED) {
             throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
         }
         auto action = job->addSleepAction("my_sleep", 10.0);
 
-        std::cerr << "TEST AFTER TASK ADDED ==== " << job.use_count() << std::endl;
         job_manager->submitJob(job, this->test->compute_service, {});
         wrench::Simulation::sleep(0.2);
-        std::cerr << "TEST AFTER JOB SUBMITTED ==== " << job.use_count() << std::endl;
 
         // Check job state
         if (job->getState() != wrench::CompoundJob::State::SUBMITTED) {
@@ -972,10 +969,7 @@ private:
         wrench::Simulation::sleep(1.0);
 
         // Terminate the job
-        std::cerr << "TEST BEFORE TERMINATING ==== " << job.use_count() << std::endl;
         job_manager->terminateJob(job);
-        wrench::Simulation::sleep(0.1);
-        std::cerr << "TEST AFTER TERMINATING ==== " << job.use_count() << std::endl;
 
         // Check job state
         if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
@@ -990,9 +984,7 @@ private:
             throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
         }
         wrench::Simulation::sleep(0.1);
-        std::cerr << "TEST SETTING JOB TO BULL ==== " << job.use_count() << std::endl;
         job = nullptr;
-        // std::cerr << "TEST END ==== " << job.use_count() << std::endl;
 
         return 0;
     }
@@ -1006,11 +998,11 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

@@ -906,6 +906,7 @@ namespace wrench {
         for (auto const& action : job->getActions()) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
                 this->action_execution_service->terminateAction(action, termination_cause);
+                this->dispatched_actions.erase(action);
             }
             else if (this->not_ready_actions.find(action) != this->not_ready_actions.end()) {
                 std::shared_ptr<FailureCause> failure_cause;
