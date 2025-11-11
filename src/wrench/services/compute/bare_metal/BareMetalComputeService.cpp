@@ -548,7 +548,6 @@ namespace wrench {
         for (auto const& action : job->getActions())
         WRENCH_INFO("  - ACTION %s (min #cores=%lu)", action->getName().c_str(), action->getMinNumCores());
 
-        std::cerr << "BM: IN processSubmitCompoundJob(): " << job->getActions().begin()->use_count() << "\n";
         // Action execution service may have terminated
         try {
             this->action_execution_service->assertServiceIsUp();
@@ -604,9 +603,6 @@ namespace wrench {
                 job, this->getSharedPtr<BareMetalComputeService>(), true, nullptr,
                 this->getMessagePayloadValue(
                     ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
-
-        std::cerr << "BM: AT THE END OF processSubmitCompoundJob(): " << job->getActions().begin()->use_count() << "\n";
-
     }
 
     /**
@@ -676,6 +672,7 @@ namespace wrench {
 
         terminateCurrentCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
         this->current_jobs.erase(job);
+        this->num_dispatched_actions_for_cjob.erase(job);
 
         // reply
         auto answer_message = new ComputeServiceTerminateCompoundJobAnswerMessage(

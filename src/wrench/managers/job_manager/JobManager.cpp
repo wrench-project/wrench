@@ -716,11 +716,12 @@ namespace wrench {
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
         job->applyTaskUpdates(state_changes, failure_count_increments);
+
     }
 
 
     /**
-    * @brief Terminate a compound job  that hasn't completed/expired/failed yet
+    * @brief Terminate a compound job that hasn't completed/expired/failed yet
     * @param job: the job to be terminated
     *
     */
@@ -757,6 +758,9 @@ namespace wrench {
 
         job->getParentComputeService()->terminateJob(job->compound_job);
         job->state = PilotJob::State::TERMINATED;
+        this->jobs_dispatched.erase(job->compound_job);
+        this->cjob_to_pjob_map.erase(job->compound_job);
+
         this->num_running_pilot_jobs--;
     }
 

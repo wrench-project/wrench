@@ -439,7 +439,6 @@ namespace wrench {
             unsigned long target_num_cores;
             sg_size_t required_ram;
 
-            std::cerr << "AE: BEFORE DISPATCHING READY ACTION: " << action.use_count() << "\n";
             std::tuple<simgrid::s4u::Host *, unsigned long> allocation =
                     pickAllocation(action,
                                    std::get<0>(this->action_run_specs[action]),
@@ -493,7 +492,6 @@ namespace wrench {
             this->running_thread_counts[target_host] += target_num_cores;
 
             dispatched_actions.insert(action);
-            std::cerr << "AE: AFTER DISPATCHING READY ACTION: " << action.use_count() << "\n";
 
         }
 
@@ -915,7 +913,6 @@ namespace wrench {
             S4U_CommPort *answer_commport, const std::shared_ptr<Action> &action) {
         WRENCH_INFO("Asked to run action %s", action->getName().c_str());
 
-        std::cerr << "AE: IN processSubmitAction(): " << action.use_count() << "\n";
 
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
 
@@ -950,7 +947,6 @@ namespace wrench {
         answer_commport->dputMessage(
                 new ActionExecutionServiceSubmitActionAnswerMessage(true, nullptr, 0.0));
 
-        std::cerr << "AE: AT THE END OF processSubmitAction(): " << action.use_count() << "\n";
 
     }
 
