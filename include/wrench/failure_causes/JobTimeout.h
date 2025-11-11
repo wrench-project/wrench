@@ -31,12 +31,11 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobTimeout(std::shared_ptr<Job> job);
+        JobTimeout();
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<Job> getJob();
         std::string toString() override;
 
     private:

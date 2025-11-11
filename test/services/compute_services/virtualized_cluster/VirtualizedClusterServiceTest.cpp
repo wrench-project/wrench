@@ -1530,9 +1530,6 @@ private:
             throw std::runtime_error(
                     "Unexpected failure cause: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
         }
-        if (cause->getJob() != job) {
-            throw std::runtime_error("Failure cause does not point to the correct job");
-        }
 
         return 0;
     }

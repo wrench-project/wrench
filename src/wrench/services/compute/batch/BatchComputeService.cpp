@@ -586,7 +586,7 @@ namespace wrench {
             if (send_failure_notifications) {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(batch_job->getJobID()),
-                        std::make_shared<JobKilled>(compound_job));
+                        std::make_shared<JobKilled>());
             }
             this->running_jobs.erase(compound_job);
         }
@@ -598,16 +598,16 @@ namespace wrench {
             std::shared_ptr<FailureCause> failure_cause;
             switch (termination_cause) {
                 case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
-                    failure_cause = std::make_shared<JobKilled>(compound_job);
+                    failure_cause = std::make_shared<JobKilled>();
                     break;
                 case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
                     failure_cause = std::make_shared<ServiceIsDown>(this->getSharedPtr<ComputeService>());
                     break;
                 case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
-                    failure_cause = std::make_shared<JobTimeout>(compound_job);
+                    failure_cause = std::make_shared<JobTimeout>();
                     break;
                 default:
-                    failure_cause = std::make_shared<JobKilled>(compound_job);
+                    failure_cause = std::make_shared<JobKilled>();
                     break;
             }
             for (auto const &action: compound_job->getActions()) {
@@ -616,7 +616,7 @@ namespace wrench {
             if (send_failure_notifications) {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(batch_job->getJobID()),
-                        std::make_shared<JobKilled>(compound_job));
+                        std::make_shared<JobKilled>());
             }
             this->batch_queue.pop_front();
         }

@@ -688,16 +688,16 @@ namespace wrench {
             std::shared_ptr<FailureCause> failure_cause;
             switch (termination_cause) {
                 case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
-                    failure_cause = std::make_shared<JobKilled>(action->getJob());
+                    failure_cause = std::make_shared<JobKilled>();
                     break;
                 case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
                     failure_cause = std::make_shared<ServiceIsDown>(this->parent_service);
                     break;
                 case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
-                    failure_cause = std::make_shared<JobTimeout>(action->getJob());
+                    failure_cause = std::make_shared<JobTimeout>();
                     break;
                 default:
-                    failure_cause = std::make_shared<JobKilled>(action->getJob());
+                    failure_cause = std::make_shared<JobKilled>();
                     break;
             }
             this->killAction(action, failure_cause);
@@ -813,16 +813,16 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
         switch (termination_cause) {
             case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
-                failure_cause = std::make_shared<JobKilled>(action->getJob());
+                failure_cause = std::make_shared<JobKilled>();
                 break;
             case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
                 failure_cause = std::make_shared<ServiceIsDown>(this->parent_service);
                 break;
             case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
-                failure_cause = std::make_shared<JobTimeout>(action->getJob());
+                failure_cause = std::make_shared<JobTimeout>();
                 break;
             default:
-                failure_cause = std::make_shared<JobKilled>(action->getJob());
+                failure_cause = std::make_shared<JobKilled>();
                 break;
         }
         this->killAction(action, failure_cause);

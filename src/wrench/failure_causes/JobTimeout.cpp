@@ -23,17 +23,7 @@ namespace wrench {
     *
     * @param job: the job that has timed out
     */
-    JobTimeout::JobTimeout(std::shared_ptr<Job> job) {
-        this->job = std::move(job);
-    }
-
-
-    /**
-     * @brief Getter
-     * @return the job
-     */
-    std::shared_ptr<Job> JobTimeout::getJob() {
-        return this->job;
+    JobTimeout::JobTimeout() {
     }
 
     /**
@@ -41,7 +31,7 @@ namespace wrench {
      * @return the message
      */
     std::string JobTimeout::toString() {
-        return std::string("Job has timed out - likely not enough time was requested for batch job");
+        return std::string("Job timed out - likely not enough time was requested for batch job");
     }
 
 }// namespace wrench

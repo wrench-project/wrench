@@ -1711,9 +1711,6 @@ private:
                     throw std::runtime_error("Expected event, but unexpected failure cause: " +
                                              real_event->failure_cause->toString() + " (expected: JobTimeout)");
                 }
-                if (cause->getJob() != job) {
-                    throw std::runtime_error("Expected JobTimeout failure cause does not point to expected job");
-                }
                 cause->toString();// for coverage
                 // success, do nothing for now
             } else {
@@ -2626,10 +2623,6 @@ private:
                                              real_event->failure_cause->toString() + " (expected: JobTimeout)");
                 }
                 std::string error_msg = cause->toString();
-                if (cause->getJob() != job) {
-                    throw std::runtime_error(
-                            "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
-                }
             } else {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
@@ -3321,11 +3314,6 @@ private:
             if (not cause) {
                 throw std::runtime_error("Expected event, but unexpected failure cause: " +
                                          real_event->failure_cause->toString() + " (expected: JobKilled)");
-            }
-            if ((cause->getJob() != jobs[0]) and
-                (cause->getJob() != jobs[1]) and
-                (cause->getJob() != jobs[2])) {
-                throw std::runtime_error("Expected JobKilled failure cause does not point to expected job");
             }
             cause->toString();// for coverage
         }

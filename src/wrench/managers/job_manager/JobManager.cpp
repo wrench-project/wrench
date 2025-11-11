@@ -965,9 +965,9 @@ namespace wrench {
         // Fix the failure cause in case it's a failure cause that refers to a job (in which case it is
         // right now referring to the compound job instead of the standard job
         if (std::dynamic_pointer_cast<JobKilled>(job_failure_cause)) {
-            job_failure_cause = std::make_shared<JobKilled>(job);
+            job_failure_cause = std::make_shared<JobKilled>();
         } else if (std::dynamic_pointer_cast<JobTimeout>(job_failure_cause)) {
-            job_failure_cause = std::make_shared<JobTimeout>(job);
+            job_failure_cause = std::make_shared<JobTimeout>();
         } else if (auto actual_cause = std::dynamic_pointer_cast<NotEnoughResources>(job_failure_cause)) {
             job_failure_cause = std::make_shared<NotEnoughResources>(job, actual_cause->getService());
         }

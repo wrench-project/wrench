@@ -23,16 +23,7 @@ namespace wrench {
     * @brief Constructor
     * @param job: the job that was killed
     */
-    JobKilled::JobKilled(std::shared_ptr<Job> job) {
-        this->job = std::move(job);
-    }
-
-    /**
-     * @brief Getter
-     * @return the job
-     */
-    std::shared_ptr<Job> JobKilled::getJob() {
-        return this->job;
+    JobKilled::JobKilled() {
     }
 
     /**
@@ -40,11 +31,7 @@ namespace wrench {
      * @return the message
      */
     std::string JobKilled::toString() {
-        std::string message = "Job " + this->job->getName() + " ";
-        if (this->job->getParentComputeService()) {
-            message += "on service " + this->job->getParentComputeService()->getName() + " ";
-        }
-        message += "was killed";
+        std::string message = "Job was killed";
         return message;
     }
 

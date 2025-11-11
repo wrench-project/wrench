@@ -32,12 +32,11 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobKilled(std::shared_ptr<Job> job);
+        JobKilled();
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<Job> getJob();
         std::string toString() override;
 
     private:
