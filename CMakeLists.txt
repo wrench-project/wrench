@@ -14,6 +14,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs -Wno-deprecated-builtins -Wno-unused-but-set-variable" )
 
 if (ENABLE_BATSCHED)
@@ -74,6 +75,10 @@ find_package(FSMod REQUIRED)
 find_package(nlohmann_json)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "2")

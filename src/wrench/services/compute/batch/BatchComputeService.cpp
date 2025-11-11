@@ -636,10 +636,10 @@ namespace wrench {
                     failure_cause = std::make_shared<ServiceIsDown>(this->getSharedPtr<ComputeService>());
                     break;
                 case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
-                    failure_cause = std::make_shared<JobTimeout>(compound_job);
+                    failure_cause = std::make_shared<JobTimeout>();
                     break;
                 default:
-                    failure_cause = std::make_shared<JobKilled>(compound_job);
+                    failure_cause = std::make_shared<JobKilled>();
                     break;
             }
             for (auto const &action: compound_job->getActions()) {
@@ -650,7 +650,7 @@ namespace wrench {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(batch_job->getJobID()),
                         std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job)));
+                                new JobKilled()));
             }
 
             this->waiting_jobs.erase(batch_job);
