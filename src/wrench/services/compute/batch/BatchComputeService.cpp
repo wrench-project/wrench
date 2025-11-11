@@ -630,7 +630,7 @@ namespace wrench {
             std::shared_ptr<FailureCause> failure_cause;
             switch (termination_cause) {
                 case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
-                    failure_cause = std::make_shared<JobKilled>(compound_job);
+                    failure_cause = std::make_shared<JobKilled>();
                     break;
                 case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
                     failure_cause = std::make_shared<ServiceIsDown>(this->getSharedPtr<ComputeService>());
