@@ -684,8 +684,9 @@ namespace wrench {
         this->setStateToDown();
 
         WRENCH_INFO("Failing currently running actions");
-        for (auto const &action: this->running_actions) {
+        while (not this->action_executors.empty()) {
             std::shared_ptr<FailureCause> failure_cause;
+            auto action = this->action_executors.begin()->first;
             switch (termination_cause) {
                 case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
                     failure_cause = std::make_shared<JobKilled>();

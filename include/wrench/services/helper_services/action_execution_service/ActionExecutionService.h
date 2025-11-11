@@ -102,7 +102,7 @@ namespace wrench {
         std::unordered_map<std::shared_ptr<StandardJob>, std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
         // Set of running jobs
-        std::set<std::shared_ptr<Action>> running_actions;
+        // std::set<std::shared_ptr<Action>> running_actions;
 
         // Action execution specs
         std::unordered_map<std::shared_ptr<Action>, std::tuple<simgrid::s4u::Host *, unsigned long>> action_run_specs;
