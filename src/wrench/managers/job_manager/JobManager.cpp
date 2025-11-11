@@ -736,6 +736,7 @@ namespace wrench {
 
         job->getParentComputeService()->terminateJob(job);
         job->state = CompoundJob::State::DISCONTINUED;
+        this->jobs_dispatched.erase(job);
     }
 
 

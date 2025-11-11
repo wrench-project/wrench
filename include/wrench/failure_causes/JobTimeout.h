@@ -37,9 +37,6 @@ namespace wrench {
         /***********************/
 
         std::string toString() override;
-
-    private:
-        std::shared_ptr<Job> job;
     };
 
 

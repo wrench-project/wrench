@@ -72,7 +72,10 @@ namespace wrench {
         std::string getStateAsString() const;
         void setPriority(double p) override;
 
-        ~CompoundJob() = default;
+        ~CompoundJob() {
+            std::cerr << "IN JOB DESTRUCTOR" << std::endl;
+        }
+
 
         std::shared_ptr<SleepAction> addSleepAction(const std::string &name, double sleep_time);
 
