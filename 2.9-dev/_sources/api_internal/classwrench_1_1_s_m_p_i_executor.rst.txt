@@ -1,0 +1,8 @@
+.. _SMPIExecutor:
+wrench::SMPIExecutor
+********************
+
+.. doxygenclass:: wrench::SMPIExecutor
+   :project: internal
+   :members:
+

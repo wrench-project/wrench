@@ -1,0 +1,8 @@
+.. _WfCommonsWorkflowParser:
+wrench::WfCommonsWorkflowParser
+*******************************
+
+.. doxygenclass:: wrench::WfCommonsWorkflowParser
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _FCFSServerlessScheduler:
+wrench::FCFSServerlessScheduler
+*******************************
+
+.. doxygenclass:: wrench::FCFSServerlessScheduler
+   :project: user
+   :members:
+

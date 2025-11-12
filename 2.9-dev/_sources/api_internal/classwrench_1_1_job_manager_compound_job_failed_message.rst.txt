@@ -1,0 +1,8 @@
+.. _JobManagerCompoundJobFailedMessage:
+wrench::JobManagerCompoundJobFailedMessage
+******************************************
+
+.. doxygenclass:: wrench::JobManagerCompoundJobFailedMessage
+   :project: internal
+   :members:
+

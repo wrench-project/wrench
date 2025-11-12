@@ -1,0 +1,8 @@
+.. _InvalidDirectoryPath:
+wrench::InvalidDirectoryPath
+****************************
+
+.. doxygenclass:: wrench::InvalidDirectoryPath
+   :project: developer
+   :members:
+

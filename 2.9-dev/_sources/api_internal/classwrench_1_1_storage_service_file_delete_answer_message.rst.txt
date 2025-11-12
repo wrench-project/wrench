@@ -1,0 +1,8 @@
+.. _StorageServiceFileDeleteAnswerMessage:
+wrench::StorageServiceFileDeleteAnswerMessage
+*********************************************
+
+.. doxygenclass:: wrench::StorageServiceFileDeleteAnswerMessage
+   :project: internal
+   :members:
+

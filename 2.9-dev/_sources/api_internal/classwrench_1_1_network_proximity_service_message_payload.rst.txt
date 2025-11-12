@@ -1,0 +1,8 @@
+.. _NetworkProximityServiceMessagePayload:
+wrench::NetworkProximityServiceMessagePayload
+*********************************************
+
+.. doxygenclass:: wrench::NetworkProximityServiceMessagePayload
+   :project: internal
+   :members:
+

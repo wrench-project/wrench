@@ -1,0 +1,8 @@
+.. _FileCopyFailedEvent:
+wrench::FileCopyFailedEvent
+***************************
+
+.. doxygenclass:: wrench::FileCopyFailedEvent
+   :project: internal
+   :members:
+

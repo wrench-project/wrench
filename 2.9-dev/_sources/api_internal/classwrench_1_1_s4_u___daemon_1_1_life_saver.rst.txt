@@ -1,0 +1,8 @@
+.. _S4U_Daemon::LifeSaver:
+wrench::S4U_Daemon::LifeSaver
+*****************************
+
+.. doxygenclass:: wrench::S4U_Daemon::LifeSaver
+   :project: internal
+   :members:
+

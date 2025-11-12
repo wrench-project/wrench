@@ -1,0 +1,8 @@
+.. _NetworkProximityServiceProperty:
+wrench::NetworkProximityServiceProperty
+***************************************
+
+.. doxygenclass:: wrench::NetworkProximityServiceProperty
+   :project: internal
+   :members:
+

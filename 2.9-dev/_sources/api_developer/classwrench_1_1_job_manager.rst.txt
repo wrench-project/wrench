@@ -1,0 +1,8 @@
+.. _JobManager:
+wrench::JobManager
+******************
+
+.. doxygenclass:: wrench::JobManager
+   :project: developer
+   :members:
+

@@ -1,0 +1,8 @@
+.. _XRootD::ContinueSearchMessage:
+wrench::XRootD::ContinueSearchMessage
+*************************************
+
+.. doxygenclass:: wrench::XRootD::ContinueSearchMessage
+   :project: internal
+   :members:
+

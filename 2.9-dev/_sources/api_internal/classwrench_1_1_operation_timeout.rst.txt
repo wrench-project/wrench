@@ -1,0 +1,8 @@
+.. _OperationTimeout:
+wrench::OperationTimeout
+************************
+
+.. doxygenclass:: wrench::OperationTimeout
+   :project: internal
+   :members:
+

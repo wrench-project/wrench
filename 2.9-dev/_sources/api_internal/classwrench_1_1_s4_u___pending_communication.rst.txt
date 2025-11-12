@@ -1,0 +1,8 @@
+.. _S4U_PendingCommunication:
+wrench::S4U_PendingCommunication
+********************************
+
+.. doxygenclass:: wrench::S4U_PendingCommunication
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _MPIAction:
+wrench::MPIAction
+*****************
+
+.. doxygenclass:: wrench::MPIAction
+   :project: developer
+   :members:
+

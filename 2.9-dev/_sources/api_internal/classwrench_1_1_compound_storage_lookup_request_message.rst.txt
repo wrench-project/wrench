@@ -1,0 +1,8 @@
+.. _CompoundStorageLookupRequestMessage:
+wrench::CompoundStorageLookupRequestMessage
+*******************************************
+
+.. doxygenclass:: wrench::CompoundStorageLookupRequestMessage
+   :project: internal
+   :members:
+

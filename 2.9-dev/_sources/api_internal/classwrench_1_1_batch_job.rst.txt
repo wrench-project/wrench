@@ -1,0 +1,8 @@
+.. _BatchJob:
+wrench::BatchJob
+****************
+
+.. doxygenclass:: wrench::BatchJob
+   :project: internal
+   :members:
+

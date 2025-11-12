@@ -1,0 +1,8 @@
+.. _NegotiatorCompletionMessage:
+wrench::NegotiatorCompletionMessage
+***********************************
+
+.. doxygenclass:: wrench::NegotiatorCompletionMessage
+   :project: internal
+   :members:
+

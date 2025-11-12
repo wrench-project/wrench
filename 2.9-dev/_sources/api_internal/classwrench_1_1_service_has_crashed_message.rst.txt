@@ -1,0 +1,8 @@
+.. _ServiceHasCrashedMessage:
+wrench::ServiceHasCrashedMessage
+********************************
+
+.. doxygenclass:: wrench::ServiceHasCrashedMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _BandwidthMeterService:
+wrench::BandwidthMeterService
+*****************************
+
+.. doxygenclass:: wrench::BandwidthMeterService
+   :project: internal
+   :members:
+

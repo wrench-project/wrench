@@ -1,0 +1,8 @@
+.. _StorageServiceFileDeleteRequestMessage:
+wrench::StorageServiceFileDeleteRequestMessage
+**********************************************
+
+.. doxygenclass:: wrench::StorageServiceFileDeleteRequestMessage
+   :project: internal
+   :members:
+

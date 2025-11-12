@@ -1,0 +1,8 @@
+.. _SimulationTimestampFileReadCompletion:
+wrench::SimulationTimestampFileReadCompletion
+*********************************************
+
+.. doxygenclass:: wrench::SimulationTimestampFileReadCompletion
+   :project: developer
+   :members:
+

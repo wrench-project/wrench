@@ -1,0 +1,8 @@
+.. _FunctionManagerFunctionCompletedMessage:
+wrench::FunctionManagerFunctionCompletedMessage
+***********************************************
+
+.. doxygenclass:: wrench::FunctionManagerFunctionCompletedMessage
+   :project: internal
+   :members:
+

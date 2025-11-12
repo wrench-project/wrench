@@ -1,0 +1,8 @@
+.. _StorageServiceProperty:
+wrench::StorageServiceProperty
+******************************
+
+.. doxygenclass:: wrench::StorageServiceProperty
+   :project: internal
+   :members:
+

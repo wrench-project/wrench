@@ -1,0 +1,8 @@
+.. _ComputeServicePilotJobStartedMessage:
+wrench::ComputeServicePilotJobStartedMessage
+********************************************
+
+.. doxygenclass:: wrench::ComputeServicePilotJobStartedMessage
+   :project: internal
+   :members:
+

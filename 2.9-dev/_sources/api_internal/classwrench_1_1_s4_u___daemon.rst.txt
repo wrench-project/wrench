@@ -1,0 +1,8 @@
+.. _S4U_Daemon:
+wrench::S4U_Daemon
+******************
+
+.. doxygenclass:: wrench::S4U_Daemon
+   :project: internal
+   :members:
+
