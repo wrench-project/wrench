@@ -1,0 +1,8 @@
+.. _ConstantEfficiencyParallelModel:
+wrench::ConstantEfficiencyParallelModel
+***************************************
+
+.. doxygenclass:: wrench::ConstantEfficiencyParallelModel
+   :project: internal
+   :members:
+

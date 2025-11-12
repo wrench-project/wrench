@@ -1,0 +1,8 @@
+.. _DataManagerFileReadAnswerMessage:
+wrench::DataManagerFileReadAnswerMessage
+****************************************
+
+.. doxygenclass:: wrench::DataManagerFileReadAnswerMessage
+   :project: internal
+   :members:
+

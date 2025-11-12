@@ -1,0 +1,8 @@
+.. _FunctionManagerFunctionInvocationAnswerMessage:
+wrench::FunctionManagerFunctionInvocationAnswerMessage
+******************************************************
+
+.. doxygenclass:: wrench::FunctionManagerFunctionInvocationAnswerMessage
+   :project: internal
+   :members:
+

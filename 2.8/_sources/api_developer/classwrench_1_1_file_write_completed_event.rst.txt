@@ -1,0 +1,8 @@
+.. _FileWriteCompletedEvent:
+wrench::FileWriteCompletedEvent
+*******************************
+
+.. doxygenclass:: wrench::FileWriteCompletedEvent
+   :project: developer
+   :members:
+

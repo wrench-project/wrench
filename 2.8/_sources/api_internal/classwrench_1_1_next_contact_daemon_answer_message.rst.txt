@@ -1,0 +1,8 @@
+.. _NextContactDaemonAnswerMessage:
+wrench::NextContactDaemonAnswerMessage
+**************************************
+
+.. doxygenclass:: wrench::NextContactDaemonAnswerMessage
+   :project: internal
+   :members:
+

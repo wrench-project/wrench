@@ -1,0 +1,8 @@
+.. _HostStateChangeDetectorProperty:
+wrench::HostStateChangeDetectorProperty
+***************************************
+
+.. doxygenclass:: wrench::HostStateChangeDetectorProperty
+   :project: internal
+   :members:
+

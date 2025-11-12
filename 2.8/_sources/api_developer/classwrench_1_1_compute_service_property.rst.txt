@@ -1,0 +1,8 @@
+.. _ComputeServiceProperty:
+wrench::ComputeServiceProperty
+******************************
+
+.. doxygenclass:: wrench::ComputeServiceProperty
+   :project: developer
+   :members:
+

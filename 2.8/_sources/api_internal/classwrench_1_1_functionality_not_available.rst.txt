@@ -1,0 +1,8 @@
+.. _FunctionalityNotAvailable:
+wrench::FunctionalityNotAvailable
+*********************************
+
+.. doxygenclass:: wrench::FunctionalityNotAvailable
+   :project: internal
+   :members:
+

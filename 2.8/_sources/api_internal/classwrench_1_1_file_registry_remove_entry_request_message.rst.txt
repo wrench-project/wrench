@@ -1,0 +1,8 @@
+.. _FileRegistryRemoveEntryRequestMessage:
+wrench::FileRegistryRemoveEntryRequestMessage
+*********************************************
+
+.. doxygenclass:: wrench::FileRegistryRemoveEntryRequestMessage
+   :project: internal
+   :members:
+

@@ -1,0 +1,8 @@
+.. _StandardJobCompletedEvent:
+wrench::StandardJobCompletedEvent
+*********************************
+
+.. doxygenclass:: wrench::StandardJobCompletedEvent
+   :project: internal
+   :members:
+

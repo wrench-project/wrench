@@ -1,0 +1,8 @@
+.. _FunctionManagerWaitAllMessage:
+wrench::FunctionManagerWaitAllMessage
+*************************************
+
+.. doxygenclass:: wrench::FunctionManagerWaitAllMessage
+   :project: internal
+   :members:
+

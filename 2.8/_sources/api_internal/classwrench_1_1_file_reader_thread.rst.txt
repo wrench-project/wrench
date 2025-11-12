@@ -1,0 +1,8 @@
+.. _FileReaderThread:
+wrench::FileReaderThread
+************************
+
+.. doxygenclass:: wrench::FileReaderThread
+   :project: internal
+   :members:
+

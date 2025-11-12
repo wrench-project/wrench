@@ -1,0 +1,8 @@
+.. _FileRegistryServiceMessagePayload:
+wrench::FileRegistryServiceMessagePayload
+*****************************************
+
+.. doxygenclass:: wrench::FileRegistryServiceMessagePayload
+   :project: developer
+   :members:
+

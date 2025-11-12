@@ -1,0 +1,8 @@
+.. _FileRegistryServiceProperty:
+wrench::FileRegistryServiceProperty
+***********************************
+
+.. doxygenclass:: wrench::FileRegistryServiceProperty
+   :project: developer
+   :members:
+

@@ -1,0 +1,8 @@
+.. _SimulationTimestampDiskWriteFailure:
+wrench::SimulationTimestampDiskWriteFailure
+*******************************************
+
+.. doxygenclass:: wrench::SimulationTimestampDiskWriteFailure
+   :project: developer
+   :members:
+

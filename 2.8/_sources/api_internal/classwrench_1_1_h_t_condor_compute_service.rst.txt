@@ -1,0 +1,8 @@
+.. _HTCondorComputeService:
+wrench::HTCondorComputeService
+******************************
+
+.. doxygenclass:: wrench::HTCondorComputeService
+   :project: internal
+   :members:
+

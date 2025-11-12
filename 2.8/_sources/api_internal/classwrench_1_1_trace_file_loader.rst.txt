@@ -1,0 +1,8 @@
+.. _TraceFileLoader:
+wrench::TraceFileLoader
+***********************
+
+.. doxygenclass:: wrench::TraceFileLoader
+   :project: internal
+   :members:
+

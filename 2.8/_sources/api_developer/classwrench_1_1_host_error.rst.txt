@@ -1,0 +1,8 @@
+.. _HostError:
+wrench::HostError
+*****************
+
+.. doxygenclass:: wrench::HostError
+   :project: developer
+   :members:
+

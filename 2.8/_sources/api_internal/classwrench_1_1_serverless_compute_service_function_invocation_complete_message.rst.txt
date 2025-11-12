@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceFunctionInvocationCompleteMessage:
+wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage
+*****************************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage
+   :project: internal
+   :members:
+

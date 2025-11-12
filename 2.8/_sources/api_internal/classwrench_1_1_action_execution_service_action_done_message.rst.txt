@@ -1,0 +1,8 @@
+.. _ActionExecutionServiceActionDoneMessage:
+wrench::ActionExecutionServiceActionDoneMessage
+***********************************************
+
+.. doxygenclass:: wrench::ActionExecutionServiceActionDoneMessage
+   :project: internal
+   :members:
+

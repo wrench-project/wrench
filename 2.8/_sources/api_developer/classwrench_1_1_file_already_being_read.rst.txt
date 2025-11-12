@@ -1,0 +1,8 @@
+.. _FileAlreadyBeingRead:
+wrench::FileAlreadyBeingRead
+****************************
+
+.. doxygenclass:: wrench::FileAlreadyBeingRead
+   :project: developer
+   :members:
+

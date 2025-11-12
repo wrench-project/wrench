@@ -1,0 +1,8 @@
+.. _XRootD::Message:
+wrench::XRootD::Message
+***********************
+
+.. doxygenclass:: wrench::XRootD::Message
+   :project: internal
+   :members:
+

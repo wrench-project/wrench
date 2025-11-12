@@ -1,0 +1,8 @@
+.. _HTCondorCentralManagerServiceMessagePayload:
+wrench::HTCondorCentralManagerServiceMessagePayload
+***************************************************
+
+.. doxygenclass:: wrench::HTCondorCentralManagerServiceMessagePayload
+   :project: internal
+   :members:
+

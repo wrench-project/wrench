@@ -1,0 +1,8 @@
+.. _NotAllowed:
+wrench::NotAllowed
+******************
+
+.. doxygenclass:: wrench::NotAllowed
+   :project: developer
+   :members:
+

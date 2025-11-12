@@ -1,0 +1,8 @@
+.. _SimulationTimestampDiskWriteCompletion:
+wrench::SimulationTimestampDiskWriteCompletion
+**********************************************
+
+.. doxygenclass:: wrench::SimulationTimestampDiskWriteCompletion
+   :project: developer
+   :members:
+

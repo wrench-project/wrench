@@ -1,0 +1,8 @@
+.. _FileWriteFailedEvent:
+wrench::FileWriteFailedEvent
+****************************
+
+.. doxygenclass:: wrench::FileWriteFailedEvent
+   :project: developer
+   :members:
+

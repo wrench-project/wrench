@@ -1,0 +1,8 @@
+.. _ServiceStopDaemonMessage:
+wrench::ServiceStopDaemonMessage
+********************************
+
+.. doxygenclass:: wrench::ServiceStopDaemonMessage
+   :project: internal
+   :members:
+

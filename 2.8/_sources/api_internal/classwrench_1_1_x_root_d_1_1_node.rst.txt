@@ -1,0 +1,8 @@
+.. _XRootD::Node:
+wrench::XRootD::Node
+********************
+
+.. doxygenclass:: wrench::XRootD::Node
+   :project: internal
+   :members:
+
