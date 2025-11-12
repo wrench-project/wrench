@@ -4,7 +4,7 @@ WRENCH Release Notes
 
 (Nov 12, 2025) This releases includes **minor enhancements and updates**, and an **upgrade to SimGrid 4.1** (although it should still work with SimGrid 4.0). More specifically:
 
-  - Implementation of `CustomEvent` and `CustomMessage` classes so that Controllers can trigger an event in another controller, which opens up new simulator design possibilities and is alreaedy used in two simulators out there.
+  - Implementation of `CustomEvent` and `CustomMessage` classes so that Controllers can trigger an event in another controller, which opens up new simulator design possibilities and is already used in two simulators out there.
   - Minor bug fixes and code/documentation cleanups.
 
 ### wrench 2.7
