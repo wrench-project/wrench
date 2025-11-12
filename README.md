@@ -45,8 +45,8 @@ on top of the REST API, is available in [a separate repository](https://github.c
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/) - version 4.0
-- [SimGrid File System Module](https://github.com/simgrid/file-system-module) - version 0.3 or higher
+- [SimGrid](https://framagit.org/simgrid/simgrid/) - version 4.1
+- [SimGrid File System Module](https://github.com/simgrid/file-system-module) - version 0.4
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.11.0 or higher 
 
 ### Optional Dependencies

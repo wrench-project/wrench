@@ -22,8 +22,8 @@ And, one of the following: - **g++** - version 7.5 or higher - **clang**
 Required Dependencies
 ---------------------
 
--  `SimGrid <https://simgrid.org/>`__ ??? version 4.0
--  `SimGrid File System Module <https://github.com/simgrid/file-system-module>`__ ??? version 0.3 or higher
+-  `SimGrid <https://simgrid.org/>`__ ??? version 4.1
+-  `SimGrid File System Module <https://github.com/simgrid/file-system-module>`__ ??? version 0.4
 -  `JSON for Modern C++ <https://github.com/nlohmann/json>`__ ??? version
    3.11.0 or higher
 
