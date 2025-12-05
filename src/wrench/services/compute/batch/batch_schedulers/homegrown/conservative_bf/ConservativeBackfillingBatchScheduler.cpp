@@ -14,7 +14,7 @@
 
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.h"
 
-//#define  PRINT_SCHEDULE 1
+// #define  PRINT_SCHEDULE 1
 
 WRENCH_LOG_CATEGORY(wrench_core_conservative_bf_batch_scheduler, "Log category for ConservativeBackfillingBatchScheduler");
 
@@ -192,7 +192,8 @@ namespace wrench {
      * @param batch_job: the job that completed
      */
     void ConservativeBackfillingBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
-        WRENCH_INFO("Notified of completion of BatchComputeService job, %lu", batch_job->getJobID());
+        WRENCH_INFO("Notified of completion of BatchComputeService job %s, %lu",
+            batch_job->compound_job->getName().c_str(), batch_job->getJobID());
 
         auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
         this->schedule->setTimeOrigin(now);
@@ -245,7 +246,7 @@ namespace wrench {
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
-        if (num_nodes > cs->available_nodes_to_cores.size()) {
+        if (num_nodes > cs->available_nodes_to_cores.size() - cs->reclaimed_hosts.size()) { // shouldn't happen {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->get_core_count())) {
@@ -288,4 +289,15 @@ namespace wrench {
         return to_return;
     }
 
+/**
+  * @brief Method to process a host being reclaimed
+  * @param host the host
+  * @param reclaim_job the reclaim job
+  */
+    void ConservativeBackfillingBatchScheduler::processReclaimedHost(simgrid::s4u::Host* host,
+        std::shared_ptr<BatchJob> reclaim_job) {
+        this->schedule->add(this->schedule->getTimeOrigin(), UINT32_MAX, reclaim_job);
+        reclaim_job->easy_bf_start_date = this->schedule->getTimeOrigin();
+        reclaim_job->easy_bf_expected_end_date = UINT32_MAX;
+    }
 }// namespace wrench

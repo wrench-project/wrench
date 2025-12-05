@@ -92,6 +92,15 @@ namespace wrench {
          */
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) override;
 
+        /**
+         * @brief Method to process a host being reclaimed
+         * @param host the host
+         * @param reclaim_job the reclaim job
+         */
+        void processReclaimedHost(simgrid::s4u::Host *host, std::shared_ptr<BatchJob> reclaim_job) override {
+            throw std::runtime_error("BatschedBatchScheduler::processReclaimedHost(): Not implemented/supported");
+        }
+
     private:
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                        std::string kill_reason, std::string event_type);

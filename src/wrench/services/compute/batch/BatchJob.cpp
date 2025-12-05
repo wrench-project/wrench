@@ -177,16 +177,25 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the resources allocated to this BatchComputeService job
-     * @param resources: a list of resource, each as a <host, number of cores, bytes of RAM> tuple
-     */
+ * @brief Set the resources allocated to this BatchComputeService job
+ * @param resources: a list of resource, each as a <host, number of cores, bytes of RAM> tuple
+ */
     void BatchJob::setAllocatedResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &resources) {
         if (resources.empty()) {
             throw std::invalid_argument(
-                    "BatchJob::setAllocatedResources(): Empty Resources allocated");
+                  "BatchJob::setAllocatedResources(): Empty Resources allocated");
         }
         this->resources_allocated = resources;
     }
+
+    /**
+     * @brief Determine whether the job is using a particular host
+     * @param host: a host
+     */
+    bool BatchJob::isRunningOnHost(simgrid::s4u::Host *host) {
+        return this->resources_allocated.find(host) != this->resources_allocated.end();
+    }
+
 
 
 }// namespace wrench

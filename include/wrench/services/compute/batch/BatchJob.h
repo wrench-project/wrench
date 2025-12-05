@@ -35,6 +35,7 @@ namespace wrench {
         void setEndingTimestamp(double time_stamp);
         std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> getResourcesAllocated();
         void setAllocatedResources(const std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> &resources);
+        bool isRunningOnHost(simgrid::s4u::Host *);
 
         /** 
          * @brief Set the indices of the allocated nodes

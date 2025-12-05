@@ -64,6 +64,9 @@ namespace wrench {
          * @return a host:<core,RAM> map
          */
         virtual std::map<simgrid::s4u::Host *, std::tuple<unsigned long, sg_size_t>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, sg_size_t ram_per_node) = 0;
+
+        void processReclaimedHost(simgrid::s4u::Host *host, std::shared_ptr<BatchJob> reclaim_job) override = 0;
+
     };
 
     /***********************/

@@ -49,7 +49,7 @@ namespace wrench {
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
-        if (num_nodes > cs->available_nodes_to_cores.size()) {
+        if (num_nodes > cs->available_nodes_to_cores.size() - cs->reclaimed_hosts.size()) { // shouldn't happen
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->
@@ -78,6 +78,11 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Method to obtain start time estimates
+     * @param set_of_jobs: set of jobs for which we need estimates
+     * @return a map a start time estimates
+     */
     std::map<std::string, double> FCFSBatchScheduler::getStartTimeEstimates(
         std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) {
         if (cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM) != "FIRSTFIT") {
@@ -258,6 +263,8 @@ namespace wrench {
     }
 
 
+
+
     /**
      * @brief Method to process queued  jobs
      */
@@ -343,4 +350,15 @@ namespace wrench {
     void FCFSBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
+
+    /**
+     * @brief Method to process a host being reclaimed
+     * @param host the host
+     * @param reclaim_job the reclaim job
+     */
+    void FCFSBatchScheduler::processReclaimedHost(simgrid::s4u::Host* host, std::shared_ptr<BatchJob> reclaim_job) {
+        // Do nothing
+    }
+
+
 } // namespace wrench

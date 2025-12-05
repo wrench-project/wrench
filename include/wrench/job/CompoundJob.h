@@ -187,6 +187,7 @@ namespace wrench {
 
     protected:
         friend class BareMetalComputeService;
+        friend class BatchComputeService;
         friend class JobManager;
         friend class Action;
 

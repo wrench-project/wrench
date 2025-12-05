@@ -255,7 +255,7 @@ namespace wrench {
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
-        if (num_nodes > cs->available_nodes_to_cores.size()) {
+        if (num_nodes > cs->available_nodes_to_cores.size() - cs->reclaimed_hosts.size()) { // shouldn't happen
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->get_core_count())) {
@@ -313,5 +313,16 @@ namespace wrench {
         }
         return to_return;
     }
-
+    /**
+  * @brief Method to process a host being reclaimed
+  * @param host the host
+  * @param reclaim_job the reclaim job
+  */
+    void ConservativeBackfillingBatchSchedulerCoreLevel::processReclaimedHost(simgrid::s4u::Host* host,
+        std::shared_ptr<BatchJob> reclaim_job) {
+        auto est = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
+        this->schedule->add(est, UINT32_MAX, reclaim_job);
+        reclaim_job->conservative_bf_start_date = est;
+        reclaim_job->conservative_bf_expected_end_date =UINT32_MAX;
+    }
 }// namespace wrench

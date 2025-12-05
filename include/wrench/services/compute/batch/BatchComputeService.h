@@ -123,6 +123,9 @@ namespace wrench {
 
         std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> getQueue();
 
+        void reclaimHost(const std::string &hostname);
+        void returnHost(const std::string &hostname);
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -203,6 +206,10 @@ namespace wrench {
 
         // Scheduler
         std::unique_ptr<BatchScheduler> scheduler;
+
+        // Bookeeping of reclaimed hosts
+        std::map<simgrid::s4u::Host *, std::shared_ptr<BatchJob>> reclaimed_hosts;
+        std::map<std::shared_ptr<BatchJob>, simgrid::s4u::Host *> reclaimed_host_jobs;
 
 
 #ifdef ENABLE_BATSCHED
@@ -285,6 +292,7 @@ namespace wrench {
 
         // process a resource request
         void processIsThereAtLeastOneHostWithAvailableResources(S4U_CommPort *answer_commport, unsigned long num_cores, sg_size_t ram);
+
 
 #ifdef ENABLE_BATSCHED
         void processExecuteJobFromBatSched(const std::string &bat_sched_reply);

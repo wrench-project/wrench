@@ -87,7 +87,11 @@ namespace wrench {
         for (auto &availability_timeslot: this->availability_timeslots) {
             std::cerr << availability_timeslot.first << "(" << availability_timeslot.second.num_nodes_utilized << ") | ";
             for (auto const &j: availability_timeslot.second.jobs) {
-                std::cerr << j->getCompoundJob()->getName() << "(" << j->getRequestedNumNodes() << ") ";
+                if (j->getCompoundJob()) {
+                    std::cerr << j->getCompoundJob()->getName() << "(" << j->getRequestedNumNodes() << ") ";
+                } else {
+                    std::cerr << "RECLAIMED" << "(" << j->getRequestedNumNodes() << ") ";
+                }
             }
             std::cerr << "\n";
         }

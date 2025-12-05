@@ -248,7 +248,7 @@ namespace wrench {
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
-        if (num_nodes > cs->available_nodes_to_cores.size()) {
+        if (num_nodes > cs->available_nodes_to_cores.size() - cs->reclaimed_hosts.size()) { // shouldn't happen
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->get_core_count())) {
@@ -273,6 +273,18 @@ namespace wrench {
         std::map<std::string, double> to_return;
 
         throw std::runtime_error("EasyBackfillingBatchScheduler::getStartTimeEstimates(): Method not implemented (ever?) for EASY backfilling");
+    }
+
+    /**
+     * @brief Method to process a host being reclaimed
+     * @param host the host
+     * @param reclaim_job the reclaim job
+     */
+    void EasyBackfillingBatchScheduler::processReclaimedHost(simgrid::s4u::Host* host,
+        std::shared_ptr<BatchJob> reclaim_job) {
+        this->schedule->add(this->schedule->getTimeOrigin(), UINT32_MAX, reclaim_job);
+        reclaim_job->easy_bf_start_date = this->schedule->getTimeOrigin();
+        reclaim_job->easy_bf_expected_end_date = UINT32_MAX;
     }
 
 }// namespace wrench

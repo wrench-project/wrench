@@ -250,6 +250,99 @@ namespace wrench {
     }
 
     /**
+     * @brief Preempt a host by: (i) brutally terminating the jobs that are running on that host; and (ii)
+     *        making that host unavailable until the returnHost method is called.
+     * @param hostname
+     */
+    void BatchComputeService::reclaimHost(const std::string &hostname) {
+#ifdef ENABLE_BATSCHED
+        throw std::runtime_error("BatchComputeService::reclaimHost(): Not available when using Batsched");
+#endif
+
+        auto host_to_reclaim = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
+        if (host_to_reclaim == nullptr) {
+            throw std::invalid_argument("BatchComputeService::reclaimHost(): unknown physical host '" + hostname + "'");
+        }
+        if (this->reclaimed_hosts.find(host_to_reclaim) != this->reclaimed_hosts.end()) {
+            throw std::invalid_argument("BatchComputeService::reclaimHost(): Host '" + hostname + "' already reclaimed");
+        }
+
+        {
+            // Identify all jobs RUNNING on that host
+            std::vector<std::shared_ptr<BatchJob>> batch_jobs_to_terminate;
+            for (const auto & [fst, batch_job] : this->running_jobs) {
+                if (batch_job->isRunningOnHost(host_to_reclaim)) {
+                    batch_jobs_to_terminate.push_back(batch_job);
+                }
+            }
+            // Terminate all those jobs and send back notifications, which should be ok since
+            // I won't go back to my main loop yet anyway
+            for (auto const &batch_job : batch_jobs_to_terminate) {
+                auto compound_job = batch_job->getCompoundJob();
+                this->scheduler->processJobTermination(batch_job);
+
+                terminateRunningCompoundJob(compound_job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
+                this->freeUpResources(batch_job->getResourcesAllocated());
+                this->running_jobs.erase(batch_job->getCompoundJob());
+                this->removeBatchJobFromJobsList(batch_job);
+                // Send the termination requests
+                compound_job->popCallbackCommPort(); // pop once to bypass myself!!
+                auto answer_message =
+                    new ComputeServiceCompoundJobFailedMessage(
+                            compound_job, this->getSharedPtr<BatchComputeService>(),
+                            this->getMessagePayloadValue(
+                                    BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD));
+                compound_job->popCallbackCommPort()->dputMessage(answer_message);
+            }
+        }
+
+        {
+            // Identify all jobs WAITING that will become too big and remove them from the batch queue
+            auto batch_queue_it = this->batch_queue.begin();
+            while (batch_queue_it != this->batch_queue.end()) {
+                auto batch_job = *batch_queue_it;
+                if (batch_job->getRequestedNumNodes() <= this->total_num_of_nodes - (this->reclaimed_hosts.size() + 1)) {
+                    ++batch_queue_it;
+                    continue;
+                }
+                // Cancel that job
+                batch_queue_it = this->batch_queue.erase(batch_queue_it);
+                auto compound_job = batch_job->getCompoundJob();
+                this->scheduler->processJobTermination(batch_job);
+                this->removeBatchJobFromJobsList(batch_job);
+                // Send back notification
+                auto failure_cause = std::make_shared<NotEnoughResources>(compound_job, this->getSharedPtr<BatchComputeService>());
+                compound_job->setAllActionsFailed(failure_cause);
+                this->sendCompoundJobFailureNotification(compound_job, std::to_string((batch_job->getJobID())), failure_cause);
+            }
+        }
+
+        // Create an infinite reclaim job that uses all cores of a node
+        auto infinite_reclaim_job = std::make_shared<BatchJob>(nullptr, wrench::BatchComputeService::generateUniqueJobID(),
+            ULONG_MAX, 1, this->num_cores_per_node, "reclaim", -1, S4U_Simulation::getClock());
+
+        // TODO: Start the infinite job on the reclaimed host right away
+        this->available_nodes_to_cores[host_to_reclaim] = 0;
+        this->scheduler->processReclaimedHost(host_to_reclaim, infinite_reclaim_job);
+
+        // Keep track of the host-reclaim job (so that it can be returned/un-reclaimed later)
+        this->reclaimed_hosts[host_to_reclaim] = infinite_reclaim_job;
+        this->reclaimed_host_jobs[infinite_reclaim_job] = host_to_reclaim;
+    }
+
+    /**
+     * @brief Return a host that was previously reclaimed.
+     * @param hostname
+     */
+    void BatchComputeService::returnHost(const std::string &hostname) {
+#ifdef ENABLE_BATSCHED
+        throw std::runtime_error("BatchComputeService::returnHost(): Not available when using Batsched");
+#endif
+        // TODO: TO IMPLEMENT
+    }
+
+
+    /**
     * @brief Gets the state of the BatchComputeService queue
     * @return A vector of tuples:
     *              - std::string: username
@@ -771,7 +864,8 @@ namespace wrench {
 
         sg_size_t required_ram_per_host = job->getMemoryRequirement();
 
-        if ((requested_hosts > this->available_nodes_to_cores.size()) or
+        auto num_available_nodes = this->available_nodes_to_cores.size() - this->reclaimed_hosts.size();
+        if ((requested_hosts > num_available_nodes) or
             (requested_num_cores_per_host >
              static_cast<unsigned long>(this->available_nodes_to_cores.begin()->first->get_core_count())) or
             (required_ram_per_host >
@@ -1154,9 +1248,9 @@ namespace wrench {
             this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
+            this->batch_queue.erase(batch_pending_it); // This needs to be done BEFORE calling the scheduler's method
             this->scheduler->processJobTermination((*batch_pending_it));
             auto to_free = *batch_pending_it;
-            this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
         }
 #ifdef ENABLE_BATSCHED
@@ -1310,7 +1404,7 @@ namespace wrench {
                 if ((sscanf(value.c_str(), "%lu", &num_nodes) != 1) or (num_nodes == 0)) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
-                if (this->compute_hosts.size() < num_nodes) {
+                if (this->compute_hosts.size()  - this->reclaimed_hosts.size() < num_nodes) {
                     throw ExecutionException(std::make_shared<NotEnoughResources>(cjob, this->getSharedPtr<ComputeService>()));
                 }
             } else if (key == "-t") {
