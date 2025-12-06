@@ -22,6 +22,7 @@ WRENCH_LOG_CATEGORY(batch_compute_service_host_reclaim_test,
                     "Log category for BatchComputeServiceHostReclaimTest test");
 
 #define EPSILON 0.0001
+#define HOUR 3600.0
 
 std::vector<std::string> scheduling_algorithms = {"fcfs",  "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
 
@@ -33,8 +34,9 @@ public:
     void do_KillTooBigJob_test(std::string scheduling_algorithm);
     void do_TwoSmallJobsBehindBigOne_test(std::string scheduling_algorithm);
     void do_TwoSmallJobsBehindMediumOne_test(std::string scheduling_algorithm);
-    void do_BasicReclaimReturn_test(std::string scheduling_algorithm);
-    void do_LessBasicReclaimReturn_test(std::string scheduling_algorithm);
+    void do_BasicReclaimRelease_test(std::string scheduling_algorithm);
+    void do_LessBasicReclaimRelease_test(std::string scheduling_algorithm);
+    void do_EvenLessBasicReclaimRelease_test(std::string scheduling_algorithm);
 
     std::shared_ptr<wrench::Workflow> workflow;
 
@@ -727,9 +729,9 @@ void BatchComputeServiceHostReclaimTest::do_TwoSmallJobsBehindMediumOne_test(std
 /**  BASIC RECLAIM/RETURN TEST                                       **/
 /**********************************************************************/
 
-class BatchBasicReclaimReturnTestWMS : public wrench::ExecutionController {
+class BatchBasicReclaimReleaseTestWMS : public wrench::ExecutionController {
 public:
-    BatchBasicReclaimReturnTestWMS(BatchComputeServiceHostReclaimTest* test,
+    BatchBasicReclaimReleaseTestWMS(BatchComputeServiceHostReclaimTest* test,
                                      std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
                                      std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test),
                                                               batch_compute_service(std::move(batch_compute_service)) {
@@ -796,13 +798,13 @@ private:
         // Sleep for 10 seconds
         wrench::Simulation::sleep(10);
 
-        // Return Host2 (coverage)
+        // Release Host2 (coverage)
         try {
             this->test->compute_service->releaseHost("Host2");
             throw std::runtime_error("Should be able to return Host2 since it hasn't been reclaimed");
         } catch (std::exception& ignore) {}
 
-        // Return Host1
+        // Release Host1
         this->test->compute_service->releaseHost("Host1");
 
         {
@@ -843,18 +845,18 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimReturn) {
+TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
 #else
-TEST_F(BatchComputeServiceHostReclaimTest, ReclaimReturn) {
+TEST_F(BatchComputeServiceHostReclaimTest, ReclaimRelease) {
 #endif
     for (auto const &alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
-        std::cerr << "************ TESTING WITH " << alg << " ************\n";
-        DO_TEST_WITH_FORK_ONE_ARG(do_BasicReclaimReturn_test, alg);
+        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        DO_TEST_WITH_FORK_ONE_ARG(do_BasicReclaimRelease_test, alg);
     }
 }
 
-void BatchComputeServiceHostReclaimTest::do_BasicReclaimReturn_test(std::string scheduling_algorithm) {
+void BatchComputeServiceHostReclaimTest::do_BasicReclaimRelease_test(std::string scheduling_algorithm) {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
@@ -887,7 +889,7 @@ void BatchComputeServiceHostReclaimTest::do_BasicReclaimReturn_test(std::string 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-        new BatchBasicReclaimReturnTestWMS(this, compute_service, hostname)));
+        new BatchBasicReclaimReleaseTestWMS(this, compute_service, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -903,9 +905,9 @@ void BatchComputeServiceHostReclaimTest::do_BasicReclaimReturn_test(std::string 
 /**  LESS BASIC RECLAIM/RETURN TEST                                  **/
 /**********************************************************************/
 
-class BatchLessBasicReclaimReturnTestWMS : public wrench::ExecutionController {
+class BatchLessBasicReclaimReleaseTestWMS : public wrench::ExecutionController {
 public:
-    BatchLessBasicReclaimReturnTestWMS(BatchComputeServiceHostReclaimTest* test,
+    BatchLessBasicReclaimReleaseTestWMS(BatchComputeServiceHostReclaimTest* test,
                                      std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
                                      std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test),
                                                               batch_compute_service(std::move(batch_compute_service)) {
@@ -973,7 +975,7 @@ private:
 
         wrench::Simulation::sleep(10);
 
-        // Return Host1
+        // Release Host1
         this->test->compute_service->releaseHost("Host1");
 
         // At this point, the third job should start as well
@@ -1009,18 +1011,18 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimReturn) {
+TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
 #else
-TEST_F(BatchComputeServiceHostReclaimTest, LessBasicReclaimReturn) {
+TEST_F(BatchComputeServiceHostReclaimTest, LessBasicReclaimRelease) {
 #endif
     for (auto const &alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
-        std::cerr << "************ TESTING WITH " << alg << " ************\n";
-        DO_TEST_WITH_FORK_ONE_ARG(do_LessBasicReclaimReturn_test, alg);
+        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        DO_TEST_WITH_FORK_ONE_ARG(do_LessBasicReclaimRelease_test, alg);
     }
 }
 
-void BatchComputeServiceHostReclaimTest::do_LessBasicReclaimReturn_test(std::string scheduling_algorithm) {
+void BatchComputeServiceHostReclaimTest::do_LessBasicReclaimRelease_test(std::string scheduling_algorithm) {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
@@ -1053,7 +1055,7 @@ void BatchComputeServiceHostReclaimTest::do_LessBasicReclaimReturn_test(std::str
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-        new BatchLessBasicReclaimReturnTestWMS(this, compute_service, hostname)));
+        new BatchLessBasicReclaimReleaseTestWMS(this, compute_service, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1064,3 +1066,183 @@ void BatchComputeServiceHostReclaimTest::do_LessBasicReclaimReturn_test(std::str
     free(argv);
 }
 
+
+/**********************************************************************/
+/**  EVENLESS BASIC RECLAIM/RETURN TEST                              **/
+/**********************************************************************/
+
+
+class BatchEvenLessBasicReclaimReleaseTestWMS : public wrench::ExecutionController {
+public:
+    BatchEvenLessBasicReclaimReleaseTestWMS(BatchComputeServiceHostReclaimTest* test,
+                                     std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
+                                     std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test),
+                                                              batch_compute_service(std::move(batch_compute_service)) {
+    }
+
+private:
+    BatchComputeServiceHostReclaimTest* test;
+    std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
+
+    int main() override {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        {
+            // Submit a  job that uses  3 hosts and submit it (this one will start)
+            auto job = job_manager->createCompoundJob("A");
+            double sleep_time = 3 * HOUR;
+            auto action = job->addSleepAction("", sleep_time);
+
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "3";
+            service_specific_args["-c"] = "10";
+            service_specific_args["-t"] = std::to_string(sleep_time);
+            job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+        }
+
+        {
+            // Submit a second  job that uses only one host and submit it (this one will start
+            auto job = job_manager->createCompoundJob("B");
+            double sleep_time = 10 * HOUR;
+            auto action = job->addSleepAction("", sleep_time);
+
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "1";
+            service_specific_args["-c"] = "10";
+            service_specific_args["-t"] = std::to_string(sleep_time);
+            job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+        }
+
+        {
+            // Submit a third  job that uses only two hosts and submit it (this one will be waiting)
+            auto job = job_manager->createCompoundJob("C");
+            double sleep_time = 3 * HOUR;
+            auto action = job->addSleepAction("", sleep_time);
+
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "2";
+            service_specific_args["-c"] = "10";
+            service_specific_args["-t"] = std::to_string(sleep_time);
+            job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+        }
+
+        {
+            // Submit a fourth  job that uses only two hosts and submit it (this one will be waiting)
+            auto job = job_manager->createCompoundJob("D");
+            double sleep_time = 4 * HOUR;
+            auto action = job->addSleepAction("", sleep_time);
+
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args["-N"] = "2";
+            service_specific_args["-c"] = "10";
+            service_specific_args["-t"] = std::to_string(sleep_time);
+            job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+        }
+
+
+        // Sleep for 1 hour
+        wrench::Simulation::sleep(1 * HOUR);
+
+        // Reclaim Host1
+        this->test->compute_service->reclaimHost("Host1"); // Should kill Job "A"
+
+        // At this point, the first job has been killed, and the second job should start immediately
+        {
+            // Wait for the workflow execution event
+            auto event = this->waitForNextEvent();
+            auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
+            if (not real_event) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+            if (real_event->job->getName() != "A") {
+                throw std::runtime_error("Wrong job was killed!");
+            }
+        }
+
+        // Sleep for 1 hour
+        wrench::Simulation::sleep(1 * HOUR);
+
+        // Release Host1
+        this->test->compute_service->releaseHost("Host1");
+
+        // At this point, we will get three completions in a row
+        std::vector<std::pair<std::string, double>> expected_events = {{"C", 4}, {"D", 8}, {"B", 10}};
+        for (int i=0; i < 3; i++) {
+            // Wait for the workflow execution event
+            auto event = this->waitForNextEvent();
+            auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event);
+            if (not real_event) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+
+            if (real_event->job->getName() != expected_events[i].first) {
+                throw std::runtime_error("Unexpected job in event #" + std::to_string(i) + ": " + real_event->job->getName());
+            }
+            if (fabs(real_event->job->getEndDate() - expected_events[i].second * HOUR) > EPSILON) {
+                throw std::runtime_error("Unexpected job completion date for job " + real_event->job->getName() + ": " + std::to_string(wrench::Simulation::getCurrentSimulatedDate() / HOUR));
+            }
+        }
+
+        // Stop the Job Manager manually, just for kicks
+        job_manager->stop();
+
+        return 0;
+    }
+};
+
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
+#else
+TEST_F(BatchComputeServiceHostReclaimTest, EvenLessBasicReclaimRelease) {
+#endif
+    for (auto const &alg : scheduling_algorithms) {
+        SCOPED_TRACE("Algorithm: " + alg);
+        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        DO_TEST_WITH_FORK_ONE_ARG(do_EvenLessBasicReclaimRelease_test, alg);
+    }
+}
+
+void BatchComputeServiceHostReclaimTest::do_EvenLessBasicReclaimRelease_test(std::string scheduling_algorithm) {
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("batch_host_reclaim_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+        new wrench::BatchComputeService("Host1",
+            {"Host1", "Host2", "Host3", "Host4"},
+            "",
+            {
+            {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, scheduling_algorithm},
+            })));
+
+    // Create a Controller
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+        new BatchEvenLessBasicReclaimReleaseTestWMS(this, compute_service, hostname)));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
