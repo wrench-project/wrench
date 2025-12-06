@@ -124,7 +124,7 @@ namespace wrench {
         std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> getQueue();
 
         void reclaimHost(const std::string &hostname);
-        void returnHost(const std::string &hostname);
+        void releaseHost(const std::string &hostname);
 
         /***********************/
         /** \endcond          **/

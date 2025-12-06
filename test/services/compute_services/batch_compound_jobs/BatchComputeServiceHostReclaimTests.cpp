@@ -798,12 +798,12 @@ private:
 
         // Return Host2 (coverage)
         try {
-            this->test->compute_service->returnHost("Host2");
+            this->test->compute_service->releaseHost("Host2");
             throw std::runtime_error("Should be able to return Host2 since it hasn't been reclaimed");
         } catch (std::exception& ignore) {}
 
         // Return Host1
-        this->test->compute_service->returnHost("Host1");
+        this->test->compute_service->releaseHost("Host1");
 
         {
             // Submit a compound job that uses 4 hosts and submit it (this one will start)
@@ -974,7 +974,7 @@ private:
         wrench::Simulation::sleep(10);
 
         // Return Host1
-        this->test->compute_service->returnHost("Host1");
+        this->test->compute_service->releaseHost("Host1");
 
         // At this point, the third job should start as well
         {

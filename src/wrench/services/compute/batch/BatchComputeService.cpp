@@ -338,7 +338,7 @@ namespace wrench {
      * @brief Return a host that was previously reclaimed.
      * @param hostname
      */
-    void BatchComputeService::returnHost(const std::string &hostname) {
+    void BatchComputeService::releaseHost(const std::string &hostname) {
 #ifdef ENABLE_BATSCHED
         throw std::runtime_error("BatchComputeService::returnHost(): Not available when using Batsched");
 #endif
