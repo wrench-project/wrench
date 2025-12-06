@@ -44,21 +44,8 @@ namespace wrench {
                     batch_job->getJobID(), batch_job->getRequestedNumNodes());
     }
 
-    /**
-     * @brief Method to schedule (possibly) the next jobs to be scheduled
-     */
-    void EasyBackfillingBatchScheduler::processQueuedJobs() {
-        if (this->cs->batch_queue.empty()) {
-            return;
-        }
-
-
-        // Update the time origin
-        double now = Simulation::getCurrentSimulatedDate();
-//        std::cerr << "** [" <<  now << "] IN PROCESSING QUEUE JOB (" << this->cs->batch_queue.size() << " JOBS IN THE QUEUE)" << std::endl;
-        this->schedule->setTimeOrigin(static_cast<u_int32_t>(now));
-
-        // While the first job can be scheduled now, schedule it
+    void EasyBackfillingBatchScheduler::processBatchQueue() {
+ // While the first job can be scheduled now, schedule it
         unsigned int i;
         for (i = 0; i < this->cs->batch_queue.size(); i++) {
             auto first_job = this->cs->batch_queue.at(i);
@@ -152,6 +139,23 @@ namespace wrench {
                 }
             }
         }
+    }
+
+    /**
+     * @brief Method to schedule (possibly) the next jobs to be scheduled
+     */
+    void EasyBackfillingBatchScheduler::processQueuedJobs() {
+        if (this->cs->batch_queue.empty()) {
+            return;
+        }
+
+        // Update the time origin
+        double now = Simulation::getCurrentSimulatedDate();
+//        std::cerr << "** [" <<  now << "] IN PROCESSING QUEUE JOB (" << this->cs->batch_queue.size() << " JOBS IN THE QUEUE)" << std::endl;
+        this->schedule->setTimeOrigin(static_cast<u_int32_t>(now));
+
+        // Process the jobs in the batch queue and update the schedule
+        this->processBatchQueue();
 
 //        this->schedule->print();
 //        std::cerr << "STARTING ALL THE JOBS THAT WERE SCHEDULED, GIVEN THE ABOVE SCHEDULE\n";
@@ -162,6 +166,11 @@ namespace wrench {
         for (auto const &batch_job: next_jobs) {
             // If the job has already been allocated resources, it's already running anyway
             if (not batch_job->resources_allocated.empty()) {
+                continue;
+            }
+
+            // If the job is a reclaim job, ignore it
+            if (not batch_job->getCompoundJob()) {
                 continue;
             }
 
@@ -282,9 +291,23 @@ namespace wrench {
      */
     void EasyBackfillingBatchScheduler::processReclaimedHost(simgrid::s4u::Host* host,
         std::shared_ptr<BatchJob> reclaim_job) {
+
+        // Clear the schedule
+        this->schedule->clear();
+
+        // Re-create the schedule for all running jobs
+        for (const auto & [fst, snd] : this->cs->running_jobs) {
+            this->schedule->addSlotForRunningJob(snd);
+        }
+
+        // Insert the reclaim job
         this->schedule->add(this->schedule->getTimeOrigin(), UINT32_MAX, reclaim_job);
-        reclaim_job->easy_bf_start_date = this->schedule->getTimeOrigin();
-        reclaim_job->easy_bf_expected_end_date = UINT32_MAX;
+        reclaim_job->conservative_bf_start_date = this->schedule->getTimeOrigin();
+        reclaim_job->conservative_bf_expected_end_date = UINT32_MAX;
+
+        // Rebuild the whole schedule
+        this->processBatchQueue();
+
     }
 
 }// namespace wrench

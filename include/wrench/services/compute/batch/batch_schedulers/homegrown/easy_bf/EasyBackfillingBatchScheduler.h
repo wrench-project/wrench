@@ -29,6 +29,7 @@ namespace wrench {
         explicit EasyBackfillingBatchScheduler(BatchComputeService *cs, int depth, unsigned long backfilling_depth);
 
         void processQueuedJobs() override;
+        void processBatchQueue();
 
         void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
         void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;

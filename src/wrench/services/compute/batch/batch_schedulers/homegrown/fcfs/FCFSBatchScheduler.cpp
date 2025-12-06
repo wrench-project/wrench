@@ -285,15 +285,15 @@ namespace wrench {
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long requested_time = batch_job->getRequestedTime();
 
-            //      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
-            //                  (unsigned long)batch_job,
-            //                  workflow_job->getName().c_str());
+            // WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
+            //             batch_job->getJobID(),
+            //             compound_job->getName().c_str());
             //        std::map<std::string, std::tuple<unsigned long, double>> resources;
 
             auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for,
                                                    ComputeService::ALL_RAM);
             if (resources.empty()) {
-                //                WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
+                // WRENCH_INFO("Can't run job %s right now", compound_job->getName().c_str());
                 break;
             }
 

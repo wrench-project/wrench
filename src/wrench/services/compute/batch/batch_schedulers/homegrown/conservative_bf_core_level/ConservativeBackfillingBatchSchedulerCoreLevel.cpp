@@ -320,9 +320,6 @@ namespace wrench {
   */
     void ConservativeBackfillingBatchSchedulerCoreLevel::processReclaimedHost(simgrid::s4u::Host* host,
         std::shared_ptr<BatchJob> reclaim_job) {
-        auto est = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
-        this->schedule->add(est, UINT32_MAX, reclaim_job);
-        reclaim_job->conservative_bf_start_date = est;
-        reclaim_job->conservative_bf_expected_end_date =UINT32_MAX;
+        throw std::runtime_error("ConservativeBackfillingBatchSchedulerCoreLevel::processReclaimedHost(): Not implemented/supported for this scheduling algorithm");
     }
 }// namespace wrench

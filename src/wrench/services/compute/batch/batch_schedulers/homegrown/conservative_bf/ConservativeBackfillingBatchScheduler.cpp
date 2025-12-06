@@ -70,7 +70,7 @@ namespace wrench {
         // Update the time origin
         this->schedule->setTimeOrigin(static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate()));
 
-        // Start  all non-started the jobs in the next slot!
+        // Start all non-started the jobs in the next slot!
         std::set<std::shared_ptr<BatchJob>> next_jobs = this->schedule->getJobsInFirstSlot();
         if (next_jobs.empty()) {
             this->compactSchedule();
@@ -80,6 +80,11 @@ namespace wrench {
         for (auto const &batch_job: next_jobs) {
             // If the job has already been allocated resources, it's already running anyway
             if (not batch_job->resources_allocated.empty()) {
+                continue;
+            }
+
+            // If the job is a reclaim job, ignore it
+            if (not batch_job->getCompoundJob()) {
                 continue;
             }
 
@@ -139,7 +144,7 @@ namespace wrench {
 
             // Remove the job from the schedule
             //            WRENCH_INFO("REMOVING IT FROM SCHEDULE");
-            this->schedule->remove(batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date + 100, batch_job);
+            this->schedule->remove(batch_job->conservative_bf_start_date, (batch_job->getCompoundJob() ? batch_job->conservative_bf_expected_end_date + 100 : UINT32_MAX), batch_job);
             //            this->schedule->print();
 
             // Find the earliest start time
@@ -192,12 +197,15 @@ namespace wrench {
      * @param batch_job: the job that completed
      */
     void ConservativeBackfillingBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
-        WRENCH_INFO("Notified of completion of BatchComputeService job %s, %lu",
-            batch_job->compound_job->getName().c_str(), batch_job->getJobID());
+        auto cj = batch_job->compound_job;
+        if (cj) {
+            WRENCH_INFO("Notified of completion of BatchComputeService job %s, %lu",
+                batch_job->compound_job->getName().c_str(), batch_job->getJobID());
+        }
 
         auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
         this->schedule->setTimeOrigin(now);
-        this->schedule->remove(now, batch_job->conservative_bf_expected_end_date + 100, batch_job);
+        this->schedule->remove(now, (cj ? batch_job->conservative_bf_expected_end_date + 100 : UINT32_MAX), batch_job);
 
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
@@ -296,8 +304,31 @@ namespace wrench {
   */
     void ConservativeBackfillingBatchScheduler::processReclaimedHost(simgrid::s4u::Host* host,
         std::shared_ptr<BatchJob> reclaim_job) {
+
+        // Clear the schedule
+        this->schedule->clear();
+
+        // Re-create the schedule for all running jobs
+        for (const auto & [fst, snd] : this->cs->running_jobs) {
+            this->schedule->addSlotForRunningJob(snd);
+        }
+
+        // Insert the reclaim job
         this->schedule->add(this->schedule->getTimeOrigin(), UINT32_MAX, reclaim_job);
-        reclaim_job->easy_bf_start_date = this->schedule->getTimeOrigin();
-        reclaim_job->easy_bf_expected_end_date = UINT32_MAX;
+        reclaim_job->conservative_bf_start_date = this->schedule->getTimeOrigin();
+        reclaim_job->conservative_bf_expected_end_date = UINT32_MAX;
+
+        // Rebuild the whole schedule
+        for (const auto &batch_job:  this->cs->batch_queue) {
+            // This is essentially a copy-paste the scheduling code above
+            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes(), nullptr);
+            //        WRENCH_INFO("The Earliest start time is: %u", est);
+
+            // Insert it in the schedule
+            this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
+            batch_job->conservative_bf_start_date = est;
+            batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
+        }
+
     }
 }// namespace wrench

@@ -36,6 +36,7 @@ namespace wrench {
         void add(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) { update(true, start, end, std::move(job)); }
         void remove(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) { update(false, start, end, std::move(job)); }
         void clear();
+        void addSlotForRunningJob(const std::shared_ptr<BatchJob> &job);
         void print();
         std::set<std::shared_ptr<BatchJob>> getJobsInFirstSlot();
         u_int32_t findEarliestStartTime(uint32_t duration, unsigned long num_nodes, unsigned long *num_available_nodes_at_that_time);

@@ -47,6 +47,16 @@ namespace wrench {
     }
 
     /**
+     * @brief Method to add a slot for a running job
+     */
+    void NodeAvailabilityTimeLine::addSlotForRunningJob(const std::shared_ptr<BatchJob> &job) {
+        auto job_set = new BatchJobSet();
+        job_set->add(job);
+        this->availability_timeslots +=
+                    make_pair(boost::icl::interval<u_int32_t>::right_open(this->getTimeOrigin(), job->conservative_bf_expected_end_date), *job_set);
+    }
+
+    /**
      * @brief Method to set the node availability timeline's time origin
      * @param t: a date
      */

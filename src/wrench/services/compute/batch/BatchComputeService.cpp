@@ -252,7 +252,7 @@ namespace wrench {
     /**
      * @brief Preempt a host by: (i) brutally terminating the jobs that are running on that host; and (ii)
      *        making that host unavailable until the returnHost method is called.
-     * @param hostname
+     * @param hostname the name of the host to reclaim
      */
     void BatchComputeService::reclaimHost(const std::string &hostname) {
 #ifdef ENABLE_BATSCHED
@@ -320,6 +320,7 @@ namespace wrench {
         // Create an infinite reclaim job that uses all cores of a node
         auto infinite_reclaim_job = std::make_shared<BatchJob>(nullptr, wrench::BatchComputeService::generateUniqueJobID(),
             ULONG_MAX, 1, this->num_cores_per_node, "reclaim", -1, S4U_Simulation::getClock());
+        infinite_reclaim_job->setAllocatedResources({{host_to_reclaim, std::make_pair(this->num_cores_per_node, ComputeService::ALL_RAM)}});
 
         // TODO: Start the infinite job on the reclaimed host right away
         this->available_nodes_to_cores[host_to_reclaim] = 0;
@@ -328,6 +329,9 @@ namespace wrench {
         // Keep track of the host-reclaim job (so that it can be returned/un-reclaimed later)
         this->reclaimed_hosts[host_to_reclaim] = infinite_reclaim_job;
         this->reclaimed_host_jobs[infinite_reclaim_job] = host_to_reclaim;
+
+        // Invoke the scheduler as perhaps some jobs can now run right-away!
+        this->scheduler->processQueuedJobs();
     }
 
     /**
@@ -338,7 +342,26 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
         throw std::runtime_error("BatchComputeService::returnHost(): Not available when using Batsched");
 #endif
-        // TODO: TO IMPLEMENT
+        auto host_to_reclaim = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
+        if (host_to_reclaim == nullptr) {
+            throw std::invalid_argument("BatchComputeService::reclaimHost(): unknown physical host '" + hostname + "'");
+        }
+        if (this->reclaimed_hosts.find(host_to_reclaim) == this->reclaimed_hosts.end()) {
+            throw std::invalid_argument("BatchComputeService::reclaimHost(): Host '" + hostname + "' was not previously reclaimed");
+        }
+
+        // Untrack the reclaim job
+        auto reclaim_job = this->reclaimed_hosts[host_to_reclaim];
+        this->reclaimed_hosts.erase(host_to_reclaim);
+        this->reclaimed_host_jobs.erase(reclaim_job);
+
+        // Terminate the reclaim job
+        this->freeUpResources(reclaim_job->getResourcesAllocated());
+        this->scheduler->processJobTermination(reclaim_job);
+        this->removeBatchJobFromJobsList(reclaim_job);
+
+        // Invoke the scheduler as perhaps some jobs can now run right-away!
+        this->scheduler->processQueuedJobs();
     }
 
 
