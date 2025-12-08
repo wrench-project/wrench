@@ -60,10 +60,10 @@ namespace wrench {
         friend class NodeAvailabilityTimeLine;
         friend class CoreAvailabilityTimeLine;
 
-        u_int32_t easy_bf_start_date;               // Field used by EASY_BF
-        u_int32_t easy_bf_expected_end_date;        // Field used by EASY_BF
-        u_int32_t conservative_bf_start_date;       // Field used by CONSERVATIVE_BF
-        u_int32_t conservative_bf_expected_end_date;// Field used by CONSERVATIVE_BF
+        u_int32_t easy_bf_start_date = 0;                // Field used by EASY_BF
+        u_int32_t easy_bf_expected_end_date = 0;         // Field used by EASY_BF
+        u_int32_t conservative_bf_start_date = 0;        // Field used by CONSERVATIVE_BF
+        u_int32_t conservative_bf_expected_end_date = 0; // Field used by CONSERVATIVE_BF
 
         unsigned long job_id;
         unsigned long requested_num_nodes;
