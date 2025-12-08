@@ -257,8 +257,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Preempt hosts by: (i) brutally terminating the jobs that are running on these hosts; and (ii)
-     *        making that hosts unavailable until releaseHost is called.
+     * @brief Reclaim a set of hosts, which will: (i) terminate the jobs that are running on any of these hosts; and (ii)
+     *        make these hosts unavailable until they are released. 
      * @param hostnames: the list of the hostnames of the hosts to reclaim
      */
     void BatchComputeService::reclaimHosts(const std::set<std::string>& hostnames) {
@@ -370,8 +370,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Return hosts that wer previously reclaimed (together)
-     * @param hostnames: list of hostnames for the hosts to return
+     * @brief Release hosts that were previously reclaimed (as a set)
+     * @param hostnames: list of hostnames of the hosts to release
      */
     void BatchComputeService::releaseHosts(const std::set<std::string>& hostnames) {
 #ifdef ENABLE_BATSCHED
