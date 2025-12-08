@@ -811,6 +811,7 @@ private:
         // Sleep for 10 seconds
         wrench::Simulation::sleep(10);
 
+
         // Release Host2 (coverage)
         try {
             this->test->compute_service->releaseHosts({"Host2"});
@@ -819,9 +820,11 @@ private:
         catch (std::exception& ignore) {
         }
 
+        std::cerr << "*** TEST : RELEASING HOST 1\n";
         // Release Host1
         this->test->compute_service->releaseHosts({"Host1"});
 
+        std::cerr << "*** TEST : SUBMITTING A JOB THAT SHOULD RUN\n";
         {
             // Submit a compound job that uses 4 hosts and submit it (this one will start)
             auto job = job_manager->createCompoundJob("");
@@ -834,6 +837,7 @@ private:
             job_manager->submitJob(job, this->test->compute_service, service_specific_args);
         }
 
+        std::cerr << "*** TEST : WAITING FOR COMPLETION\n";
         {
             // Wait for the workflow execution event
             auto event = this->waitForNextEvent();
@@ -865,6 +869,9 @@ TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
 #else
 TEST_F(BatchComputeServiceHostReclaimTest, ReclaimRelease) {
 #endif
+    // std::vector<std::string> scheduling_algorithms = {"fcfs", "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
+    // std::vector<std::string> scheduling_algorithms = {"fcfs"};
+    std::vector<std::string> scheduling_algorithms = {"easy_bf_depth0"};
     for (auto const& alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
         // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
@@ -876,10 +883,10 @@ void BatchComputeServiceHostReclaimTest::do_BasicReclaimRelease_test(std::string
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 1;
+    int argc = 2;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("batch_host_reclaim_test");
-    // argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

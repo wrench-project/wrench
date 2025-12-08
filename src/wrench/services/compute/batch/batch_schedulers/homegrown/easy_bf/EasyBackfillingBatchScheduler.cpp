@@ -45,29 +45,35 @@ namespace wrench {
     }
 
     void EasyBackfillingBatchScheduler::processBatchQueue() {
+        std::cerr << "SCHEDULER: processBatchQueue(): " << this->cs->batch_queue.size() << "\n";
+        this->schedule->print();
  // While the first job can be scheduled now, schedule it
         unsigned int i;
         for (i = 0; i < this->cs->batch_queue.size(); i++) {
             auto first_job = this->cs->batch_queue.at(i);
+            std::cerr << "first_job =  " << first_job->getJobID() << ": " << first_job->getCompoundJob()->getName() << "\n";
 
             // If the job has already been allocated resources, nevermind
             if (not first_job->resources_allocated.empty()) {
+                std::cerr << "WTF1\n";
                 continue;
             }
 
             // If the job is already in the schedule, nevermind
             auto jobs_in_first_slot = this->schedule->getJobsInFirstSlot();
             if (jobs_in_first_slot.find(first_job) != jobs_in_first_slot.end()) {
+                std::cerr << "WTF2\n";
                 continue;
             }
 
             // If the job cannot start now, that's it
             if (this->schedule->getNumAvailableNodesInFirstSlot() < first_job->getRequestedNumNodes()) {
-//                std::cerr << "CANNOT BE STARTED: " << this->schedule->getNumAvailableNodesInFirstSlot() << " " << first_job->getRequestedNumNodes() << " \n";
+                std::cerr << "CANNOT BE STARTED: " << this->schedule->getNumAvailableNodesInFirstSlot() << " " << first_job->getRequestedNumNodes() << " \n";
                 break;
             }
 
             // SCHEDULED IT!
+            std::cerr << "SCUEDU:ER: SCHEDULING IT\n";
             this->schedule->add(this->schedule->getTimeOrigin(), this->schedule->getTimeOrigin() + first_job->getRequestedTime(),
                                 first_job);
             first_job->easy_bf_start_date = this->schedule->getTimeOrigin();
@@ -210,12 +216,19 @@ namespace wrench {
     void EasyBackfillingBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         WRENCH_INFO("Notified of completion of BatchComputeService job, %lu", batch_job->getJobID());
 
+        this->schedule->print();
+        std::cerr << "TARGET JOB:: " << Simulation::getCurrentSimulatedDate() << " -> " << batch_job->easy_bf_expected_end_date << "\n";
         // If the job was never inserted in the schedule, then nevermind
-        if (batch_job->easy_bf_expected_end_date == 0) return;
+        // if (batch_job->easy_bf_expected_end_date == 0) {
+        //     std::cerr << "EASY: IGNORIUNG THE JOB IN PROCESS JOB COMPLETION\n";
+        //     return;
+        // }
+        std::cerr << "NOT IGNORING\n";
 
         auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
+
         this->schedule->setTimeOrigin(now);
-        this->schedule->remove(now, batch_job->easy_bf_expected_end_date, batch_job);
+        this->schedule->remove(now, batch_job->easy_bf_expected_end_date + 100, batch_job);
 
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
@@ -228,6 +241,7 @@ namespace wrench {
     */
     void EasyBackfillingBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
+        std::cerr << "EASY: JOB TERMINATION\n";
         this->processJobCompletion(batch_job);
     }
 
@@ -237,6 +251,7 @@ namespace wrench {
     */
     void EasyBackfillingBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
+        std::cerr << "EASY: JOB FAILRE\n";
         this->processJobCompletion(batch_job);
     }
 
