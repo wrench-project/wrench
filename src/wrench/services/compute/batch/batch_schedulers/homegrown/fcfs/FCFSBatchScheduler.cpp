@@ -49,7 +49,7 @@ namespace wrench {
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
-        if (num_nodes > cs->available_nodes_to_cores.size() - cs->reclaimed_hosts.size()) { // shouldn't happen
+        if (num_nodes > cs->available_nodes_to_cores.size() - cs->num_reclaimed_hosts) { // shouldn't happen
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->
@@ -273,7 +273,7 @@ namespace wrench {
             // Invoke the scheduler to pick a job to schedule
             auto batch_job = this->pickNextJobToSchedule();
             if (batch_job == nullptr) {
-                WRENCH_INFO("No pending jobs to schedule");
+                // WRENCH_INFO("No pending jobs to schedule");
                 break;
             }
 
@@ -356,7 +356,7 @@ namespace wrench {
      * @param host the host
      * @param reclaim_job the reclaim job
      */
-    void FCFSBatchScheduler::processReclaimedHost(simgrid::s4u::Host* host, std::shared_ptr<BatchJob> reclaim_job) {
+    void FCFSBatchScheduler::processReclaimedHosts(const std::set<simgrid::s4u::Host*> &host, std::shared_ptr<BatchJob> reclaim_job) {
         // Do nothing
     }
 

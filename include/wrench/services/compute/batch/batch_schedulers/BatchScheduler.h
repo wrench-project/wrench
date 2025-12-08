@@ -105,7 +105,7 @@ namespace wrench {
          */
         virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) = 0;
 
-        virtual void processReclaimedHost(simgrid::s4u::Host *host, std::shared_ptr<BatchJob> reclaim_job) = 0;
+        virtual void processReclaimedHosts(const std::set<simgrid::s4u::Host*> &hosts, std::shared_ptr<BatchJob> reclaim_job) = 0;
 
     protected:
         /**
