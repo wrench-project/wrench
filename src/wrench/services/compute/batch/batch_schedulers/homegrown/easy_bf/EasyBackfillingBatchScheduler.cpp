@@ -45,8 +45,7 @@ namespace wrench {
     }
 
     void EasyBackfillingBatchScheduler::processBatchQueue() {
-        this->schedule->print();
- // While the first job can be scheduled now, schedule it
+        // While the first job can be scheduled now, schedule it
         unsigned int i;
         for (i = 0; i < this->cs->batch_queue.size(); i++) {
             auto first_job = this->cs->batch_queue.at(i);

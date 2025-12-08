@@ -24,8 +24,7 @@ WRENCH_LOG_CATEGORY(batch_compute_service_host_reclaim_test,
 #define EPSILON 0.0001
 #define HOUR 3600.0
 
-// std::vector<std::string> scheduling_algorithms = {"fcfs", "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
-std::vector<std::string> scheduling_algorithms = {"conservative_bf"};
+std::vector<std::string> scheduling_algorithms = {"fcfs", "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
 
 class BatchComputeServiceHostReclaimTest : public ::testing::Test {
 public:
