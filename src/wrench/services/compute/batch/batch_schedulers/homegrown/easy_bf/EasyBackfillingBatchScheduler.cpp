@@ -45,35 +45,29 @@ namespace wrench {
     }
 
     void EasyBackfillingBatchScheduler::processBatchQueue() {
-        std::cerr << "SCHEDULER: processBatchQueue(): " << this->cs->batch_queue.size() << "\n";
         this->schedule->print();
  // While the first job can be scheduled now, schedule it
         unsigned int i;
         for (i = 0; i < this->cs->batch_queue.size(); i++) {
             auto first_job = this->cs->batch_queue.at(i);
-            std::cerr << "first_job =  " << first_job->getJobID() << ": " << first_job->getCompoundJob()->getName() << "\n";
 
             // If the job has already been allocated resources, nevermind
             if (not first_job->resources_allocated.empty()) {
-                std::cerr << "WTF1\n";
                 continue;
             }
 
             // If the job is already in the schedule, nevermind
             auto jobs_in_first_slot = this->schedule->getJobsInFirstSlot();
             if (jobs_in_first_slot.find(first_job) != jobs_in_first_slot.end()) {
-                std::cerr << "WTF2\n";
                 continue;
             }
 
             // If the job cannot start now, that's it
             if (this->schedule->getNumAvailableNodesInFirstSlot() < first_job->getRequestedNumNodes()) {
-                std::cerr << "CANNOT BE STARTED: " << this->schedule->getNumAvailableNodesInFirstSlot() << " " << first_job->getRequestedNumNodes() << " \n";
                 break;
             }
 
             // SCHEDULED IT!
-            std::cerr << "SCUEDU:ER: SCHEDULING IT\n";
             this->schedule->add(this->schedule->getTimeOrigin(), this->schedule->getTimeOrigin() + first_job->getRequestedTime(),
                                 first_job);
             first_job->easy_bf_start_date = this->schedule->getTimeOrigin();
