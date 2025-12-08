@@ -326,7 +326,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_KillTooBigJob) {
 #else
 TEST_F(BatchComputeServiceHostReclaimTest, KillTooBigJob) {
 #endif
-    std::vector<std::string> scheduling_algorithms = {"easy_bf_depth0"};
+    std::vector<std::string> scheduling_algorithms = {"easy_bf_depth1"};
     for (auto const& alg : scheduling_algorithms) {
         // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_KillTooBigJob_test, alg);
