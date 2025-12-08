@@ -1,5 +1,9 @@
 WRENCH Release Notes
 ------
+### wrench 2.9-dev
+
+  - Implementation of `reclaimHosts()` and `releaseHosts()` methods for the batch compute service, by which one can make compute nodes temporarily (or permanently) unavailable at runtime at any time throughout the simulation.
+
 ### wrench 2.8
 
 (Nov 12, 2025) This releases includes **minor enhancements and updates**, and an **upgrade to SimGrid 4.1** (although it should still work with SimGrid 4.0). More specifically:
