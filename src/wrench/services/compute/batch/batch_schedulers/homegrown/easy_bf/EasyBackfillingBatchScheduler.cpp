@@ -216,19 +216,13 @@ namespace wrench {
     void EasyBackfillingBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         WRENCH_INFO("Notified of completion of BatchComputeService job, %lu", batch_job->getJobID());
 
-        this->schedule->print();
-        std::cerr << "TARGET JOB:: " << Simulation::getCurrentSimulatedDate() << " -> " << batch_job->easy_bf_expected_end_date << "\n";
-        // If the job was never inserted in the schedule, then nevermind
-        // if (batch_job->easy_bf_expected_end_date == 0) {
-        //     std::cerr << "EASY: IGNORIUNG THE JOB IN PROCESS JOB COMPLETION\n";
-        //     return;
-        // }
-        std::cerr << "NOT IGNORING\n";
-
         auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
 
         this->schedule->setTimeOrigin(now);
-        this->schedule->remove(now, batch_job->easy_bf_expected_end_date + 100, batch_job);
+
+        // Is this padding really useful???
+        u_int32_t padding = std::min<u_int32_t>(UINT32_MAX - batch_job->easy_bf_expected_end_date, 100);
+        this->schedule->remove(now, batch_job->easy_bf_expected_end_date + padding, batch_job);
 
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
@@ -241,7 +235,6 @@ namespace wrench {
     */
     void EasyBackfillingBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
-        std::cerr << "EASY: JOB TERMINATION\n";
         this->processJobCompletion(batch_job);
     }
 
@@ -251,7 +244,6 @@ namespace wrench {
     */
     void EasyBackfillingBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
-        std::cerr << "EASY: JOB FAILRE\n";
         this->processJobCompletion(batch_job);
     }
 
@@ -320,8 +312,8 @@ namespace wrench {
 
         // Insert the reclaim job
         this->schedule->add(this->schedule->getTimeOrigin(), UINT32_MAX, reclaim_job);
-        reclaim_job->conservative_bf_start_date = this->schedule->getTimeOrigin();
-        reclaim_job->conservative_bf_expected_end_date = UINT32_MAX;
+        reclaim_job->easy_bf_start_date = this->schedule->getTimeOrigin();
+        reclaim_job->easy_bf_expected_end_date = UINT32_MAX;
 
         // Rebuild the whole schedule
         this->processBatchQueue();

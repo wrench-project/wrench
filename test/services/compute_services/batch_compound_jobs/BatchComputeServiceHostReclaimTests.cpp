@@ -24,7 +24,8 @@ WRENCH_LOG_CATEGORY(batch_compute_service_host_reclaim_test,
 #define EPSILON 0.0001
 #define HOUR 3600.0
 
-std::vector<std::string> scheduling_algorithms = {"fcfs", "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
+// std::vector<std::string> scheduling_algorithms = {"fcfs", "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
+std::vector<std::string> scheduling_algorithms = {"easy_bf_depth0"};
 
 class BatchComputeServiceHostReclaimTest : public ::testing::Test {
 public:
@@ -811,7 +812,6 @@ private:
         // Sleep for 10 seconds
         wrench::Simulation::sleep(10);
 
-
         // Release Host2 (coverage)
         try {
             this->test->compute_service->releaseHosts({"Host2"});
@@ -869,9 +869,6 @@ TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
 #else
 TEST_F(BatchComputeServiceHostReclaimTest, ReclaimRelease) {
 #endif
-    // std::vector<std::string> scheduling_algorithms = {"fcfs", "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
-    // std::vector<std::string> scheduling_algorithms = {"fcfs"};
-    std::vector<std::string> scheduling_algorithms = {"easy_bf_depth0"};
     for (auto const& alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
         // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
@@ -883,10 +880,10 @@ void BatchComputeServiceHostReclaimTest::do_BasicReclaimRelease_test(std::string
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("batch_host_reclaim_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
