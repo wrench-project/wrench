@@ -407,7 +407,6 @@ namespace wrench {
 
         // Terminate the reclaim job
         this->freeUpResources(reclaim_job->getResourcesAllocated());
-        std::cerr << "CALLING THE SCHEDULER TO SAY TO TERMINATE THE RECLAIM JOB\n";
         this->scheduler->processJobTermination(reclaim_job);
         this->removeBatchJobFromJobsList(reclaim_job);
 

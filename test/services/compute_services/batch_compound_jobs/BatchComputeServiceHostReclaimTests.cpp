@@ -25,7 +25,7 @@ WRENCH_LOG_CATEGORY(batch_compute_service_host_reclaim_test,
 #define HOUR 3600.0
 
 // std::vector<std::string> scheduling_algorithms = {"fcfs", "easy_bf_depth0", "easy_bf_depth1", "conservative_bf"};
-std::vector<std::string> scheduling_algorithms = {"easy_bf_depth1"};
+std::vector<std::string> scheduling_algorithms = {"conservative_bf"};
 
 class BatchComputeServiceHostReclaimTest : public ::testing::Test {
 public:
@@ -820,11 +820,9 @@ private:
         catch (std::exception& ignore) {
         }
 
-        std::cerr << "*** TEST : RELEASING HOST 1\n";
         // Release Host1
         this->test->compute_service->releaseHosts({"Host1"});
 
-        std::cerr << "*** TEST : SUBMITTING A JOB THAT SHOULD RUN\n";
         {
             // Submit a compound job that uses 4 hosts and submit it (this one will start)
             auto job = job_manager->createCompoundJob("");
@@ -837,7 +835,6 @@ private:
             job_manager->submitJob(job, this->test->compute_service, service_specific_args);
         }
 
-        std::cerr << "*** TEST : WAITING FOR COMPLETION\n";
         {
             // Wait for the workflow execution event
             auto event = this->waitForNextEvent();

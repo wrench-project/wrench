@@ -144,7 +144,9 @@ namespace wrench {
 
             // Remove the job from the schedule
             //            WRENCH_INFO("REMOVING IT FROM SCHEDULE");
-            this->schedule->remove(batch_job->conservative_bf_start_date, (batch_job->getCompoundJob() ? batch_job->conservative_bf_expected_end_date + 100 : UINT32_MAX), batch_job);
+            // Is this padding really useful???
+            u_int32_t padding = std::min<u_int32_t>(UINT32_MAX - batch_job->conservative_bf_expected_end_date, 100);
+            this->schedule->remove(batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date + padding, batch_job);
             //            this->schedule->print();
 
             // Find the earliest start time
@@ -205,7 +207,9 @@ namespace wrench {
 
         auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
         this->schedule->setTimeOrigin(now);
-        this->schedule->remove(now, (cj ? batch_job->conservative_bf_expected_end_date + 100 : UINT32_MAX), batch_job);
+        // Is this padding really useful???
+        u_int32_t padding = std::min<u_int32_t>(UINT32_MAX - batch_job->conservative_bf_expected_end_date, 100);
+        this->schedule->remove(now, batch_job->conservative_bf_expected_end_date + padding, batch_job);
 
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
