@@ -1406,7 +1406,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, EvenLessBasicReclaimRelease) {
 #endif
     for (auto const& alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_EvenLessBasicReclaimRelease_test, alg);
     }
 }
