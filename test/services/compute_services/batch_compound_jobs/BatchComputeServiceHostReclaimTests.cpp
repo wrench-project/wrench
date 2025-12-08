@@ -313,7 +313,6 @@ private:
             // }
         }
 
-
         // Stop the Job Manager manually, just for kicks
         job_manager->stop();
 
@@ -326,7 +325,6 @@ TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_KillTooBigJob) {
 #else
 TEST_F(BatchComputeServiceHostReclaimTest, KillTooBigJob) {
 #endif
-    std::vector<std::string> scheduling_algorithms = {"easy_bf_depth1"};
     for (auto const& alg : scheduling_algorithms) {
         // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_KillTooBigJob_test, alg);
@@ -337,10 +335,10 @@ void BatchComputeServiceHostReclaimTest::do_KillTooBigJob_test(std::string sched
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("batch_host_reclaim_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
