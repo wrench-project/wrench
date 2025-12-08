@@ -210,9 +210,14 @@ namespace wrench {
     void EasyBackfillingBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         WRENCH_INFO("Notified of completion of BatchComputeService job, %lu", batch_job->getJobID());
 
+        // If the job was never inserted in the schedule, then nevermind
+        if (batch_job->easy_bf_expected_end_date == 0) return;
+        
         auto now = static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate());
         this->schedule->setTimeOrigin(now);
-        this->schedule->remove(now, batch_job->easy_bf_expected_end_date + 100, batch_job);
+        this->schedule->print();
+        std::cerr << "CALLING REMOVE FOR A BATCH JOB: " << now << " -> " << batch_job->easy_bf_expected_end_date << " (username=" << batch_job->username << ")" << std::endl;
+        this->schedule->remove(now, batch_job->easy_bf_expected_end_date, batch_job);
 
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
