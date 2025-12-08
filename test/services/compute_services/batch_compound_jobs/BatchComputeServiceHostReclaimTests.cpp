@@ -327,7 +327,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_KillTooBigJob) {
 TEST_F(BatchComputeServiceHostReclaimTest, KillTooBigJob) {
 #endif
     for (auto const& alg : scheduling_algorithms) {
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_KillTooBigJob_test, alg);
     }
 }
@@ -506,7 +506,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_TwoSmallJobsBehindBigOne) {
 TEST_F(BatchComputeServiceHostReclaimTest, TwoSmallJobsBehindBigOne) {
 #endif
     for (auto const& alg : scheduling_algorithms) {
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_TwoSmallJobsBehindBigOne_test, alg);
     }
 }
@@ -687,7 +687,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, TwoSmallJobsBehindMediumOne) {
 #endif
     for (auto const& alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_TwoSmallJobsBehindMediumOne_test, alg);
     }
 }
@@ -868,7 +868,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, ReclaimRelease) {
 #endif
     for (auto const& alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_BasicReclaimRelease_test, alg);
     }
 }
@@ -1049,7 +1049,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, ReclaimReleaseTwoHosts) {
 #endif
     for (auto const& alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_BasicReclaimReleaseTwoHosts_test, alg);
     }
 }
@@ -1220,7 +1220,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, LessBasicReclaimRelease) {
 #endif
     for (auto const& alg : scheduling_algorithms) {
         SCOPED_TRACE("Algorithm: " + alg);
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         DO_TEST_WITH_FORK_ONE_ARG(do_LessBasicReclaimRelease_test, alg);
     }
 }
@@ -1526,7 +1526,7 @@ TEST_F(BatchComputeServiceHostReclaimTest, RandomReclaimRelease) {
 #endif
     // std::vector<std::string> scheduling_algorithms = {"conservative_bf"};
     for (auto const& alg : scheduling_algorithms) {
-        std::cout << "[ INFO     ] Testing with " << alg << std::endl;
+        // std::cout << "[ INFO     ] Testing with " << alg << std::endl;
         for (int seed = 0; seed < 20; seed++) {
             SCOPED_TRACE("Algorithm: " + alg + ", seed = " + std::to_string(seed));
             DO_TEST_WITH_FORK_TWO_ARGS(do_RandomReclaimRelease_test, alg, seed);
