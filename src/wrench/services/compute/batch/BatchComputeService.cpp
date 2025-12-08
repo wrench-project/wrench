@@ -295,6 +295,7 @@ namespace wrench {
                 for (const auto& host_to_reclaim : hosts_to_reclaim) {
                     if (batch_job->isRunningOnHost(host_to_reclaim)) {
                         batch_jobs_to_terminate.push_back(batch_job);
+                        break; // don't duplicate the job!
                     }
                 }
             }

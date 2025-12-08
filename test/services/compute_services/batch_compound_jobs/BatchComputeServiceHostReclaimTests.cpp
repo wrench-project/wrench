@@ -955,7 +955,6 @@ private:
         wrench::Simulation::sleep(10);
 
         // Reclaim Host1 and Host2
-        std::cerr << "RECLAIMING HOST1 and HOST 2\n";
         this->test->compute_service->reclaimHosts({"Host1", "Host2"});
 
         // At this point, the first job has been killed
@@ -972,9 +971,6 @@ private:
                 throw std::runtime_error("Unexpected job state: " + real_event->job->getStateAsString());
             }
         }
-
-        std::cerr << "GOT THE JOB FAILURE\n";
-        std::cerr << "SUBMITTING A 3-HOST JOB, WHICH SHOULD FAIL\n";
 
         // Try to submit a 3-host job, and make sure that fails
         {
@@ -994,25 +990,20 @@ private:
             }
         }
 
-        std::cerr << "OK, GOT THE FAILURE, SLEEPING 10 AGAIN\n";
-
         // Sleep for 10 seconds
         wrench::Simulation::sleep(10);
 
-        // try {
-        //     this->test->compute_service->releaseHosts({"Host1"});
-        //     throw std::runtime_error("Should not be able to release Host1 only");
-        // } catch (std::exception& ignore) {}
-        // try {
-        //     this->test->compute_service->releaseHosts({"Host3", "Host4"});
-        //     throw std::runtime_error("Should not be able to release {Host3, host4} only");
-        // } catch (std::exception& ignore) {}
+        try {
+            this->test->compute_service->releaseHosts({"Host1"});
+            throw std::runtime_error("Should not be able to release Host1 only");
+        } catch (std::exception& ignore) {}
+        try {
+            this->test->compute_service->releaseHosts({"Host3", "Host4"});
+            throw std::runtime_error("Should not be able to release {Host3, host4} only");
+        } catch (std::exception& ignore) {}
 
-        std::cerr << "RELEADING HOST1 and HOST2\n";
         this->test->compute_service->releaseHosts({"Host1", "Host2"});
 
-
-        std::cerr << "SUBMITTING A 3-HOST JOB, WHICH SHOULD WORK\n";
         {
             // Submit a compound job that uses 3 hosts and submit it (this one will start)
             auto job = job_manager->createCompoundJob("");
@@ -1024,8 +1015,6 @@ private:
             service_specific_args["-t"] = "3600";
             job_manager->submitJob(job, this->test->compute_service, service_specific_args);
         }
-
-        std::cerr << "WAITING FOR EVENT\n";
 
         {
             // Wait for the workflow execution event
@@ -1069,10 +1058,10 @@ void BatchComputeServiceHostReclaimTest::do_BasicReclaimReleaseTwoHosts_test(std
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("batch_host_reclaim_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
