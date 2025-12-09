@@ -1311,6 +1311,30 @@ namespace wrench {
     }
 
     /**
+    * @brief Starts a new execution controller during execution. The simulation takes ownership of
+     *        the reference and will call the destructor. (call setDaemonize() on it to change
+     *        the daemonization status if need be)
+     * @param controller: An instance of an execution controller
+     * @return
+     */
+    std::shared_ptr<ExecutionController> Simulation::startNewExecutionController(ExecutionController *controller) {
+        if (controller == nullptr) {
+            throw std::invalid_argument("Simulation::startNewExecutionController(): invalid argument (nullptr service)");
+        }
+
+        if (not this->is_running) {
+            throw std::runtime_error("Simulation::startNewExecutionController(): simulation is not running yet");
+        }
+
+        controller->simulation_ = this;
+        auto shared_ptr = std::shared_ptr<ExecutionController>(controller);
+        this->execution_controllers.insert(shared_ptr);
+        shared_ptr->start(shared_ptr, false, false);// Daemonized, no auto-restart
+        return shared_ptr;
+    }
+
+
+    /**
      * @brief Starts a new compute service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.

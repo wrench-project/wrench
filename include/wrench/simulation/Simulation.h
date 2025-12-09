@@ -159,6 +159,8 @@ namespace wrench {
         void setPstate(const std::string &hostname, int pstate);
         static int getCurrentPstate(const std::string &hostname);
 
+        std::shared_ptr<ExecutionController> startNewExecutionController(ExecutionController *controller);
+
         std::shared_ptr<ComputeService> startNewService(ComputeService *service);
         std::shared_ptr<StorageService> startNewService(StorageService *service);
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);

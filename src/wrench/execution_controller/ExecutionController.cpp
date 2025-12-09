@@ -301,7 +301,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Make the execution controller daemonized, meaning that the simulation can terminate without
+     * @brief Make the execution controller daemonized, meaning that the simulation can terminate without that controller terminating.
      * 
      * @param daemonized: true if the controller should be daemonized, false otherwise
      */
