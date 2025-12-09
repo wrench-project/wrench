@@ -71,6 +71,7 @@ namespace wrench {
         CompoundJob::State getState() const;
         std::string getStateAsString() const;
         void setPriority(double p) override;
+        void setDetached(bool d);
 
         ~CompoundJob() = default;
 
@@ -211,6 +212,11 @@ namespace wrench {
          * @brief Job priority
          */
         double priority;
+
+        /**
+         * @brief Job detached status
+         */
+        bool detached;
 
         void updateStateActionMap(const std::shared_ptr<Action> &action, Action::State old_state, Action::State new_state);
 
