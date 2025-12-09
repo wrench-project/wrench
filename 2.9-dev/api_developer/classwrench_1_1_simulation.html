@@ -187,6 +187,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Simulation9isRunningEv"><code class="docutils literal notranslate"><span class="pre">isRunning()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation6launchEv"><code class="docutils literal notranslate"><span class="pre">launch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation9setPstateERKNSt6stringEi"><code class="docutils literal notranslate"><span class="pre">setPstate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation27startNewExecutionControllerEP19ExecutionController"><code class="docutils literal notranslate"><span class="pre">startNewExecutionController()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15startNewServiceEP14ComputeService"><code class="docutils literal notranslate"><span class="pre">startNewService()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15startNewServiceEP19FileRegistryService"><code class="docutils literal notranslate"><span class="pre">startNewService()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15startNewServiceEP23NetworkProximityService"><code class="docutils literal notranslate"><span class="pre">startNewService()</span></code></a></li>
@@ -533,6 +534,20 @@
 <li><p><strong>hostname</strong> – the host name </p></li>
 <li><p><strong>pstate</strong> – the power state index (as specified in the platform xml description file) </p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation27startNewExecutionControllerEP19ExecutionController">
+<span id="_CPPv3N6wrench10Simulation27startNewExecutionControllerEP19ExecutionController"></span><span id="_CPPv2N6wrench10Simulation27startNewExecutionControllerEP19ExecutionController"></span><span id="wrench::Simulation::startNewExecutionController__ExecutionControllerP"></span><span class="target" id="classwrench_1_1_simulation_1a8c128abdbfce1ea97db28ae04486fbdf"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionControllerE" title="wrench::ExecutionController"><span class="n"><span class="pre">ExecutionController</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">startNewExecutionController</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="classwrench_1_1_execution_controller.html#_CPPv4N6wrench19ExecutionControllerE" title="wrench::ExecutionController"><span class="n"><span class="pre">ExecutionController</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">controller</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10Simulation27startNewExecutionControllerEP19ExecutionController" title="Link to this definition"></a><br /></dt>
+<dd><p>Starts a new execution controller during execution. The simulation takes ownership of the reference and will call the destructor. (call setDaemonize() on it to change the daemonization status if need be) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>controller</strong> – An instance of an execution controller </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
 </dd>
 </dl>
 </dd></dl>
