@@ -90,6 +90,19 @@ namespace wrench {
     }
 
     /**
+     * @brief Set the "detached" status of the job. For a detached job, the controller that
+     *        created the job will never receive an execution event related to that job.
+     *        This method can only be called before the job has been submitted.
+     * @param d: true if the job is supposed to be detached, false otherwise
+     */
+    void CompoundJob::setDetached(bool d) {
+        if (this->state != CompoundJob::State::NOT_SUBMITTED) {
+            throw std::invalid_argument("CompoundJob::setDetached(): Can only be called on a job that has not be submitted yet");
+        }
+        this->detached = d;
+    }
+
+    /**
      * @brief Add a sleep action to the job
      * @param name: the action's name (if empty, a unique name will be picked for you)
      * @param sleep_time: the time to sleep, in seconds

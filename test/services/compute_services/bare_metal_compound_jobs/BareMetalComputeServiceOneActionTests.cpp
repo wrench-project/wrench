@@ -32,6 +32,7 @@ public:
     void do_BadSetup_test();
     void do_Noop_test();
     void do_OneSleepAction_test();
+    void do_OneSleepActionDetached_test();
     void do_OneComputeActionNotEnoughResources_test();
     void do_OneComputeActionBogusServiceSpecificArgs_test();
     void do_OneSleepActionServiceCrashed_test();
@@ -521,6 +522,107 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     free(argv);
 }
 
+
+/**********************************************************************/
+/**  ONE SLEEP ACTION DETACHED TEST                                  **/
+/**********************************************************************/
+
+class BareMetalOneSleepActionDetachedTestWMS : public wrench::ExecutionController {
+public:
+    BareMetalOneSleepActionDetachedTestWMS(BareMetalComputeServiceOneActionTest *test,
+                                   std::shared_ptr<wrench::Workflow> workflow,
+                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                   std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceOneActionTest *test;
+
+    int main() override {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job and submit it
+        auto job = job_manager->createCompoundJob("my_job");
+        job->setDetached(true);
+
+        auto action = job->addSleepAction("my_sleep", 10.0);
+        job_manager->submitJob(job, this->test->compute_service, {});
+
+        // Wait for the workflow execution event
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent(1000.00);
+
+        if (wrench::Simulation::getCurrentSimulatedDate() < 1000) {
+            throw std::runtime_error("Should not have gotten any event!");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneActionTest, OneSleepActionDetached) {
+    DO_TEST_WITH_FORK(do_OneSleepActionDetached_test);
+}
+
+void BareMetalComputeServiceOneActionTest::do_OneSleepActionDetached_test() {
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("one_action_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+                            new wrench::BareMetalComputeService("Host3",
+                                                                {std::make_pair("Host4",
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                {"/scratch"},
+                                                                {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+                            wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+                            new BareMetalOneSleepActionDetachedTestWMS(
+                                    this,
+                                    workflow,
+                                    {compute_service}, {storage_service1}, hostname)));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(storage_service1->createFile(input_file));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
 
 /**********************************************************************/
 /**  ONE COMPUTE ACTION NOT ENOUGH RESOURCES TEST                    **/

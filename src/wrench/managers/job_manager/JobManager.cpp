@@ -1141,12 +1141,14 @@ namespace wrench {
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
 
-        // Forward the notification along the notification chain
-        try {
-            auto message =
-                    new JobManagerCompoundJobCompletedMessage(job, std::move(compute_service));
-            job->popCallbackCommPort()->dputMessage(message);
-        } catch (NetworkError &e) {
+        if (not job->detached) {
+            // Forward the notification along the notification chain
+            try {
+                auto message =
+                        new JobManagerCompoundJobCompletedMessage(job, std::move(compute_service));
+                job->popCallbackCommPort()->dputMessage(message);
+            } catch (NetworkError &e) {
+            }
         }
     }
 
@@ -1163,13 +1165,15 @@ namespace wrench {
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
 
-        // Forward the notification along the notification chain
-        try {
-            auto message =
-                    new JobManagerCompoundJobFailedMessage(job, std::move(compute_service),
-                                                           std::make_shared<SomeActionsHaveFailed>());
-            job->popCallbackCommPort()->dputMessage(message);
-        } catch (NetworkError &e) {
+        if (not job->detached) {
+            // Forward the notification along the notification chain
+            try {
+                auto message =
+                        new JobManagerCompoundJobFailedMessage(job, std::move(compute_service),
+                                                               std::make_shared<SomeActionsHaveFailed>());
+                job->popCallbackCommPort()->dputMessage(message);
+            } catch (NetworkError &e) {
+            }
         }
     }
 
