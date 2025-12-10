@@ -622,7 +622,7 @@ namespace wrench {
         auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
         // The image is in RAM
-        if (not ss_memory->hasFile(image_file, "/ram_disk")) {
+        if (not ss_memory->hasFile(image_file, ss_memory->getBaseRootPath())) {
             WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",
                         image_file->getID().c_str(), hostname.c_str());
             return false;
@@ -774,11 +774,11 @@ namespace wrench {
             {
                 // Create a RAM disk on the host
                 auto host = simgrid::s4u::Engine::get_instance()->host_by_name(hostname);
-                auto ram_disk = host->add_disk("ram_disk",
+                auto ram_disk = host->add_disk("ram_disk_" + std::to_string(ServerlessComputeService::sequence_number++),
                                                S4U_Simulation::RAM_READ_BANDWIDTH,
                                                S4U_Simulation::RAM_WRITE_BANDWIDTH);
                 auto ram_capacity = S4U_Simulation::getHostMemoryCapacity(hostname);
-                std::string ram_mount_point = "/ram_disk";
+                std::string ram_mount_point = "/" + ram_disk->get_name();
                 ram_disk->set_property("size", std::to_string(ram_capacity) + "B");
                 ram_disk->set_property("mount", ram_mount_point);
 
@@ -1086,7 +1086,9 @@ namespace wrench {
             auto src_location = wrench::FileLocation::LOCATION(
                 _state_of_the_system->_compute_storages[compute_host], image);
             auto dst_location = wrench::FileLocation::LOCATION(
-                _state_of_the_system->_compute_memories[compute_host], "/ram_disk", image);
+                _state_of_the_system->_compute_memories[compute_host],
+                _state_of_the_system->_compute_memories[compute_host]->getBaseRootPath(),
+                image);
             try {
                 StorageService::copyFile(src_location, dst_location);
                 // std::cerr << "THE IMAGE LOAD SUCCEEDED\n";

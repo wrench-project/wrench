@@ -168,6 +168,6 @@ namespace wrench {
      * @return true or false
      */
     bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::string& node, const std::shared_ptr<DataFile>& image) {
-        return _compute_memories[node]->hasFile(image, "/ram_disk");
+        return _compute_memories[node]->hasFile(image, _compute_memories[node]->getBaseRootPath());
     }
 }; // namespace wrench
