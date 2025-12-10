@@ -90,7 +90,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the "detached" status of the job. For a detached job, the controller that
+     * @brief Set the "detached" status of the job (default status is 'false'). For a detached job, the controller that
      *        created the job will never receive an execution event related to that job.
      *        This method can only be called before the job has been submitted.
      * @param d: true if the job is supposed to be detached, false otherwise
