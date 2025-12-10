@@ -217,7 +217,7 @@ namespace wrench {
         /**
          * @brief Job detached status
          */
-        bool detached;
+        bool detached = false;
 
         void updateStateActionMap(const std::shared_ptr<Action> &action, Action::State old_state, Action::State new_state);
 
