@@ -151,6 +151,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench11CompoundJob23printActionDependenciesEv"><code class="docutils literal notranslate"><span class="pre">printActionDependencies()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob12printTaskMapEv"><code class="docutils literal notranslate"><span class="pre">printTaskMap()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob12removeActionERKNSt10shared_ptrI6ActionEE"><code class="docutils literal notranslate"><span class="pre">removeAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob11setDetachedEb"><code class="docutils literal notranslate"><span class="pre">setDetached()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob11setPriorityEd"><code class="docutils literal notranslate"><span class="pre">setPriority()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench11CompoundJob11usesScratchEv"><code class="docutils literal notranslate"><span class="pre">usesScratch()</span></code></a></li>
 </ul>
@@ -1027,6 +1028,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>action</strong> – the action to remove </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench11CompoundJob11setDetachedEb">
+<span id="_CPPv3N6wrench11CompoundJob11setDetachedEb"></span><span id="_CPPv2N6wrench11CompoundJob11setDetachedEb"></span><span id="wrench::CompoundJob::setDetached__b"></span><span class="target" id="classwrench_1_1_compound_job_1a38a26fec87e4635659d3b01166b5bc80"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setDetached</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">d</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Set the “detached” status of the job (default status is ‘false’). For a detached job, the controller that created the job will never receive an execution event related to that job. This method can only be called before the job has been submitted. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>d</strong> – true if the job is supposed to be detached, false otherwise </p>
 </dd>
 </dl>
 </dd></dl>
