@@ -551,6 +551,10 @@ private:
 
         auto action = job->addSleepAction("my_sleep", 10.0);
         job_manager->submitJob(job, this->test->compute_service, {});
+        try {
+            job->setDetached(false);
+            throw std::runtime_error("Shouldn't be able to call setDetached() on a job unless is hasn't been submitted");
+        } catch (std::invalid_argument &ignore) {}
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent(1000.00);
