@@ -738,7 +738,7 @@ private:
 
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
 
-        // Registering a function with BOTH SERVICES
+        // Registering a function with one of the two compute services
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
