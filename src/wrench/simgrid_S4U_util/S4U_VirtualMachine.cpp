@@ -151,8 +151,6 @@ namespace wrench {
             return "RUNNING";
         case State::SUSPENDED:
             return "SUSPENDED";
-        default:
-            return "???";
         }
     }
 

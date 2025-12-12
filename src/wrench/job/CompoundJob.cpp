@@ -74,8 +74,6 @@ namespace wrench {
                 return "COMPLETED";
             case DISCONTINUED:
                 return "DISCONTINUED";
-            default:
-                return "???";
         }
     }
 
