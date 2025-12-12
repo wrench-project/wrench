@@ -413,6 +413,12 @@ private:
         job_manager->submitJob(job, this->test->compute_service, {});
         job->getStateAsString();// coverage
 
+        // Try to submit again (coverate)
+        try {
+        job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Should not be able to submit the same job again");
+        } catch (std::invalid_argument &ignore) {}
+
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
