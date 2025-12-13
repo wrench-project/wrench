@@ -197,10 +197,6 @@ namespace wrench {
             processGetResourceInformation(msg->answer_commport, msg->key);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage *>(message.get())) {
-            processGetExecutionHosts(msg->answer_commport);
-            return true;
-
         } else if (auto msg = dynamic_cast<CloudComputeServiceCreateVMRequestMessage *>(message.get())) {
             processCreateVM(msg->answer_commport, msg->num_cores, msg->ram_memory, msg->physical_host,
                             msg->property_list,

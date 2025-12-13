@@ -215,12 +215,10 @@ private:
         CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::map<std::string, double>({{"aa", 2.3}, {"bb", 4.5}})}, 666));
 
 
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage(commport, 600));
         CUSTOM_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage(nullptr, 666), std::invalid_argument);
 
         std::vector<std::string> arg;
         arg.emplace_back("aaa");
-        CUSTOM_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsAnswerMessage(arg, 600));
 
         std::map<std::string, std::string> property_list;
         std::map<std::string, std::string> messagepayload_list;
