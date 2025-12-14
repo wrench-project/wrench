@@ -414,6 +414,7 @@ TEST_F(AllDependenciesWorkflowTest, AllDependenciesWorkflowStructure) {
     ASSERT_EQ(3, workflow->getTasks().size());
 
     workflow->removeTask(t1);
+    auto name = workflow->getName(); // coverage
 }
 
 TEST_F(WorkflowTest, LowLevelDagOfTasksTest) {

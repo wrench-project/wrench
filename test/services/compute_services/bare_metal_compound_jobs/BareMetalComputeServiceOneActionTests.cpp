@@ -463,6 +463,9 @@ private:
         // Stop the Compute service manually, for coverage
         this->test->compute_service->stop();
 
+        // coverage
+        auto start_date = this->test->workflow->getStartDate();
+
         return 0;
     }
 };

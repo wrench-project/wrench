@@ -627,6 +627,14 @@ private:
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
+        auto dsl = registered_function1->getDiskSpaceLimit(); // coverage
+        if (dsl != 2000 * MB) {
+            throw std::runtime_error("Disk space limit must be 2000MB");
+        }
+        if (registered_function1->getImageFile() != image_file) {
+            throw std::runtime_error("Image file must be the same as the image for the function");
+        }
+
         // Place an invocation
         {
             auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
