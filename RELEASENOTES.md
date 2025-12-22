@@ -1,5 +1,10 @@
 WRENCH Release Notes
 ------
+### wrench 2.9-dev
+
+  - Added the ability to dynamically reclaim/release the compute hosts used by a batch scheduling service
+  - Added the possibility to start execution controllers dynamically
+
 ### wrench 2.8
 
 (Nov 12, 2025) This releases includes **minor enhancements and updates**, and an **upgrade to SimGrid 4.1** (although it should still work with SimGrid 4.0). More specifically:
