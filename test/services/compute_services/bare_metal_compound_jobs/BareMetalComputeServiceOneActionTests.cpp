@@ -413,6 +413,12 @@ private:
         job_manager->submitJob(job, this->test->compute_service, {});
         job->getStateAsString();// coverage
 
+        // Try to submit again (coverate)
+        try {
+        job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Should not be able to submit the same job again");
+        } catch (std::invalid_argument &ignore) {}
+
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
@@ -456,6 +462,9 @@ private:
 
         // Stop the Compute service manually, for coverage
         this->test->compute_service->stop();
+
+        // coverage
+        auto start_date = this->test->workflow->getStartDate();
 
         return 0;
     }
@@ -551,6 +560,10 @@ private:
 
         auto action = job->addSleepAction("my_sleep", 10.0);
         job_manager->submitJob(job, this->test->compute_service, {});
+        try {
+            job->setDetached(false);
+            throw std::runtime_error("Shouldn't be able to call setDetached() on a job unless is hasn't been submitted");
+        } catch (std::invalid_argument &ignore) {}
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent(1000.00);

@@ -15,7 +15,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs -Wno-deprecated-builtins -Wno-unused-but-set-variable" )
+add_definitions("-Wall -Wswitch -Wno-unused-variable -Wno-unused-private-field -Wno-unused-local-typedefs -Wno-deprecated-builtins -Wno-unused-but-set-variable" )
 
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)

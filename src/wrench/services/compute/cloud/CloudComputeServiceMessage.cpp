@@ -26,34 +26,6 @@ namespace wrench {
      * @brief Constructor
      *
      * @param answer_commport: the commport to which to send the answer
-     * @param payload: the message size in bytes
-     *
-     */
-    CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(
-            S4U_CommPort *answer_commport, sg_size_t payload) : CloudComputeServiceMessage(payload) {
-#ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if (answer_commport == nullptr) {
-            throw std::invalid_argument(
-                    "CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(): "
-                    "Invalid arguments");
-        }
-#endif
-        this->answer_commport = answer_commport;
-    }
-
-    /**
-     * @brief Constructor
-     *
-     * @param execution_hosts: the hosts available for running virtual machines
-     * @param payload: the message size in bytes
-     */
-    CloudComputeServiceGetExecutionHostsAnswerMessage::CloudComputeServiceGetExecutionHostsAnswerMessage(
-            std::vector<std::string> &execution_hosts, sg_size_t payload) : CloudComputeServiceMessage(payload), execution_hosts(execution_hosts) {}
-
-    /**
-     * @brief Constructor
-     *
-     * @param answer_commport: the commport to which to send the answer
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
      * @param ram_memory: the VM's RAM memory_manager_service capacity (use ComputeService::ALL_RAM to use all RAM available on the

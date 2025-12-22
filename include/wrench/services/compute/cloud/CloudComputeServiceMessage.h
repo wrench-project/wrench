@@ -33,28 +33,6 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent to a CloudComputeService to request the list of its execution hosts
-     */
-    class CloudComputeServiceGetExecutionHostsRequestMessage : public CloudComputeServiceMessage {
-    public:
-        CloudComputeServiceGetExecutionHostsRequestMessage(S4U_CommPort *answer_commport, sg_size_t payload);
-
-        /** @brief The commport_name to which a reply should be sent */
-        S4U_CommPort *answer_commport;
-    };
-
-    /**
-     * @brief A message sent by a CloudComputeService in answer to a list of execution hosts request
-     */
-    class CloudComputeServiceGetExecutionHostsAnswerMessage : public CloudComputeServiceMessage {
-    public:
-        CloudComputeServiceGetExecutionHostsAnswerMessage(std::vector<std::string> &execution_hosts, sg_size_t payload);
-
-        /** @brief The list of execution hosts */
-        std::vector<std::string> execution_hosts;
-    };
-
-    /**
      * @brief A message sent to a CloudComputeService to request a VM creation
      */
     class CloudComputeServiceCreateVMRequestMessage : public CloudComputeServiceMessage {

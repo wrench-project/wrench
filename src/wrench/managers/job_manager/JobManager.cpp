@@ -509,7 +509,7 @@ namespace wrench {
             } else {
                 throw;
             }
-        } catch (std::invalid_argument &) {
+        } catch (std::invalid_argument &ignore) {
             throw;
         }
 
@@ -535,7 +535,7 @@ namespace wrench {
         // Send a message to wake up the daemon
         try {
             this->commport->putMessage(new JobManagerWakeupMessage());
-        } catch (std::exception &) {
+        } catch (std::exception &ignore) {
             throw std::runtime_error("Cannot connect to job manager");
         }
     }

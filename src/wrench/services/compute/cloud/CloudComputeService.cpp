@@ -493,11 +493,11 @@ namespace wrench
             processGetResourceInformation(csrir_msg->answer_commport, csrir_msg->key);
             return true;
         }
-        else if (auto ccsgehr_msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage*>(message.get()))
-        {
-            processGetExecutionHosts(ccsgehr_msg->answer_commport);
-            return true;
-        }
+        // else if (auto ccsgehr_msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage*>(message.get()))
+        // {
+        //     processGetExecutionHosts(ccsgehr_msg->answer_commport);
+        //     return true;
+        // }
         else if (auto ccscvmr_msg = dynamic_cast<CloudComputeServiceCreateVMRequestMessage*>(message.get()))
         {
             processCreateVM(ccscvmr_msg->answer_commport, ccscvmr_msg->num_cores, ccscvmr_msg->ram_memory, "",
@@ -557,19 +557,19 @@ namespace wrench
         }
     }
 
-    /**
-     * @brief Process a execution host list request
-     *
-     * @param answer_commport: the commport to which the answer message should be sent
-     */
-    void CloudComputeService::processGetExecutionHosts(S4U_CommPort* answer_commport)
-    {
-        answer_commport->dputMessage(
-            new CloudComputeServiceGetExecutionHostsAnswerMessage(
-                this->execution_hosts,
-                this->getMessagePayloadValue(
-                    CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD)));
-    }
+    // /**
+    //  * @brief Process a execution host list request
+    //  *
+    //  * @param answer_commport: the commport to which the answer message should be sent
+    //  */
+    // void CloudComputeService::processGetExecutionHosts(S4U_CommPort* answer_commport)
+    // {
+    //     answer_commport->dputMessage(
+    //         new CloudComputeServiceGetExecutionHostsAnswerMessage(
+    //             this->execution_hosts,
+    //             this->getMessagePayloadValue(
+    //                 CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD)));
+    // }
 
     /**
      * @brief Create a BareMetalComputeService VM on a physical machine

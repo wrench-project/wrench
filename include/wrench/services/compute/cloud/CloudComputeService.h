@@ -167,8 +167,6 @@ namespace wrench {
         virtual void processGetResourceInformation(S4U_CommPort *answer_commport,
                                                    const std::string &key);
 
-        virtual void processGetExecutionHosts(S4U_CommPort *answer_commport);
-
         virtual void processCreateVM(S4U_CommPort *answer_commport,
                                      unsigned long requested_num_cores,
                                      sg_size_t requested_ram,

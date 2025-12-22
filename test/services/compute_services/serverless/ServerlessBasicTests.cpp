@@ -14,6 +14,7 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/failure_causes/OperationTimeout.h"
+#include "wrench/failure_causes/FunctionNotFound.h"
 #include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
@@ -626,6 +627,14 @@ private:
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
+        auto dsl = registered_function1->getDiskSpaceLimit(); // coverage
+        if (dsl != 2000 * MB) {
+            throw std::runtime_error("Disk space limit must be 2000MB");
+        }
+        if (registered_function1->getImageFile() != image_file) {
+            throw std::runtime_error("Image file must be the same as the image for the function");
+        }
+
         // Place an invocation
         {
             auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
@@ -748,7 +757,12 @@ private:
             try {
                 function_manager->invokeFunction(registered_function1, this->other_compute_service, input);
                 throw std::runtime_error("Should not be able to invoke a non-registered function");
-            } catch (wrench::ExecutionException &ignore) {
+            } catch (wrench::ExecutionException &e) {
+                auto failure_cause = std::dynamic_pointer_cast<wrench::FunctionNotFound>(e.getCause());
+                if (not failure_cause) {
+                    throw std::runtime_error("Should have gotten a FunctionNotFound failure cause, instead: " + e.getCause()->toString());
+                }
+                failure_cause->toString(); // coverage
             }
         }
 

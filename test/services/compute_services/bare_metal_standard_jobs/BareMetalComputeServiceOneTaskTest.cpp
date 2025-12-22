@@ -407,7 +407,7 @@ private:
                                                                              test->storage_service1, test->input_file)},
                                                   {test->output_file, wrench::FileLocation::LOCATION(
                                                                               test->storage_service1, test->output_file)}});
-            throw std::runtime_error("Should not be able to create a job with an empty task1");
+            throw std::runtime_error("Should not be able to create a job with an null task vector");
         } catch (std::invalid_argument &e) {
         }
 
@@ -419,7 +419,7 @@ private:
                                                                              test->storage_service1, test->input_file)},
                                                   {test->output_file, wrench::FileLocation::LOCATION(
                                                                               test->storage_service1, test->output_file)}});
-            throw std::runtime_error("Should not be able to create a job with an empty task1 vector");
+            throw std::runtime_error("Should not be able to create a job with an empty task vector");
         } catch (std::invalid_argument &e) {
         }
 

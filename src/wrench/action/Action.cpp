@@ -94,8 +94,6 @@ namespace wrench {
                 return "KILLED";
             case Action::State::FAILED:
                 return "FAILED";
-            default:
-                return "???";
         }
     }
 
