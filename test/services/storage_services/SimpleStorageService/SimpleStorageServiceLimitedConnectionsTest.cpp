@@ -138,7 +138,7 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         // Reading
-        for (auto dst_storage_service: {this->test->storage_service_unlimited, this->test->storage_service_limited}) {
+        for (auto const &dst_storage_service: {this->test->storage_service_unlimited, this->test->storage_service_limited}) {
 
             std::shared_ptr<wrench::StorageService> src_storage_service;
             if (dst_storage_service == this->test->storage_service_unlimited) {
@@ -193,12 +193,12 @@ private:
                         success = false;
                     }
                     if ((i > 0) and (i < NUM_PARALLEL_TRANSFERS - 1)) {
-                        if (std::abs<double>(elapsed[i] - 2.0 * elapsed[i / 3 - 1]) > 1) {
+                        if (std::abs(elapsed[i] - 2.0 * elapsed[i / 3 - 1]) > 1) {
                             success = false;
                         }
                     }
                 }
-                if (std::abs<double>(elapsed[NUM_PARALLEL_TRANSFERS - 1] - elapsed[NUM_PARALLEL_TRANSFERS - 2] - (elapsed[0] / 3.0)) > 1) {
+                if (std::abs(elapsed[NUM_PARALLEL_TRANSFERS - 1] - elapsed[NUM_PARALLEL_TRANSFERS - 2] - (elapsed[0] / 3.0)) > 1) {
                     success = false;
                 }
 

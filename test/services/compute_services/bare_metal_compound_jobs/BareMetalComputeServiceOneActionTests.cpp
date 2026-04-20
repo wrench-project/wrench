@@ -962,7 +962,7 @@ private:
             throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
         }
 
-        if ((action->getStartDate() > 0.0001) or (std::abs<double>(action->getEndDate() - 1.0) > 0)) {
+        if ((action->getStartDate() > 0.0001) or (std::abs(action->getEndDate() - 1.0) > 0)) {
             throw std::runtime_error("Unexpected action start/end dates");
         }
 
@@ -1224,7 +1224,7 @@ private:
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
         }
 
-        if ((std::abs<double>(action->getStartDate() - 2.0) > 0.0001) or (std::abs<double>(action->getEndDate() - 12.0) > 0.0001)) {
+        if ((std::abs(action->getStartDate() - 2.0) > 0.0001) or (std::abs(action->getEndDate() - 12.0) > 0.0001)) {
             throw std::runtime_error("Unexpected action start/end dates");
         }
 
@@ -1235,8 +1235,8 @@ private:
         }
         auto top = history.top();
         if ((top.failure_cause != nullptr) or
-            (std::abs<double>(top.start_date - 2.0) > 0.0001) or
-            (std::abs<double>(top.end_date - 12.0) > 0.0001) or
+            (std::abs(top.start_date - 2.0) > 0.0001) or
+            (std::abs(top.end_date - 12.0) > 0.0001) or
             (top.execution_host != "Host4") or
             (top.num_cores_allocated != 0) or
             (top.state != wrench::Action::State::COMPLETED) or
@@ -1248,8 +1248,8 @@ private:
         top = history.top();
         if ((top.failure_cause == nullptr) or
             (std::dynamic_pointer_cast<wrench::HostError>(top.failure_cause) == nullptr) or
-            (std::abs<double>(top.start_date - 0.0) > 0.0001) or
-            (std::abs<double>(top.end_date - 1.0) > 0.0001) or
+            (std::abs(top.start_date - 0.0) > 0.0001) or
+            (std::abs(top.end_date - 1.0) > 0.0001) or
             (top.execution_host != "Host4") or
             (top.num_cores_allocated != 0) or
             (top.state != wrench::Action::State::FAILED) or

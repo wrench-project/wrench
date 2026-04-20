@@ -485,7 +485,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     double task1_completion_date_1 = completions_trace[0]->getDate();
 
     //    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_1 - task1_start_date_1), 10.0);
-    ASSERT_TRUE(std::abs<double>((task1_completion_date_1 - task1_start_date_1) - 10.0) < EPSILON);
+    ASSERT_TRUE(std::abs((task1_completion_date_1 - task1_start_date_1) - 10.0) < EPSILON);
 
     double task1_start_date_2 = starts_trace[1]->getDate();
     double task1_completion_date_2 = completions_trace[1]->getDate();
@@ -494,7 +494,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     //    std::cerr << task1_start_date_2 << "\n";
     //    std::cerr << std::floor(task1_completion_date_2 - task1_start_date_2) << "\n";
     //    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_2 - task1_start_date_2), 10.0);
-    ASSERT_TRUE(std::abs<double>((task1_completion_date_2 - task1_start_date_2) - 10.0) < EPSILON);
+    ASSERT_TRUE(std::abs((task1_completion_date_2 - task1_start_date_2) - 10.0) < EPSILON);
 
     double failed_task_start_date_1 = starts_trace[2]->getDate();
     double failed_task_failure_date_1 = failures_trace[0]->getDate();

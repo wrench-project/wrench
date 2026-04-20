@@ -1210,15 +1210,15 @@ private:
         // Are the dates sensible?
         if (action1->getStartDate() > EPSILON)
             throw std::runtime_error("Unexpected action1 start date " + std::to_string(action1->getStartDate()));
-        if (std::abs<double>(action1->getEndDate() - 10.0) > EPSILON)
+        if (std::abs(action1->getEndDate() - 10.0) > EPSILON)
             throw std::runtime_error("Unexpected action1 end date " + std::to_string(action1->getEndDate()));
-        if (std::abs<double>(action2->getStartDate() - 10.0) > EPSILON)
+        if (std::abs(action2->getStartDate() - 10.0) > EPSILON)
             throw std::runtime_error("Unexpected action2 start date " + std::to_string(action2->getStartDate()));
-        if (std::abs<double>(action2->getEndDate() - 55.0) > EPSILON)
+        if (std::abs(action2->getEndDate() - 55.0) > EPSILON)
             throw std::runtime_error("Unexpected action2 end date " + std::to_string(action2->getEndDate()));
-        if (std::abs<double>(action3->getStartDate() - 55.0) > EPSILON)
+        if (std::abs(action3->getStartDate() - 55.0) > EPSILON)
             throw std::runtime_error("Unexpected action3 start date " + std::to_string(action3->getStartDate()));
-        if (std::abs<double>(action3->getEndDate() - 60.0) > EPSILON)
+        if (std::abs(action3->getEndDate() - 60.0) > EPSILON)
             throw std::runtime_error("Unexpected action3 end date " + std::to_string(action3->getEndDate()));
 
 

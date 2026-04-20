@@ -1289,10 +1289,10 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
                               (double) result_json["host1"]["/file_1"][operation][i]["start"];
             if (i < 2) {
                 ASSERT_EQ(num_bytes, 400000);
-                ASSERT_TRUE(std::abs<double>(duration - 0.4) < 0.0001);
+                ASSERT_TRUE(std::abs(duration - 0.4) < 0.0001);
             } else {
                 ASSERT_EQ(num_bytes, 200000);
-                ASSERT_TRUE(std::abs<double>(duration - 0.2) < 0.0001);
+                ASSERT_TRUE(std::abs(duration - 0.2) < 0.0001);
             }
         }
     }
@@ -1304,7 +1304,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
         double duration = (double) result_json["host2"]["/file_1.wrench_tmp.1"][operation][0]["end"] -
                           (double) result_json["host2"]["/file_1.wrench_tmp.1"][operation][0]["start"];
         ASSERT_EQ(num_bytes, 1000000);
-        ASSERT_TRUE(std::abs<double>(duration - 0.5) < 0.0001);
+        ASSERT_TRUE(std::abs(duration - 0.5) < 0.0001);
     }
 
     workflow->clear();

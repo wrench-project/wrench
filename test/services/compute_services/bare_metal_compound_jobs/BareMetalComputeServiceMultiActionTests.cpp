@@ -251,7 +251,7 @@ private:
         }
 
         // Check makespan
-        if (std::abs<double>(wrench::Simulation::getCurrentSimulatedDate() - expected_makespan) > 0.0001) {
+        if (std::abs(wrench::Simulation::getCurrentSimulatedDate() - expected_makespan) > 0.0001) {
             throw std::runtime_error("Unexpected makespan");
         }
 
@@ -491,11 +491,11 @@ private:
         }
 
         // Check timing
-        if (std::abs<double>(compute1->getEndDate() - compute2->getEndDate()) > 0.0001) {
+        if (std::abs(compute1->getEndDate() - compute2->getEndDate()) > 0.0001) {
             throw std::runtime_error("Compute1 and Compute2 actions should have completed at the same time");
         }
 
-        if (std::abs<double>(compute3->getEndDate() - compute4->getStartDate()) > 0.0001) {
+        if (std::abs(compute3->getEndDate() - compute4->getStartDate()) > 0.0001) {
             throw std::runtime_error("Compute4 action should start only after Compute3 action has completed");
         }
 
@@ -570,10 +570,10 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
 class PartialFailureTestWMS : public wrench::ExecutionController {
 public:
     PartialFailureTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                          std::shared_ptr<wrench::Workflow> workflow,
+                          const std::shared_ptr<wrench::Workflow>& workflow,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                          const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:

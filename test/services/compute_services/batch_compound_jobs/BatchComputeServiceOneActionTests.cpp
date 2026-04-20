@@ -869,7 +869,7 @@ private:
             throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
         }
 
-        if ((action->getStartDate() > EPSILON) or (std::abs<double>(action->getEndDate() - 1.0) > EPSILON)) {
+        if ((action->getStartDate() > EPSILON) or (std::abs(action->getEndDate() - 1.0) > EPSILON)) {
             throw std::runtime_error("Unexpected action start/end dates");
         }
 

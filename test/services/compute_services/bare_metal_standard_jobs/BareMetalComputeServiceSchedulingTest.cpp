@@ -47,7 +47,7 @@ public:
     }
 
     static bool isAboutTheSame(double base, double variable) {
-        return ((std::abs<double>(variable - base) < EPSILON));
+        return ((std::abs(variable - base) < EPSILON));
     }
 
 protected:

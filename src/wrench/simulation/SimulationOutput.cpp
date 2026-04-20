@@ -26,7 +26,7 @@
 #include <cmath>
 #include <unordered_set>
 
-#define DBL_EQUAL(x, y) (std::abs<double>((x) - (y)) < 0.1)
+#define DBL_EQUAL(x, y) (std::abs((x) - (y)) < 0.1)
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_output,
                     "Log category for Simulation Output");
