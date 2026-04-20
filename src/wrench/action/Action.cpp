@@ -95,6 +95,7 @@ namespace wrench {
             case Action::State::FAILED:
                 return "FAILED";
         }
+	return "UNKNOWN";
     }
 
 

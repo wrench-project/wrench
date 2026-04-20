@@ -75,6 +75,7 @@ namespace wrench {
             case DISCONTINUED:
                 return "DISCONTINUED";
         }
+	return "UNKNOWN";
     }
 
 
