@@ -97,7 +97,7 @@ namespace wrench {
          * @param hosts the hosts that were reclaimed
          * @param reclaim_job the reclaim job
          */
-        void processReclaimedHosts(const std::set<simgrid::s4u::Host> *hosts, std::shared_ptr<BatchJob> reclaim_job) override {
+        void processReclaimedHosts(const std::set<simgrid::s4u::Host*> *hosts, std::shared_ptr<BatchJob> reclaim_job) override {
             throw std::runtime_error("BatschedBatchScheduler::processReclaimedHost(): Not implemented/supported");
         }
 
