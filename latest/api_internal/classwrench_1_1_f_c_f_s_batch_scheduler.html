@@ -176,6 +176,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18FCFSBatchScheduler20processJobSubmissionENSt10shared_ptrI8BatchJobEE"><code class="docutils literal notranslate"><span class="pre">processJobSubmission()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18FCFSBatchScheduler21processJobTerminationENSt10shared_ptrI8BatchJobEE"><code class="docutils literal notranslate"><span class="pre">processJobTermination()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18FCFSBatchScheduler17processQueuedJobsEv"><code class="docutils literal notranslate"><span class="pre">processQueuedJobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18FCFSBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE"><code class="docutils literal notranslate"><span class="pre">processReclaimedHosts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18FCFSBatchScheduler15scheduleOnHostsEmm9sg_size_t"><code class="docutils literal notranslate"><span class="pre">scheduleOnHosts()</span></code></a></li>
 </ul>
 </li>
@@ -476,13 +477,13 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench18FCFSBatchScheduler21getStartTimeEstimatesENSt3setINSt5tupleINSt6stringEmm9sg_size_tEEEE">
 <span id="_CPPv3N6wrench18FCFSBatchScheduler21getStartTimeEstimatesENSt3setINSt5tupleINSt6stringEmm9sg_size_tEEEE"></span><span id="_CPPv2N6wrench18FCFSBatchScheduler21getStartTimeEstimatesENSt3setINSt5tupleINSt6stringEmm9sg_size_tEEEE"></span><span id="wrench::FCFSBatchScheduler::getStartTimeEstimates__std::set:std::tuple:ss.unsigned-l.unsigned-l.sg_size_t::"></span><span class="target" id="classwrench_1_1_f_c_f_s_batch_scheduler_1ab3cb2da9487b1dc762c8d9aff21481ce"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getStartTimeEstimates</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">sg_size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">set_of_jobs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench18FCFSBatchScheduler21getStartTimeEstimatesENSt3setINSt5tupleINSt6stringEmm9sg_size_tEEEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Method to get start time estimates. </p>
+<dd><p>Method to obtain start time estimates. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>set_of_jobs</strong> – the set of job configurations whose start times should be estimated </p>
+<dd class="field-odd"><p><strong>set_of_jobs</strong> – set of jobs for which we need estimates </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>start time estimates </p>
+<dd class="field-even"><p>a map a start time estimates </p>
 </dd>
 </dl>
 </dd></dl>
@@ -546,6 +547,20 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench18FCFSBatchScheduler17processQueuedJobsEv">
 <span id="_CPPv3N6wrench18FCFSBatchScheduler17processQueuedJobsEv"></span><span id="_CPPv2N6wrench18FCFSBatchScheduler17processQueuedJobsEv"></span><span id="wrench::FCFSBatchScheduler::processQueuedJobs"></span><span class="target" id="classwrench_1_1_f_c_f_s_batch_scheduler_1ab5ab96a562d53a18ec9be53efddb8181"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">processQueuedJobs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench18FCFSBatchScheduler17processQueuedJobsEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Method to process queued jobs. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench18FCFSBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE">
+<span id="_CPPv3N6wrench18FCFSBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE"></span><span id="_CPPv2N6wrench18FCFSBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE"></span><span id="wrench::FCFSBatchScheduler::processReclaimedHosts__std::set:simgrid::s4u::HostP:CR.std::shared_ptr:BatchJob:"></span><span class="target" id="classwrench_1_1_f_c_f_s_batch_scheduler_1afbfec6ce257478be44243fc97afe5430"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">processReclaimedHosts</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">simgrid</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">s4u</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Host</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hosts</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_batch_job.html#_CPPv4N6wrench8BatchJobE" title="wrench::BatchJob"><span class="n"><span class="pre">BatchJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reclaim_job</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench18FCFSBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Method to process a host being reclaimed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> – the host </p></li>
+<li><p><strong>reclaim_job</strong> – the reclaim job </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">

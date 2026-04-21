@@ -87,6 +87,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService19BatchComputeServiceERKNSt6stringENSt6vectorINSt6stringEEERKNSt6stringE31WRENCH_PROPERTY_COLLECTION_TYPE38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE"><code class="docutils literal notranslate"><span class="pre">BatchComputeService()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService8getQueueEv"><code class="docutils literal notranslate"><span class="pre">getQueue()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService21getStartTimeEstimatesENSt3setINSt5tupleINSt6stringEmm9sg_size_tEEEE"><code class="docutils literal notranslate"><span class="pre">getStartTimeEstimates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService12reclaimHostsERKNSt3setINSt6stringEEE"><code class="docutils literal notranslate"><span class="pre">reclaimHosts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService12releaseHostsERKNSt3setINSt6stringEEE"><code class="docutils literal notranslate"><span class="pre">releaseHosts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService20supportsCompoundJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsCompoundJobs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService17supportsFunctionsEv"><code class="docutils literal notranslate"><span class="pre">supportsFunctions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench19BatchComputeService17supportsPilotJobsEv"><code class="docutils literal notranslate"><span class="pre">supportsPilotJobs()</span></code></a></li>
@@ -521,6 +523,28 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>start date predictions in seconds (as a map of ids). A prediction that’s negative means that the job configuration can not run on the service (e.g., not enough hosts, not enough cores per host) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench19BatchComputeService12reclaimHostsERKNSt3setINSt6stringEEE">
+<span id="_CPPv3N6wrench19BatchComputeService12reclaimHostsERKNSt3setINSt6stringEEE"></span><span id="_CPPv2N6wrench19BatchComputeService12reclaimHostsERKNSt3setINSt6stringEEE"></span><span id="wrench::BatchComputeService::reclaimHosts__std::set:ss:CR"></span><span class="target" id="classwrench_1_1_batch_compute_service_1adc84c757c42a7554c40d7e4cea80cd5c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reclaimHosts</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostnames</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Reclaim a set of hosts, which will: (i) terminate the jobs that are running on any of these hosts; and (ii) make these hosts unavailable until they are released. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostnames</strong> – the list of the hostnames of the hosts to reclaim </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench19BatchComputeService12releaseHostsERKNSt3setINSt6stringEEE">
+<span id="_CPPv3N6wrench19BatchComputeService12releaseHostsERKNSt3setINSt6stringEEE"></span><span id="_CPPv2N6wrench19BatchComputeService12releaseHostsERKNSt3setINSt6stringEEE"></span><span id="wrench::BatchComputeService::releaseHosts__std::set:ss:CR"></span><span class="target" id="classwrench_1_1_batch_compute_service_1a4789cb5ede4c0dd3a424c390518b977c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">releaseHosts</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostnames</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Release hosts that were previously reclaimed (as a set) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hostnames</strong> – list of hostnames of the hosts to release </p>
 </dd>
 </dl>
 </dd></dl>

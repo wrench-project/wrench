@@ -150,6 +150,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench37ConservativeBackfillingBatchScheduler20processJobSubmissionENSt10shared_ptrI8BatchJobEE"><code class="docutils literal notranslate"><span class="pre">processJobSubmission()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench37ConservativeBackfillingBatchScheduler21processJobTerminationENSt10shared_ptrI8BatchJobEE"><code class="docutils literal notranslate"><span class="pre">processJobTermination()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench37ConservativeBackfillingBatchScheduler17processQueuedJobsEv"><code class="docutils literal notranslate"><span class="pre">processQueuedJobs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench37ConservativeBackfillingBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE"><code class="docutils literal notranslate"><span class="pre">processReclaimedHosts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench37ConservativeBackfillingBatchScheduler15scheduleOnHostsEmm9sg_size_t"><code class="docutils literal notranslate"><span class="pre">scheduleOnHosts()</span></code></a></li>
 </ul>
 </li>
@@ -544,6 +545,20 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench37ConservativeBackfillingBatchScheduler17processQueuedJobsEv">
 <span id="_CPPv3N6wrench37ConservativeBackfillingBatchScheduler17processQueuedJobsEv"></span><span id="_CPPv2N6wrench37ConservativeBackfillingBatchScheduler17processQueuedJobsEv"></span><span id="wrench::ConservativeBackfillingBatchScheduler::processQueuedJobs"></span><span class="target" id="classwrench_1_1_conservative_backfilling_batch_scheduler_1a00a793810131b4308a41cee750541efa"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">processQueuedJobs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench37ConservativeBackfillingBatchScheduler17processQueuedJobsEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Method to schedule (possibly) the next jobs to be scheduled. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench37ConservativeBackfillingBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE">
+<span id="_CPPv3N6wrench37ConservativeBackfillingBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE"></span><span id="_CPPv2N6wrench37ConservativeBackfillingBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE"></span><span id="wrench::ConservativeBackfillingBatchScheduler::processReclaimedHosts__std::set:simgrid::s4u::HostP:CR.std::shared_ptr:BatchJob:"></span><span class="target" id="classwrench_1_1_conservative_backfilling_batch_scheduler_1ae1c1aa4722b2f7aa0d04147929c448a6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">processReclaimedHosts</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">simgrid</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">s4u</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Host</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hosts</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_batch_job.html#_CPPv4N6wrench8BatchJobE" title="wrench::BatchJob"><span class="n"><span class="pre">BatchJob</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reclaim_job</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench37ConservativeBackfillingBatchScheduler21processReclaimedHostsERKNSt3setIPN7simgrid3s4u4HostEEENSt10shared_ptrI8BatchJobEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Method to process a host being reclaimed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hosts</strong> – the hosts that are being reclaimed </p></li>
+<li><p><strong>reclaim_job</strong> – the reclaim job </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
