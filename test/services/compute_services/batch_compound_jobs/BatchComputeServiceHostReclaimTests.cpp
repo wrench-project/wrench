@@ -888,7 +888,7 @@ void BatchComputeServiceHostReclaimTest::do_BasicReclaimRelease_test(std::string
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1213,7 +1213,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
+TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_LessBasicReclaimRelease) {
 #else
 TEST_F(BatchComputeServiceHostReclaimTest, LessBasicReclaimRelease) {
 #endif
@@ -1399,7 +1399,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
+TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_EvenLessBasicReclaimRelease) {
 #else
 TEST_F(BatchComputeServiceHostReclaimTest, EvenLessBasicReclaimRelease) {
 #endif
@@ -1519,7 +1519,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_ReclaimRelease) {
+TEST_F(BatchComputeServiceHostReclaimTest, DISABLED_RandomReclaimRelease) {
 #else
 TEST_F(BatchComputeServiceHostReclaimTest, RandomReclaimRelease) {
 #endif
