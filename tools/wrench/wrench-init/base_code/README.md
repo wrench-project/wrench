@@ -14,12 +14,12 @@ make
 sudo make install
 ```
 
-If you have installed SimGrid and/or WRENCH in non-standard locations,  then you should specify `SimGrid_PATH` and/or `WRENCH_PATH` variables. For instance:
+If you have installed SimGrid, FSMod, and/or WRENCH in non-standard locations,  then you should specify `SimGrid_PATH`, `FSMOD_PATH`, and/or `WRENCH_PATH` variables. For instance:
 
 ```bash
 mkdir build
 cd build
-cmake -DSimGrid_PATH=/my/simgrid/path/ -DWRENCH_PATH=/my/wrench/path/ ..
+cmake -DSimGrid_PATH=/my/simgrid/path/ -DFSMOD_PATH=/my/fsmod/path/ -DWRENCH_PATH=/my/wrench/path/ ..
 make
 sudo make install 
 ```
