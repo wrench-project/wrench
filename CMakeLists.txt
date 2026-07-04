@@ -95,7 +95,8 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
+include_directories(SYSTEM ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/)
 
 
 # For MacOS's MacPorts

@@ -74,7 +74,8 @@ find_package(WRENCH REQUIRED)
 
 
 # include directories
-include_directories(include/ /usr/local/include/ /opt/local/include/ ${WRENCH_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+include_directories(SYSTEM /usr/local/include/ /opt/local/include/ ${WRENCH_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+include_directories(include/)
 
 # source files
 set(SOURCE_FILES
