@@ -75,6 +75,7 @@ namespace wrench {
         void instantiatePlatformFromString(const std::string &platform);
 
         static std::vector<std::string> getHostnameList();
+        static std::vector<std::string> getHostnameListWithSubstring(const std::string &substring);
         static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
         static sg_size_t getHostMemoryCapacity(const std::string &hostname);
         static unsigned long getHostNumCores(const std::string &hostname);

@@ -381,6 +381,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the list of names of all the physical hosts in the platform
+     * that contain a particular substring
+     *
+     * @return a vector of hostnames
+     */
+    std::vector<std::string> Simulation::getHostnameListWithSubstring(const std::string &substring) {
+        std::vector<std::string> to_return;
+        for (auto const &h : S4U_Simulation::getAllHostnames()) {
+            if (h.find(substring) != std::string::npos) {
+                to_return.push_back(h);
+            }
+        }
+        return to_return;
+    }
+
+    /**
      * @brief Get the list of link names on the route between two hosts
      * @param src_host: src hostname
      * @param dst_host: dst hostname
