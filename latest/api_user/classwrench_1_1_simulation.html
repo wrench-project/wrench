@@ -131,6 +131,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation21getHostMemoryCapacityERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getHostMemoryCapacity()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15getHostnameListEv"><code class="docutils literal notranslate"><span class="pre">getHostnameList()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation24getHostnameListByClusterEv"><code class="docutils literal notranslate"><span class="pre">getHostnameListByCluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation28getHostnameListWithSubstringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getHostnameListWithSubstring()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15getHostNumCoresERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getHostNumCores()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation16getListOfPstatesERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getListOfPstates()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation22getMaxPowerConsumptionERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">getMaxPowerConsumption()</span></code></a></li>
@@ -508,6 +509,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a map of lists of hosts, indexed by cluster name </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation28getHostnameListWithSubstringERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation28getHostnameListWithSubstringERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation28getHostnameListWithSubstringERKNSt6stringE"></span><span id="wrench::Simulation::getHostnameListWithSubstring__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1aad32da4f1b73e2c33e03789075eb1a6d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getHostnameListWithSubstring</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">substring</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Get the list of names of all the physical hosts in the platform that contain a particular substring. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a vector of hostnames </p>
 </dd>
 </dl>
 </dd></dl>
