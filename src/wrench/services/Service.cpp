@@ -474,4 +474,19 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Get the service's name
+     */
+    std::string Service::getName() const {
+        return this->name;
+    }
+
+    /**
+     * @brief Set the service's name
+     * @param name: the new name
+     */
+    void Service::setName(const std::string& name) {
+        this->name = name;
+    }
+
 }// namespace wrench

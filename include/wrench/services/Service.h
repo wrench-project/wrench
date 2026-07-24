@@ -39,6 +39,10 @@ namespace wrench {
     class Service : public S4U_Daemon {
 
     public:
+
+        std::string getName() const;
+        void setName(const std::string& name);
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
@@ -68,6 +72,7 @@ namespace wrench {
 
         double getNetworkTimeoutValue() const;
         void setNetworkTimeoutValue(double value);
+
 
         /***********************/
         /** \endcond           */
