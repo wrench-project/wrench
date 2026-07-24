@@ -52,19 +52,35 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the invocation's start date
+    * @brief Get the invocation's container's start date
     * @return A simulated date (or -1.0 if not submitted)
     */
-    double Invocation::getStartDate() const {
-        return _start_date;
+    double Invocation::getContainerStartDate() const {
+        return _container_start_date;
     }
 
     /**
-    * @brief Get the invocation's end date
+    * @brief Get the invocation's container's end date
     * @return A simulated date (or -1.0 if not submitted)
     */
-    double Invocation::getEndDate() const {
-        return _end_date;
+    double Invocation::getContainerEndDate() const {
+        return _container_end_date;
+    }
+
+    /**
+    * @brief Get the invocation's function execution start date
+    * @return A simulated date (or -1.0 if not submitted)
+    */
+    double Invocation::getFunctionStartDate() const {
+        return _function_start_date;
+    }
+
+    /**
+    * @brief Get the invocation's function execution end date
+    * @return A simulated date (or -1.0 if not submitted)
+    */
+    double Invocation::getFunctionEndDate() const {
+        return _function_end_date;
     }
 
     /**

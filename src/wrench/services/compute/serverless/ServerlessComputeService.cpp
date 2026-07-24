@@ -553,7 +553,7 @@ namespace wrench {
     void ServerlessComputeService::processInvocationCompletion(const std::shared_ptr<Invocation>& invocation,
                                                                const std::shared_ptr<Action>& action) {
         std::shared_ptr<FailureCause> failure_cause = action->getFailureCause();
-        invocation->_end_date = Simulation::getCurrentSimulatedDate();
+        invocation->_container_end_date = S4U_Simulation::getClock();
         WRENCH_INFO("A function invocation for function %s has finished [%s]",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
                     (failure_cause ? "FAILURE" : "SUCCESS"));
@@ -701,8 +701,10 @@ namespace wrench {
             const auto function = invocation->_registered_function->_function;
 
             // Invoke the user's lambda function
+            invocation->_function_start_date = wrench::S4U_Simulation::getClock();
             invocation->_function_output = function->_lambda(invocation->_function_input,
                                                              invocation->_tmp_storage_service);
+            invocation->_function_end_date = wrench::S4U_Simulation::getClock();
 
             // Clean up the on-disk storage
             invocation->_tmp_storage_service->stop();
@@ -740,7 +742,7 @@ namespace wrench {
         WRENCH_INFO("Dispatched an invocation for function %s",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
         _state_of_the_system->_available_cores[target_host] -= 1;
-        invocation->_start_date = Simulation::getCurrentSimulatedDate();
+        invocation->_container_start_date = Simulation::getCurrentSimulatedDate();
         action_executor->start(action_executor, true, false);
 
         // WRENCH_INFO("Function [%s] invoked", invocation->_registered_function->_function->getName().c_str());
@@ -1061,8 +1063,8 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         action_executor->start(action_executor, true, false);
 
-        // WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID().c_str(),
-        //             computeHost.c_str());
+        WRENCH_INFO("Initiated image copy for image [%s] from head host to compute host [%s]", image->getID().c_str(),
+                    compute_host.c_str());
     }
 
     /**
@@ -1127,7 +1129,7 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         action_executor->start(action_executor, true, false);
 
-        // WRENCH_INFO("Initiating image copy for image [%s] to compute host [%s]", image->getID().c_str(),
-        //             computeHost.c_str());
+        WRENCH_INFO("Initiated image copy for image [%s] to compute host [%s]", image->getID().c_str(),
+                    compute_host.c_str());
     }
 }; // namespace wrench

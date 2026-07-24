@@ -36,8 +36,10 @@ namespace wrench {
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
         [[nodiscard]] double getSubmitDate() const;
-        [[nodiscard]] double getStartDate() const;
-        [[nodiscard]] double getEndDate() const;
+        [[nodiscard]] double getContainerStartDate() const;
+        [[nodiscard]] double getContainerEndDate() const;
+        [[nodiscard]] double getFunctionStartDate() const;
+        [[nodiscard]] double getFunctionEndDate() const;
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -66,8 +68,10 @@ namespace wrench {
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
 
         double _submit_date = -1.0;
-        double _start_date = -1.0;
-        double _end_date = -1.0;
+        double _container_start_date = -1.0;
+        double _function_start_date = -1.0;
+        double _function_end_date = -1.0;
+        double _container_end_date = -1.0;
 
         std::string _target_host;
 

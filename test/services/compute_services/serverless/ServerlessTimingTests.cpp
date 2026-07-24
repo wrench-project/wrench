@@ -310,13 +310,13 @@ private:
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
         for (unsigned long i = 0; i < num_invocations; i += 10) {
-            double start_date = invocations.at(i)->getStartDate();
-            double end_date = invocations.at(i)->getEndDate();
+            double start_date = invocations.at(i)->getContainerStartDate();
+            double end_date = invocations.at(i)->getContainerEndDate();
             for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 10, num_invocations); j++) {
-                if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
+                if (fabs(start_date - invocations.at(j)->getContainerStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-                if (fabs(end_date - invocations.at(j)->getEndDate()) > 0.1) {
+                if (fabs(end_date - invocations.at(j)->getContainerEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
             }
@@ -441,24 +441,24 @@ private:
         double expected_invocation_2_start = expected_invocation_1_end + image_load;
         double expected_invocation_2_end = expected_invocation_2_start + compute_time;
 
-        if (fabs(expected_invocation_1_start - invocation_1->getStartDate()) > EPSILON) {
+        if (fabs(expected_invocation_1_start - invocation_1->getContainerStartDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_1 start date " +
-                std::to_string(invocation_1->getStartDate()) + " instead of " + std::to_string(
+                std::to_string(invocation_1->getContainerStartDate()) + " instead of " + std::to_string(
                     expected_invocation_1_start));
         }
-        if (fabs(expected_invocation_1_end - invocation_1->getEndDate()) > EPSILON) {
+        if (fabs(expected_invocation_1_end - invocation_1->getContainerEndDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_1 end date " +
-                std::to_string(invocation_1->getEndDate()) + " instead of " + std::to_string(
+                std::to_string(invocation_1->getContainerEndDate()) + " instead of " + std::to_string(
                     expected_invocation_1_end));
         }
-        if (fabs(expected_invocation_2_start - invocation_2->getStartDate()) > EPSILON) {
+        if (fabs(expected_invocation_2_start - invocation_2->getContainerStartDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_2 start date " +
-                std::to_string(invocation_2->getStartDate()) + " instead of " + std::to_string(
+                std::to_string(invocation_2->getContainerStartDate()) + " instead of " + std::to_string(
                     expected_invocation_2_start));
         }
-        if (fabs(expected_invocation_2_end - invocation_2->getEndDate()) > EPSILON) {
+        if (fabs(expected_invocation_2_end - invocation_2->getContainerEndDate()) > EPSILON) {
             throw std::runtime_error("Unexpected invocation_2 end date " +
-                std::to_string(invocation_2->getEndDate()) + " instead of " + std::to_string(
+                std::to_string(invocation_2->getContainerEndDate()) + " instead of " + std::to_string(
                     expected_invocation_2_end));
         }
 
@@ -569,13 +569,13 @@ private:
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
         for (unsigned long i = 0; i < num_invocations; i += 4) {
-            double start_date = invocations.at(i)->getStartDate();
-            double end_date = invocations.at(i)->getEndDate();
+            double start_date = invocations.at(i)->getContainerStartDate();
+            double end_date = invocations.at(i)->getContainerEndDate();
             for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 4, num_invocations); j++) {
-                if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
+                if (fabs(start_date - invocations.at(j)->getContainerStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-                if (fabs(end_date - invocations.at(j)->getEndDate()) > 0.1) {
+                if (fabs(end_date - invocations.at(j)->getContainerEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
             }
@@ -687,10 +687,10 @@ private:
         function_manager->wait_one(invocation_2);
 
         // We expect that as soo as invocation_1 has started, then invocation_2 can finally do the copy and load.
-        double expected_invocation_2_start_date = invocation_1->getStartDate() + 2 * (61 * GB / (100 * MB));
+        double expected_invocation_2_start_date = invocation_1->getContainerStartDate() + 2 * (61 * GB / (100 * MB));
 
-        if (fabs(expected_invocation_2_start_date - invocation_2->getStartDate()) > 0.1) {
-            throw std::runtime_error("Unexpected start date for invocation_2 " + std::to_string(invocation_2->getStartDate()) +
+        if (fabs(expected_invocation_2_start_date - invocation_2->getContainerStartDate()) > 0.1) {
+            throw std::runtime_error("Unexpected start date for invocation_2 " + std::to_string(invocation_2->getContainerStartDate()) +
                 " (expected: " +std::to_string(expected_invocation_2_start_date) + ")");
         }
 
@@ -798,13 +798,13 @@ private:
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
         for (unsigned long i = 0; i < num_invocations; i += 3) {
-            double start_date = invocations.at(i)->getStartDate();
-            double end_date = invocations.at(i)->getEndDate();
+            double start_date = invocations.at(i)->getContainerStartDate();
+            double end_date = invocations.at(i)->getContainerEndDate();
             for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 3, num_invocations); j++) {
-                if (fabs(start_date - invocations.at(j)->getStartDate()) > 0.1) {
+                if (fabs(start_date - invocations.at(j)->getContainerStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-                if (fabs(end_date - invocations.at(j)->getEndDate()) > 0.1) {
+                if (fabs(end_date - invocations.at(j)->getContainerEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
             }
