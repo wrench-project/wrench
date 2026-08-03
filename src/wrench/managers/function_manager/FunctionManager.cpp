@@ -128,7 +128,6 @@ namespace wrench {
         const std::shared_ptr<FunctionInput>& function_input) {
         // WRENCH_INFO("Function [%s] invoked with compute service [%s]", registered_function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the commport to notify
-
         return sl_compute_service->invokeFunction(registered_function, function_input, this->commport);
     }
 

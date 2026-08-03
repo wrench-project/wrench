@@ -693,6 +693,7 @@ namespace wrench {
                                    invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
 
 
+        // Declare the function invocation's necessary lambdas
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
 

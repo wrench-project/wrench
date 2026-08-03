@@ -44,7 +44,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the invocation's submit date
+     * @brief Get the invocation's submit date (i.e., the date at which the compute service received the invocation request)
      * @return A simulated date (or -1.0 if not submitted)
      */
     double Invocation::getSubmitDate() const {
