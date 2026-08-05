@@ -149,6 +149,8 @@ namespace wrench {
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation, const std::string& target_host);
 
+        static void releaseInvocationResources(const std::shared_ptr<Invocation>& invocation);
+
         unsigned long num_cores_of_compute_host;
         double speed_of_compute_core;
         sg_size_t ram_of_compute_host;

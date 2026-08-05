@@ -696,7 +696,8 @@ namespace wrench {
 
 
         // Declare the function invocation's necessary lambdas
-        const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
+        const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
+            ServerlessComputeService::releaseInvocationResources(invocation);
         };
 
         const std::function lambda_execute = [invocation](
@@ -704,17 +705,16 @@ namespace wrench {
             const auto function = invocation->_registered_function->_function;
 
             // Invoke the user's lambda function
-            invocation->_function_start_date = wrench::S4U_Simulation::getClock();
-            invocation->_function_output = function->_lambda(invocation->_function_input,
-                                                             invocation->_tmp_storage_service);
-            invocation->_function_end_date = wrench::S4U_Simulation::getClock();
-
-            // Clean up the on-disk storage
-            invocation->_tmp_storage_service->stop();
-            invocation->_opened_tmp_file->close();
-            invocation->_tmp_storage_service = nullptr; // Should free up all memory...
-            StorageService::removeFileAtLocation(invocation->_tmp_file);
-            // WRENCH_INFO("Done with the lambda execute!!");
+            invocation->_function_start_date = S4U_Simulation::getClock();
+            try {
+                invocation->_function_output = function->_lambda(invocation->_function_input,
+                                                                 invocation->_tmp_storage_service);
+            } catch (ExecutionException& e) {
+                ServerlessComputeService::releaseInvocationResources(invocation);
+                invocation->_function_end_date = S4U_Simulation::getClock();
+                throw;
+            }
+            invocation->_function_end_date = S4U_Simulation::getClock();
         };
 
 
@@ -1135,4 +1135,16 @@ namespace wrench {
         WRENCH_INFO("Initiated image copy for image [%s] to compute host [%s]", image->getID().c_str(),
                     compute_host.c_str());
     }
+
+    /**
+     * @brief Helper method to release the resources allocated to an invocation that has terminated (successfully or not)
+     */
+    void ServerlessComputeService::releaseInvocationResources(const std::shared_ptr<Invocation>& invocation) {
+        // Stop amd clean up the on-disk storage
+        invocation->_tmp_storage_service->stop();
+        invocation->_opened_tmp_file->close();
+        invocation->_tmp_storage_service = nullptr; // Should free up all memory...
+        StorageService::removeFileAtLocation(invocation->_tmp_file);
+    }
+
 }; // namespace wrench
