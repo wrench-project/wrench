@@ -456,6 +456,7 @@ namespace wrench {
                     this->getMessagePayloadValue(
                         ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
                 answer_commport->dputMessage(answerMessage);
+                return;
             }
 
             if (needed_ram_space > this->ram_of_compute_host) {
@@ -466,11 +467,12 @@ namespace wrench {
                     this->getMessagePayloadValue(
                         ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
                 answer_commport->dputMessage(answerMessage);
+                return;
             }
         }
 
 
-        // Register the function
+        // At this point, we can register the function
         auto registered_function = std::make_shared<RegisteredFunction>(
             function,
             time_limit,
