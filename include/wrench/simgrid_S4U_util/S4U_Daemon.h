@@ -101,6 +101,8 @@ namespace wrench {
 
 
         std::string getName() const;
+        void setName(std::string name);
+
 
         /** @brief Daemon states */
         enum State {

@@ -388,25 +388,33 @@ namespace wrench {
     }
 
     /**
- * @brief Returns the value returned by main() (if the daemon has returned from main)
- * @return The return value
- */
+     * @brief Returns the value returned by main() (if the daemon has returned from main)
+     * @return The return value
+     */
     int S4U_Daemon::getReturnValue() const {
         return this->return_value_;
     }
 
     /**
- * @brief Retrieve the process name
- * @return the name
- */
+     * @brief Retrieve the process name
+     * @return the name
+     */
     std::string S4U_Daemon::getName() const {
         return this->process_name;
     }
 
     /**
- * @brief Create a life-saver for the daemon
- * @param reference
- */
+     * @brief Set the service's name
+     * @param name: the new name
+     */
+    void S4U_Daemon::setName(const std::string name) {
+        this->process_name = std::move(name);
+    }
+
+    /**
+     * @brief Create a life-saver for the daemon
+     * @param reference
+     */
     void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
         if (this->life_saver) {
             throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");

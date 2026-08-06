@@ -40,8 +40,6 @@ namespace wrench {
 
     public:
 
-        std::string getName() const;
-        void setName(const std::string& name);
 
         /***********************/
         /** \cond DEVELOPER    */
