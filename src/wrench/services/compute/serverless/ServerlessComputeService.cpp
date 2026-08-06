@@ -570,6 +570,7 @@ namespace wrench {
 
         bool success = action->getState() == Action::State::COMPLETED;
 
+        _state_of_the_system->_running_invocations.erase(invocation);
 
         invocation->_notify_commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationCompleteMessage(
@@ -594,7 +595,7 @@ namespace wrench {
                 //             invocation_to_place->_registered_function->_function->getName().c_str());
 
                 if (dispatchInvocation(invocation, hostname)) {
-                    _state_of_the_system->_running_invocations.push(invocation);
+                    _state_of_the_system->_running_invocations.insert(invocation);
                     invocation->_target_host = hostname;
                     dispatched_invocations.insert(invocation);
                 }

@@ -69,10 +69,10 @@ namespace wrench
         std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
         // queue of function invocations whose images have been downloaded
         std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
-        // queue of function invocations currently running
-        std::queue<std::shared_ptr<Invocation>> _running_invocations;
-        // queue of function invocations that have finished executing
-        std::queue<std::shared_ptr<Invocation>> _finished_invocations;
+        // set of function invocations currently running
+        std::set<std::shared_ptr<Invocation>> _running_invocations;
+        // set of function invocations that have finished executing
+        // std::set<std::shared_ptr<Invocation>> _finished_invocations;
 
         std::string _head_storage_service_mount_point;
         // std::vector<std::shared_ptr<BareMetalComputeService>> _compute_services;
