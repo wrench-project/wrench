@@ -48,6 +48,16 @@ namespace wrench {
                                                        messagepayload_list) :
         ComputeService(hostname,
                        "ServerlessComputeService", "") {
+
+        // Check that there is at least one compute host
+        if (compute_hosts.empty()) {
+            throw std::invalid_argument("ServerlessComputeService::ServerlessComputeService(): The list of compute hosts cannot be empty");
+        }
+
+        // Check that the scheduler is specified
+        if (not scheduler) {
+            throw std::invalid_argument("ServerlessComputeService::ServerlessComputeService(): A non-null scheduler must be provided");
+        }
         // Check platform homogeneity
         check_homogeneity(compute_hosts);
 
@@ -393,7 +403,7 @@ namespace wrench {
         }
         else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
-            _state_of_the_system->_being_copied_images[scsncc_msg->_compute_host].erase(scsncc_msg->_image_file);
+            _state_of_the_system->_being_copied_images.at(scsncc_msg->_compute_host).erase(scsncc_msg->_image_file);
             if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("An image copy has failed (due to disk pressure) for image %s... nevermind",
                             scsncc_msg->_image_file->getID().c_str());
@@ -408,7 +418,7 @@ namespace wrench {
         }
         else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
-            _state_of_the_system->_being_loaded_images[scsnlc_msg->_compute_host].erase(scsnlc_msg->_image_file);
+            _state_of_the_system->_being_loaded_images.at(scsnlc_msg->_compute_host).erase(scsnlc_msg->_image_file);
             if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("An image load has failed (due to memory pressure) for image %s... nevermind",
                             scsnlc_msg->_image_file->getID().c_str());
@@ -515,7 +525,7 @@ namespace wrench {
             invocation->_submit_date = Simulation::getCurrentSimulatedDate();
             _state_of_the_system->_new_invocations.push(invocation);
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                true, invocation, nullptr, 0);
+                true, invocation, nullptr, ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD);
             answer_commport->dputMessage(answerMessage);
         }
     }
@@ -539,7 +549,7 @@ namespace wrench {
         // _state_of_the_system->_downloaded_image_files.insert(image_file);
 
         // Move all relevant invocations from the admitted to the schedulable queue
-        auto& queue = _state_of_the_system->_admitted_invocations[image_file];
+        auto& queue = _state_of_the_system->_admitted_invocations.at(image_file);
         while (not queue.empty()) {
             _state_of_the_system->_schedulable_invocations.emplace(
                 _state_of_the_system->_schedulable_invocations.end(), std::move(queue.front()));
@@ -566,7 +576,7 @@ namespace wrench {
         invocation->_opened_image_ram_file->close();
         invocation->_opened_tmp_ram_file->close();
         StorageService::removeFileAtLocation(invocation->_tmp_ram_file_location);
-        _state_of_the_system->_available_cores[host]++;
+        _state_of_the_system->_available_cores.at(host)++;
 
         bool success = action->getState() == Action::State::COMPLETED;
 
@@ -607,7 +617,6 @@ namespace wrench {
         for (auto const& invocation : _state_of_the_system->_schedulable_invocations) {
             if (dispatched_invocations.find(invocation) == dispatched_invocations.end()) {
                 updated_list_of_schedulable_invocations.push_back(invocation);
-                dispatched_invocations.erase(invocation); // Should be more efficient
             }
         }
         _state_of_the_system->_schedulable_invocations = updated_list_of_schedulable_invocations;
@@ -622,7 +631,7 @@ namespace wrench {
     bool ServerlessComputeService::invocationCanBeStarted(
         const std::shared_ptr<Invocation>& invocation,
         const std::string& hostname) const {
-        auto ss_memory = _state_of_the_system->_compute_memories[hostname];
+        auto ss_memory = _state_of_the_system->_compute_memories.at(hostname);
         auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
         // The image is in RAM
@@ -632,7 +641,7 @@ namespace wrench {
             return false;
         }
         // There is an available core
-        if (_state_of_the_system->_available_cores[hostname] < 1) {
+        if (_state_of_the_system->_available_cores.at(hostname) < 1) {
             WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
             return false;
         }
@@ -676,7 +685,7 @@ namespace wrench {
         auto tmp_memory_file = Simulation::addFile(
             "tmp_ram_file_" + std::to_string(++ServerlessComputeService::sequence_number),
             invocation->getRegisteredFunction()->getRAMLimit());
-        auto compute_ram_ss = _state_of_the_system->_compute_memories[target_host];
+        auto compute_ram_ss = _state_of_the_system->_compute_memories.at(target_host);
         try {
             auto file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
             StorageService::createFileAtLocation(file_location);
@@ -816,13 +825,13 @@ namespace wrench {
         std::shared_ptr<FileLocation> tmp_file;
         std::shared_ptr<simgrid::fsmod::File> opened_tmp_file;
         try {
-            tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages[target_host],
+            tmp_file = wrench::FileLocation::LOCATION(_state_of_the_system->_compute_storages.at(target_host),
                                                       Simulation::addFile(
                                                           "tmp_" + std::to_string(
                                                               ++ServerlessComputeService::sequence_number),
                                                           invocation->_registered_function->_disk_space));
             StorageService::createFileAtLocation(tmp_file);
-            opened_tmp_file = _state_of_the_system->_compute_storages[target_host]->openFile(tmp_file);
+            opened_tmp_file = _state_of_the_system->_compute_storages.at(target_host)->openFile(tmp_file);
         }
         catch (ExecutionException& e) {
             throw;
@@ -1038,7 +1047,7 @@ namespace wrench {
             // Copy the image file from the head host to the current host's storage service
             auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service, image);
             auto local_image_path = wrench::FileLocation::LOCATION(
-                _state_of_the_system->_compute_storages[compute_host],
+                _state_of_the_system->_compute_storages.at(compute_host),
                 image);
             StorageService::copyFile(head_host_image_path, local_image_path);
             // WRENCH_INFO("Done with the lambda execute!!");
@@ -1094,10 +1103,10 @@ namespace wrench {
             const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the image load lambda execute!!");
             auto src_location = wrench::FileLocation::LOCATION(
-                _state_of_the_system->_compute_storages[compute_host], image);
+                _state_of_the_system->_compute_storages.at(compute_host), image);
             auto dst_location = wrench::FileLocation::LOCATION(
-                _state_of_the_system->_compute_memories[compute_host],
-                _state_of_the_system->_compute_memories[compute_host]->getBaseRootPath(),
+                _state_of_the_system->_compute_memories.at(compute_host),
+                _state_of_the_system->_compute_memories.at(compute_host)->getBaseRootPath(),
                 image);
             try {
                 StorageService::copyFile(src_location, dst_location);
@@ -1137,8 +1146,7 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         action_executor->start(action_executor, true, false);
 
-        WRENCH_INFO("Initiated image copy for image [%s] to compute host [%s]", image->getID().c_str(),
-                    compute_host.c_str());
+        WRENCH_INFO("Initiated image load at compute host [%s]", compute_host.c_str());
     }
 
     /**
