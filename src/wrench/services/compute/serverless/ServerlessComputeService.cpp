@@ -529,6 +529,7 @@ namespace wrench {
     void ServerlessComputeService::processImageDownloadCompletion(const std::shared_ptr<Action>& action,
                                                                   const std::shared_ptr<DataFile>& image_file) {
         if (action->getFailureCause()) {
+            _state_of_the_system->_free_space_on_head_storage -= image_file->getSize();
             throw std::runtime_error("ServerlessComputeService::processImageDownloadCompletion(): "
                 "An image download (from remote) has failed. Handling of such failures is currently not implemented");
         }
@@ -891,8 +892,7 @@ namespace wrench {
             // If the image file is already downloaded, make the invocation schedulable immediately
             if (_state_of_the_system->_head_storage_service->hasFile(image->getFile())) {
                 _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_schedulable_invocations.emplace(
-                    _state_of_the_system->_schedulable_invocations.begin(), invocation);
+                _state_of_the_system->_schedulable_invocations.emplace_back(invocation); // Insert at the end
                 continue;
             }
 
@@ -915,6 +915,10 @@ namespace wrench {
                 _state_of_the_system->_new_invocations.pop();
                 _state_of_the_system->_admitted_invocations[image->getFile()].push(invocation);
                 continue;
+            } else {
+                throw std::runtime_error("ServerlessComputeService::admitInvocations(): "
+                "An invocation cannot be admitted because there is not enough space on the head storage to download its (remote) image. "
+                "Currently, no mechanism is implemented to manage the head storage (just make it bigger).");
             }
 
             // If we're here, we couldn't admit invocations, and so we stop
