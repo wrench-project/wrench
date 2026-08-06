@@ -60,8 +60,8 @@ namespace wrench
 
         // map of available cores on each compute host
         std::map<std::string, unsigned long> _available_cores;
-        // map of available RAM on each compute host
-        std::map<std::string, sg_size_t> _available_ram;
+        // map of available RAM on each compute host (deprecated: done as a storage service now)
+        // std::map<std::string, sg_size_t> _available_ram;
 
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _new_invocations;
@@ -70,7 +70,7 @@ namespace wrench
         // queue of function invocations whose images have been downloaded
         std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
         // set of function invocations currently running
-        std::set<std::shared_ptr<Invocation>> _running_invocations;
+        std::unordered_set<std::shared_ptr<Invocation>> _running_invocations;
         // set of function invocations that have finished executing
         // std::set<std::shared_ptr<Invocation>> _finished_invocations;
 
