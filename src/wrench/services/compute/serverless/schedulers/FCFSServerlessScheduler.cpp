@@ -20,7 +20,7 @@ namespace wrench {
      */
     std::shared_ptr<ServerlessSchedulingDecisions> FCFSServerlessScheduler::schedule(
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-        const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+        const ServerlessStateOfTheSystem* state) {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
         makeImageDecisions(decisions, schedulable_invocations, state);
         makeInvocationDecisions(decisions, schedulable_invocations, state);
@@ -35,7 +35,7 @@ namespace wrench {
      */
     void FCFSServerlessScheduler::makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                            const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+                            const ServerlessStateOfTheSystem* state) {
         // Copy data from the state of the system so we can simulate assignment
         auto available_cores = state->getAvailableCores();
         auto compute_nodes = state->getComputeHosts();
@@ -89,7 +89,7 @@ namespace wrench {
      */
     void FCFSServerlessScheduler::makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                  const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                 const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+                                 const ServerlessStateOfTheSystem* state) {
         auto available_cores = state->getAvailableCores();
 
         for (const auto& inv : schedulable_invocations) {

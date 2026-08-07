@@ -25,7 +25,7 @@ namespace wrench {
         /***********************/
         std::shared_ptr<ServerlessSchedulingDecisions> schedule(
             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-            const std::shared_ptr<ServerlessStateOfTheSystem>& state
+            const ServerlessStateOfTheSystem* state
         ) override;
 
         /***********************/
@@ -38,11 +38,11 @@ namespace wrench {
     private:
         void makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                 const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                const std::shared_ptr<ServerlessStateOfTheSystem>& state);
+                                const ServerlessStateOfTheSystem* state);
 
         void makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                      const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                     const std::shared_ptr<ServerlessStateOfTheSystem>& state);
+                                     const ServerlessStateOfTheSystem* state);
 
 
         // Function type -> total workload (in time units)
@@ -58,7 +58,7 @@ namespace wrench {
         void calculateFunctionWorkloads(const std::vector<std::shared_ptr<Invocation>>& invocations);
 
         // Helper to create allocation plan
-        void createAllocationPlan(const std::shared_ptr<ServerlessStateOfTheSystem>& state);
+        void createAllocationPlan(const ServerlessStateOfTheSystem* state);
 
         // Map function names to their image files
         std::unordered_map<std::string, std::shared_ptr<DataFile>> function_images;

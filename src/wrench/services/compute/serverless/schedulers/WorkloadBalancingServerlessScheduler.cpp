@@ -18,7 +18,7 @@ namespace wrench {
      */
     std::shared_ptr<ServerlessSchedulingDecisions> WorkloadBalancingServerlessScheduler::schedule(
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-        const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+        const ServerlessStateOfTheSystem* state) {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
         makeImageDecisions(decisions, schedulable_invocations, state);
         makeInvocationDecisions(decisions, schedulable_invocations, state);
@@ -33,7 +33,7 @@ namespace wrench {
      */
     void WorkloadBalancingServerlessScheduler::makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                             const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                            const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+                            const ServerlessStateOfTheSystem* state) {
 
 
         calculateFunctionWorkloads(schedulable_invocations);
@@ -72,7 +72,7 @@ namespace wrench {
      */
     void WorkloadBalancingServerlessScheduler::makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                  const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                 const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+                                 const ServerlessStateOfTheSystem* state) {
 
         // Get current available cores
         auto availableCores = state->getAvailableCores();
@@ -148,7 +148,7 @@ namespace wrench {
      * @param state Curent state
      */
     void WorkloadBalancingServerlessScheduler::createAllocationPlan(
-        const std::shared_ptr<ServerlessStateOfTheSystem> &state) {
+        const ServerlessStateOfTheSystem *state) {
         // Clear existing plan
         allocation_plan.clear();
 

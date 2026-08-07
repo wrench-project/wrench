@@ -52,7 +52,6 @@ namespace wrench {
 
     private:
         friend class FunctionManager;
-        friend class ServerlessComputeService;
 
         std::string _name; // the name of the function
         std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> _lambda; // the function logic

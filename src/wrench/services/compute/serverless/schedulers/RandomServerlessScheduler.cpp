@@ -23,7 +23,7 @@ namespace wrench {
      */
     std::shared_ptr<ServerlessSchedulingDecisions> RandomServerlessScheduler::schedule(
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-        const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+        const ServerlessStateOfTheSystem* state) {
         auto decision = std::make_shared<ServerlessSchedulingDecisions>();
 
         this->makeImageDecisions(decision, schedulable_invocations, state);
@@ -39,7 +39,7 @@ namespace wrench {
      */
     void RandomServerlessScheduler::makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                                        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                                       const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+                                                       const ServerlessStateOfTheSystem* state) {
 
         // Copy available cores so we can simulate assignment
         auto availableCores = state->getAvailableCores();
@@ -107,7 +107,7 @@ namespace wrench {
      */
     void RandomServerlessScheduler::makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
                                 const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                const std::shared_ptr<ServerlessStateOfTheSystem>& state) {
+                                const ServerlessStateOfTheSystem* state) {
 
         auto availableCores = state->getAvailableCores();
 
