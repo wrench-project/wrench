@@ -300,6 +300,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon4mainEv"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10S4U_Daemon17releaseDaemonLockEv"><code class="docutils literal notranslate"><span class="pre">releaseDaemonLock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10S4U_Daemon11resumeActorEv"><code class="docutils literal notranslate"><span class="pre">resumeActor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon7setNameENSt6stringE"><code class="docutils literal notranslate"><span class="pre">setName()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon13setSimulationEP10Simulation"><code class="docutils literal notranslate"><span class="pre">setSimulation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon19setupOnExitFunctionEv"><code class="docutils literal notranslate"><span class="pre">setupOnExitFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon11startDaemonEbb"><code class="docutils literal notranslate"><span class="pre">startDaemon()</span></code></a></li>
@@ -322,6 +323,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___simulation.html">wrench::S4U_Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___virtual_machine.html">wrench::S4U_VirtualMachine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html">wrench::ServerlessComputeNode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
@@ -698,6 +700,17 @@
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench10S4U_Daemon11resumeActorEv">
 <span id="_CPPv3NK6wrench10S4U_Daemon11resumeActorEv"></span><span id="_CPPv2NK6wrench10S4U_Daemon11resumeActorEv"></span><span id="wrench::S4U_Daemon::resumeActorC"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1ac15a56ac774237456bb47fdd67876a80"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resumeActor</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10S4U_Daemon11resumeActorEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Resume the daemon/actor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon7setNameENSt6stringE">
+<span id="_CPPv3N6wrench10S4U_Daemon7setNameENSt6stringE"></span><span id="_CPPv2N6wrench10S4U_Daemon7setNameENSt6stringE"></span><span id="wrench::S4U_Daemon::setName__ss"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1ace5f4fb984a5e327591c2dc5cf2a3c89"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setName</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon7setNameENSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the service’s name. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – the new name </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">

@@ -238,11 +238,13 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Invocation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench10InvocationE"><code class="docutils literal notranslate"><span class="pre">wrench::Invocation</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI18RegisteredFunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort"><code class="docutils literal notranslate"><span class="pre">Invocation()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation10getEndDateEv"><code class="docutils literal notranslate"><span class="pre">getEndDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation19getContainerEndDateEv"><code class="docutils literal notranslate"><span class="pre">getContainerEndDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation21getContainerStartDateEv"><code class="docutils literal notranslate"><span class="pre">getContainerStartDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation15getFailureCauseEv"><code class="docutils literal notranslate"><span class="pre">getFailureCause()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation18getFunctionEndDateEv"><code class="docutils literal notranslate"><span class="pre">getFunctionEndDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation20getFunctionStartDateEv"><code class="docutils literal notranslate"><span class="pre">getFunctionStartDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation9getOutputEv"><code class="docutils literal notranslate"><span class="pre">getOutput()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation21getRegisteredFunctionEv"><code class="docutils literal notranslate"><span class="pre">getRegisteredFunction()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation12getStartDateEv"><code class="docutils literal notranslate"><span class="pre">getStartDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation13getSubmitDateEv"><code class="docutils literal notranslate"><span class="pre">getSubmitDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation12hasSucceededEv"><code class="docutils literal notranslate"><span class="pre">hasSucceeded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation6isDoneEv"><code class="docutils literal notranslate"><span class="pre">isDone()</span></code></a></li>
@@ -300,6 +302,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___simulation.html">wrench::S4U_Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___virtual_machine.html">wrench::S4U_VirtualMachine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html">wrench::ServerlessComputeNode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
@@ -478,9 +481,20 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation10getEndDateEv">
-<span id="_CPPv3NK6wrench10Invocation10getEndDateEv"></span><span id="_CPPv2NK6wrench10Invocation10getEndDateEv"></span><span id="wrench::Invocation::getEndDateC"></span><span class="target" id="classwrench_1_1_invocation_1a40b3815691771f370acfa0fbeac4b009"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getEndDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><p>Get the invocation’s end date. </p>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation19getContainerEndDateEv">
+<span id="_CPPv3NK6wrench10Invocation19getContainerEndDateEv"></span><span id="_CPPv2NK6wrench10Invocation19getContainerEndDateEv"></span><span id="wrench::Invocation::getContainerEndDateC"></span><span class="target" id="classwrench_1_1_invocation_1abc8e27f3a4c781aa6cbbfa617f6ee598"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getContainerEndDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the invocation’s container’s end date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A simulated date (or -1.0 if not submitted) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation21getContainerStartDateEv">
+<span id="_CPPv3NK6wrench10Invocation21getContainerStartDateEv"></span><span id="_CPPv2NK6wrench10Invocation21getContainerStartDateEv"></span><span id="wrench::Invocation::getContainerStartDateC"></span><span class="target" id="classwrench_1_1_invocation_1a0cf3cc532ed335f06c730dd537a23be9"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getContainerStartDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the invocation’s container’s start date. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A simulated date (or -1.0 if not submitted) </p>
@@ -495,6 +509,28 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A failure cause </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation18getFunctionEndDateEv">
+<span id="_CPPv3NK6wrench10Invocation18getFunctionEndDateEv"></span><span id="_CPPv2NK6wrench10Invocation18getFunctionEndDateEv"></span><span id="wrench::Invocation::getFunctionEndDateC"></span><span class="target" id="classwrench_1_1_invocation_1ac20f43dc0f393c948005b89b5a8acef7"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFunctionEndDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the invocation’s function execution end date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A simulated date (or -1.0 if not submitted) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation20getFunctionStartDateEv">
+<span id="_CPPv3NK6wrench10Invocation20getFunctionStartDateEv"></span><span id="_CPPv2NK6wrench10Invocation20getFunctionStartDateEv"></span><span id="wrench::Invocation::getFunctionStartDateC"></span><span class="target" id="classwrench_1_1_invocation_1ae2e1002acb0b6ab3d07557864aa30c4b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFunctionStartDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the invocation’s function execution start date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A simulated date (or -1.0 if not submitted) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -522,20 +558,9 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation12getStartDateEv">
-<span id="_CPPv3NK6wrench10Invocation12getStartDateEv"></span><span id="_CPPv2NK6wrench10Invocation12getStartDateEv"></span><span id="wrench::Invocation::getStartDateC"></span><span class="target" id="classwrench_1_1_invocation_1aff3192755afa4598d5480507ca584255"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getStartDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><p>Get the invocation’s start date. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A simulated date (or -1.0 if not submitted) </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation13getSubmitDateEv">
 <span id="_CPPv3NK6wrench10Invocation13getSubmitDateEv"></span><span id="_CPPv2NK6wrench10Invocation13getSubmitDateEv"></span><span id="wrench::Invocation::getSubmitDateC"></span><span class="target" id="classwrench_1_1_invocation_1a4d0a2b7dda9ecb9af67b54d51d5ecb39"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getSubmitDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><p>Get the invocation’s submit date. </p>
+<dd><p>Get the invocation’s submit date (i.e., the date at which the compute service received the invocation request) </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A simulated date (or -1.0 if not submitted) </p>
