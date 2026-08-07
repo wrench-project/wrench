@@ -92,7 +92,7 @@ namespace wrench {
         WRENCH_INFO("Waiting for invocation to be done");
         function_manager->wait_one(invocation);
 
-        std::cout << "Function invocation completed at time " << invocation->getEndDate() << " with a " <<
+        std::cout << "Function invocation completed at time " << invocation->getFunctionEndDate() << " with a " <<
                     (invocation->hasSucceeded() ? "SUCCESS" : "FAILURE") << std::endl;
         return 0;
     }
