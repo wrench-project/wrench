@@ -561,7 +561,7 @@ private:
             job_manager->submitJob(job1, this->test->compute_service, service_specific_arguments);
             throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
         } catch (wrench::ExecutionException &e) {
-            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
             if (not failure_cause) {
                 throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
             }
@@ -575,7 +575,7 @@ private:
             job_manager->submitJob(job1, this->test->compute_service, service_specific_arguments);
             throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
         } catch (wrench::ExecutionException &e) {
-            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
             if (not failure_cause) {
                 throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
             }
@@ -594,7 +594,7 @@ private:
             job_manager->submitJob(job2, this->test->compute_service, service_specific_arguments);
             throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
         } catch (wrench::ExecutionException &e) {
-            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
             if (not failure_cause) {
                 throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
             }
@@ -613,7 +613,7 @@ private:
             job_manager->submitJob(job3, this->test->compute_service, service_specific_arguments);
             throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
         } catch (wrench::ExecutionException &e) {
-            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
             if (not failure_cause) {
                 throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
             }

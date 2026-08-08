@@ -584,7 +584,6 @@ namespace wrench {
 
         // Should the container be terminated?
         if (this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT) <= 0) {
-            std::cerr << "SHUTTING DOWN THE CONTAINER\n";
             container->shutdown();
             invocation->_compute_node->containers.erase(container);
         } else {
@@ -777,7 +776,6 @@ namespace wrench {
 
         WRENCH_INFO("Dispatched an invocation for function %s",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
-
 
         invocation->_container = container;
         invocation->_container_start_date = Simulation::getCurrentSimulatedDate();

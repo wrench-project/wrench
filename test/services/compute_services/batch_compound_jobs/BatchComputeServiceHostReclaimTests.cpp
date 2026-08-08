@@ -150,7 +150,7 @@ private:
                 throw std::runtime_error("Should not be able to submit a 4-node job");
             }
             catch (wrench::ExecutionException& e) {
-                if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause())) {
+                if (not std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause())) {
                     throw std::runtime_error("Should have gotten a 'not enough resources' failure cause");
                 }
             }

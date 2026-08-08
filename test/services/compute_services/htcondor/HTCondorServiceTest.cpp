@@ -1434,7 +1434,7 @@ private:
                 job_manager->submitJob(grid_job, this->test->htcondor_service, test_service_specs);
                 throw std::runtime_error("Should not have been able to submit job successfully");
             } catch (wrench::ExecutionException &e) {
-                auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+                auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
                 if (not real_cause) {
                     throw std::runtime_error("Should have gotten a NotEnoughResources failure cause");
                 }
@@ -1449,7 +1449,7 @@ private:
                 job_manager->submitJob(ngrid_job, this->test->htcondor_service, {});
                 //                throw std::runtime_error("Should not have been able to submit job successfully");
             } catch (wrench::ExecutionException &e) {
-                auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+                auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
                 if (not real_cause) {
                     throw std::runtime_error("Should have gotten a NotEnoughResources failure cause");
                 }
@@ -1466,7 +1466,7 @@ private:
             if (not real_event) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
-            if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(real_event->failure_cause)) {
+            if (not std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(real_event->failure_cause)) {
                 throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString());
             }
         }

@@ -605,7 +605,7 @@ private:
     std::shared_ptr<wrench::StorageService> storage_service;
 
     int main() override {
-        // Register a function
+        // Create and register a function
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
                                   const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
@@ -622,7 +622,6 @@ private:
 
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
 
-        // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);

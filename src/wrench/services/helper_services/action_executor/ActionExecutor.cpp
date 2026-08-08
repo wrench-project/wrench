@@ -167,13 +167,12 @@ namespace wrench {
             &failure_cause);
 
         action_executor_with_timeout->setSimulation(this->simulation_);
-        action_executor_with_timeout->start(action_executor_with_timeout, true, false);
         auto now = simgrid::s4u::Engine::get_clock();
+        action_executor_with_timeout->start(action_executor_with_timeout, true, false);
         action_executor_with_timeout->s4u_actor->join(this->action_timeout);
 
-        // Did we have a timeout?
-        auto elapsed = simgrid::s4u::Engine::get_clock() - now;
-        if (elapsed >= this->action_timeout) {
+        // Did we have a timeout (if the S4U ActorPtr is non-null, the actor is still running)?
+        if (action_executor_with_timeout->s4u_actor != nullptr) {
             action_executor_with_timeout->kill(false);
             throw ExecutionException(std::make_shared<OperationTimeout>());
         }
@@ -280,8 +279,7 @@ namespace wrench {
     int ActionExecutorActorWithTimeout::main() {
         try {
             this->action->execute(this->getSharedPtr<ActionExecutor>());
-        }
-        catch (ExecutionException& e) {
+        } catch (ExecutionException& e) {
             *(this->failure_cause) = e.getCause();
         }
         return 0;

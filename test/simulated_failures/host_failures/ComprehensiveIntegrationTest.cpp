@@ -231,7 +231,7 @@ private:
                     try {
                         this->test->cloud_service->startVM(vm);
                     } catch (wrench::ExecutionException &e) {
-                        if (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause())) {
+                        if (std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause())) {
                             //  WRENCH_INFO("Cannot start VM");
                         } else if (std::dynamic_pointer_cast<wrench::HostError>(e.getCause())) {
                             //  WRENCH_INFO("Cannot start VM because Host is down");

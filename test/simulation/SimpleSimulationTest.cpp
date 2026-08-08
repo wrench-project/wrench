@@ -175,10 +175,10 @@ private:
             cs->createVM(1000, 10000000);
             throw std::runtime_error("Should not be able to create a VM that exceeds the capacity of all hosts on the service");
         } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString() +
-                                         "(Was expecting NotEnoughResources");
+                                         " (Was expecting NotEnoughResourcesForJob");
             }
         }
 

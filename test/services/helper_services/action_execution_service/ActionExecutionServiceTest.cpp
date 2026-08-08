@@ -1042,7 +1042,7 @@ private:
             action_execution_service->submitAction(action1);
             throw std::runtime_error("Should not have been able to submit action 1");
         } catch (wrench::ExecutionException &e) {
-            if (not(std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
+            if (not(std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause()))) {
                 throw std::runtime_error("Unexpected failure cause");
             }
         }
@@ -1050,7 +1050,7 @@ private:
             action_execution_service->submitAction(action2);
             throw std::runtime_error("Should not have been able to submit action 2");
         } catch (wrench::ExecutionException &e) {
-            if (not(std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
+            if (not(std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause()))) {
                 throw std::runtime_error("Unexpected failure cause");
             }
         }

@@ -27,18 +27,18 @@ namespace wrench {
      *
      */
     void Container::spawn() {
-        WRENCH_INFO("Starting a new container for an invocation of function %s...",
-                    _registered_function->getFunction()->getName().c_str());
+        // WRENCH_INFO("Starting a new container for an invocation of function %s...",
+        //             _registered_function->getFunction()->getName().c_str());
 
         // Reserve space on the compute node's storage service
         try {
-            _tmp_file = wrench::FileLocation::LOCATION(_compute_node->disk,
+            _tmp_file_location = wrench::FileLocation::LOCATION(_compute_node->disk,
                                                       Simulation::addFile(
                                                           "tmp_" + std::to_string(
                                                               ++ServerlessComputeService::sequence_number),
                                                           _registered_function->getDiskSpaceLimit()));
-            StorageService::createFileAtLocation(_tmp_file);
-            _opened_tmp_file = _compute_node->disk->openFile(_tmp_file);
+            StorageService::createFileAtLocation(_tmp_file_location);
+            _opened_tmp_file = _compute_node->disk->openFile(_tmp_file_location);
         }
         catch (ExecutionException& e) {
             auto cause = std::dynamic_pointer_cast<StorageServiceNotEnoughSpace>(e.getCause());
@@ -91,10 +91,16 @@ namespace wrench {
 
 
     void Container::shutdown() {
-        _opened_image_ram_file->close();
-        _opened_tmp_ram_file->close();
-
-        StorageService::removeFileAtLocation(_tmp_ram_file_location);
+        // Clearing disk space
         _tmp_storage_service->stop();
+        _opened_tmp_file->close();
+        StorageService::removeFileAtLocation(_tmp_file_location);
+
+        // Clearing RAM space
+        _opened_tmp_ram_file->close();
+        StorageService::removeFileAtLocation(_tmp_ram_file_location);
+
+        // Close the image ram file
+        _opened_image_ram_file->close();
     }
 }

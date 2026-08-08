@@ -60,7 +60,7 @@ namespace wrench {
         ServerlessComputeService *_serverless_compute_service;
         ContainerState _state;
 
-        std::shared_ptr<FileLocation> _tmp_file;
+        std::shared_ptr<FileLocation> _tmp_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
         std::shared_ptr<StorageService> _tmp_storage_service;
 
