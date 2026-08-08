@@ -22,6 +22,21 @@ WRENCH_LOG_CATEGORY(Container, "Log category for Container");
 
 
 namespace wrench {
+
+    void Container::makeIdle() {
+        _state = State::IDLE;
+        _idle_date = S4U_Simulation::getClock();
+    }
+
+    void Container::makeBusy() {
+        _state = State::BUSY;
+        _idle_date = -1;
+    }
+
+    double Container::getIdleTime() const {
+        return S4U_Simulation::getClock() - _idle_date;
+    }
+
     /**
      * @brief Method to spawn a container
      *

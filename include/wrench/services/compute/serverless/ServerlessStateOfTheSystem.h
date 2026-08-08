@@ -52,7 +52,7 @@ namespace wrench
     private:
         friend class ServerlessComputeService;
 
-        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts);
+        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts, ServerlessComputeService *serverless_compute_service);
 
         // set of Registered functions
         std::set<std::shared_ptr<RegisteredFunction>> _registered_functions;
@@ -73,6 +73,9 @@ namespace wrench
 
         // list of compute nodes
         std::vector<std::shared_ptr<ServerlessComputeNode>> _compute_nodes;
+
+        // The compute service this is for
+        ServerlessComputeService *_serverless_compute_service;
 
 
     };

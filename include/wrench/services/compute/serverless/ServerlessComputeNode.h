@@ -29,8 +29,12 @@ namespace wrench
     class ServerlessComputeNode {
 
     public:
-        ServerlessComputeNode(std::string  h, unsigned int c) :
-            hostname(std::move(h)), total_cores(c), available_cores(c) {}
+        ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService *service);
+
+        std::shared_ptr<Container> spawnContainer(RegisteredFunction *registered_function);
+        void makeContainerIdle(const std::shared_ptr<Container>& container);
+        void makeContainerBusy(const std::shared_ptr<Container>& container);
+        void shutdownContainer(const std::shared_ptr<Container>& container);
 
         std::string hostname;
         unsigned long total_cores;
@@ -44,6 +48,8 @@ namespace wrench
 
         std::set<std::shared_ptr<Container>> busy_containers;
         std::set<std::shared_ptr<Container>> idle_containers;
+
+        ServerlessComputeService *serverless_compute_service;
     };
 
     /***********************/

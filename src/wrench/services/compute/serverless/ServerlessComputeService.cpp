@@ -22,6 +22,7 @@
 
 #include "wrench/action/CustomAction.h"
 #include "wrench/services/ServiceMessage.h"
+#include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/simulation/Simulation.h"
@@ -71,7 +72,7 @@ namespace wrench {
 
         // Create the state of the system object
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
-            new ServerlessStateOfTheSystem(compute_hosts));
+            new ServerlessStateOfTheSystem(compute_hosts, this));
         _state_of_the_system->_head_storage_service_mount_point = head_node_storage_mount_point;
 
         _scheduler = scheduler;
@@ -576,19 +577,25 @@ namespace wrench {
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
                     (failure_cause ? "FAILURE" : "SUCCESS"));
 
-        invocation->_compute_node->available_cores++;
+        auto compute_node = invocation->_compute_node;
+        // Free up the core
+        compute_node->available_cores++;
 
         // Make container idle (TODO: make this cleaner?)
         auto container = invocation->_container;
-        invocation->_compute_node->busy_containers.erase(container);
-        container->makeIdle();
-        invocation->_compute_node->idle_containers.insert(container);
+        compute_node->makeContainerIdle(container);
 
-        // Should the container be terminated?
+        // Should the container be terminated or left idling?
         if (this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT) <= 0) {
-            container->shutdown();
-            invocation->_compute_node->idle_containers.erase(container);
+            compute_node->shutdownContainer(container);
         } else {
+            // Start the timeout alarm
+            // auto msg = new ContainerTimeOutMessage(container);
+            //
+            // std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
+            //                                                               batch_job->getEndingTimestamp(),
+            //                                                               this->_hostname,
+            //                                                               this->commport, msg,
             throw std::runtime_error("ServerlessComputeService::processInvocationCompletion(): CONTAINER IDLING IS STILL TO BE IMPLEMENTED");
         }
 
@@ -710,15 +717,10 @@ namespace wrench {
         const std::shared_ptr<Invocation>& invocation,
         const std::shared_ptr<ServerlessComputeNode>& target_compute_node) {
 
-        // Create a container object
-        auto container = std::make_shared<Container>(
-            invocation->getRegisteredFunction(),
-            target_compute_node,
-            this);
-
         // Spawn the container
+        std::shared_ptr<Container> container;
         try {
-            container->spawn();
+            container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
         } catch (ExecutionException& e) {
             WRENCH_INFO("Couldn't spaw a container for an invocation for %s: %s",
                         invocation->_registered_function->_function->getName().c_str(),

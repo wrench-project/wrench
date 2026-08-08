@@ -12,6 +12,7 @@
 #define CONTAINER_H
 
 #include <memory>
+#include <fsmod/File.hpp>
 #include <wrench/managers/function_manager/RegisteredFunction.h>
 
 namespace wrench {
@@ -27,38 +28,42 @@ namespace wrench {
      */
     class Container {
 
-      enum class ContainerState {
+    public:
+        enum class State {
             BUSY,
             IDLE,
         };
-
-    public:
-
-        explicit Container(const std::shared_ptr<RegisteredFunction> &registered_function,
-            const std::shared_ptr<ServerlessComputeNode> &compute_node,
-            ServerlessComputeService* serverless_compute_service) {
-            _registered_function = registered_function;
-            _compute_node = compute_node;
-            _serverless_compute_service = serverless_compute_service;
-            _state = ContainerState::BUSY;
-
-         }
-
-        [[nodiscard]] bool isIdle() const { return _state == ContainerState::IDLE; }
-        void makeIdle() { _state = ContainerState::IDLE; }
-        void makeBusy() { _state = ContainerState::BUSY; }
-
-        void spawn();
-        void shutdown();
-
-        std::shared_ptr<StorageService> getPrivateStorageService() const {return _tmp_storage_service; }
+        [[nodiscard]] bool isIdle() const { return _state == State::IDLE; }
+        [[nodiscard]] bool isBusy() const { return _state == State::BUSY; }
+        [[nodiscard]] double getIdleTime() const;
+        [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const { return _tmp_storage_service; }
 
 
     private:
-        std::shared_ptr<RegisteredFunction> _registered_function;
-        std::shared_ptr<ServerlessComputeNode> _compute_node;
-        ServerlessComputeService *_serverless_compute_service;
-        ContainerState _state;
+        friend class ServerlessComputeNode;
+
+        explicit Container(const RegisteredFunction* registered_function,
+                           const ServerlessComputeNode* compute_node,
+                           const ServerlessComputeService* serverless_compute_service,
+                           State initial_state) {
+            _registered_function = registered_function;
+            _compute_node = compute_node;
+            _serverless_compute_service = serverless_compute_service;
+            _state = initial_state;
+            _idle_date = -1.0;
+        }
+
+        void makeIdle();
+        void makeBusy();
+        void spawn();
+        void shutdown();
+
+
+        const RegisteredFunction* _registered_function;
+        const ServerlessComputeNode *_compute_node;
+        const ServerlessComputeService* _serverless_compute_service;
+        State _state;
+        double _idle_date;
 
         std::shared_ptr<FileLocation> _tmp_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
@@ -69,10 +74,9 @@ namespace wrench {
         std::shared_ptr<FileLocation> _tmp_ram_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
 
-    /***********************/
-    /** \endcond          **/
-    /***********************/
-
+        /***********************/
+        /** \endcond          **/
+        /***********************/
     };
 }
 
