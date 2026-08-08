@@ -680,31 +680,29 @@ namespace wrench {
         const std::shared_ptr<Invocation>& invocation,
         const ServerlessComputeNode* compute_node,
         const std::shared_ptr<Container>& target_container) const {
+
+        // The node has available cores?
+        if (compute_node->available_cores < 1) {
+            WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
+            return false;
+        }
+
+        // The image is in RAM?
         auto ss_memory = compute_node->memory;
         auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
-
-        // The image is in RAM
         if (not ss_memory->hasFile(image_file, ss_memory->getBaseRootPath())) {
             WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",
                         image_file->getID().c_str(), compute_node->hostname.c_str());
             return false;
         }
-        if (target_container and not target_container->isIdle()) {
-            WRENCH_INFO("Scheduled invocation cannot be started because the target container is not idle");
-            return false;
-        }
-        else {
-            if (compute_node->available_cores < 1) {
-                WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
+
+        if (target_container) {
+            // The container is idle?
+            if (target_container and not target_container->isIdle()) {
+                WRENCH_INFO("Scheduled invocation cannot be started because the target container is not idle");
                 return false;
             }
         }
-        // We shouldn't check this, this will fail if LRU says it should...
-        // // There is available RAM space for the function itself
-        // if (ss_memory->getTotalFreeSpaceZeroTime() < invocation->getRegisteredFunction()->getRAMLimit()) {
-        //     WRENCH_INFO("Scheduled invocation cannot be started because there is not enough available RAM");
-        //     return false;
-        // }
         return true;
     }
 
@@ -720,6 +718,10 @@ namespace wrench {
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                                       ServerlessComputeNode* target_compute_node,
                                                       std::shared_ptr<Container> target_container) {
+        if (not target_compute_node) {
+            target_compute_node = target_container->getComputeNode();
+        }
+
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
         if (not invocationCanBeStarted(invocation, target_compute_node, target_container)) {
             return false;
