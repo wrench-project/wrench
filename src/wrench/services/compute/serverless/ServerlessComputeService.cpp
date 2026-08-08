@@ -578,14 +578,16 @@ namespace wrench {
 
         invocation->_compute_node->available_cores++;
 
-        // Make container idle
+        // Make container idle (TODO: make this cleaner?)
         auto container = invocation->_container;
+        invocation->_compute_node->busy_containers.erase(container);
         container->makeIdle();
+        invocation->_compute_node->idle_containers.insert(container);
 
         // Should the container be terminated?
         if (this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT) <= 0) {
             container->shutdown();
-            invocation->_compute_node->containers.erase(container);
+            invocation->_compute_node->idle_containers.erase(container);
         } else {
             throw std::runtime_error("ServerlessComputeService::processInvocationCompletion(): CONTAINER IDLING IS STILL TO BE IMPLEMENTED");
         }
@@ -613,18 +615,14 @@ namespace wrench {
         // Dispatched the invocations in the order of the schedulable list
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
 
-        for (const auto& [compute_node, invocations_to_place] : decisions->
-             invocations_to_start_on_new_container_at_compute_node) {
-            for (const auto& invocation : invocations_to_place) {
+        for (const auto &[invocation, compute_node] : decisions->invocations_on_new_container) {
                 // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
                 //             invocation_to_place->_registered_function->_function->getName().c_str());
-
                 if (dispatchInvocation(invocation, compute_node, nullptr)) {
                     _state_of_the_system->_running_invocations.insert(invocation);
                     invocation->_compute_node = compute_node;
                     dispatched_invocations.insert(invocation);
                 }
-            }
         }
 
         // Update the list of schedulable invocations (not super efficient, but clearer than the erase-as-I-go)
@@ -787,7 +785,7 @@ namespace wrench {
         action_executor->start(action_executor, true, false);
 
         // WRENCH_INFO("Function [%s] invoked", invocation->_registered_function->_function->getName().c_str());
-        target_compute_node->containers.insert(container);
+        target_compute_node->busy_containers.insert(container);
         return true;
     }
 
@@ -1002,10 +1000,8 @@ namespace wrench {
      */
     void ServerlessComputeService::initiateImageLoads(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // For each compute node, load initiate image load from disk into RAM and if space
-        for (const auto& [compute_node, images_to_load] : decisions->images_to_load_into_RAM_at_compute_node) {
-            for (const auto& image : images_to_load) {
-                initiateImageLoadAtComputeNode(compute_node, image);
-            }
+        for (const auto& [image_file, compute_node] : decisions->images_loads_to_RAM) {
+                initiateImageLoadAtComputeNode(compute_node, image_file);
         }
     }
 
@@ -1016,10 +1012,8 @@ namespace wrench {
     void ServerlessComputeService::initiateImageCopies(
         const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // For each compute node, initiate image copy (from head node) if need be
-        for (const auto& [compute_node, image_files] : decisions->images_to_copy_to_compute_node) {
-            for (const auto& image : image_files) {
-                initiateImageCopyToComputeNode(compute_node, image);
-            }
+        for (const auto& [image_file, compute_node] : decisions->image_copies_to_disk) {
+                initiateImageCopyToComputeNode(compute_node, image_file);
         }
     }
 

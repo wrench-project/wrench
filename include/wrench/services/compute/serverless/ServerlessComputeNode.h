@@ -42,7 +42,8 @@ namespace wrench
         std::set<std::shared_ptr<DataFile>> images_being_copied;
         std::set<std::shared_ptr<DataFile>> images_being_loaded;
 
-        std::set<std::shared_ptr<Container>> containers;
+        std::set<std::shared_ptr<Container>> busy_containers;
+        std::set<std::shared_ptr<Container>> idle_containers;
     };
 
     /***********************/

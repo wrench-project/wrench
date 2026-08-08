@@ -52,12 +52,13 @@ namespace wrench {
                 auto image = function_images[function_name];
                 if (!state->isImageOnNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
-                    decisions->images_to_copy_to_compute_node[node].push_back(image);
+                    decisions->image_copies_to_disk.push_back(CopyImage{image, node});
                 }
                 else if (state->isImageOnNode(node, image) &&
                     !state->isImageBeingLoadedAtNode(node, image) &&
                     !state->isImageInRAMAtNode(node, image)) {
-                    decisions->images_to_load_into_RAM_at_compute_node[node].push_back(image);
+                    decisions->images_loads_to_RAM.push_back(LoadImage{image, node});
+
                 }
             }
         }
@@ -103,7 +104,7 @@ namespace wrench {
                     // Make sure the image is on this node
                     auto image_file = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
                     if (state->isImageInRAMAtNode(node, image_file)) {
-                        decisions->invocations_to_start_on_new_container_at_compute_node[node].push_back(inv);
+                        decisions->invocations_on_new_container.push_back(DispatchInvocationOnNewContainer{inv, node});
                         availableCores[node]--;
                         scheduled++;
                     }

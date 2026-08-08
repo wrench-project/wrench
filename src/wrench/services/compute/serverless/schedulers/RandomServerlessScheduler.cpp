@@ -86,12 +86,12 @@ namespace wrench {
                 // Schedule copying only if the image isn't on the node and isn't already being copied.
                 if (!state->isImageOnNode(node, df) &&
                     !state->isImageBeingCopiedToNode(node, df)) {
-                    decisions->images_to_copy_to_compute_node[node].push_back(df);
+                    decisions->image_copies_to_disk.push_back({df, node});
                 }
                 else if (state->isImageOnNode(node, df) &&
                     !state->isImageBeingLoadedAtNode(node, df) &&
                     !state->isImageInRAMAtNode(node, df)) {
-                    decisions->images_to_load_into_RAM_at_compute_node[node].push_back(df);
+                    decisions->images_loads_to_RAM.push_back({df, node});
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace wrench {
             if (!candidates.empty()) {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
                 const std::shared_ptr<ServerlessComputeNode>& chosen_node = candidates[dist(rng)];
-                decisions->invocations_to_start_on_new_container_at_compute_node[chosen_node].push_back(inv);
+                decisions->invocations_on_new_container.push_back({inv, chosen_node});
                 availableCores[chosen_node]--;
             }
             else {

@@ -18,8 +18,23 @@
 namespace wrench {
 
     /***********************/
-    /** \cond DEVELOPER   **/
+    /** \cond INTERNAL    **/
     /***********************/
+
+    struct CopyImage {
+        std::shared_ptr<DataFile> image;
+        std::shared_ptr<ServerlessComputeNode> compute_node;
+    };
+
+    struct LoadImage {
+        std::shared_ptr<DataFile> image;
+        std::shared_ptr<ServerlessComputeNode> compute_node;
+    };
+
+    struct DispatchInvocationOnNewContainer {
+        std::shared_ptr<Invocation> invocation;
+        std::shared_ptr<ServerlessComputeNode> compute_node;
+    };
 
     /**
      * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
@@ -28,12 +43,12 @@ namespace wrench {
      *        - Which invocations should be started at compute nodes right now
      */
     struct ServerlessSchedulingDecisions {
-	    /** @brief The compute-node-keyed map of images to copy to compute nodes */
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::vector<std::shared_ptr<DataFile>>> images_to_copy_to_compute_node;
-	    /** @brief The compute-node-keyed map of images to load in RAM at compute nodes */
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::vector<std::shared_ptr<DataFile>>> images_to_load_into_RAM_at_compute_node;
-	    /** @brief The compute-node-keyed map of functions to invoke on a new container at compute nodes */
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::vector<std::shared_ptr<Invocation>>> invocations_to_start_on_new_container_at_compute_node;
+	    /** @brief The list of image copies to storage at compute nodes */
+        std::vector<CopyImage> image_copies_to_disk;
+	    /** @brief The list of image loads in RAM at compute nodes */
+        std::vector<LoadImage> images_loads_to_RAM;
+	    /** @brief The list of function invocations on a new container at compute nodes */
+        std::vector<DispatchInvocationOnNewContainer> invocations_on_new_container;
     };
 
     /**

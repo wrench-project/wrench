@@ -70,12 +70,12 @@ namespace wrench {
             for (const auto& image_file : required_images[node]) {
                 if (!state->isImageOnNode(node, image_file) &&
                     !state->isImageBeingCopiedToNode(node, image_file)) {
-                    decisions->images_to_copy_to_compute_node[node].push_back(image_file);
+                    decisions->image_copies_to_disk.push_back({image_file, node});
                 }
                 else if (state->isImageOnNode(node, image_file) &&
                     !state->isImageInRAMAtNode(node, image_file) &&
                     !state->isImageBeingLoadedAtNode(node, image_file)) {
-                    decisions->images_to_load_into_RAM_at_compute_node[node].push_back(image_file);
+                    decisions->images_loads_to_RAM.push_back({image_file, node});
                 }
             }
         }
@@ -97,11 +97,11 @@ namespace wrench {
             // Get the image for this invocation
             auto image_file = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
-            for (const auto& [hostname, num_available_cores] : available_cores) {
+            for (const auto& [node, num_available_cores] : available_cores) {
                 // Checking if the node has available cores and if the image is on the node
-                if (num_available_cores > 0 && state->isImageInRAMAtNode(hostname, image_file)) {
-                    decisions->invocations_to_start_on_new_container_at_compute_node[hostname].push_back(inv);
-                    available_cores[hostname]--;
+                if (num_available_cores > 0 && state->isImageInRAMAtNode(node, image_file)) {
+                    decisions->invocations_on_new_container.push_back({inv, node});
+                    available_cores[node]--;
                     // Move on to next invocation
                     break;
                 }
