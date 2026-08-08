@@ -1,0 +1,8 @@
+.. _Container:
+wrench::Container
+*****************
+
+.. doxygenclass:: wrench::Container
+   :project: internal
+   :members:
+
