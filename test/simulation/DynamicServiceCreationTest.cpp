@@ -175,15 +175,15 @@ private:
 
         // Dynamically create a File Registry Service on this host
         auto dynamically_created_file_registry_service = this->getSimulation()->startNewService(
-                new wrench::FileRegistryService(hostname));
+                new wrench::FileRegistryService(_hostname));
 
         // Dynamically create a Network Proximity Service on this host
         auto dynamically_created_network_proximity_service = this->getSimulation()->startNewService(
-                new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
+                new wrench::NetworkProximityService(_hostname, {"DualCoreHost", "QuadCoreHost"}));
 
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = this->getSimulation()->startNewService(
-                wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
+                wrench::SimpleStorageService::createSimpleStorageService(_hostname, {"/disk2"},
                                                                          {},
                                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
@@ -191,7 +191,7 @@ private:
         // Dynamically create a Cloud Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
         auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->getSimulation()->startNewService(
-                new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
+                new wrench::CloudComputeService(_hostname, execution_hosts, "/scratch",
                                                 {})));
 
         std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = this->test->workflow->getReadyTasks();
@@ -330,12 +330,12 @@ private:
         // Dynamically create a BM Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
         auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(this->getSimulation()->startNewService(
-                new wrench::BareMetalComputeService(hostname, execution_hosts, "/scratch",
+                new wrench::BareMetalComputeService(_hostname, execution_hosts, "/scratch",
                                                     {})));
 
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = this->getSimulation()->startNewService(
-                wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/disk2"},
+                wrench::SimpleStorageService::createSimpleStorageService(_hostname, {"/disk2"},
                                                                          {},
                                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 

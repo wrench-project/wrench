@@ -12,7 +12,7 @@
 #include <wrench/action/Action.h>
 #include <wrench/action/MPIAction.h>
 #include <wrench/exceptions/ExecutionException.h>
-#include <wrench/failure_causes/NotEnoughResources.h>
+#include <wrench/failure_causes/NotEnoughResourcesForJob.h>
 #include <wrench/services/helper_services/action_executor//ActionExecutor.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 #include "smpi/smpi.h"
@@ -66,7 +66,7 @@ namespace wrench {
                 }
             }
             if (not added_at_least_one_host) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>(this->getJob(), action_executor->getActionExecutionService()->getParentService()));
+                throw ExecutionException(std::make_shared<NotEnoughResourcesForJob>(this->getJob(), action_executor->getActionExecutionService()->getParentService()));
             }
         }
 
@@ -80,7 +80,7 @@ namespace wrench {
             S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = commport;
             // Create and start my own Controller
             auto mpi_private_execution_controller = std::make_shared<MPIPrivateExecutionController>(
-                    action_executor->hostname, "mpi_private");
+                    action_executor->_hostname, "mpi_private");
             mpi_private_execution_controller->setSimulation(action_executor->getSimulation());
             mpi_private_execution_controller->start(mpi_private_execution_controller, true, false);// Daemonized, no auto-restart
 

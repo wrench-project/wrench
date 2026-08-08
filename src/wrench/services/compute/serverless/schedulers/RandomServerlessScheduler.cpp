@@ -127,7 +127,7 @@ namespace wrench {
             if (!candidates.empty()) {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
                 const std::shared_ptr<ServerlessComputeNode>& chosen_node = candidates[dist(rng)];
-                decisions->invocations_to_start_at_compute_node[chosen_node].push_back(inv);
+                decisions->invocations_to_start_on_new_container_at_compute_node[chosen_node].push_back(inv);
                 availableCores[chosen_node]--;
             }
             else {

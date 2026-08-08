@@ -406,7 +406,7 @@ namespace wrench
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
         WRENCH_INFO("Cloud Service starting on host %s listening on commport %s",
-                    this->hostname.c_str(),
+                    this->_hostname.c_str(),
                     this->commport->get_cname());
 
         // Start the Scratch Storage Service
@@ -608,7 +608,7 @@ namespace wrench
                 new CloudComputeServiceCreateVMAnswerMessage(
                     false,
                     empty,
-                    std::make_shared<NotEnoughResources>(nullptr, this->getSharedPtr<CloudComputeService>()),
+                    std::make_shared<NotEnoughResourcesForJob>(nullptr, this->getSharedPtr<CloudComputeService>()),
                     this->getMessagePayloadValue(
                         CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
 
@@ -908,7 +908,7 @@ namespace wrench
                                         "true"));
 
             cs = std::shared_ptr<BareMetalComputeService>(
-                new BareMetalComputeService(this->hostname,
+                new BareMetalComputeService(this->_hostname,
                                             compute_resources,
                                             plist,
                                             vm->getMessagePayloadList(),
@@ -923,7 +923,7 @@ namespace wrench
         // Create a failure detector for the service
         //        WRENCH_INFO("CREATING SERVICE TERMINATION DETECTOR THAT WILL REPORT TO COMMPORT %s", this->commport->get_cname());
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
-            this->hostname, cs,
+            this->_hostname, cs,
             this->commport, false, true);
         termination_detector->setSimulation(this->simulation_);
         termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart

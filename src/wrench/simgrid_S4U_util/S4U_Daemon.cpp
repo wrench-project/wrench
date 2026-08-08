@@ -74,7 +74,7 @@ namespace wrench {
 
         this->state = S4U_Daemon::State::CREATED;
         this->daemon_lock = simgrid::s4u::Mutex::create();
-        this->hostname = hostname;
+        this->_hostname = hostname;
         this->host = S4U_Simulation::get_host_or_vm_by_name(hostname);
         this->simulation_ = nullptr;
         unsigned long seq = S4U_CommPort::generateUniqueSequenceNumber();
@@ -134,7 +134,7 @@ namespace wrench {
             S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
         }
         // Default behavior is to throw in case of any problem
-        if ((not has_returned_from_main) and (not S4U_Simulation::isHostOn(hostname))) {
+        if ((not has_returned_from_main) and (not S4U_Simulation::isHostOn(_hostname))) {
             throw std::runtime_error(
                     "S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
                     "(so that is can implement fault-tolerance or explicitly ignore fault) ");
@@ -189,8 +189,8 @@ namespace wrench {
         }
 
         // Check that the host is up!
-        if (not S4U_Simulation::isHostOn(hostname)) {
-            throw ExecutionException(std::make_shared<HostError>(hostname));
+        if (not S4U_Simulation::isHostOn(_hostname)) {
+            throw ExecutionException(std::make_shared<HostError>(_hostname));
         }
 
         this->daemonized_ = daemonized;
@@ -215,7 +215,7 @@ namespace wrench {
 
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
         if (this->s4u_actor == nullptr) {
-            throw ExecutionException(std::make_shared<HostError>(hostname));
+            throw ExecutionException(std::make_shared<HostError>(_hostname));
         }
 
         // This test here is critical. It's possible that the created actor above returns

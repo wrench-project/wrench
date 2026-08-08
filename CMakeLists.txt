@@ -246,6 +246,7 @@ set(HEADER_FILES
         include/wrench/failure_causes/OperationTimeout.h
         include/wrench/failure_causes/NetworkError.h
         include/wrench/failure_causes/NotAllowed.h
+        include/wrench/failure_causes/NotEnoughResourcesForJob.h
         include/wrench/failure_causes/NotEnoughResources.h
         include/wrench/failure_causes/ServiceIsDown.h
         include/wrench/failure_causes/ServiceIsSuspended.h
@@ -363,6 +364,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.cpp
         src/wrench/services/compute/serverless/ServerlessComputeServiceProperty.cpp
         src/wrench/services/compute/serverless/Invocation.cpp
+        src/wrench/services/compute/serverless/Container.cpp
         src/wrench/services/compute/serverless/ServerlessStateOfTheSystem.cpp
         src/wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.cpp
         src/wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.cpp
@@ -453,6 +455,7 @@ set(SOURCE_FILES
         src/wrench/failure_causes/NetworkError.cpp
         src/wrench/failure_causes/NotAllowed.cpp
         src/wrench/failure_causes/NotEnoughResources.cpp
+        src/wrench/failure_causes/NotEnoughResourcesForJob.cpp
         src/wrench/failure_causes/ServiceIsDown.cpp
         src/wrench/failure_causes/ServiceIsSuspended.cpp
         src/wrench/failure_causes/StorageServiceNotEnoughSpace.cpp

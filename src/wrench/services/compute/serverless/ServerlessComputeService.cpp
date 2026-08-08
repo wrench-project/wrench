@@ -11,6 +11,7 @@
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h>
 #include <wrench/services/compute/serverless/Invocation.h>
+#include <wrench/services/compute/serverless/Container.h>
 #include <wrench/managers/function_manager/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/ExecutionException.h>
@@ -235,7 +236,8 @@ namespace wrench {
             // RAM availability per host
             std::map<std::string, double> ram_availability;
             for (auto const& compute_node : this->_state_of_the_system->_compute_nodes) {
-                ram_availability[compute_node->hostname] = static_cast<double>(compute_node->memory->getTotalFreeSpaceZeroTime());
+                ram_availability[compute_node->hostname] = static_cast<double>(compute_node->memory->
+                    getTotalFreeSpaceZeroTime());
             }
             return ram_availability;
         }
@@ -574,12 +576,20 @@ namespace wrench {
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
                     (failure_cause ? "FAILURE" : "SUCCESS"));
 
-        const auto compute_node = invocation->_compute_node;
-        // _state_of_the_system->_scheduling_decisions.erase(invocation);
-        invocation->_opened_image_ram_file->close();
-        invocation->_opened_tmp_ram_file->close();
-        StorageService::removeFileAtLocation(invocation->_tmp_ram_file_location);
-        compute_node->available_cores++;
+        invocation->_compute_node->available_cores++;
+
+        // Make container idle
+        auto container = invocation->_container;
+        container->makeIdle();
+
+        // Should the container be terminated?
+        if (this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT) <= 0) {
+            std::cerr << "SHUTTING DOWN THE CONTAINER\n";
+            container->shutdown();
+            invocation->_compute_node->containers.erase(container);
+        } else {
+            throw std::runtime_error("ServerlessComputeService::processInvocationCompletion(): CONTAINER IDLING IS STILL TO BE IMPLEMENTED");
+        }
 
         bool success = action->getState() == Action::State::COMPLETED;
 
@@ -604,12 +614,13 @@ namespace wrench {
         // Dispatched the invocations in the order of the schedulable list
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
 
-        for (const auto& [compute_node, invocations_to_place] : decisions->invocations_to_start_at_compute_node) {
+        for (const auto& [compute_node, invocations_to_place] : decisions->
+             invocations_to_start_on_new_container_at_compute_node) {
             for (const auto& invocation : invocations_to_place) {
                 // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
                 //             invocation_to_place->_registered_function->_function->getName().c_str());
 
-                if (dispatchInvocation(invocation, compute_node)) {
+                if (dispatchInvocation(invocation, compute_node, nullptr)) {
                     _state_of_the_system->_running_invocations.insert(invocation);
                     invocation->_compute_node = compute_node;
                     dispatched_invocations.insert(invocation);
@@ -631,11 +642,13 @@ namespace wrench {
      * @brief Helper method to ensure that an invocation can be started
      * @param invocation: the invocation to start
      * @param compute_node: the compute node on which to start it
+     * @param target_container: the target container (nullptr if none)
      * @return true if the invocation can be started, false otherwise
      */
     bool ServerlessComputeService::invocationCanBeStarted(
         const std::shared_ptr<Invocation>& invocation,
-        const std::shared_ptr<ServerlessComputeNode>& compute_node) const {
+        const std::shared_ptr<ServerlessComputeNode>& compute_node,
+        const std::shared_ptr<Container>& target_container) const {
         auto ss_memory = compute_node->memory;
         auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
@@ -645,10 +658,15 @@ namespace wrench {
                         image_file->getID().c_str(), compute_node->hostname.c_str());
             return false;
         }
-        // There is an available core
-        if (compute_node->available_cores < 1) {
-            WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
+        if (target_container and not target_container->isIdle()) {
+            WRENCH_INFO("Scheduled invocation cannot be started because the target container is not idle");
             return false;
+        }
+        else {
+            if (compute_node->available_cores < 1) {
+                WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
+                return false;
+            }
         }
         // We shouldn't check this, this will fail if LRU says it should...
         // // There is available RAM space for the function itself
@@ -664,60 +682,59 @@ namespace wrench {
      * @brief Helper method to dispatch an invocation
      *
      * @param invocation invocation to dispatch
-     * @param target_compute_node the target host
+     * @param target_compute_node the target compute node
+     * @param target_container the target container (if nullptr, create a new container)
      * @return true on success, false on failure
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
-                                                      const std::shared_ptr<ServerlessComputeNode>&
-                                                      target_compute_node) {
+                                                      const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
+                                                      const std::shared_ptr<Container>& target_container) {
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
-        if (not invocationCanBeStarted(invocation, target_compute_node)) {
+        if (not invocationCanBeStarted(invocation, target_compute_node, target_container)) {
             return false;
         }
 
-        // Start the invocation's own private storage service, on disk, if possible
-        std::shared_ptr<StorageService> private_ss;
+        if (not target_container) {
+            return dispatchInvocationOnNewContainer(invocation, target_compute_node);
+        }
+        else {
+            return dispatchInvocationOnIdleContainer(invocation, target_compute_node, target_container);
+        }
+    }
+
+    /**
+     * @brief Helper method to dispatch an invocation
+     *
+     * @param invocation invocation to dispatch
+     * @param target_compute_node the target compute node
+     * @return true on success, false on failure
+     */
+    bool ServerlessComputeService::dispatchInvocationOnNewContainer(
+        const std::shared_ptr<Invocation>& invocation,
+        const std::shared_ptr<ServerlessComputeNode>& target_compute_node) {
+
+        // Create a container object
+        auto container = std::make_shared<Container>(
+            invocation->getRegisteredFunction(),
+            target_compute_node,
+            this);
+
+        // Spawn the container
         try {
-            private_ss = startInvocationStorageService(invocation, target_compute_node);
-        }
-        catch (ExecutionException& e) {
-            WRENCH_INFO("Couldn't start private on-disk storage for an invocation for %s due to lack of space",
-                        invocation->_registered_function->_function->getName().c_str());
+            container->spawn();
+        } catch (ExecutionException& e) {
+            WRENCH_INFO("Couldn't spaw a container for an invocation for %s: %s",
+                        invocation->_registered_function->_function->getName().c_str(),
+                        e.getCause()->toString().c_str());
             return false;
         }
-
-
-        // Create and open a tmp memory file in RAM and open it, if possible
-        auto tmp_memory_file = Simulation::addFile(
-            "tmp_ram_file_" + std::to_string(++ServerlessComputeService::sequence_number),
-            invocation->getRegisteredFunction()->getRAMLimit());
-        auto compute_ram_ss = target_compute_node->memory;
-        try {
-            auto file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
-            StorageService::createFileAtLocation(file_location);
-            invocation->_tmp_ram_file_location = file_location;
-            invocation->_opened_tmp_ram_file = compute_ram_ss->openFile(invocation->_tmp_ram_file_location);
-        }
-        catch (ExecutionException& e) {
-            WRENCH_INFO("Couldn't create a private RAM space for an invocation for %s due to lack of space",
-                        invocation->_registered_function->_function->getName().c_str());
-            // Kill private storage service
-            private_ss->stop();
-            return false;
-        }
-
-        // Open the image memory file
-        invocation->_opened_image_ram_file = compute_ram_ss->openFile(
-            FileLocation::LOCATION(compute_ram_ss,
-                                   invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile()));
 
 
         // Declare the function invocation's necessary lambdas
         const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
-            ServerlessComputeService::releaseInvocationResources(invocation);
         };
 
-        const std::function lambda_execute = [invocation](
+        const std::function lambda_execute = [invocation, container](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             const auto function = invocation->_registered_function->_function;
 
@@ -725,16 +742,14 @@ namespace wrench {
             invocation->_function_start_date = S4U_Simulation::getClock();
             try {
                 invocation->_function_output = function->execute(invocation->_function_input,
-                                                                 invocation->_tmp_storage_service);
+                                                                 container->getPrivateStorageService());
             }
             catch (ExecutionException& e) {
-                ServerlessComputeService::releaseInvocationResources(invocation);
                 invocation->_function_end_date = S4U_Simulation::getClock();
                 throw;
             }
             invocation->_function_end_date = S4U_Simulation::getClock();
         };
-
 
         // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
@@ -762,12 +777,36 @@ namespace wrench {
 
         WRENCH_INFO("Dispatched an invocation for function %s",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
-        target_compute_node->available_cores -= 1;
+
+
+        invocation->_container = container;
         invocation->_container_start_date = Simulation::getCurrentSimulatedDate();
+
+        // Update the core count of the compute node
+        target_compute_node->available_cores -= 1;
+
+        // Start the action executor object
         action_executor->start(action_executor, true, false);
 
         // WRENCH_INFO("Function [%s] invoked", invocation->_registered_function->_function->getName().c_str());
+        target_compute_node->containers.insert(container);
         return true;
+    }
+
+    /**
+     * @brief Helper method to dispatch an invocation
+     *
+     * @param invocation invocation to dispatch
+     * @param target_compute_node the target compute node
+     * @param target_container the target container (if nullptr, create a new container)
+     * @return true on success, false on failure
+     */
+    bool ServerlessComputeService::dispatchInvocationOnIdleContainer(const std::shared_ptr<Invocation>& invocation,
+                                                                     const std::shared_ptr<ServerlessComputeNode>&
+                                                                     target_compute_node,
+                                                                     const std::shared_ptr<Container>&
+                                                                     target_container) {
+        throw std::runtime_error("NOT IMPLEMENTED YET!");
     }
 
     /**
@@ -818,57 +857,7 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Method to create a tmp storage service for an invocation
-     *
-     * @param invocation A function invocation
-     * @param target_compute_node the target compute node
-     * @return A storage service
-     */
-    std::shared_ptr<StorageService> ServerlessComputeService::startInvocationStorageService(
-        const std::shared_ptr<Invocation>& invocation,
-        const std::shared_ptr<ServerlessComputeNode>& target_compute_node) {
-        // WRENCH_INFO("Starting a new storage service for an invocation...");
-        // Reserve space on the storage service if possible
-        std::shared_ptr<FileLocation> tmp_file;
-        std::shared_ptr<simgrid::fsmod::File> opened_tmp_file;
-        try {
-            auto host_storage = target_compute_node->disk;
-            tmp_file = wrench::FileLocation::LOCATION(host_storage,
-                                                      Simulation::addFile(
-                                                          "tmp_" + std::to_string(
-                                                              ++ServerlessComputeService::sequence_number),
-                                                          invocation->_registered_function->_disk_space));
-            StorageService::createFileAtLocation(tmp_file);
-            opened_tmp_file = host_storage->openFile(tmp_file);
-        }
-        catch (ExecutionException& e) {
-            throw;
-        }
 
-        // Create a tmp file system
-        const auto disk = S4U_Simulation::hostHasMountPoint(target_compute_node->hostname, "/");
-        const auto ods = simgrid::fsmod::OneDiskStorage::create(
-            "is_" + std::to_string(ServerlessComputeService::sequence_number), disk);
-        const auto fs = simgrid::fsmod::FileSystem::create(
-            "fs" + std::to_string(ServerlessComputeService::sequence_number));
-        fs->mount_partition("/", ods, invocation->_registered_function->_disk_space);
-
-        // Create a tmp storage service
-        auto ss = std::shared_ptr<SimpleStorageService>(
-            SimpleStorageService::createSimpleStorageServiceWithExistingFileSystem(
-                target_compute_node->hostname, fs, {}, {}));
-        ss->setSimulation(this->simulation_);
-        ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
-        ss->start(ss, true, false);
-
-        // Keep track of all this
-        invocation->_tmp_file = tmp_file;
-        invocation->_opened_tmp_file = opened_tmp_file;
-        invocation->_tmp_storage_service = ss;
-
-        return ss;
-    }
 
     /**
      * @brief Helper method to start the storage service on the head node
@@ -876,7 +865,7 @@ namespace wrench {
      */
     void ServerlessComputeService::startHeadStorageService() {
         const auto ss = SimpleStorageService::createSimpleStorageService(
-            hostname,
+            _hostname,
             {_state_of_the_system->_head_storage_service_mount_point},
             {
                 {
@@ -1041,8 +1030,9 @@ namespace wrench {
      * @param compute_node The compute node
      * @param image The image
      */
-    void ServerlessComputeService::initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
-                                                                  const std::shared_ptr<DataFile>& image) {
+    void ServerlessComputeService::initiateImageCopyToComputeNode(
+        const std::shared_ptr<ServerlessComputeNode>& compute_node,
+        const std::shared_ptr<DataFile>& image) {
         // Add the image to the being_copied_images data structure for this host
         compute_node->images_being_copied.insert(image);
 
@@ -1163,14 +1153,4 @@ namespace wrench {
         WRENCH_INFO("Initiated image load at compute host [%s]", compute_node->hostname.c_str());
     }
 
-    /**
-     * @brief Helper method to release the resources allocated to an invocation that has terminated (successfully or not)
-     */
-    void ServerlessComputeService::releaseInvocationResources(const std::shared_ptr<Invocation>& invocation) {
-        // Stop amd clean up the on-disk storage
-        invocation->_tmp_storage_service->stop();
-        invocation->_opened_tmp_file->close();
-        invocation->_tmp_storage_service = nullptr; // Should free up all memory...
-        StorageService::removeFileAtLocation(invocation->_tmp_file);
-    }
 }; // namespace wrench

@@ -679,7 +679,7 @@ private:
                 job_manager->submitJob(job, this->test->compute_service, {});
                 throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
             } catch (wrench::ExecutionException &e) {
-                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
                 if (not cause) {
                     throw std::runtime_error("Unexpected failure cause");
                 }

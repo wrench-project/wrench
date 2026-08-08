@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_NOT_ENOUGH_RESOURCES_H
-#define WRENCH_NOT_ENOUGH_RESOURCES_H
+#ifndef WRENCH_NOT_ENOUGH_RESOURCES_FOR_JOBS_H
+#define WRENCH_NOT_ENOUGH_RESOURCES_FOR_JOBS_H
 
 #include <set>
 #include <string>
@@ -26,22 +26,25 @@ namespace wrench {
 
 
     /**
-     * @brief A generic "not enough resources" failure cause
+     * @brief A "compute service doesn't have enough resources" failure cause
      */
-    class NotEnoughResources : public FailureCause {
+    class NotEnoughResourcesForJob : public FailureCause {
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        explicit NotEnoughResources(std::string message);
+        NotEnoughResourcesForJob(std::shared_ptr<Job> job, std::shared_ptr<Service> service);
         /***********************/
         /** \endcond           */
         /***********************/
 
+        std::shared_ptr<Job> getJob();
+        std::shared_ptr<Service> getService();
         std::string toString() override;
-    private:
-        std::string message;
 
+    private:
+        std::shared_ptr<Job> job;
+        std::shared_ptr<Service> service;
     };
 
 
@@ -51,4 +54,4 @@ namespace wrench {
 }// namespace wrench
 
 
-#endif//WRENCH_NOT_ENOUGH_RESOURCES_H
+#endif//WRENCH_NOT_ENOUGH_RESOURCES_FOR_JOB_H

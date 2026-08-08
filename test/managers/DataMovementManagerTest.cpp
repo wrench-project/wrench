@@ -169,7 +169,7 @@ private:
 
         // Create a new file registry service to resume normal testing
         file_registry_service = std::shared_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(
-                this->hostname, {}, {}));
+                this->_hostname, {}, {}));
         file_registry_service->setSimulation(this->getSimulation());
         file_registry_service->start(file_registry_service, true, false);
 

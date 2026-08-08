@@ -212,7 +212,7 @@ namespace wrench {
 
     private:
         friend class Simulation;
-        friend class ServerlessComputeService;
+        friend class Container;
 
         std::shared_ptr<simgrid::fsmod::File> openFile(const std::shared_ptr<FileLocation> &location);
 

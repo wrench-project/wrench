@@ -103,7 +103,7 @@ namespace wrench {
                     // Make sure the image is on this node
                     auto image_file = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
                     if (state->isImageInRAMAtNode(node, image_file)) {
-                        decisions->invocations_to_start_at_compute_node[node].push_back(inv);
+                        decisions->invocations_to_start_on_new_container_at_compute_node[node].push_back(inv);
                         availableCores[node]--;
                         scheduled++;
                     }

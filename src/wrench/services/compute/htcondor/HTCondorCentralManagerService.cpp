@@ -20,7 +20,7 @@
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 #include <wrench/failure_causes/NotAllowed.h>
-#include <wrench/failure_causes/NotEnoughResources.h>
+#include <wrench/failure_causes/NotEnoughResourcesForJob.h>
 
 #include <memory>
 
@@ -132,7 +132,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
         WRENCH_INFO("HTCondor Service starting on host %s listening on commport %s",
-                    this->hostname.c_str(), this->commport->get_cname());
+                    this->_hostname.c_str(), this->commport->get_cname());
 
         // main loop
         while (this->processNextMessage()) {
@@ -141,7 +141,7 @@ namespace wrench {
                 if (not this->pending_jobs.empty()) {
                     this->dispatching_jobs = true;
                     auto negotiator = std::make_shared<HTCondorNegotiatorService>(
-                            this->hostname,
+                            this->_hostname,
                             this->negotiator_startup_overhead,
                             this->grid_pre_overhead,
                             this->non_grid_pre_overhead,
@@ -479,7 +479,7 @@ namespace wrench {
             }
             return std::make_shared<NotAllowed>(this->getSharedPtr<Service>(), error_message);
         } else if (not found_one) {
-            return std::make_shared<NotEnoughResources>(job, this->getSharedPtr<Service>());
+            return std::make_shared<NotEnoughResourcesForJob>(job, this->getSharedPtr<Service>());
         } else {
             return nullptr;
         }

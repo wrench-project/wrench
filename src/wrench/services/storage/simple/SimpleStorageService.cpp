@@ -159,11 +159,11 @@ namespace wrench {
             this->file_system = sgfs::FileSystem::create(this->getName() + "_fs", INT_MAX);
             for (const auto &mp: mount_points) {
                 // Find the disk
-                auto disk = S4U_Simulation::hostHasMountPoint(this->hostname, mp);
+                auto disk = S4U_Simulation::hostHasMountPoint(this->_hostname, mp);
                 if (disk == nullptr) {
-                    throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): There is no disk at host " + this->hostname + " mounted at " + mp);
+                    throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): There is no disk at host " + this->_hostname + " mounted at " + mp);
                 }
-                auto disk_capacity = S4U_Simulation::getDiskCapacity(this->hostname, mp);
+                auto disk_capacity = S4U_Simulation::getDiskCapacity(this->_hostname, mp);
                 sgfs::Partition::CachingScheme caching_scheme;
                 std::string caching_behavior_property = this->getPropertyValueAsString(wrench::StorageServiceProperty::CACHING_BEHAVIOR);
                 if (caching_behavior_property == "NONE") {
@@ -579,7 +579,7 @@ namespace wrench {
         if (!partition) {
             return nullptr;
         }
-        return S4U_Simulation::hostHasMountPoint(this->hostname, partition->get_name());
+        return S4U_Simulation::hostHasMountPoint(this->_hostname, partition->get_name());
     }
 
     /**

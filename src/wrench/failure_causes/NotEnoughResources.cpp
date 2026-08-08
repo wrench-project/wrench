@@ -22,28 +22,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: the job that could not be executed (or nullptr if no job was involved)
-     * @param service: the compute service that didn't have enough cores or ram
+     * @param message: a message
      */
-    NotEnoughResources::NotEnoughResources(std::shared_ptr<Job> job, std::shared_ptr<Service> service) {
-        this->job = std::move(job);
-        this->service = std::move(service);
-    }
-
-    /**
-     * @brief Getter
-     * @return the job
-     */
-    std::shared_ptr<Job> NotEnoughResources::getJob() {
-        return this->job;
-    }
-
-    /**
-     * @brief Getter
-     * @return the compute service
-     */
-    std::shared_ptr<Service> NotEnoughResources::getService() {
-        return this->service;
+    NotEnoughResources::NotEnoughResources(std::string message) {
+        this->message = message;
     }
 
     /**
@@ -51,11 +33,7 @@ namespace wrench {
      * @return the message
      */
     std::string NotEnoughResources::toString() {
-        std::string text_msg = "Compute service " + this->service->getName() + " on host " +
-                               this->service->getHostname() + " does not have enough compute resources";
-        if (job) {
-            text_msg += " to support job " + job->getName();
-        }
+        std::string text_msg = "Not enough resources: " + this->message;
         return text_msg;
     }
 

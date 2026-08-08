@@ -1672,7 +1672,7 @@ private:
             job_manager->submitJob(job, test->compute_service, {{"task2", "OneCoreHost:2"}});
             throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
         } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
                                          e.getCause()->toString() + " (expected: NotEnoughResources)");
@@ -1780,7 +1780,7 @@ private:
             job_manager->submitJob(job, test->compute_service);
             throw std::runtime_error("Should not be able to submit a job to a service without enough RAM");
         } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResourcesForJob>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
                                          e.getCause()->toString() + " (expected: NotEnoughResources)");

@@ -32,8 +32,8 @@ namespace wrench {
         std::map<std::shared_ptr<ServerlessComputeNode>, std::vector<std::shared_ptr<DataFile>>> images_to_copy_to_compute_node;
 	    /** @brief The compute-node-keyed map of images to load in RAM at compute nodes */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::vector<std::shared_ptr<DataFile>>> images_to_load_into_RAM_at_compute_node;
-	    /** @brief The compute-node-keyed map of functions to invoke at compute nodes */
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::vector<std::shared_ptr<Invocation>>> invocations_to_start_at_compute_node;
+	    /** @brief The compute-node-keyed map of functions to invoke on a new container at compute nodes */
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::vector<std::shared_ptr<Invocation>>> invocations_to_start_on_new_container_at_compute_node;
     };
 
     /**

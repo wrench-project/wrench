@@ -122,7 +122,7 @@ namespace wrench {
 
         this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
         // Initiate the read in a thread
-        auto frt = std::make_shared<FileReaderThread>(this->hostname, this->commport, location, num_bytes);
+        auto frt = std::make_shared<FileReaderThread>(this->_hostname, this->commport, location, num_bytes);
         frt->setSimulation(this->simulation_);
         frt->start(frt, true, false);
     }
@@ -153,7 +153,7 @@ namespace wrench {
         this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
 
         // Initiate the write operation in a thread
-        auto fwt = std::make_shared<FileWriterThread>(this->hostname, this->commport, location);
+        auto fwt = std::make_shared<FileWriterThread>(this->_hostname, this->commport, location);
         fwt->setSimulation(this->simulation_);
         fwt->start(fwt, true, false);
     }

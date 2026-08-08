@@ -65,7 +65,7 @@ namespace wrench {
 
         this->action->setNumCoresAllocated(this->num_cores);
         this->action->setRAMAllocated(this->ram_footprint);
-        this->action->setExecutionHost(this->hostname);
+        this->action->setExecutionHost(this->_hostname);
     }
 
     /**
@@ -124,7 +124,7 @@ namespace wrench {
                 // If no failure cause was set, then it's a host failure
                 if (not this->action->getFailureCause()) {
                     this->action->setFailureCause(
-                        std::make_shared<HostError>(this->hostname));
+                        std::make_shared<HostError>(this->_hostname));
                 }
             }
         }
@@ -154,7 +154,7 @@ namespace wrench {
         // Create and start an actor to execute the task, while catching a failure if any
         std::shared_ptr<FailureCause> failure_cause = nullptr;
         auto action_executor_with_timeout = std::make_shared<ActionExecutorActorWithTimeout>(
-            this->hostname,
+            this->_hostname,
             this->num_cores,
             this->ram_footprint,
             this->action_startup_overhead,

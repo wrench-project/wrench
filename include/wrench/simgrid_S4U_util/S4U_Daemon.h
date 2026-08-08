@@ -63,7 +63,7 @@ namespace wrench {
         S4U_CommPort *recv_commport;
 
         /** @brief The name of the host on which the daemon is running */
-        std::string hostname;
+        std::string _hostname;
 
         static S4U_CommPort *getRunningActorRecvCommPort();
 

@@ -228,7 +228,7 @@ namespace wrench {
 
         // Create a FileTransferThread
         auto ftt = std::make_shared<FileTransferThread>(
-                this->hostname,
+                this->_hostname,
                 this->getSharedPtr<StorageService>(),
                 location->getFile(),
                 num_bytes_to_write,
@@ -289,7 +289,7 @@ namespace wrench {
         if (success) {
             // Create a FileTransferThread
             auto ftt = std::make_shared<FileTransferThread>(
-                    this->hostname,
+                    this->_hostname,
                     this->getSharedPtr<StorageService>(),
                     location->getFile(),
                     num_bytes_to_read,
@@ -355,7 +355,7 @@ namespace wrench {
         transfer_size = (uint64_t) (src_location->getFile()->getSize());
 
         auto ftt = std::make_shared<FileTransferThread>(
-                this->hostname,
+                this->_hostname,
                 this->getSharedPtr<StorageService>(),
                 src_location->getFile(),
                 transfer_size,

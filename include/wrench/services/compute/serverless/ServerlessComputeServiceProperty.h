@@ -27,6 +27,10 @@ namespace wrench {
          *         Examples: "5", "5s", "5000ms", etc.
          **/
         DECLARE_PROPERTY_NAME(CONTAINER_STARTUP_OVERHEAD);
+
+        /** @brief The timeout before an idle container is terminated and its disk/resources reclaimed.
+         **/
+        DECLARE_PROPERTY_NAME(CONTAINER_IDLE_TIMEOUT);
     };
 
 }// namespace wrench

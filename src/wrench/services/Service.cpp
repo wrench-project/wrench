@@ -361,7 +361,7 @@ namespace wrench {
     * @return the hostname
     */
     std::string Service::getHostname() {
-        return this->hostname;
+        return this->_hostname;
     }
 
     /**
@@ -377,10 +377,10 @@ namespace wrench {
     * @return the physical hostname
     */
     std::string Service::getPhysicalHostname() {
-        if (S4U_VirtualMachine::vm_to_pm_map.find(this->hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
-            return S4U_VirtualMachine::vm_to_pm_map[this->hostname];
+        if (S4U_VirtualMachine::vm_to_pm_map.find(this->_hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+            return S4U_VirtualMachine::vm_to_pm_map[this->_hostname];
         } else {
-            return this->hostname;
+            return this->_hostname;
         }
     }
 

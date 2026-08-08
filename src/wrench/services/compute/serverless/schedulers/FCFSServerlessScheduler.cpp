@@ -100,7 +100,7 @@ namespace wrench {
             for (const auto& [hostname, num_available_cores] : available_cores) {
                 // Checking if the node has available cores and if the image is on the node
                 if (num_available_cores > 0 && state->isImageInRAMAtNode(hostname, image_file)) {
-                    decisions->invocations_to_start_at_compute_node[hostname].push_back(inv);
+                    decisions->invocations_to_start_on_new_container_at_compute_node[hostname].push_back(inv);
                     available_cores[hostname]--;
                     // Move on to next invocation
                     break;

@@ -288,7 +288,7 @@ namespace wrench {
                 hosts_to_monitor.push_back(h.first);
             }
             this->host_state_change_monitor = std::make_shared<HostStateChangeDetector>(
-                this->hostname, hosts_to_monitor, true, true, true,
+                this->_hostname, hosts_to_monitor, true, true, true,
                 this->getSharedPtr<Service>(), this->commport);
             this->host_state_change_monitor->setSimulation(this->simulation_);
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
@@ -480,7 +480,7 @@ namespace wrench {
             // Start a failure detector for this action executor (which will send me a message in case the
             // action executor has died)
             auto failure_detector = std::make_shared<ServiceTerminationDetector>(
-                this->hostname, action_executor, this->commport, true, false);
+                this->_hostname, action_executor, this->commport, true, false);
             failure_detector->setSimulation(this->simulation_);
             failure_detector->start(failure_detector, true, false);// Daemonized, no auto-restart
 
@@ -921,7 +921,7 @@ namespace wrench {
             answer_commport->dputMessage(
                     new ActionExecutionServiceSubmitActionAnswerMessage(
                             false,
-                            std::make_shared<NotEnoughResources>(action->getJob(), this->parent_service),
+                            std::make_shared<NotEnoughResourcesForJob>(action->getJob(), this->parent_service),
                             0.0));
             return;
         }

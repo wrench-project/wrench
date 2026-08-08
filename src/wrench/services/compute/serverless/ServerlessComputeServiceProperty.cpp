@@ -12,5 +12,6 @@
 namespace wrench {
 
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, CONTAINER_STARTUP_OVERHEAD);
+    SET_PROPERTY_NAME(ServerlessComputeServiceProperty, CONTAINER_IDLE_TIMEOUT);
 
 }// namespace wrench

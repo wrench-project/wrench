@@ -121,7 +121,7 @@ namespace wrench {
             if ((action->getMinRAMFootprint() > max_ram) or
                 (action->getMinNumCores() > max_cores)) {
                 throw ExecutionException(
-                    std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
+                    std::make_shared<NotEnoughResourcesForJob>(job, this->getSharedPtr<BareMetalComputeService>()));
             }
         }
 
@@ -148,7 +148,7 @@ namespace wrench {
                     if ((target_num_cores != ULONG_MAX) and (target_num_cores > std::get<0>(
                         compute_resources[target_host]))) {
                         throw ExecutionException(
-                            std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
+                            std::make_shared<NotEnoughResourcesForJob>(job, this->getSharedPtr<BareMetalComputeService>()));
                     }
                 }
 
@@ -170,7 +170,7 @@ namespace wrench {
                     }
                     if (target_num_cores > max_cores) {
                         throw ExecutionException(
-                            std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
+                            std::make_shared<NotEnoughResourcesForJob>(job, this->getSharedPtr<BareMetalComputeService>()));
                     }
                 }
             }
@@ -403,7 +403,7 @@ namespace wrench {
             BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
             // Set up a service termination detector for the action execution service if necessary
             auto termination_detector = std::make_shared<ServiceTerminationDetector>(
-                this->hostname, this->action_execution_service,
+                this->_hostname, this->action_execution_service,
                 this->commport, false, true);
             termination_detector->setSimulation(this->simulation_);
             termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
@@ -576,7 +576,7 @@ namespace wrench {
             answer_commport->dputMessage(
                 new ComputeServiceSubmitCompoundJobAnswerMessage(
                     job, this->getSharedPtr<BareMetalComputeService>(), false,
-                    std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()),
+                    std::make_shared<NotEnoughResourcesForJob>(job, this->getSharedPtr<BareMetalComputeService>()),
                     this->getMessagePayloadValue(
                         BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
             return;

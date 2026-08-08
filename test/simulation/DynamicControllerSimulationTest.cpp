@@ -69,7 +69,7 @@ public:
 private:
     int main() override {
         wrench::Simulation::sleep(10);
-        auto new_controller = this->simulation_->startNewExecutionController(new TestDynamicChildController(this->hostname));
+        auto new_controller = this->simulation_->startNewExecutionController(new TestDynamicChildController(this->_hostname));
         new_controller->join();
         return 0;
     }

@@ -31,6 +31,7 @@ namespace wrench {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
+            {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0"},
             {ServerlessComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}
         };
 
@@ -74,6 +75,8 @@ namespace wrench {
     /** \cond INTERNAL    **/
     /***********************/
 
+        static unsigned long sequence_number;
+
     protected:
         friend class FunctionManager;
 
@@ -89,7 +92,6 @@ namespace wrench {
                                                              sg_size_t egress_in_bytes);
 
     private:
-        static unsigned long sequence_number;
 
         std::shared_ptr<ServerlessScheduler> _scheduler;
         std::shared_ptr<ServerlessStateOfTheSystem> _state_of_the_system;
@@ -146,12 +148,17 @@ namespace wrench {
         void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
 
         bool invocationCanBeStarted(const std::shared_ptr<Invocation>& invocation,
-            const std::shared_ptr<ServerlessComputeNode>& compute_node) const;
+            const std::shared_ptr<ServerlessComputeNode>& compute_node,
+            const std::shared_ptr<Container>& target_container) const;
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
+            const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
+            const std::shared_ptr<Container>& container);
+        bool dispatchInvocationOnNewContainer(const std::shared_ptr<Invocation>& invocation,
             const std::shared_ptr<ServerlessComputeNode>& target_compute_node);
-
-        static void releaseInvocationResources(const std::shared_ptr<Invocation>& invocation);
+        bool dispatchInvocationOnIdleContainer(const std::shared_ptr<Invocation>& invocation,
+            const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
+            const std::shared_ptr<Container>& container);
 
         unsigned long num_cores_of_compute_host;
         double speed_of_compute_core;

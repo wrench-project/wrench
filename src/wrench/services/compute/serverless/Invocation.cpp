@@ -8,9 +8,9 @@
  */
 
 #include "wrench/services/compute/serverless/Invocation.h"
-
 #include "wrench/logging/TerminalOutput.h"
-WRENCH_LOG_CATEGORY(Invocations, "Log category for Serverless invocations");
+
+WRENCH_LOG_CATEGORY(Invocation, "Log category for Serverless invocations");
 
 
 namespace wrench {

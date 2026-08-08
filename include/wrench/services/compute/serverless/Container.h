@@ -12,9 +12,10 @@
 #define CONTAINER_H
 
 #include <memory>
-#include <wrench/managers/function_manager/Function.h>
+#include <wrench/managers/function_manager/RegisteredFunction.h>
 
 namespace wrench {
+    class ServerlessComputeNode;
 
     /***********************/
     /** \cond INTERNAL    **/
@@ -27,21 +28,46 @@ namespace wrench {
     class Container {
 
       enum class ContainerState {
-            STARTING,
+            BUSY,
             IDLE,
-            BUSY
         };
 
     public:
 
-        explicit Container(const std::shared_ptr<Function> &registered_function) {
+        explicit Container(const std::shared_ptr<RegisteredFunction> &registered_function,
+            const std::shared_ptr<ServerlessComputeNode> &compute_node,
+            ServerlessComputeService* serverless_compute_service) {
             _registered_function = registered_function;
-            _state = ContainerState::STARTING;
+            _compute_node = compute_node;
+            _serverless_compute_service = serverless_compute_service;
+            _state = ContainerState::BUSY;
+
          }
 
+        [[nodiscard]] bool isIdle() const { return _state == ContainerState::IDLE; }
+        void makeIdle() { _state = ContainerState::IDLE; }
+        void makeBusy() { _state = ContainerState::BUSY; }
+
+        void spawn();
+        void shutdown();
+
+        std::shared_ptr<StorageService> getPrivateStorageService() const {return _tmp_storage_service; }
+
+
     private:
-        std::shared_ptr<Function> _registered_function;
+        std::shared_ptr<RegisteredFunction> _registered_function;
+        std::shared_ptr<ServerlessComputeNode> _compute_node;
+        ServerlessComputeService *_serverless_compute_service;
         ContainerState _state;
+
+        std::shared_ptr<FileLocation> _tmp_file;
+        std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
+        std::shared_ptr<StorageService> _tmp_storage_service;
+
+        std::shared_ptr<simgrid::fsmod::File> _opened_image_ram_file;
+
+        std::shared_ptr<FileLocation> _tmp_ram_file_location;
+        std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
 
     /***********************/
     /** \endcond          **/

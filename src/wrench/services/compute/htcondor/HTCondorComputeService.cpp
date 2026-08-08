@@ -148,7 +148,7 @@ namespace wrench {
     int HTCondorComputeService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
         WRENCH_INFO(
-                "HTCondor Service starting on host %s listening on commport %s", this->hostname.c_str(),
+                "HTCondor Service starting on host %s listening on commport %s", this->_hostname.c_str(),
                 this->commport->get_cname());
 
         // start the central manager service

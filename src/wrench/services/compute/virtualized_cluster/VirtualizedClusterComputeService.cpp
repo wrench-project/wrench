@@ -140,7 +140,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
         WRENCH_INFO(
                 "Virtualized Cluster Service starting on host %s listening on commport %s",
-                this->hostname.c_str(),
+                this->_hostname.c_str(),
                 this->commport->get_cname());
 
         // Start the Scratch Storage Service
@@ -268,7 +268,7 @@ namespace wrench {
         if ((dest_available_ram < vm->getMemory()) or (dest_available_cores < static_cast<double>(vm->getNumCores()))) {
             msg_to_send_back = new VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
                     false,
-                    std::make_shared<NotEnoughResources>(
+                    std::make_shared<NotEnoughResourcesForJob>(
                         nullptr, this->getSharedPtr<VirtualizedClusterComputeService>()),
                     this->getMessagePayloadValue(
                             VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));

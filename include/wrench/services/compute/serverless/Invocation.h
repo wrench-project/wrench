@@ -63,13 +63,6 @@ namespace wrench {
         std::shared_ptr<FunctionOutput> _function_output; // the output of the function invocation
         S4U_CommPort* _notify_commport; // the communication port for notifications
 
-        std::shared_ptr<FileLocation> _tmp_file;
-        std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
-        std::shared_ptr<StorageService> _tmp_storage_service;
-        std::shared_ptr<simgrid::fsmod::File> _opened_image_ram_file;
-        std::shared_ptr<FileLocation> _tmp_ram_file_location;
-        std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
-
         double _submit_date = -1.0;
         double _container_start_date = -1.0;
         double _function_start_date = -1.0;

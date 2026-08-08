@@ -69,7 +69,7 @@ namespace wrench {
                 children.push_back(child);
                 return child;
             }
-            throw std::runtime_error("Supervisor running on " + hostname + " already has 64 children");
+            throw std::runtime_error("Supervisor running on " + _hostname + " already has 64 children");
         }
 
         //            /**
@@ -321,7 +321,7 @@ namespace wrench {
                             Alarm::createAndStartAlarm(this->simulation_,
                                                        wrench::S4U_Simulation::getClock() + this->
                                                        getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT),
-                                                       this->hostname, this->commport,
+                                                       this->_hostname, this->commport,
                                                        new FileNotFoundAlarm(
                                                            msg->answer_commport, file, false, answered),
                                                        "XROOTD_FileNotFoundAlarm");
@@ -436,7 +436,7 @@ namespace wrench {
                             Alarm::createAndStartAlarm(this->simulation_,
                                                        wrench::S4U_Simulation::getClock() + this->
                                                        getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT),
-                                                       this->hostname, this->commport,
+                                                       this->_hostname, this->commport,
                                                        new FileNotFoundAlarm(
                                                            msg->answer_commport, file, true, answered),
                                                        "XROOTD_FileNotFoundAlarm");
@@ -857,7 +857,7 @@ namespace wrench {
             }
             //            internalStorage = make_shared<SimpleStorageService>(hostname, path, property_list, messagepayload_list);
             internalStorage = std::shared_ptr<SimpleStorageService>(
-                SimpleStorageService::createSimpleStorageService(hostname, std::move(path), std::move(property_list),
+                SimpleStorageService::createSimpleStorageService(_hostname, std::move(path), std::move(property_list),
                                                                  std::move(messagepayload_list)));
             return true;
         }
@@ -907,7 +907,7 @@ namespace wrench {
                 return internalStorage->getFileLastWriteDate(location);
             }
             else {
-                throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + hostname);
+                throw std::runtime_error("Node::getFileLastWriteDate() called on non storage Node " + _hostname);
             }
         }
 
@@ -983,7 +983,7 @@ namespace wrench {
         */
         void Node::createFile(const std::shared_ptr<FileLocation>& location) {
             if (internalStorage == nullptr) {
-                throw std::runtime_error("Node::createFile() called on non storage Node " + hostname);
+                throw std::runtime_error("Node::createFile() called on non storage Node " + _hostname);
             }
 
             internalStorage->createFile(location);
@@ -997,7 +997,7 @@ namespace wrench {
         */
         void Node::removeFile(const std::shared_ptr<FileLocation>& location) {
             if (internalStorage == nullptr) {
-                throw std::runtime_error("Node::removeFile() called on non storage Node " + hostname);
+                throw std::runtime_error("Node::removeFile() called on non storage Node " + _hostname);
             }
 
             internalStorage->removeFile(location);
@@ -1116,7 +1116,7 @@ namespace wrench {
             }
             else {
                 return false; // TODO: IS THIS A GOOD IDEA? MAY MESS UP COPYING???
-                throw std::runtime_error("Node::isBufferized() called on non storage Node " + hostname);
+                throw std::runtime_error("Node::isBufferized() called on non storage Node " + _hostname);
             }
         }
 
@@ -1129,7 +1129,7 @@ namespace wrench {
                 return internalStorage->getBufferSize();
             }
             else {
-                throw std::runtime_error("Node::getBufferSize() called on non storage Node " + hostname);
+                throw std::runtime_error("Node::getBufferSize() called on non storage Node " + _hostname);
             }
         }
 
@@ -1143,7 +1143,7 @@ namespace wrench {
                 return internalStorage->reserveSpace(location);
             }
             else {
-                throw std::runtime_error("Node::reserveSpace() called on non storage Node " + hostname);
+                throw std::runtime_error("Node::reserveSpace() called on non storage Node " + _hostname);
             }
         }
 
@@ -1156,7 +1156,7 @@ namespace wrench {
                 internalStorage->unreserveSpace(location);
             }
             else {
-                throw std::runtime_error("Node::unreserveSpace() called on non storage Node " + hostname);
+                throw std::runtime_error("Node::unreserveSpace() called on non storage Node " + _hostname);
             }
         }
     } // namespace XRootD

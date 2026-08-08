@@ -150,7 +150,7 @@ namespace wrench {
         }
 
         auto ss = SimpleStorageService::createSimpleStorageService(
-                hostname,
+                _hostname,
                 {scratch_space_mount_point},
                 {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)}}, {});
 

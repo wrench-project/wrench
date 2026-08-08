@@ -419,8 +419,8 @@ namespace wrench {
             compute_service->validateServiceSpecificArguments(job->compound_job, new_args);
         } catch (ExecutionException &e) {
             job->compound_job = nullptr;
-            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
+            if (std::dynamic_pointer_cast<NotEnoughResourcesForJob>(e.getCause())) {
+                throw ExecutionException(std::make_shared<NotEnoughResourcesForJob>(job, compute_service));
             } else {
                 throw;
             }
@@ -504,8 +504,8 @@ namespace wrench {
         try {
             compute_service->validateServiceSpecificArguments(job, service_specific_args);
         } catch (ExecutionException &e) {
-            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
+            if (std::dynamic_pointer_cast<NotEnoughResourcesForJob>(e.getCause())) {
+                throw ExecutionException(std::make_shared<NotEnoughResourcesForJob>(job, compute_service));
             } else {
                 throw;
             }
@@ -589,7 +589,7 @@ namespace wrench {
                     // TODO: Deal with Properties!
                     auto bm_cs = std::shared_ptr<BareMetalComputeService>(
                             new BareMetalComputeService(
-                                    executor->hostname,
+                                    executor->_hostname,
                                     specified_compute_resources,
                                     {},
                                     {},
@@ -621,8 +621,8 @@ namespace wrench {
             compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
         } catch (ExecutionException &e) {
             job->compound_job = nullptr;
-            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
+            if (std::dynamic_pointer_cast<NotEnoughResourcesForJob>(e.getCause())) {
+                throw ExecutionException(std::make_shared<NotEnoughResourcesForJob>(job, compute_service));
             }
             throw;
         } catch (std::invalid_argument &) {
@@ -635,8 +635,8 @@ namespace wrench {
         try {
             compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
         } catch (ExecutionException &e) {
-            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>(job, compute_service));
+            if (std::dynamic_pointer_cast<NotEnoughResourcesForJob>(e.getCause())) {
+                throw ExecutionException(std::make_shared<NotEnoughResourcesForJob>(job, compute_service));
             } else {
                 throw;
             }
@@ -973,8 +973,8 @@ namespace wrench {
             job_failure_cause = std::make_shared<JobKilled>();
         } else if (std::dynamic_pointer_cast<JobTimeout>(job_failure_cause)) {
             job_failure_cause = std::make_shared<JobTimeout>();
-        } else if (auto actual_cause = std::dynamic_pointer_cast<NotEnoughResources>(job_failure_cause)) {
-            job_failure_cause = std::make_shared<NotEnoughResources>(job, actual_cause->getService());
+        } else if (auto actual_cause = std::dynamic_pointer_cast<NotEnoughResourcesForJob>(job_failure_cause)) {
+            job_failure_cause = std::make_shared<NotEnoughResourcesForJob>(job, actual_cause->getService());
         }
 
         // remove the job from the "dispatched" list

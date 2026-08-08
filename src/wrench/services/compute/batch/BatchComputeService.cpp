@@ -30,7 +30,7 @@
 #include <wrench/failure_causes/FunctionalityNotAvailable.h>
 #include <wrench/failure_causes/JobKilled.h>
 #include <wrench/failure_causes/ServiceIsDown.h>
-#include <wrench/failure_causes/NotEnoughResources.h>
+#include <wrench/failure_causes/NotEnoughResourcesForJob.h>
 #include <wrench/failure_causes/JobTimeout.h>
 #include <wrench/failure_causes/NotAllowed.h>
 
@@ -336,7 +336,7 @@ namespace wrench {
                 this->scheduler->processJobTermination(batch_job);
                 this->removeBatchJobFromJobsList(batch_job);
                 // Send back notification
-                auto failure_cause = std::make_shared<NotEnoughResources>(
+                auto failure_cause = std::make_shared<NotEnoughResourcesForJob>(
                     compound_job, this->getSharedPtr<BatchComputeService>());
                 compound_job->setAllActionsFailed(failure_cause);
                 this->sendCompoundJobFailureNotification(compound_job, std::to_string((batch_job->getJobID())),
@@ -960,7 +960,7 @@ namespace wrench {
                         job->getCompoundJob(),
                         this->getSharedPtr<BatchComputeService>(),
                         false,
-                        std::make_shared<NotEnoughResources>(
+                        std::make_shared<NotEnoughResourcesForJob>(
                             job->getCompoundJob(),
                             this->getSharedPtr<BatchComputeService>()),
                         this->getMessagePayloadValue(
@@ -1137,7 +1137,7 @@ namespace wrench {
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(
             new BareMetalComputeServiceOneShot(
                 compound_job,
-                this->hostname,
+                this->_hostname,
                 resources_by_hostname,
                 {
                     {
@@ -1166,7 +1166,7 @@ namespace wrench {
 
         std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
                                                                       batch_job->getEndingTimestamp(),
-                                                                      this->hostname,
+                                                                      this->_hostname,
                                                                       this->commport, msg,
                                                                       "batch_standard");
         compound_job_alarms[compound_job] = alarm_ptr;
@@ -1498,7 +1498,7 @@ namespace wrench {
                 }
                 if (this->compute_hosts.size() - this->num_reclaimed_hosts < num_nodes) {
                     throw ExecutionException(
-                        std::make_shared<NotEnoughResources>(cjob, this->getSharedPtr<ComputeService>()));
+                        std::make_shared<NotEnoughResourcesForJob>(cjob, this->getSharedPtr<ComputeService>()));
                 }
             }
             else if (key == "-t") {
@@ -1518,11 +1518,11 @@ namespace wrench {
                 }
                 if (this->num_cores_per_node < num_cores) {
                     throw ExecutionException(
-                        std::make_shared<NotEnoughResources>(cjob, this->getSharedPtr<ComputeService>()));
+                        std::make_shared<NotEnoughResourcesForJob>(cjob, this->getSharedPtr<ComputeService>()));
                 }
                 if (cjob->getMinimumRequiredNumCores() > num_cores) {
                     throw ExecutionException(
-                        std::make_shared<NotEnoughResources>(cjob, this->getSharedPtr<ComputeService>()));
+                        std::make_shared<NotEnoughResourcesForJob>(cjob, this->getSharedPtr<ComputeService>()));
                 }
             }
             else if (key == "-u" || key == "-color") {
@@ -1559,7 +1559,7 @@ namespace wrench {
         // Double check that memory requirements of all tasks can be met
         if (cjob->getMinimumRequiredMemory() > S4U_Simulation::getHostMemoryCapacity(
             this->available_nodes_to_cores.begin()->first)) {
-            throw ExecutionException(std::make_shared<NotEnoughResources>(cjob, this->getSharedPtr<ComputeService>()));
+            throw ExecutionException(std::make_shared<NotEnoughResourcesForJob>(cjob, this->getSharedPtr<ComputeService>()));
         }
     }
 
