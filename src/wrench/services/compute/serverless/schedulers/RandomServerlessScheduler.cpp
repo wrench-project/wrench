@@ -45,10 +45,8 @@ namespace wrench {
         auto availableCores = state->getAvailableCores();
 
 
-        // Mapping: compute node -> set of required image IDs
-        // std::map<std::string, std::unordered_set<std::string>> requiredImages;
         // Mapping: compute node -> vector of required DataFile pointers
-        std::map<std::string, std::set<std::shared_ptr<DataFile>>> requiredImages;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<DataFile>>> requiredImages;
 
         // For each invocation, randomly assign it to a compute node that has an available core
         for (const auto& inv : schedulable_invocations) {
@@ -56,17 +54,17 @@ namespace wrench {
             // std::string imageID = imageFile->getID();
 
             // Build list of nodes with available cores
-            std::vector<std::string> candidates;
-            for (const auto& [hostname, num_cores] : availableCores) {
+            std::vector<std::shared_ptr<ServerlessComputeNode>> candidates;
+            for (const auto& [compute_node, num_cores] : availableCores) {
                 if (num_cores > 0) {
-                    candidates.push_back(hostname);
+                    candidates.push_back(compute_node);
                 }
             }
 
             if (!candidates.empty()) {
                 // Pick a random candidate
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
-                const std::string& chosenNode = candidates[dist(rng)];
+                const std::shared_ptr<ServerlessComputeNode>& chosenNode = candidates[dist(rng)];
                 // Decrement available core for chosen node
                 availableCores[chosenNode]--;
 
@@ -77,7 +75,7 @@ namespace wrench {
         }
 
         // For each compute node, determine the images to copy
-        auto computeNodes = state->getComputeHosts();
+        auto computeNodes = state->getComputeNodes();
 
         for (const auto& node : computeNodes) {
             // Get required images for this node
@@ -115,7 +113,7 @@ namespace wrench {
         for (const auto& inv : schedulable_invocations) {
             auto imageFile = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
-            std::vector<std::string> candidates;
+            std::vector<std::shared_ptr<ServerlessComputeNode>> candidates;
             for (const auto& [hostname, num_available_cores
                 ] : availableCores) {
                 if (num_available_cores > 0) {
@@ -128,7 +126,7 @@ namespace wrench {
 
             if (!candidates.empty()) {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
-                const std::string& chosen_node = candidates[dist(rng)];
+                const std::shared_ptr<ServerlessComputeNode>& chosen_node = candidates[dist(rng)];
                 decisions->invocations_to_start_at_compute_node[chosen_node].push_back(inv);
                 availableCores[chosen_node]--;
             }

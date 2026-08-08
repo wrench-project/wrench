@@ -10,16 +10,11 @@
 #ifndef WRENCH_SERVERLESSCOMPUTENODE_H
 #define WRENCH_SERVERLESSCOMPUTENODE_H
 
-#include <utility>
-#include <vector>
-#include <map>
-#include <queue>
 #include <set>
 #include <memory>
 #include <string>
-#include <wrench/services/compute/serverless/Invocation.h>
-#include <wrench/services/storage/StorageService.h>
 #include <wrench/data_file/DataFile.h>
+#include <wrench/services/compute/serverless/Container.h>
 
 namespace wrench
 {
@@ -47,7 +42,7 @@ namespace wrench
         std::set<std::shared_ptr<DataFile>> images_being_copied;
         std::set<std::shared_ptr<DataFile>> images_being_loaded;
 
-//        std::unordered_map<ContainerId, std::shared_ptr<ServerlessContainer>> containers;
+        std::set<std::shared_ptr<Container>> containers;
     };
 
     /***********************/

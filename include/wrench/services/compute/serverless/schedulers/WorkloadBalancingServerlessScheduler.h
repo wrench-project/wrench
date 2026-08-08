@@ -52,7 +52,7 @@ namespace wrench {
         std::unordered_map<std::string, int> function_pending_count;
 
         // Node -> function -> cores allocated
-        std::unordered_map<std::string, std::unordered_map<std::string, unsigned>> allocation_plan;
+        std::unordered_map<std::shared_ptr<ServerlessComputeNode>, std::unordered_map<std::string, unsigned>> allocation_plan;
 
         // Helper to calculate workloads for each function type
         void calculateFunctionWorkloads(const std::vector<std::shared_ptr<Invocation>>& invocations);

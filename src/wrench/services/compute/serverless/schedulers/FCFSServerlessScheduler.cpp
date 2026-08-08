@@ -38,26 +38,26 @@ namespace wrench {
                             const ServerlessStateOfTheSystem* state) {
         // Copy data from the state of the system so we can simulate assignment
         auto available_cores = state->getAvailableCores();
-        auto compute_nodes = state->getComputeHosts();
+        auto compute_nodes = state->getComputeNodes();
 
         // In a first phase we go through all the invocations in order, and while there is an
         // idle core on the compute nodes (going in order as well), we declare our intent to run that
         // invocation on the compute node.
 
-        std::map<std::string, std::set<std::shared_ptr<DataFile>>> required_images;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<DataFile>>> required_images;
 
         // For each invocation, assign it to the first compute node with an available core
         for (const auto& invocation : schedulable_invocations) {
             auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
-            for (const auto& [hostname, num_available_cores] : available_cores) {
+            for (const auto& [compute_node, num_available_cores] : available_cores) {
                 if (num_available_cores > 0) {
                     // Pick the first available node
                     // Decrement our own available core count for chosen node
-                    available_cores[hostname]--;
+                    available_cores[compute_node]--;
 
                     // Record that this node requires the image (avoiding duplicates by using a set)
-                    required_images[hostname].insert(image_file);
+                    required_images[compute_node].insert(image_file);
 
                     // Move to next invocation
                     break;

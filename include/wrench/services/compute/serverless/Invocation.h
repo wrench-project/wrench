@@ -17,6 +17,9 @@
 #include <wrench/managers/function_manager/FunctionOutput.h>
 #include <wrench/failure_causes/FailureCause.h>
 
+#include "Container.h"
+#include "ServerlessComputeNode.h"
+
 namespace wrench {
 
     /***********************/
@@ -73,7 +76,8 @@ namespace wrench {
         double _function_end_date = -1.0;
         double _container_end_date = -1.0;
 
-        std::string _target_host;
+        std::shared_ptr<ServerlessComputeNode> _compute_node;
+        std::shared_ptr<Container> _container;
 
         /***********************/
         /** \endcond          **/

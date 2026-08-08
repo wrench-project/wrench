@@ -139,15 +139,17 @@ namespace wrench {
         void startComputeHostsServices();
         std::shared_ptr<StorageService> startInvocationStorageService(
             const std::shared_ptr<Invocation>& invocation,
-            const std::string& target_host);
+            const std::shared_ptr<ServerlessComputeNode>& target_compute_node);
 
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
-        void initiateImageCopyToComputeHost(const std::string& compute_host, const std::shared_ptr<DataFile>& image);
-        void initiateImageLoadAtComputeHost(const std::string& compute_host, const std::shared_ptr<DataFile>& image);
+        void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
+        void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
 
-        bool invocationCanBeStarted(const std::shared_ptr<Invocation>& invocation, const std::string& hostname) const;
+        bool invocationCanBeStarted(const std::shared_ptr<Invocation>& invocation,
+            const std::shared_ptr<ServerlessComputeNode>& compute_node) const;
 
-        bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation, const std::string& target_host);
+        bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
+            const std::shared_ptr<ServerlessComputeNode>& target_compute_node);
 
         static void releaseInvocationResources(const std::shared_ptr<Invocation>& invocation);
 

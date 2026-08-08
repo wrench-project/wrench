@@ -5,7 +5,6 @@
 #include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
 
 namespace wrench {
-
     /**
      * @brief Given the list of schedulable invocations and the current system state, decide:
      *   - which images to copy to compute nodes
@@ -31,31 +30,31 @@ namespace wrench {
      * @param schedulable_invocations A list of invocations whose images reside on the head node
      * @param state The current system state
      */
-    void WorkloadBalancingServerlessScheduler::makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
-                            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                            const ServerlessStateOfTheSystem* state) {
-
-
+    void WorkloadBalancingServerlessScheduler::makeImageDecisions(
+        const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
+        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+        const ServerlessStateOfTheSystem* state) {
         calculateFunctionWorkloads(schedulable_invocations);
         createAllocationPlan(state);
 
         for (const auto& [node, function_allocation] : allocation_plan) {
             std::set<std::string> required_function_names;
-    
+
             // figure out which functions we need here
             for (const auto& [function_name, core_count] : function_allocation) {
                 if (core_count > 0) {
                     required_function_names.insert(function_name);
                 }
             }
-    
+
             // only copy each image if it's neither already on the node nor currently being copied
             for (const auto& function_name : required_function_names) {
                 auto image = function_images[function_name];
                 if (!state->isImageOnNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
                     decisions->images_to_copy_to_compute_node[node].push_back(image);
-                } else if (state->isImageOnNode(node, image) &&
+                }
+                else if (state->isImageOnNode(node, image) &&
                     !state->isImageBeingLoadedAtNode(node, image) &&
                     !state->isImageInRAMAtNode(node, image)) {
                     decisions->images_to_load_into_RAM_at_compute_node[node].push_back(image);
@@ -70,30 +69,30 @@ namespace wrench {
      * @param schedulable_invocations A list of invocations whose images reside on the head node
      * @param state The current system state
      */
-    void WorkloadBalancingServerlessScheduler::makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
-                                 const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                 const ServerlessStateOfTheSystem* state) {
-
+    void WorkloadBalancingServerlessScheduler::makeInvocationDecisions(
+        const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
+        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+        const ServerlessStateOfTheSystem* state) {
         // Get current available cores
         auto availableCores = state->getAvailableCores();
 
         // Group invocations by function name
-        std::unordered_map<std::string, std::vector<std::shared_ptr<Invocation> > > invocations_by_function;
-        for (const auto &inv: schedulable_invocations) {
+        std::unordered_map<std::string, std::vector<std::shared_ptr<Invocation>>> invocations_by_function;
+        for (const auto& inv : schedulable_invocations) {
             std::string function_name = inv->getRegisteredFunction()->getFunction()->getName();
             invocations_by_function[function_name].push_back(inv);
         }
 
         // For each function in our allocation plan
-        for (const auto &[node, function_allocation]: allocation_plan) {
-            for (const auto &[function_name, cores_allocated]: function_allocation) {
+        for (const auto& [node, function_allocation] : allocation_plan) {
+            for (const auto& [function_name, cores_allocated] : function_allocation) {
                 if (cores_allocated == 0 || invocations_by_function.find(function_name) == invocations_by_function.
                     end()) {
                     continue;
                 }
 
                 // Get invocations for this function
-                auto &invocations = invocations_by_function[function_name];
+                auto& invocations = invocations_by_function[function_name];
 
                 // Schedule up to cores_allocated invocations of this function to this node
                 unsigned int scheduled = 0;
@@ -119,14 +118,14 @@ namespace wrench {
      * @param invocations A list of invocations
      */
     void WorkloadBalancingServerlessScheduler::calculateFunctionWorkloads(
-        const std::vector<std::shared_ptr<Invocation> > &invocations) {
+        const std::vector<std::shared_ptr<Invocation>>& invocations) {
         // Clear existing data
         function_workloads.clear();
         function_pending_count.clear();
         function_images.clear();
 
         // Process each invocation
-        for (const auto &inv: invocations) {
+        for (const auto& inv : invocations) {
             std::string function_name = inv->getRegisteredFunction()->getFunction()->getName();
 
             // Store image file
@@ -148,7 +147,7 @@ namespace wrench {
      * @param state Curent state
      */
     void WorkloadBalancingServerlessScheduler::createAllocationPlan(
-        const ServerlessStateOfTheSystem *state) {
+        const ServerlessStateOfTheSystem* state) {
         // Clear existing plan
         allocation_plan.clear();
 
@@ -159,12 +158,12 @@ namespace wrench {
         unsigned total_cores = 0;
         double total_workload = 0.0;
 
-        for (const auto &[node, cores]: availableCores) {
+        for (const auto& [node, cores] : availableCores) {
             total_cores += cores;
             allocation_plan[node] = {}; // Initialize empty allocation map for node
         }
 
-        for (const auto &[function_name, workload]: function_workloads) {
+        for (const auto& [function_name, workload] : function_workloads) {
             total_workload += workload;
         }
 
@@ -173,9 +172,9 @@ namespace wrench {
         }
 
         // Allocate cores proportionally to workload
-        std::vector<std::pair<std::string, unsigned> > function_core_allocation;
+        std::vector<std::pair<std::string, unsigned>> function_core_allocation;
 
-        for (const auto &[function_name, workload]: function_workloads) {
+        for (const auto& [function_name, workload] : function_workloads) {
             const double proportion = workload / total_workload;
             auto cores_for_function = static_cast<unsigned>(std::ceil(proportion * total_cores));
 
@@ -190,20 +189,20 @@ namespace wrench {
 
         // Sort functions by cores needed (descending)
         std::sort(function_core_allocation.begin(), function_core_allocation.end(),
-                  [](const auto &a, const auto &b) { return a.second > b.second; });
+                  [](const auto& a, const auto& b) { return a.second > b.second; });
 
         // Distribute cores across nodes to minimize makespan with greedy bin-packing approach
-        for (const auto &[function_name, cores_needed]: function_core_allocation) {
+        for (const auto& [function_name, cores_needed] : function_core_allocation) {
             unsigned cores_remaining = cores_needed;
 
             while (cores_remaining > 0) {
                 // Find node with most available cores
-                std::string best_node;
+                std::shared_ptr<ServerlessComputeNode> best_node = nullptr;
                 unsigned best_available = 0;
 
-                for (const auto &[node, cores]: availableCores) {
+                for (const auto& [node, cores] : availableCores) {
                     unsigned allocated = 0;
-                    for (const auto &[_, count]: allocation_plan[node]) {
+                    for (const auto& [_, count] : allocation_plan[node]) {
                         allocated += count;
                     }
 
@@ -215,7 +214,7 @@ namespace wrench {
                     }
                 }
 
-                if (best_node.empty() || best_available == 0) {
+                if (best_node == nullptr || best_available == 0) {
                     break; // No more space
                 }
 

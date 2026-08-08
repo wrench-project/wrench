@@ -143,6 +143,7 @@ set(HEADER_FILES
         include/wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h
         include/wrench/services/compute/serverless/ServerlessComputeServiceProperty.h
         include/wrench/services/compute/serverless/Invocation.h
+        include/wrench/services/compute/serverless/Container.h
         include/wrench/services/compute/serverless/ServerlessScheduler.h
         include/wrench/services/compute/serverless/ServerlessStateOfTheSystem.h
         include/wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h

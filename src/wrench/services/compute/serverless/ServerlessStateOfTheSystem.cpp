@@ -28,7 +28,7 @@ namespace wrench {
         for (const auto& hostname : compute_hosts) {
             auto num_cores = S4U_Simulation::getHostNumCores(hostname);
             auto compute_node = std::make_shared<ServerlessComputeNode>(hostname, num_cores);
-            _compute_nodes[hostname] = compute_node;
+            _compute_nodes.push_back(compute_node);
         }
     }
 
@@ -36,12 +36,8 @@ namespace wrench {
      * @brief Getter for the compute hosts
      * @return The compute hosts
      */
-    std::vector<std::string> ServerlessStateOfTheSystem::getComputeHosts() const {
-        std::vector<std::string> to_return;
-        for (const auto& [hostname, value] : _compute_nodes) {
-            to_return.push_back(hostname);
-        }
-        return to_return;
+    std::vector<std::shared_ptr<ServerlessComputeNode>> ServerlessStateOfTheSystem::getComputeNodes() const {
+        return _compute_nodes;
     }
 
     /**
@@ -49,10 +45,10 @@ namespace wrench {
      *
      * @return The core availability map
      */
-    std::map<std::string, unsigned int> ServerlessStateOfTheSystem::getAvailableCores() const {
-        std::map<std::string, unsigned int> to_return;
-        for (const auto& [hostname, value] : _compute_nodes) {
-            to_return[hostname] = value->available_cores;
+    std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> ServerlessStateOfTheSystem::getAvailableCores() const {
+        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> to_return;
+        for (const auto& compute_node : _compute_nodes) {
+            to_return[compute_node] = compute_node->available_cores;
         }
         return to_return;;
     }
@@ -63,10 +59,10 @@ namespace wrench {
      *
      * @return The RAM availability map
      */
-    std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() const {
-        std::map<std::string, sg_size_t> to_return;
-        for (const auto& [hostname, value] : _compute_nodes) {
-            to_return[hostname] = value->memory->getTotalFreeSpaceZeroTime();
+    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() const {
+        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
+        for (const auto& compute_node : _compute_nodes) {
+            to_return[compute_node] = compute_node->memory->getTotalFreeSpaceZeroTime();
         }
         return to_return;
     }
@@ -77,10 +73,10 @@ namespace wrench {
      *
      * @return The RAM availability map
      */
-    std::map<std::string, sg_size_t> ServerlessStateOfTheSystem::getAvailableDiskSpace() const {
-        std::map<std::string, sg_size_t> to_return;
-        for (const auto& [hostname, value] : _compute_nodes) {
-            to_return[hostname] = value->disk->getTotalFreeSpaceZeroTime();
+    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ServerlessStateOfTheSystem::getAvailableDiskSpace() const {
+        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
+        for (const auto& compute_node : _compute_nodes) {
+            to_return[compute_node] = compute_node->disk->getTotalFreeSpaceZeroTime();
         }
         return to_return;
     }
@@ -91,8 +87,9 @@ namespace wrench {
      * @param node the compute node
      * @return a set of image files
      */
-    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(const std::string& node) const {
-        return _compute_nodes.at(node)->images_being_copied;
+    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return node->images_being_copied;
     }
 
     /**
@@ -103,10 +100,9 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageBeingCopiedToNode(const std::string& node,
+    bool ServerlessStateOfTheSystem::isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                               const std::shared_ptr<DataFile>& image) const {
-        return (_compute_nodes.at(node)->images_being_copied.find(image) !=
-            _compute_nodes.at(node)->images_being_copied.end());
+        return (node->images_being_copied.find(image) != node->images_being_copied.end());
     }
 
     /**
@@ -117,8 +113,8 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageOnNode(const std::string& node, const std::shared_ptr<DataFile>& image) const {
-        return _compute_nodes.at(node)->disk->hasFile(image);
+    bool ServerlessStateOfTheSystem::isImageOnNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<DataFile>& image) const {
+        return node->disk->hasFile(image);
     }
 
     /**
@@ -127,8 +123,8 @@ namespace wrench {
      * @param node the compute node
      * @return a set of image files
      */
-    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingLoadedAtNode(const std::string& node) const {
-        return _compute_nodes.at(node)->images_being_loaded;
+    std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return node->images_being_loaded;
     }
 
     /**
@@ -139,9 +135,9 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageBeingLoadedAtNode(const std::string& node,
+    bool ServerlessStateOfTheSystem::isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                         const std::shared_ptr<DataFile>& image) const {
-        return _compute_nodes.at(node)->images_being_loaded.find(image) != _compute_nodes.at(node)->images_being_loaded.end();
+        return node->images_being_loaded.find(image) != node->images_being_loaded.end();
     }
 
     /**
@@ -152,9 +148,8 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::string& node, const std::shared_ptr<DataFile>& image) const {
-        auto memory = _compute_nodes.at(node)->memory;
-        return memory->hasFile(image, memory->getBaseRootPath());
+    bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<DataFile>& image) const {
+        return node->memory->hasFile(image, node->memory->getBaseRootPath());
     }
 
 }; // namespace wrench

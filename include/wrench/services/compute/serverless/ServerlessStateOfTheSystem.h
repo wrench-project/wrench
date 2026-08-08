@@ -34,18 +34,18 @@ namespace wrench
     class ServerlessStateOfTheSystem {
 
     public:
-        std::vector<std::string> getComputeHosts() const;
-        std::map<std::string, unsigned int> getAvailableCores() const;
-        std::map<std::string, sg_size_t> getAvailableRAM() const;
-        std::map<std::string, sg_size_t> getAvailableDiskSpace() const;
+        std::vector<std::shared_ptr<ServerlessComputeNode>> getComputeNodes() const;
+        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> getAvailableCores() const;
+        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAM() const;
+        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
-        std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::string &node) const;
-        bool isImageOnNode(const std::string &node, const std::shared_ptr<DataFile> &image) const;
-        bool isImageBeingCopiedToNode(const std::string& node, const std::shared_ptr<DataFile>& image) const;
+        std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        bool isImageOnNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<DataFile> &image) const;
+        bool isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<DataFile>& image) const;
 
-        std::set<std::shared_ptr<DataFile>> getImagesBeingLoadedAtNode(const std::string &node) const;
-        bool isImageInRAMAtNode(const std::string &node, const std::shared_ptr<DataFile> &image) const;
-        bool isImageBeingLoadedAtNode(const std::string &node, const std::shared_ptr<DataFile> &image) const;
+        std::set<std::shared_ptr<DataFile>> getImagesBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        bool isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<DataFile> &image) const;
+        bool isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<DataFile> &image) const;
 
         ~ServerlessStateOfTheSystem() = default;
 
@@ -71,14 +71,8 @@ namespace wrench
         std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
         sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shenanigans
 
-        // map of compute nodes
-        // std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _being_copied_images;
-        // std::unordered_map<std::string, std::set<std::shared_ptr<DataFile>>> _being_loaded_images;
-        // std::vector<std::string> _compute_hosts;
-        // std::map<std::string, unsigned long> _available_cores;
-        // std::unordered_map<std::string, std::shared_ptr<SimpleStorageService>> _compute_storages;
-        // std::unordered_map<std::string, std::shared_ptr<SimpleStorageService>> _compute_memories;
-        std::map<std::string, std::shared_ptr<ServerlessComputeNode>> _compute_nodes;
+        // list of compute nodes
+        std::vector<std::shared_ptr<ServerlessComputeNode>> _compute_nodes;
 
 
     };
