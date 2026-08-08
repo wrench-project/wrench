@@ -90,7 +90,7 @@ namespace wrench {
     void HTCondorCentralManagerService::addComputeService(const std::shared_ptr<ComputeService>& compute_service) {
         this->compute_services.insert(compute_service);
         //  send a "wake up" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new CentralManagerWakeUpMessage(0));
     }
 
@@ -109,7 +109,7 @@ namespace wrench {
         auto answer_commport = getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new ComputeServiceSubmitCompoundJobRequestMessage(
                         answer_commport, job, service_specific_args,
                         this->getMessagePayloadValue(
@@ -132,7 +132,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
         WRENCH_INFO("HTCondor Service starting on host %s listening on commport %s",
-                    this->_hostname.c_str(), this->commport->get_cname());
+                    this->_hostname.c_str(), this->_commport->get_cname());
 
         // main loop
         while (this->processNextMessage()) {
@@ -148,7 +148,7 @@ namespace wrench {
                             this->fast_bmcs_resource_availability,
                             this->fcfs,
                             this->compute_services,
-                            this->running_jobs, this->pending_jobs, this->commport);
+                            this->running_jobs, this->pending_jobs, this->_commport);
                     negotiator->setSimulation(this->simulation_);
                     negotiator->start(negotiator, true, false);// Daemonized, no auto-restart
                 }
@@ -180,7 +180,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }

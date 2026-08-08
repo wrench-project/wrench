@@ -129,7 +129,7 @@ namespace wrench {
 
             S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::MESSAGE_OVERHEAD));
             try {
-                message = this->commport->getMessage();
+                message = this->_commport->getMessage();
             }
             catch (ExecutionException& e) {
                 WRENCH_INFO(
@@ -149,7 +149,7 @@ namespace wrench {
                         WRENCH_DEBUG("File %s found in cache", msg->file->getID().c_str());
 
                         auto cached = getCached(msg->file);
-                        supervisor->commport->dputMessage(
+                        supervisor->_commport->dputMessage(
                             new UpdateCacheMessage(
                                 msg->answer_commport,
                                 msg->original,
@@ -176,7 +176,7 @@ namespace wrench {
                                         internalStorage->hasFile(msg->file)) {
                                         //File in internal storage
                                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
-                                        supervisor->commport->dputMessage(
+                                        supervisor->_commport->dputMessage(
                                             new UpdateCacheMessage(
                                                 msg->answer_commport,
                                                 msg->original,
@@ -191,7 +191,7 @@ namespace wrench {
                                     }
                                 }
                                 else {
-                                    entry.first->commport->dputMessage(
+                                    entry.first->_commport->dputMessage(
                                         new AdvancedContinueSearchMessage(
                                             msg,
                                             entry.second));
@@ -203,7 +203,7 @@ namespace wrench {
                             internalStorage->hasFile(msg->file)) {
                             //File in internal storage
                             cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
-                            supervisor->commport->dputMessage(
+                            supervisor->_commport->dputMessage(
                                 new UpdateCacheMessage(
                                     msg->answer_commport,
                                     msg->original,
@@ -238,7 +238,7 @@ namespace wrench {
                             this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                         for (auto const& entry : splitStacks) {
                             if (entry.first != this) {
-                                entry.first->commport->dputMessage(
+                                entry.first->_commport->dputMessage(
                                     new AdvancedRippleDelete(
                                         msg,
                                         entry.second));
@@ -321,7 +321,7 @@ namespace wrench {
                             Alarm::createAndStartAlarm(this->simulation_,
                                                        wrench::S4U_Simulation::getClock() + this->
                                                        getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT),
-                                                       this->_hostname, this->commport,
+                                                       this->_hostname, this->_commport,
                                                        new FileNotFoundAlarm(
                                                            msg->answer_commport, file, false, answered),
                                                        "XROOTD_FileNotFoundAlarm");
@@ -342,7 +342,7 @@ namespace wrench {
                                         // But just in case, I don't want a rogue search going who knows where
                                     }
                                     else {
-                                        entry.first->commport->dputMessage(
+                                        entry.first->_commport->dputMessage(
                                             new AdvancedContinueSearchMessage(
                                                 msg->answer_commport,
                                                 nullptr,
@@ -362,7 +362,7 @@ namespace wrench {
 
 
                                 for (const auto& child : children) {
-                                    child->commport->dputMessage(
+                                    child->_commport->dputMessage(
                                         new ContinueSearchMessage(
                                             msg->answer_commport,
                                             nullptr,
@@ -398,7 +398,7 @@ namespace wrench {
                     auto cacheCopies = getCached(file);
                     auto best = selectBest(cacheCopies);
 
-                    best->getStorageService()->commport->dputMessage(
+                    best->getStorageService()->_commport->dputMessage(
                         new StorageServiceFileReadRequestMessage(
                             msg->answer_commport,
                             simgrid::s4u::this_actor::get_host(),
@@ -413,7 +413,7 @@ namespace wrench {
                         WRENCH_DEBUG("File %s found in internal Storage", file->getID().c_str());
                         //File in internal storage
                         cache.add(file, FileLocation::LOCATION(internalStorage, file));
-                        internalStorage->commport->dputMessage(
+                        internalStorage->_commport->dputMessage(
                             new StorageServiceFileReadRequestMessage(
                                 msg->answer_commport,
                                 simgrid::s4u::this_actor::get_host(),
@@ -436,7 +436,7 @@ namespace wrench {
                             Alarm::createAndStartAlarm(this->simulation_,
                                                        wrench::S4U_Simulation::getClock() + this->
                                                        getPropertyValueAsTimeInSecond(Property::FILE_NOT_FOUND_TIMEOUT),
-                                                       this->_hostname, this->commport,
+                                                       this->_hostname, this->_commport,
                                                        new FileNotFoundAlarm(
                                                            msg->answer_commport, file, true, answered),
                                                        "XROOTD_FileNotFoundAlarm");
@@ -457,7 +457,7 @@ namespace wrench {
                                         // But just in case, I don't want a rogue search going who knows where
                                     }
                                     else {
-                                        entry.first->commport->dputMessage(
+                                        entry.first->_commport->dputMessage(
                                             new AdvancedContinueSearchMessage(
                                                 msg->answer_commport,
                                                 make_shared<StorageServiceFileReadRequestMessage>(msg),
@@ -475,7 +475,7 @@ namespace wrench {
                                 //shotgun continued search message to all children
                                 WRENCH_DEBUG("Starting basic search for %s", file->getID().c_str());
                                 for (const auto& child : children) {
-                                    child->commport->dputMessage(
+                                    child->_commport->dputMessage(
                                         new ContinueSearchMessage(
                                             msg->answer_commport,
                                             make_shared<StorageServiceFileReadRequestMessage>(
@@ -513,7 +513,7 @@ namespace wrench {
                     //File Cached
                     WRENCH_DEBUG("Found %s in cache", msg->file->getID().c_str());
                     auto cached = getCached(msg->file);
-                    supervisor->commport->dputMessage(new UpdateCacheMessage(
+                    supervisor->_commport->dputMessage(new UpdateCacheMessage(
                         msg->answer_commport,
                         msg->original,
                         msg->node,
@@ -531,7 +531,7 @@ namespace wrench {
                         WRENCH_DEBUG("Found %s in internal storage", msg->file->getID().c_str());
                         //File in internal storage
                         cache.add(msg->file, FileLocation::LOCATION(internalStorage, msg->file));
-                        supervisor->commport->dputMessage(
+                        supervisor->_commport->dputMessage(
                             new UpdateCacheMessage(
                                 msg->answer_commport,
                                 msg->original,
@@ -552,7 +552,7 @@ namespace wrench {
                             S4U_Simulation::compute(
                                 this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             for (const auto& child : children) {
-                                child->commport->dputMessage(
+                                child->_commport->dputMessage(
                                     new ContinueSearchMessage(msg));
                             }
                         }
@@ -569,7 +569,7 @@ namespace wrench {
                 cache.add(msg->file, msg->locations);
                 if (this != msg->node && supervisor) {
                     WRENCH_DEBUG("Forward update to super");
-                    supervisor->commport->dputMessage(new UpdateCacheMessage(msg));
+                    supervisor->_commport->dputMessage(new UpdateCacheMessage(msg));
                 }
                 else {
                     WRENCH_DEBUG("Update has reached top of subtree");
@@ -583,7 +583,7 @@ namespace wrench {
                             //this was a file read
                             shared_ptr<FileLocation> best = selectBest(cacheCopies);
                             //msg->original->location=best;
-                            best->getStorageService()->commport->dputMessage(
+                            best->getStorageService()->_commport->dputMessage(
                                 new StorageServiceFileReadRequestMessage(
                                     msg->answer_commport,
                                     simgrid::s4u::this_actor::get_host(),
@@ -622,7 +622,7 @@ namespace wrench {
                             // But just in case, I don't want a rogue search going who knows where
                         }
                         else {
-                            entry.first->commport->dputMessage(
+                            entry.first->_commport->dputMessage(
                                 new AdvancedRippleDelete(
                                     msg,
                                     metavisor->defaultTimeToLive,
@@ -640,7 +640,7 @@ namespace wrench {
                     );
                 }
                 else {
-                    this->commport->dputMessage(new RippleDelete(msg, metavisor->defaultTimeToLive));
+                    this->_commport->dputMessage(new RippleDelete(msg, metavisor->defaultTimeToLive));
 
 
                     msg->answer_commport->dputMessage(
@@ -678,7 +678,7 @@ namespace wrench {
                     shared_ptr<bool> answered = make_shared<bool>(false);
 
                     for (const auto& child : children) {
-                        child->commport->dputMessage(new RippleDelete(msg));
+                        child->_commport->dputMessage(new RippleDelete(msg));
                     }
                 }
             }
@@ -702,7 +702,7 @@ namespace wrench {
                     msg->location = FileLocation::LOCATION(internalStorage, file);
                     //                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
                     //                            SimpleStorageServiceProperty::BUFFER_SIZE);
-                    internalStorage->commport->dputMessage(message.release());
+                    internalStorage->_commport->dputMessage(message.release());
                 }
             }
             else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage*>(message.get())) {
@@ -724,7 +724,7 @@ namespace wrench {
                 else {
                     // Forward the message
                     msg->dst = FileLocation::LOCATION(internalStorage, file);
-                    internalStorage->commport->dputMessage(message.release());
+                    internalStorage->_commport->dputMessage(message.release());
                 }
             }
             else if (auto msg = dynamic_cast<StorageServiceMessage*>(message.get())) {
@@ -737,7 +737,7 @@ namespace wrench {
                 }
                 else {
                     // Forwarding the message as-is to the internal Storage
-                    internalStorage->commport->dputMessage(message.release());
+                    internalStorage->_commport->dputMessage(message.release());
                 }
             }
             else {

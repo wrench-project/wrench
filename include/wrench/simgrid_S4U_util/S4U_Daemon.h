@@ -57,9 +57,9 @@ namespace wrench {
         /** @brief The name of the daemon */
         std::string process_name;
 
-        /** @brief The daemon's commport_name **/
-        S4U_CommPort *commport;
-        /** @brief The daemon's receive commport_name (to send to another daemon so that that daemon can reply) **/
+        /** @brief The daemon's commport **/
+        S4U_CommPort *_commport;
+        /** @brief The daemon's receive commport (to send to another daemon so that that daemon can reply) **/
         S4U_CommPort *recv_commport;
 
         /** @brief The name of the host on which the daemon is running */

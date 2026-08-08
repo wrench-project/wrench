@@ -124,7 +124,9 @@ namespace wrench {
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action,
                                             const std::shared_ptr<DataFile>& image_file);
 
-        void processInvocationCompletion(const std::shared_ptr<Invocation> &invocation, const std::shared_ptr<Action>& action);
+        void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Action>& action);
+
+        void processContainerIdleTimeout(const std::shared_ptr<Container>& container);
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
@@ -148,17 +150,12 @@ namespace wrench {
         void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
 
         bool invocationCanBeStarted(const std::shared_ptr<Invocation>& invocation,
-            const std::shared_ptr<ServerlessComputeNode>& compute_node,
+            const ServerlessComputeNode* compute_node,
             const std::shared_ptr<Container>& target_container) const;
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
-            const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
-            const std::shared_ptr<Container>& container);
-        bool dispatchInvocationOnNewContainer(const std::shared_ptr<Invocation>& invocation,
-            const std::shared_ptr<ServerlessComputeNode>& target_compute_node);
-        bool dispatchInvocationOnIdleContainer(const std::shared_ptr<Invocation>& invocation,
-            const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
-            const std::shared_ptr<Container>& container);
+            ServerlessComputeNode* target_compute_node,
+            std::shared_ptr<Container> container);
 
         unsigned long num_cores_of_compute_host;
         double speed_of_compute_core;

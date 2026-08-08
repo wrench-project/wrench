@@ -300,13 +300,13 @@ namespace wrench {
         }
         this->shutting_down = true;// This is to avoid another process calling stop() and being stuck
 
-        WRENCH_DEBUG("Telling the daemon listening on (%s) to terminate", this->commport->get_cname());
+        WRENCH_DEBUG("Telling the daemon listening on (%s) to terminate", this->_commport->get_cname());
 
         // Send a termination message to the daemon's commport - SYNCHRONOUSLY
         auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
-            this->commport->putMessage(new ServiceStopDaemonMessage(
+            this->_commport->putMessage(new ServiceStopDaemonMessage(
                     ack_commport,
                     false,
                     ComputeService::TerminationCause::TERMINATION_NONE,

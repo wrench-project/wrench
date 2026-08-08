@@ -43,12 +43,12 @@ namespace wrench {
         }
         this->shutting_down = true;// This is to avoid another process calling stop() and being stuck
 
-        WRENCH_DEBUG("Telling the daemon listening on (%s) to terminate", this->commport->get_cname());
+        WRENCH_DEBUG("Telling the daemon listening on (%s) to terminate", this->_commport->get_cname());
 
         // Send a termination message to the daemon's commport - SYNCHRONOUSLY
         auto ack_commport = S4U_Daemon::getRunningActorRecvCommPort();
         try {
-            this->commport->dputMessage(new ServiceStopDaemonMessage(
+            this->_commport->dputMessage(new ServiceStopDaemonMessage(
                     ack_commport,
                     send_failure_notifications,
                     termination_cause,
@@ -323,7 +323,7 @@ namespace wrench {
         // send an "info request" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->commport->putMessage(new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
+        this->_commport->putMessage(new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
                 answer_commport,
                 num_cores,
                 ram,
@@ -390,7 +390,7 @@ namespace wrench {
             // send an "info request" message to the daemon's commport
             auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-            this->commport->putMessage(new ComputeServiceResourceInformationRequestMessage(
+            this->_commport->putMessage(new ComputeServiceResourceInformationRequestMessage(
                     answer_commport,
                     key,
                     this->getMessagePayloadValue(

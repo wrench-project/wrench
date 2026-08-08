@@ -12,6 +12,7 @@
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h>
 #include <wrench/services/compute/serverless/Invocation.h>
 #include <wrench/services/compute/serverless/Container.h>
+#include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/managers/function_manager/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/ExecutionException.h>
@@ -267,7 +268,7 @@ namespace wrench {
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
                 answer_commport, function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes,
                 ingress_in_bytes, egress_in_bytes,
@@ -298,7 +299,7 @@ namespace wrench {
         const std::shared_ptr<RegisteredFunction>& registered_function, const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
-        this->commport->dputMessage(
+        this->_commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
                                                                          registered_function, input,
                                                                          notify_commport, this->getMessagePayloadValue(
@@ -325,7 +326,7 @@ namespace wrench {
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-        WRENCH_INFO("Serverless provider starting (%s)", this->commport->get_cname());
+        WRENCH_INFO("Serverless provider starting (%s)", this->_commport->get_cname());
 
         // Start the Head Storage Service
         startHeadStorageService();
@@ -367,7 +368,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         }
         catch (ExecutionException& e) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
@@ -433,6 +434,10 @@ namespace wrench {
                 WRENCH_INFO("ServerlessComputeService::processNextMessage(): Image file %s was loaded at %s",
                             scsnlc_msg->_image_file->getID().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
             }
+            return true;
+        } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
+            ServerlessComputeServiceContainerIdleTimeoutMessage>(message)) {
+            processContainerIdleTimeout(sclcit_msg->_container);
             return true;
         }
         else {
@@ -586,17 +591,16 @@ namespace wrench {
         compute_node->makeContainerIdle(container);
 
         // Should the container be terminated or left idling?
-        if (this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT) <= 0) {
+        double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
             // Start the timeout alarm
-            // auto msg = new ContainerTimeOutMessage(container);
-            //
-            // std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
-            //                                                               batch_job->getEndingTimestamp(),
-            //                                                               this->_hostname,
-            //                                                               this->commport, msg,
-            throw std::runtime_error("ServerlessComputeService::processInvocationCompletion(): CONTAINER IDLING IS STILL TO BE IMPLEMENTED");
+            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
+                                                                          S4U_Simulation::getClock() + idle_timeout,
+                                                                          this->_hostname,
+                                                                          this->_commport,
+                                                                          new ServerlessComputeServiceContainerIdleTimeoutMessage(container), "container_idle_timout");
         }
 
         bool success = action->getState() == Action::State::COMPLETED;
@@ -611,6 +615,17 @@ namespace wrench {
                     ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
     }
 
+    /**
+     * @brief Helper method to process a container idle timeout
+     * @param container the container that has idle-timed out
+     */
+    void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container) {
+        // Is it a real/fresh timeout, terminate the container, otherwise it is spurious and do nothing
+        if (container->getIdleTime() >= this->getPropertyValueAsDouble(
+            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT)) {
+            container->getComputeNode()->shutdownContainer(container);
+        }
+    }
 
     /**
      * @brief Dispatches scheduled function invocations to compute hosts
@@ -622,6 +637,7 @@ namespace wrench {
         // Dispatched the invocations in the order of the schedulable list
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
 
+        // Dispatch invocation on new containers
         for (const auto &[invocation, compute_node] : decisions->invocations_on_new_container) {
                 // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
                 //             invocation_to_place->_registered_function->_function->getName().c_str());
@@ -630,6 +646,17 @@ namespace wrench {
                     invocation->_compute_node = compute_node;
                     dispatched_invocations.insert(invocation);
                 }
+        }
+
+        // Dispatch invocation on idle containers
+        for (const auto &[invocation, container] : decisions->invocations_on_idle_container) {
+            // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
+            //             invocation_to_place->_registered_function->_function->getName().c_str());
+            if (dispatchInvocation(invocation, nullptr, container)) {
+                _state_of_the_system->_running_invocations.insert(invocation);
+                invocation->_compute_node = container->getComputeNode();
+                dispatched_invocations.insert(invocation);
+            }
         }
 
         // Update the list of schedulable invocations (not super efficient, but clearer than the erase-as-I-go)
@@ -651,7 +678,7 @@ namespace wrench {
      */
     bool ServerlessComputeService::invocationCanBeStarted(
         const std::shared_ptr<Invocation>& invocation,
-        const std::shared_ptr<ServerlessComputeNode>& compute_node,
+        const ServerlessComputeNode* compute_node,
         const std::shared_ptr<Container>& target_container) const {
         auto ss_memory = compute_node->memory;
         auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
@@ -691,49 +718,32 @@ namespace wrench {
      * @return true on success, false on failure
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
-                                                      const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
-                                                      const std::shared_ptr<Container>& target_container) {
+                                                      ServerlessComputeNode* target_compute_node,
+                                                      std::shared_ptr<Container> target_container) {
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
         if (not invocationCanBeStarted(invocation, target_compute_node, target_container)) {
             return false;
         }
 
-        if (not target_container) {
-            return dispatchInvocationOnNewContainer(invocation, target_compute_node);
-        }
-        else {
-            return dispatchInvocationOnIdleContainer(invocation, target_compute_node, target_container);
-        }
-    }
+        bool hot_start = target_container != nullptr;
 
-    /**
-     * @brief Helper method to dispatch an invocation
-     *
-     * @param invocation invocation to dispatch
-     * @param target_compute_node the target compute node
-     * @return true on success, false on failure
-     */
-    bool ServerlessComputeService::dispatchInvocationOnNewContainer(
-        const std::shared_ptr<Invocation>& invocation,
-        const std::shared_ptr<ServerlessComputeNode>& target_compute_node) {
-
-        // Spawn the container
-        std::shared_ptr<Container> container;
-        try {
-            container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
-        } catch (ExecutionException& e) {
-            WRENCH_INFO("Couldn't spaw a container for an invocation for %s: %s",
-                        invocation->_registered_function->_function->getName().c_str(),
-                        e.getCause()->toString().c_str());
-            return false;
+        if (not hot_start) {
+            // Spawn the container
+            try {
+                target_container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
+            } catch (ExecutionException& e) {
+                WRENCH_INFO("Couldn't spaw a container for an invocation for %s: %s",
+                            invocation->_registered_function->_function->getName().c_str(),
+                            e.getCause()->toString().c_str());
+                return false;
+            }
         }
-
 
         // Declare the function invocation's necessary lambdas
         const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
 
-        const std::function lambda_execute = [invocation, container](
+        const std::function lambda_execute = [invocation, target_container](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             const auto function = invocation->_registered_function->_function;
 
@@ -741,7 +751,7 @@ namespace wrench {
             invocation->_function_start_date = S4U_Simulation::getClock();
             try {
                 invocation->_function_output = function->execute(invocation->_function_input,
-                                                                 container->getPrivateStorageService());
+                                                                 target_container->getPrivateStorageService());
             }
             catch (ExecutionException& e) {
                 invocation->_function_end_date = S4U_Simulation::getClock();
@@ -764,9 +774,9 @@ namespace wrench {
             target_compute_node->hostname,
             1,
             0,
-            this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD),
+            (hot_start ? 0 : this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)),
             false,
-            this->commport,
+            this->_commport,
             custom_message,
             action,
             nullptr);
@@ -777,7 +787,7 @@ namespace wrench {
         WRENCH_INFO("Dispatched an invocation for function %s",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
 
-        invocation->_container = container;
+        invocation->_container = target_container;
         invocation->_container_start_date = Simulation::getCurrentSimulatedDate();
 
         // Update the core count of the compute node
@@ -786,25 +796,11 @@ namespace wrench {
         // Start the action executor object
         action_executor->start(action_executor, true, false);
 
-        // WRENCH_INFO("Function [%s] invoked", invocation->_registered_function->_function->getName().c_str());
-        target_compute_node->busy_containers.insert(container);
-        return true;
-    }
+        if (hot_start) {
+            target_compute_node->makeContainerBusy(target_container);
+        }
 
-    /**
-     * @brief Helper method to dispatch an invocation
-     *
-     * @param invocation invocation to dispatch
-     * @param target_compute_node the target compute node
-     * @param target_container the target container (if nullptr, create a new container)
-     * @return true on success, false on failure
-     */
-    bool ServerlessComputeService::dispatchInvocationOnIdleContainer(const std::shared_ptr<Invocation>& invocation,
-                                                                     const std::shared_ptr<ServerlessComputeNode>&
-                                                                     target_compute_node,
-                                                                     const std::shared_ptr<Container>&
-                                                                     target_container) {
-        throw std::runtime_error("NOT IMPLEMENTED YET!");
+        return true;
     }
 
     /**
@@ -971,7 +967,7 @@ namespace wrench {
             0,
             0,
             false,
-            this->commport,
+            this->_commport,
             custom_message,
             action,
             nullptr);
@@ -1068,7 +1064,7 @@ namespace wrench {
             0,
             0,
             false,
-            this->commport,
+            this->_commport,
             custom_message,
             action,
             nullptr);
@@ -1135,7 +1131,7 @@ namespace wrench {
             0,
             0,
             false,
-            this->commport,
+            this->_commport,
             custom_message,
             action,
             nullptr);

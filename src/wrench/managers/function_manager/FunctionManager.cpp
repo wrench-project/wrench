@@ -128,7 +128,7 @@ namespace wrench {
         const std::shared_ptr<FunctionInput>& function_input) {
         // WRENCH_INFO("Function [%s] invoked with compute service [%s]", registered_function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the commport to notify
-        return sl_compute_service->invokeFunction(registered_function, function_input, this->commport);
+        return sl_compute_service->invokeFunction(registered_function, function_input, this->_commport);
     }
 
     /**
@@ -155,7 +155,7 @@ namespace wrench {
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
             new FunctionManagerWaitOneMessage(
                 answer_commport,
                 invocation
@@ -178,7 +178,7 @@ namespace wrench {
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
             new FunctionManagerWaitAllMessage(
                 answer_commport,
                 invocations
@@ -200,7 +200,7 @@ namespace wrench {
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
-        WRENCH_INFO("New Function Manager starting (%s)", this->commport->get_cname());
+        WRENCH_INFO("New Function Manager starting (%s)", this->_commport->get_cname());
 
         while (processNextMessage()) {
             // TODO: Do something
@@ -222,7 +222,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         }
         catch (ExecutionException& e) {
             WRENCH_INFO(

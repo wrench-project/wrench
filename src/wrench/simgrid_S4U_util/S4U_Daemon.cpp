@@ -83,7 +83,7 @@ namespace wrench {
         this->has_returned_from_main_ = false;
 
         //        std::cerr << "IN DAEMON CONSTRUCTOR: " << this->process_name << "\n";
-        this->commport = S4U_CommPort::getTemporaryCommPort();
+        this->_commport = S4U_CommPort::getTemporaryCommPort();
         this->recv_commport = S4U_CommPort::getTemporaryCommPort();
         TRACK_OBJECT("actor");
     }
@@ -130,7 +130,7 @@ namespace wrench {
         //        this->release_held_mutexes();
 
         if (not has_returned_from_main) {
-            S4U_CommPort::retireTemporaryCommPort(this->commport);
+            S4U_CommPort::retireTemporaryCommPort(this->_commport);
             S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
         }
         // Default behavior is to throw in case of any problem
@@ -288,7 +288,7 @@ namespace wrench {
         //        this->recv_commport = S4U_CommPort::getTemporaryCommPort();
         // Set the commport receiver
         // Causes Mailbox::put() to no longer implement a rendezvous communication.
-        this->commport->s4u_mb->set_receiver(this->s4u_actor);
+        this->_commport->s4u_mb->set_receiver(this->s4u_actor);
         //        this->recv_commport->set_receiver(this->s4u_actor);
 
         S4U_Daemon::map_actor_to_recv_commport[simgrid::s4u::this_actor::get_pid()] = this->recv_commport;
@@ -304,8 +304,8 @@ namespace wrench {
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_commport.erase(simgrid::s4u::this_actor::get_pid());
 
-        this->commport->s4u_mb->set_receiver(nullptr);
-        S4U_CommPort::retireTemporaryCommPort(this->commport);
+        this->_commport->s4u_mb->set_receiver(nullptr);
+        S4U_CommPort::retireTemporaryCommPort(this->_commport);
         this->recv_commport->s4u_mb->set_receiver(nullptr);
         S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
         //        S4U_Daemon::running_actors.erase(this->getSharedPtr<S4U_Daemon>());

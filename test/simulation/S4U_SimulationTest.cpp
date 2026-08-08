@@ -372,7 +372,7 @@ private:
 
     int main() override {
 
-        this->commport->getMessage();
+        this->_commport->getMessage();
 
         return 0;
     }

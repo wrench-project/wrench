@@ -205,7 +205,7 @@ namespace wrench {
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
             new ComputeServiceSubmitCompoundJobRequestMessage(
                 answer_commport, job, service_specific_args,
                 this->getMessagePayloadValue(
@@ -404,7 +404,7 @@ namespace wrench {
             // Set up a service termination detector for the action execution service if necessary
             auto termination_detector = std::make_shared<ServiceTerminationDetector>(
                 this->_hostname, this->action_execution_service,
-                this->commport, false, true);
+                this->_commport, false, true);
             termination_detector->setSimulation(this->simulation_);
             termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
         }
@@ -434,7 +434,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         }
         catch (ExecutionException&) {
             WRENCH_INFO(
@@ -517,7 +517,7 @@ namespace wrench {
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         //  send a "terminate a compound job" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
             new ComputeServiceTerminateCompoundJobRequestMessage(
                 answer_commport, job,
                 this->getMessagePayloadValue(

@@ -60,7 +60,7 @@ namespace wrench {
      *
      */
     void JobManager::stop() {
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
@@ -449,7 +449,7 @@ namespace wrench {
 
         // Send a message to wake up the daemon
         try {
-            this->commport->putMessage(new JobManagerWakeupMessage());
+            this->_commport->putMessage(new JobManagerWakeupMessage());
         } catch (std::exception &) {
             throw std::runtime_error("Cannot connect to job manager");
         }
@@ -534,7 +534,7 @@ namespace wrench {
 
         // Send a message to wake up the daemon
         try {
-            this->commport->putMessage(new JobManagerWakeupMessage());
+            this->_commport->putMessage(new JobManagerWakeupMessage());
         } catch (std::exception &ignore) {
             throw std::runtime_error("Cannot connect to job manager");
         }
@@ -572,7 +572,7 @@ namespace wrench {
         }
 
 
-        auto callback_commport = this->commport;
+        auto callback_commport = this->_commport;
         std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
         cjob->addCustomAction(
                 "pilot_job_" + job->getName() + "_action",
@@ -656,7 +656,7 @@ namespace wrench {
 
         // Send a message to wake up the daemon
         try {
-            this->commport->putMessage(new JobManagerWakeupMessage());
+            this->_commport->putMessage(new JobManagerWakeupMessage());
         } catch (std::exception &) {
             throw std::runtime_error("Cannot connect to job manager");
         }
@@ -841,7 +841,7 @@ namespace wrench {
     int JobManager::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Job Manager starting (%s)", this->commport->get_cname());
+        WRENCH_INFO("New Job Manager starting (%s)", this->_commport->get_cname());
 
         while (processNextMessage()) {
             dispatchJobs();
@@ -857,7 +857,7 @@ namespace wrench {
     bool JobManager::processNextMessage() {
         std::shared_ptr<SimulationMessage> message = nullptr;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &) {
             WRENCH_INFO("Error while receiving message... ignoring");
             return true;
@@ -1103,7 +1103,7 @@ namespace wrench {
         // Submit the job to the service
         try {
             job->submit_date = Simulation::getCurrentSimulatedDate();
-            job->pushCallbackCommPort(this->commport);
+            job->pushCallbackCommPort(this->_commport);
             job->parent_compute_service->submitJob(job, job->getServiceSpecificArguments());
             if (this->cjob_to_pjob_map.find(job) != this->cjob_to_pjob_map.end()) {
                 this->cjob_to_pjob_map[job]->state = PilotJob::State::PENDING;

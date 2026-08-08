@@ -105,7 +105,7 @@ namespace wrench {
 #endif
 
         // In case this was a restart!
-        this->commport->reset();
+        this->_commport->reset();
         this->recv_commport->reset();
 
         /** Main loop **/
@@ -132,7 +132,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;

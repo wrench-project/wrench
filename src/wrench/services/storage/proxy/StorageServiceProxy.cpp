@@ -90,7 +90,7 @@ namespace wrench {
 
         S4U_Simulation::compute(this->getPropertyValueAsDouble(StorageServiceProxyProperty::MESSAGE_OVERHEAD));
         try {
-            message = this->commport->getMessage<ServiceMessage>();
+            message = this->_commport->getMessage<ServiceMessage>();
         } catch (ExecutionException &e) {
             WRENCH_DEBUG(
                     "Got a network error while getting some message... ignoring");
@@ -122,9 +122,9 @@ namespace wrench {
             } else if (target) {
                 pending[msg->location->getFile()].push_back(std::move(message));
                 //message=std::move(pending[msg->location->getFile()][0]);
-                target->commport->dputMessage(
+                target->_commport->dputMessage(
                         new StorageServiceFileLookupRequestMessage(
-                                commport,
+                                _commport,
                                 FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile()),
                                 target->getMessagePayloadValue(
                                         StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
@@ -172,7 +172,7 @@ namespace wrench {
                     pending[msg->location->getFile()].push_back(std::move(message));
                     WRENCH_DEBUG("Adding pending write");
                 }
-                cache->commport->putMessage(new StorageServiceFileWriteRequestMessage(commport, msg->requesting_host,
+                cache->_commport->putMessage(new StorageServiceFileWriteRequestMessage(_commport, msg->requesting_host,
                                                                                       FileLocation::LOCATION(cache, msg->location->getFile()), msg->location->getFile()->getSize(), 0));
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileWriteAnswerMessage(msg->location, false, nullptr, {}, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
@@ -530,7 +530,7 @@ namespace wrench {
     bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
         if (cache->hasFile(msg->location->getFile(), msg->location->getDirectoryPath())) {//check cache
             WRENCH_INFO("Forwarding to cache reply commport %s", msg->answer_commport->get_name().c_str());
-            cache->commport->putMessage(
+            cache->_commport->putMessage(
                     new StorageServiceFileReadRequestMessage(
                             msg->answer_commport,
                             msg->requesting_host,//msg->commport_to_receive_the_file_content,
@@ -596,7 +596,7 @@ namespace wrench {
                     return true;
                 }
 
-                StorageService::initiateFileCopy(commport, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
+                StorageService::initiateFileCopy(_commport, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
@@ -610,7 +610,7 @@ namespace wrench {
 
                     if (msg->success) {
                         tmpMsg->payload = 0;          //this message has already been sent, this is a fake resend
-                        commport->dputMessage(tmpMsg);//now that the data is cached, resend the message
+                        _commport->dputMessage(tmpMsg);//now that the data is cached, resend the message
                         std::swap(messages[i], messages.back());
                         messages.back().release();
                         messages.pop_back();
@@ -651,7 +651,7 @@ namespace wrench {
                 if (rejectDuplicateRead(msg->location->getFile())) {
                     return true;
                 }
-                StorageService::initiateFileCopy(commport, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
+                StorageService::initiateFileCopy(_commport, FileLocation::LOCATION(target, msg->location->getFile()), FileLocation::LOCATION(cache, msg->location->getFile()));
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
@@ -706,9 +706,9 @@ namespace wrench {
                 //readthrough:  all block until first read is finished, then all others read
                 //do not spend excessive time on readThrough
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
-                forward->answer_commport = commport;                                                                   //setup intercept commport
+                forward->answer_commport = _commport;                                                                   //setup intercept commport
                 forward->location = FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile());//hijack location to be on target
-                target->commport->dputMessage(forward);                                                                //send to target
+                target->_commport->dputMessage(forward);                                                                //send to target
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }
@@ -753,7 +753,7 @@ namespace wrench {
                         first = false;
                     } else {                          //these are the pending reads
                         tmpMsg->payload = 0;          //this message has already been sent, this is a fake resend
-                        commport->dputMessage(tmpMsg);//these should now be cached, and should just drop down to the cache automatically
+                        _commport->dputMessage(tmpMsg);//these should now be cached, and should just drop down to the cache automatically
                         std::swap(messages[i], messages.back());
                         messages.back().release();
                         messages.pop_back();

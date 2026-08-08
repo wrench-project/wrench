@@ -98,7 +98,7 @@ private:
 
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
+        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceDaemonStoppedMessage(1), this->_commport));
         victim1->setSimulation(this->getSimulation());
         victim1->start(victim1, true, false);// Daemonized, no auto-restart
 
@@ -109,17 +109,17 @@ private:
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->commport, true, false));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->_commport, true, false));
         failure_detector1->setSimulation(this->getSimulation());
         failure_detector1->start(failure_detector1, true, false);// Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
+        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceDaemonStoppedMessage(1), this->_commport));
         victim2->setSimulation(this->getSimulation());
         victim2->start(victim2, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->commport, true, false));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->_commport, true, false));
         failure_detector2->setSimulation(this->getSimulation());
         failure_detector2->start(failure_detector2, true, false);// Daemonized, no auto-restart
 
@@ -129,7 +129,7 @@ private:
 
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
@@ -147,7 +147,7 @@ private:
         // And again...
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
@@ -222,7 +222,7 @@ private:
     int main() override {
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
+        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceDaemonStoppedMessage(1), this->_commport));
         victim1->setSimulation(this->getSimulation());
         victim1->start(victim1, true, false);// Daemonized, no auto-restart
 
@@ -233,17 +233,17 @@ private:
         murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->commport, true, false));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->_commport, true, false));
         failure_detector1->setSimulation(this->getSimulation());
         failure_detector1->start(failure_detector1, true, false);// Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
+        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceDaemonStoppedMessage(1), this->_commport));
         victim2->setSimulation(this->getSimulation());
         victim2->start(victim2, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->commport, true, false));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->_commport, true, false));
         failure_detector2->setSimulation(this->getSimulation());
         failure_detector2->start(failure_detector2, true, false);// Daemonized, no auto-restart
 
@@ -251,7 +251,7 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message! " + cause->toString());
@@ -268,7 +268,7 @@ private:
 
         // And again...
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());

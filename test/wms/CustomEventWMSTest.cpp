@@ -94,8 +94,8 @@ private:
     int main() override {
         if (this == this->test->sender_wms.get()) {
             // I AM THE SENDER
-            this->test->receiver_wms->commport->dputMessage(new MyCustomMessage(0, 10));
-            this->test->receiver_wms->commport->dputMessage(new MyOtherCustomMessage(0, "stuff"));
+            this->test->receiver_wms->_commport->dputMessage(new MyCustomMessage(0, 10));
+            this->test->receiver_wms->_commport->dputMessage(new MyOtherCustomMessage(0, "stuff"));
         }
         else {
             // I AM THE RECEIVER

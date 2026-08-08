@@ -144,14 +144,14 @@ private:
 
         // Create a sleep action executor
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, sleep_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->_commport, nullptr, sleep_action, nullptr));
         // Start it
         sleep_action_executor->setSimulation(this->getSimulation());
         sleep_action_executor->start(sleep_action_executor, true, false);
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());

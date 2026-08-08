@@ -109,7 +109,8 @@ namespace wrench {
 
         auto availableCores = state->getAvailableCores();
 
-        // For each invocation, build a list of candidate nodes and pick one at random
+        // For each invocation, build a list of candidate nodes and pick one at random, always reusing
+        // an idle container if there is one
         for (const auto& inv : schedulable_invocations) {
             auto imageFile = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
@@ -127,7 +128,12 @@ namespace wrench {
             if (!candidates.empty()) {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
                 const std::shared_ptr<ServerlessComputeNode>& chosen_node = candidates[dist(rng)];
-                decisions->invocations_on_new_container.push_back({inv, chosen_node});
+                auto idling_container = chosen_node->findIdleContainer(inv->getRegisteredFunction().get());
+                if (idling_container) {
+                    decisions->invocations_on_idle_container.push_back({inv, idling_container});
+                } else {
+                    decisions->invocations_on_new_container.push_back({inv, chosen_node.get()});
+                }
                 availableCores[chosen_node]--;
             }
             else {

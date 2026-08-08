@@ -80,7 +80,7 @@ namespace wrench {
      *
      */
     void EnergyMeterService::stop() {
-        this->commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        this->_commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -90,7 +90,7 @@ namespace wrench {
     int EnergyMeterService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->commport->get_cname());
+        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->_commport->get_cname());
 
         /** Main loop **/
         while (true) {
@@ -141,7 +141,7 @@ namespace wrench {
     bool EnergyMeterService::processNextMessage(double timeout) {
 
         try {
-            auto msg = this->commport->getMessage<ServiceStopDaemonMessage>(
+            auto msg = this->_commport->getMessage<ServiceStopDaemonMessage>(
                     timeout,
                     "EnergyMeter::waitForNextMessage(): Received an");
             WRENCH_INFO("Energy Meter got a %s message", msg->getName().c_str());

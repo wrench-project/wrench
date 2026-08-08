@@ -250,7 +250,7 @@ namespace wrench {
         try {
             // Send report back to the service
             // (a dput() right before death is always dicey, so this is a put())
-            this->parent->commport->putMessage(msg_to_send_back);
+            this->parent->_commport->putMessage(msg_to_send_back);
         } catch (ExecutionException &e) {
             // oh well...
         }
@@ -527,7 +527,7 @@ namespace wrench {
         // Send a message to the source
         auto request_answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        src_loc->getStorageService()->commport->putMessage(
+        src_loc->getStorageService()->_commport->putMessage(
                 new StorageServiceFileReadRequestMessage(
                         request_answer_commport,
                         simgrid::s4u::this_actor::get_host(),

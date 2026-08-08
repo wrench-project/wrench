@@ -84,7 +84,7 @@ namespace wrench {
                 auto [job_name, arrival_time, runtime, num_compute_nodes] = jobs.at(next_job_to_submit);
                 WRENCH_INFO("Sending %s to batch service controller #%d",
                             job_name.c_str(), target_bath_service_controller_index);
-                target_batch_service_controller->commport->dputMessage(
+                target_batch_service_controller->_commport->dputMessage(
                     new JobRequestMessage(job_name, num_compute_nodes, runtime, true));
                 next_job_to_submit++;
 

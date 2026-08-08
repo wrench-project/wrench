@@ -109,7 +109,7 @@ namespace wrench {
         WRENCH_INFO("Network Daemon Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
         // In case of restart
-        this->commport->reset();
+        this->_commport->reset();
         this->recv_commport->reset();
 
         double time_for_next_measurement = this->getTimeUntilNextMeasurement();
@@ -197,7 +197,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->commport->getMessage(timeout);
+            message = this->_commport->getMessage(timeout);
         } catch (ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<NetworkError>(e.getCause());
             if (not cause->isTimeout()) {

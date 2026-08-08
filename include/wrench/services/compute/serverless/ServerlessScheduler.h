@@ -33,14 +33,20 @@ namespace wrench {
 
     struct DispatchInvocationOnNewContainer {
         std::shared_ptr<Invocation> invocation;
-        std::shared_ptr<ServerlessComputeNode> compute_node;
+        ServerlessComputeNode* compute_node;
+    };
+
+    struct DispatchInvocationOnIdleContainer {
+        std::shared_ptr<Invocation> invocation;
+        std::shared_ptr<Container> container;
     };
 
     /**
      * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
      *        - Which images should be copied from the head node to compute nodes' disks
      *        - Which images should be loaded into compute node's RAMs
-     *        - Which invocations should be started at compute nodes right now
+     *        - Which invocations should be started on new containers at compute nodes right now
+     *        - Which invocations should be started on idle containers at compute nodes right now
      */
     struct ServerlessSchedulingDecisions {
 	    /** @brief The list of image copies to storage at compute nodes */
@@ -49,6 +55,8 @@ namespace wrench {
         std::vector<LoadImage> images_loads_to_RAM;
 	    /** @brief The list of function invocations on a new container at compute nodes */
         std::vector<DispatchInvocationOnNewContainer> invocations_on_new_container;
+        /** @brief The list of function invocations on an idle container at compute nodes */
+        std::vector<DispatchInvocationOnIdleContainer> invocations_on_idle_container;
     };
 
     /**

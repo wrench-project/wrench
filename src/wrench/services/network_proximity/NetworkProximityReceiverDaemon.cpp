@@ -53,7 +53,7 @@ namespace wrench {
         WRENCH_INFO("Network Daemon Receiver Daemon starting on host %s!", S4U_Simulation::getHostName().c_str());
 
         // In case of restart
-        this->commport->reset();
+        this->_commport->reset();
         this->recv_commport->reset();
 
         /** Main loop **/
@@ -61,7 +61,7 @@ namespace wrench {
             S4U_Simulation::computeZeroFlop();
             std::shared_ptr<SimulationMessage> message;
             try {
-                message = this->commport->getMessage();
+                message = this->_commport->getMessage();
             } catch (ExecutionException &e) {
                 continue;
             }

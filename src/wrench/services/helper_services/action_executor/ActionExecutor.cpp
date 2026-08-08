@@ -130,7 +130,7 @@ namespace wrench {
         }
         // Retiring the commports anyway!!
         if (not has_returned_from_main) {
-            S4U_CommPort::retireTemporaryCommPort(this->commport);
+            S4U_CommPort::retireTemporaryCommPort(this->_commport);
             S4U_CommPort::retireTemporaryCommPort(this->recv_commport);
         }
     }

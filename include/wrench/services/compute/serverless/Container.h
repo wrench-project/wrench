@@ -36,7 +36,9 @@ namespace wrench {
         [[nodiscard]] bool isIdle() const { return _state == State::IDLE; }
         [[nodiscard]] bool isBusy() const { return _state == State::BUSY; }
         [[nodiscard]] double getIdleTime() const;
+        [[nodiscard]] const RegisteredFunction *getRegisteredFunction() const { return _registered_function; }
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const { return _tmp_storage_service; }
+        [[nodiscard]] ServerlessComputeNode* getComputeNode() const {return const_cast<ServerlessComputeNode*>(_compute_node); };
 
 
     private:

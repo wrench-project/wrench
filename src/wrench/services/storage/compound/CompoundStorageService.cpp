@@ -127,7 +127,7 @@ namespace wrench {
         while (true) {
             S4U_Simulation::computeZeroFlop();
 
-            simulation_message = this->commport->getMessage<SimulationMessage>();
+            simulation_message = this->_commport->getMessage<SimulationMessage>();
 
             if (not processNextMessage(simulation_message.get()))
                 break;
@@ -289,7 +289,7 @@ namespace wrench {
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport) {
         WRENCH_INFO("CSS::lookupFileLocation() - DataFile + CommPort");
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new CompoundStorageLookupRequestMessage(
                         answer_commport,
                         file,
@@ -335,7 +335,7 @@ namespace wrench {
     std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile>& file, unsigned int stripe_count, S4U_CommPort *answer_commport) {
         WRENCH_INFO("CSS::lookupOrDesignateStorageService() - DataFile + commport");
 
-        this->commport->putMessage(new CompoundStorageAllocationRequestMessage(
+        this->_commport->putMessage(new CompoundStorageAllocationRequestMessage(
                 answer_commport,
                 file,
                 stripe_count,
@@ -419,7 +419,7 @@ namespace wrench {
 
             // assertServiceIsUp(loc->getStorageService());
 
-            loc->getStorageService()->commport->putMessage(new StorageServiceFileDeleteRequestMessage(
+            loc->getStorageService()->_commport->putMessage(new StorageServiceFileDeleteRequestMessage(
                     answer_commport,
                     loc,
                     this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
@@ -480,7 +480,7 @@ namespace wrench {
         for (const auto &loc: file_parts) {
             assertServiceIsUp(loc->getStorageService());
 
-            loc->getStorageService()->commport->putMessage(new StorageServiceFileLookupRequestMessage(
+            loc->getStorageService()->_commport->putMessage(new StorageServiceFileLookupRequestMessage(
                     answer_commport,
                     location,
                     this->getMessagePayloadValue(
@@ -589,11 +589,11 @@ namespace wrench {
 
             S4U_CommPort *commport_to_contact;
             if (dst_is_non_bufferized) {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
             } else if (src_is_non_bufferized) {
-                commport_to_contact = src_parts[copy_idx]->getStorageService()->commport;
+                commport_to_contact = src_parts[copy_idx]->getStorageService()->_commport;
             } else {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
             }
 
             this->simulation_->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
@@ -726,11 +726,11 @@ namespace wrench {
 
             S4U_CommPort *commport_to_contact;
             if (dst_is_non_bufferized) {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
             } else if (src_is_non_bufferized) {
-                commport_to_contact = src_parts[copy_idx]->getStorageService()->commport;
+                commport_to_contact = src_parts[copy_idx]->getStorageService()->_commport;
             } else {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
             }
 
             this->simulation_->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
@@ -880,7 +880,7 @@ namespace wrench {
             //TODO: THIS IS UGLY, PERHAPS WOULD BE BETTER TO THINK UP ANOTHER "RESERVE" SCHEME...
             dloc->getStorageService()->unreserveSpace(dloc);
 
-            dloc->getStorageService()->commport->dputMessage(
+            dloc->getStorageService()->_commport->dputMessage(
                     new StorageServiceFileWriteRequestMessage(
                             recv_commport,
                             simgrid::s4u::this_actor::get_host(),
@@ -1017,7 +1017,7 @@ namespace wrench {
             WRENCH_DEBUG("CSS::readFile(): Sending full read request %d on file %s (<%llu> b) to %s",
                          request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
 
-            dloc->getStorageService()->commport->dputMessage(
+            dloc->getStorageService()->_commport->dputMessage(
                     new StorageServiceFileReadRequestMessage(
                             recv_commport,
                             simgrid::s4u::this_actor::get_host(),

@@ -169,6 +169,16 @@ namespace wrench {
         std::shared_ptr<ServerlessComputeNode> _compute_node;
     };
 
+    /**
+    * @brief a message sent to a ServerlessComputeService to notify that a container has idle-timed out
+    */
+    class ServerlessComputeServiceContainerIdleTimeoutMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceContainerIdleTimeoutMessage(std::shared_ptr<Container> container);
+        /** @brief The container that idle-timed out */
+        std::shared_ptr<Container> _container;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

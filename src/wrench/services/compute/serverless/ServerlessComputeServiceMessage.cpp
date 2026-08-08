@@ -150,4 +150,7 @@ namespace wrench
     ServerlessComputeServiceNodeLoadCompleteMessage::ServerlessComputeServiceNodeLoadCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image_file(std::move(image_file)), _compute_node(std::move(compute_node)) {}
 
+    ServerlessComputeServiceContainerIdleTimeoutMessage::ServerlessComputeServiceContainerIdleTimeoutMessage(
+        std::shared_ptr<Container> container) : ServerlessComputeServiceMessage(0), _container(std::move(container)) {}
+
 } // namespace wrench

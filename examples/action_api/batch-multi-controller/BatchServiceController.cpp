@@ -57,7 +57,7 @@ namespace wrench {
             if (job_request_message->_can_forward && (job_request_message->_runtime % 2)) {
                 // Forward the job
                 WRENCH_INFO("Decided to forward this job to my peer!");
-                this->_peer->commport->dputMessage(
+                this->_peer->_commport->dputMessage(
                     new JobRequestMessage(
                         job_request_message->_name,
                         job_request_message->_num_compute_nodes,
@@ -74,7 +74,7 @@ namespace wrench {
                     "", 0, 0,
                     [this, job](const std::shared_ptr<ActionExecutor>& action_executor) {
                         WRENCH_INFO("Sending back a 'job has started' notification");
-                            _originator->commport->dputMessage(new JobStartNotificationMessage(job->getName()));
+                            _originator->_commport->dputMessage(new JobStartNotificationMessage(job->getName()));
                     },
                     [](const std::shared_ptr<ActionExecutor>& action_executor) {
                     });
@@ -99,6 +99,6 @@ namespace wrench {
         auto job_name = event->job->getName();
         WRENCH_INFO("%s, which I ran locally, has completed. Notifying the job generating controller...",
                     job_name.c_str());
-        _originator->commport->dputMessage(new JobCompletionNotificationMessage(job_name));
+        _originator->_commport->dputMessage(new JobCompletionNotificationMessage(job_name));
     }
 } // namespace wrench

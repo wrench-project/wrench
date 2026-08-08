@@ -554,7 +554,7 @@ namespace wrench {
 
         // Send a "run a BatchComputeService job" message to the daemon's commport
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
-        this->commport->dputMessage(
+        this->_commport->dputMessage(
             new BatchComputeServiceJobRequestMessage(
                 answer_commport, batch_job,
                 this->getMessagePayloadValue(
@@ -579,7 +579,7 @@ namespace wrench {
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         // Send a "terminate a  job" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
             new ComputeServiceTerminateCompoundJobRequestMessage(
                 answer_commport,
                 job,
@@ -750,7 +750,7 @@ namespace wrench {
             terminateRunningCompoundJob(compound_job, termination_cause);
             // Popping, because I am terminating it, so the executor won't pop, and right now
             // if I am at the top of the stack!
-            if (compound_job->getCallbackCommPort() == this->commport) {
+            if (compound_job->getCallbackCommPort() == this->_commport) {
                 compound_job->popCallbackCommPort();
             }
             if (send_failure_notifications) {
@@ -855,7 +855,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         }
         catch (ExecutionException&) {
             return true;
@@ -1128,7 +1128,7 @@ namespace wrench {
             "Creating a BareMetalComputeServiceOneShot for a compound job on %ld nodes with %ld cores per node",
             num_nodes_allocated, cores_per_node_asked_for);
 
-        compound_job->pushCallbackCommPort(this->commport);
+        compound_job->pushCallbackCommPort(this->_commport);
 
         std::map<std::string, std::tuple<unsigned long, sg_size_t>> resources_by_hostname;
         for (auto const& h : resources) {
@@ -1167,7 +1167,7 @@ namespace wrench {
         std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
                                                                       batch_job->getEndingTimestamp(),
                                                                       this->_hostname,
-                                                                      this->commport, msg,
+                                                                      this->_commport, msg,
                                                                       "batch_standard");
         compound_job_alarms[compound_job] = alarm_ptr;
     }

@@ -69,7 +69,7 @@ namespace wrench {
         double _function_end_date = -1.0;
         double _container_end_date = -1.0;
 
-        std::shared_ptr<ServerlessComputeNode> _compute_node;
+        ServerlessComputeNode *_compute_node;
         std::shared_ptr<Container> _container;
 
         /***********************/

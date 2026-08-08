@@ -66,7 +66,7 @@ private:
         hosts.push_back(wrench::S4U_Simulation::get_host_or_vm_by_name("Host2"));
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
                 new wrench::HostStateChangeDetector(this->_hostname, hosts, true, true, this->notify_when_speed_change,
-                                                    this->getSharedPtr<wrench::ExecutionController>(), this->commport, {}));
+                                                    this->getSharedPtr<wrench::ExecutionController>(), this->_commport, {}));
         ssd->setSimulation(this->getSimulation());
         ssd->start(ssd, true, false);
 
@@ -75,7 +75,7 @@ private:
 
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->commport->getMessage(10.0);
+            message = this->_commport->getMessage(10.0);
         } catch (wrench::ExecutionException &) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
@@ -87,7 +87,7 @@ private:
         simgrid::s4u::Host::by_name("Host2")->turn_on();
 
         try {
-            message = this->commport->getMessage((double) 10);
+            message = this->_commport->getMessage((double) 10);
         } catch (wrench::ExecutionException &) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
@@ -102,7 +102,7 @@ private:
         if (this->notify_when_speed_change) {
 
             try {
-                message = this->commport->getMessage((double) 10);
+                message = this->_commport->getMessage((double) 10);
             } catch (wrench::ExecutionException &) {
                 throw std::runtime_error("Did not get a message before the timeout");
             }

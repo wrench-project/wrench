@@ -100,7 +100,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new CoordinateLookupRequestMessage(
                         answer_commport, requested_host,
                         this->getMessagePayloadValue(
@@ -137,7 +137,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new NetworkProximityLookupRequestMessage(
                         answer_commport, std::move(hosts),
                         this->getMessagePayloadValue(
@@ -182,7 +182,7 @@ namespace wrench {
         for (const auto &h: this->hosts_in_network) {
             // Set up network sender daemons
             auto np_sender_daemon = std::make_shared<NetworkProximitySenderDaemon>(
-                    this->simulation_, h, this->commport,
+                    this->simulation_, h, this->_commport,
                     this->getPropertyValueAsDouble(
                             NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
                     this->getPropertyValueAsTimeInSecond(
@@ -232,7 +232,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }
@@ -318,11 +318,11 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<NextContactDaemonRequestMessage>(message)) {
             auto chosen_peer = NetworkProximityService::getCommunicationPeer(msg->daemon);
 
-            msg->daemon->commport->dputMessage(
+            msg->daemon->_commport->dputMessage(
                     new NextContactDaemonAnswerMessage(
                             chosen_peer->getHostname(),
                             chosen_peer,
-                            chosen_peer->commport,
+                            chosen_peer->_commport,
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
@@ -392,7 +392,7 @@ namespace wrench {
 
         // all the network daemons EXCEPT the sender get pushed into this vector
         for (unsigned long index = 0; index < this->network_sender_daemons.size(); ++index) {
-            if (this->network_sender_daemons[index]->commport != sender_daemon->commport) {
+            if (this->network_sender_daemons[index]->_commport != sender_daemon->_commport) {
                 peer_list.push_back(index);
             }
         }

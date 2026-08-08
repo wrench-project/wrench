@@ -154,7 +154,7 @@ namespace wrench {
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new ActionExecutionServiceSubmitActionRequestMessage(
                         answer_commport, action,
                         0.0));
@@ -289,7 +289,7 @@ namespace wrench {
             }
             this->host_state_change_monitor = std::make_shared<HostStateChangeDetector>(
                 this->_hostname, hosts_to_monitor, true, true, true,
-                this->getSharedPtr<Service>(), this->commport);
+                this->getSharedPtr<Service>(), this->_commport);
             this->host_state_change_monitor->setSimulation(this->simulation_);
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
                                                    false);// Daemonized, no auto-restart
@@ -463,7 +463,7 @@ namespace wrench {
                                        required_ram,
                                        this->getPropertyValueAsTimeInSecond(ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
                                        this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP),
-                                       this->commport,
+                                       this->_commport,
                                        nullptr,
                                        action,
                                        this->getSharedPtr<ActionExecutionService>()));
@@ -480,7 +480,7 @@ namespace wrench {
             // Start a failure detector for this action executor (which will send me a message in case the
             // action executor has died)
             auto failure_detector = std::make_shared<ServiceTerminationDetector>(
-                this->_hostname, action_executor, this->commport, true, false);
+                this->_hostname, action_executor, this->_commport, true, false);
             failure_detector->setSimulation(this->simulation_);
             failure_detector->start(failure_detector, true, false);// Daemonized, no auto-restart
 
@@ -524,7 +524,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;
@@ -667,10 +667,10 @@ namespace wrench {
         // Send back an action failed message if necessary
         if (not killed_due_to_job_cancellation) {
             WRENCH_INFO("Sending action failure notification to '%s'",
-                        this->parent_service->commport->get_cname());
+                        this->parent_service->_commport->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                this->parent_service->commport->dputMessage(
+                this->parent_service->_commport->dputMessage(
                         new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException &e) {
                 return;
@@ -724,7 +724,7 @@ namespace wrench {
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
         //  send a "terminate action" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new ActionExecutionServiceTerminateActionRequestMessage(
                         answer_commport, std::move(action), termination_cause, 0.0));
 
@@ -758,7 +758,7 @@ namespace wrench {
         this->action_run_specs.erase(action);
 
         // Send the notification to the originator
-        this->parent_service->commport->dputMessage(
+        this->parent_service->_commport->dputMessage(
                 new ActionExecutionServiceActionDoneMessage(
                         action, 0.0));
     }
@@ -779,11 +779,11 @@ namespace wrench {
         this->action_executors.erase(action);
 
         // Send the notification
-        WRENCH_INFO("Sending action failure notification to '%s'", parent_service->commport->get_cname());
+        WRENCH_INFO("Sending action failure notification to '%s'", parent_service->_commport->get_cname());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
             auto msg = new ActionExecutionServiceActionDoneMessage(action, 0);
-            this->parent_service->commport->dputMessage(msg);
+            this->parent_service->_commport->dputMessage(msg);
         } catch (ExecutionException &) {
             return;
         }
@@ -1091,10 +1091,10 @@ namespace wrench {
             this->ready_actions.push_back(action);
         } else {
             // Send the notification
-            WRENCH_INFO("Sending action failure notification to '%s'", parent_service->commport->get_cname());
+            WRENCH_INFO("Sending action failure notification to '%s'", parent_service->_commport->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                this->parent_service->commport->dputMessage(
+                this->parent_service->_commport->dputMessage(
                         new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException &) {
                 return;

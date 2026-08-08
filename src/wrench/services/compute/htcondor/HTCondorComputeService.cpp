@@ -96,7 +96,7 @@ namespace wrench {
         auto answer_commport = getRunningActorRecvCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new ComputeServiceSubmitCompoundJobRequestMessage(
                         answer_commport, job, service_specific_args,
                         this->getMessagePayloadValue(
@@ -149,7 +149,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
         WRENCH_INFO(
                 "HTCondor Service starting on host %s listening on commport %s", this->_hostname.c_str(),
-                this->commport->get_cname());
+                this->_commport->get_cname());
 
         // start the central manager service
         this->central_manager->setSimulation(this->simulation_);
@@ -178,7 +178,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &) {
             return true;
         }

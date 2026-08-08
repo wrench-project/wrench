@@ -79,17 +79,17 @@ private:
             }
 
             // One send
-            pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
+            pending_send = this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100));
             pending_send->wait();
 
             // Another send
-            auto another_pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
+            auto another_pending_send = this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100));
             another_pending_send->wait(200);
 
             // Two sends, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends;
-            sends.push_back(this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100)));
-            sends.push_back(this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100)));
+            sends.push_back(this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100)));
+            sends.push_back(this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100)));
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
             sends.at(index)->wait();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
@@ -97,8 +97,8 @@ private:
 
             // Two sends, timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_timeout;
-            sends_timeout.push_back(this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100)));
-            sends_timeout.push_back(this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100)));
+            sends_timeout.push_back(this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100)));
+            sends_timeout.push_back(this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100)));
             double now = wrench::Simulation::getCurrentSimulatedDate();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 10);
             if (index != ULONG_MAX) {
@@ -117,7 +117,7 @@ private:
             //            }
 
             // One send, network failure
-            pending_send = this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100));
+            pending_send = this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100));
             wrench::Simulation::sleep(10);
             wrench::Simulation::turnOffLink("1");
             try {
@@ -136,8 +136,8 @@ private:
 
             // Two asynchronous sends, network failure
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_failure;
-            sends_failure.push_back(this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100)));
-            sends_failure.push_back(this->test->wms2->commport->iputMessage(new wrench::SimulationMessage(100)));
+            sends_failure.push_back(this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100)));
+            sends_failure.push_back(this->test->wms2->_commport->iputMessage(new wrench::SimulationMessage(100)));
             wrench::Simulation::sleep(10);
             simgrid::s4u::Link::by_name("1")->turn_off();
             //            WRENCH_INFO("SIZE= %ld", sends_failure.size());
@@ -164,7 +164,7 @@ private:
 
             // One synchronous sends, network failure
             try {
-                this->test->wms2->commport->putMessage(new wrench::SimulationMessage(100));
+                this->test->wms2->_commport->putMessage(new wrench::SimulationMessage(100));
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (wrench::ExecutionException &e) {
                 auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
@@ -176,18 +176,18 @@ private:
             /** RECEIVER **/
             std::shared_ptr<wrench::S4U_PendingCommunication> pending_recv;
             // One recv
-            pending_recv = this->test->wms2->commport->igetMessage();
+            pending_recv = this->test->wms2->_commport->igetMessage();
             pending_recv->wait();
 
             // Another recv
-            auto another_pending_recv = this->test->wms2->commport->igetMessage();
+            auto another_pending_recv = this->test->wms2->_commport->igetMessage();
             //            another_pending_recv->wait(0.01 - wrench::Simulation::getCurrentSimulatedDate());
             another_pending_recv->wait(200);
 
             // Two recv, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> recvs;
-            recvs.push_back(this->test->wms2->commport->igetMessage());
-            recvs.push_back(this->test->wms2->commport->igetMessage());
+            recvs.push_back(this->test->wms2->_commport->igetMessage());
+            recvs.push_back(this->test->wms2->_commport->igetMessage());
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(recvs, -1);
             recvs.at(index)->wait();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(recvs, -1);
@@ -195,13 +195,13 @@ private:
 
             // Two recvs (sends are timing out)
             try {
-                this->test->wms2->commport->getMessage();
+                this->test->wms2->_commport->getMessage();
                 throw std::runtime_error("Should have gotten some error");
             } catch (wrench::ExecutionException &e) {
                 // do nothing
             }
             try {
-                this->test->wms2->commport->getMessage();
+                this->test->wms2->_commport->getMessage();
                 throw std::runtime_error("Should have gotten some error");
             } catch (wrench::ExecutionException &e) {
                 // do nothing
@@ -209,7 +209,7 @@ private:
 
             // One recv (which fails)
             try {
-                this->test->wms2->commport->getMessage();
+                this->test->wms2->_commport->getMessage();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (wrench::ExecutionException &e) {
                 auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
@@ -220,12 +220,12 @@ private:
 
             // Two synchronous recv, network failure
             try {
-                this->test->wms2->commport->getMessage();
+                this->test->wms2->_commport->getMessage();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (wrench::ExecutionException &e) {
             }
             try {
-                this->test->wms2->commport->getMessage();
+                this->test->wms2->_commport->getMessage();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (wrench::ExecutionException &e) {
                 auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
@@ -234,7 +234,7 @@ private:
             }
 
             // One asynchronous recv, network failure
-            pending_recv = this->test->wms2->commport->igetMessage();
+            pending_recv = this->test->wms2->_commport->igetMessage();
             wrench::Simulation::sleep(10);
             try {
                 pending_recv->wait();
@@ -305,7 +305,7 @@ private:
     int main() override {
 
         try {
-            this->commport->getMessage<wrench::SimulationMessage>(10);
+            this->_commport->getMessage<wrench::SimulationMessage>(10);
             throw std::runtime_error("Should have gotten an exception");
         } catch (wrench::ExecutionException &e) {
             auto real_error = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
@@ -319,7 +319,7 @@ private:
         }
 
         try {
-            auto pending = this->commport->igetMessage();
+            auto pending = this->_commport->igetMessage();
             pending->wait(10);
             throw std::runtime_error("Should have gotten an exception");
         } catch (wrench::ExecutionException &e) {
@@ -334,7 +334,7 @@ private:
         }
 
         {
-            auto pending = this->commport->igetMessage();
+            auto pending = this->_commport->igetMessage();
             std::vector<wrench::S4U_PendingCommunication *> pending_comms = {pending.get()};
             auto index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(pending_comms, 10);
             if (index != ULONG_MAX) {

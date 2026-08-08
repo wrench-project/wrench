@@ -141,7 +141,7 @@ namespace wrench {
         WRENCH_INFO(
                 "Virtualized Cluster Service starting on host %s listening on commport %s",
                 this->_hostname.c_str(),
-                this->commport->get_cname());
+                this->_commport->get_cname());
 
         // Start the Scratch Storage Service
         this->startScratchStorageService();
@@ -169,7 +169,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }

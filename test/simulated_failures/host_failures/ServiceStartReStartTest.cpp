@@ -99,7 +99,7 @@ private:
         wrench::Simulation::turnOffHost("FailedHost");
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
-        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceDaemonStoppedMessage(1), this->_commport));
         sleeper->setSimulation(this->getSimulation());
         try {
             sleeper->start(sleeper, true, true);// Daemonized, auto-restart!!
@@ -169,7 +169,7 @@ private:
     int main() override {
 
         // Starting a sleeper (that will reply with some message)
-        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceDaemonStoppedMessage(1), this->commport));
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceDaemonStoppedMessage(1), this->_commport));
         sleeper->setSimulation(this->getSimulation());
         sleeper->start(sleeper, true, true);// Daemonized, auto-restart!!
 
@@ -188,7 +188,7 @@ private:
         // Waiting for a message
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting a message!" + cause->toString());

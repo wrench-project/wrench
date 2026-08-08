@@ -77,7 +77,7 @@ private:
     int main() override {
 
         // Create an Alarm service that will go of in 10 seconds
-        auto commport = this->commport;
+        auto commport = this->_commport;
         wrench::Alarm::createAndStartAlarm(this->getSimulation(), 10, "Host2", commport,
                                            new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 

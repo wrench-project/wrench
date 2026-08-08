@@ -77,7 +77,7 @@ namespace wrench {
      *
      */
     void BandwidthMeterService::stop() {
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
@@ -88,7 +88,7 @@ namespace wrench {
     int BandwidthMeterService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->commport->get_cname());
+        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->_commport->get_cname());
         for (auto const &l: this->measurement_periods) {
             WRENCH_INFO("  - %s", l.first.c_str());
         }
@@ -142,7 +142,7 @@ namespace wrench {
     bool BandwidthMeterService::processNextMessage(double timeout) {
 
         try {
-            auto msg = this->commport->getMessage<ServiceStopDaemonMessage>(timeout, "BandwidthMeter::waitForNextMessage(): Received an");
+            auto msg = this->_commport->getMessage<ServiceStopDaemonMessage>(timeout, "BandwidthMeter::waitForNextMessage(): Received an");
             return false;
         } catch (ExecutionException &e) {
             return true;

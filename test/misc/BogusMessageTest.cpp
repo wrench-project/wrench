@@ -159,9 +159,9 @@ private:
 
         if (this->create_data_movement_manager) {
             auto dmm = this->createDataMovementManager();
-            this->test->dst_commport = dmm->commport;
+            this->test->dst_commport = dmm->_commport;
         } else {
-            this->test->dst_commport = this->test->service->commport;
+            this->test->dst_commport = this->test->service->_commport;
         }
         this->waitForAndProcessNextEvent();
         return 0;
@@ -207,10 +207,10 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     // Create a service
     if (service_type == "file_registry") {
         this->service = simulation->add(new wrench::FileRegistryService(hostname));
-        this->dst_commport = this->service->commport;
+        this->dst_commport = this->service->_commport;
     } else if (service_type == "simple_storage") {
         this->service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(hostname, {"/"}));
-        this->dst_commport = this->service->commport;
+        this->dst_commport = this->service->_commport;
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);

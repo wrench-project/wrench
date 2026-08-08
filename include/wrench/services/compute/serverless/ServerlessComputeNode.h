@@ -36,6 +36,8 @@ namespace wrench
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
+        std::shared_ptr<Container> findIdleContainer(RegisteredFunction *registered_function);
+
         std::string hostname;
         unsigned long total_cores;
         unsigned int available_cores;

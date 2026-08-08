@@ -407,7 +407,7 @@ namespace wrench
 
         WRENCH_INFO("Cloud Service starting on host %s listening on commport %s",
                     this->_hostname.c_str(),
-                    this->commport->get_cname());
+                    this->_commport->get_cname());
 
         // Start the Scratch Storage Service
         this->startScratchStorageService();
@@ -456,7 +456,7 @@ namespace wrench
 
         try
         {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         }
         catch (ExecutionException&)
         {
@@ -924,7 +924,7 @@ namespace wrench
         //        WRENCH_INFO("CREATING SERVICE TERMINATION DETECTOR THAT WILL REPORT TO COMMPORT %s", this->commport->get_cname());
         auto termination_detector = std::make_shared<ServiceTerminationDetector>(
             this->_hostname, cs,
-            this->commport, false, true);
+            this->_commport, false, true);
         termination_detector->setSimulation(this->simulation_);
         termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
 

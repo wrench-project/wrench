@@ -116,7 +116,7 @@ namespace wrench {
 
         this->assertServiceIsUp();
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new StorageServiceFileWriteRequestMessage(
                         answer_commport,
                         simgrid::s4u::this_actor::get_host(),
@@ -192,7 +192,7 @@ namespace wrench {
 
         // Send a message to the daemon
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
-        this->commport->putMessage(new StorageServiceFreeSpaceRequestMessage(
+        this->_commport->putMessage(new StorageServiceFreeSpaceRequestMessage(
                 answer_commport,
                 path,
                 this->getMessagePayloadValue(
@@ -222,7 +222,7 @@ namespace wrench {
         assertServiceIsUp(this->getSharedPtr<Service>());
 
         // Send a message to the daemon
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new StorageServiceFileLookupRequestMessage(
                         answer_commport,
                         location,
@@ -259,7 +259,7 @@ namespace wrench {
 
         assertServiceIsUp(this->getSharedPtr<Service>());
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new StorageServiceFileReadRequestMessage(
                         answer_commport,
                         simgrid::s4u::this_actor::get_host(),
@@ -400,7 +400,7 @@ namespace wrench {
         assertServiceIsUp(this->getSharedPtr<Service>());
 
         // Send a message to the storage service's daemon
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new StorageServiceFileDeleteRequestMessage(
                         answer_commport,
                         location,
@@ -456,11 +456,11 @@ namespace wrench {
 
         S4U_CommPort *commport_to_contact;
         if (dst_is_non_bufferized) {
-            commport_to_contact = dst_location->getStorageService()->commport;
+            commport_to_contact = dst_location->getStorageService()->_commport;
         } else if (src_is_non_bufferized) {
-            commport_to_contact = src_location->getStorageService()->commport;
+            commport_to_contact = src_location->getStorageService()->_commport;
         } else {
-            commport_to_contact = dst_location->getStorageService()->commport;
+            commport_to_contact = dst_location->getStorageService()->_commport;
         }
 
 
@@ -522,11 +522,11 @@ namespace wrench {
 
         S4U_CommPort *commport_to_contact;
         if (dst_is_non_bufferized) {
-            commport_to_contact = dst_location->getStorageService()->commport;
+            commport_to_contact = dst_location->getStorageService()->_commport;
         } else if (src_is_non_bufferized) {
-            commport_to_contact = src_location->getStorageService()->commport;
+            commport_to_contact = src_location->getStorageService()->_commport;
         } else {
-            commport_to_contact = dst_location->getStorageService()->commport;
+            commport_to_contact = dst_location->getStorageService()->_commport;
         }
 
         src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,

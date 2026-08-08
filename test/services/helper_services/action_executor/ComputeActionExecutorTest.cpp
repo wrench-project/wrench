@@ -157,7 +157,7 @@ private:
             ram,
             thread_creation_overhead,
             simulation_computation_as_sleep,
-            this->commport,
+            this->_commport,
             nullptr,
             action,
             nullptr);
@@ -169,7 +169,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         }
         catch (wrench::ExecutionException& e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
@@ -299,7 +299,7 @@ private:
                                        ram,
                                        0.1,
                                        false,
-                                       this->commport,
+                                       this->_commport,
                                        nullptr,
                                        action,
                                        nullptr));
@@ -311,7 +311,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         }
         catch (wrench::ExecutionException& e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());

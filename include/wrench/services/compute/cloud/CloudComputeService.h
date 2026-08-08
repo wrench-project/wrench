@@ -156,7 +156,7 @@ namespace wrench {
          */
         std::shared_ptr<TMessageType> sendRequestAndWaitForAnswer(S4U_CommPort *answer_commport, ComputeServiceMessage *tosend) {
             serviceSanityCheck();
-            this->commport->putMessage(tosend);
+            this->_commport->putMessage(tosend);
 
             // Wait for a reply
             return answer_commport->getMessage<TMessageType>(this->network_timeout, "CloudComputeService::sendRequestAndWaitForAnswer(): received an");

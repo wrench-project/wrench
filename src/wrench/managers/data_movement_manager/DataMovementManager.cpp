@@ -52,7 +52,7 @@ namespace wrench {
      *
      */
     void DataMovementManager::stop() {
-        this->commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        this->_commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -85,7 +85,7 @@ namespace wrench {
 
 
         this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
-        wrench::StorageService::initiateFileCopy(this->commport, src, dst);
+        wrench::StorageService::initiateFileCopy(this->_commport, src, dst);
     }
 
     /**
@@ -122,7 +122,7 @@ namespace wrench {
 
         this->pending_file_reads.push_front(std::make_unique<ReadRequestSpecs>(location, num_bytes));
         // Initiate the read in a thread
-        auto frt = std::make_shared<FileReaderThread>(this->_hostname, this->commport, location, num_bytes);
+        auto frt = std::make_shared<FileReaderThread>(this->_hostname, this->_commport, location, num_bytes);
         frt->setSimulation(this->simulation_);
         frt->start(frt, true, false);
     }
@@ -153,7 +153,7 @@ namespace wrench {
         this->pending_file_writes.push_front(std::make_unique<WriteRequestSpecs>(location, file_registry_service));
 
         // Initiate the write operation in a thread
-        auto fwt = std::make_shared<FileWriterThread>(this->_hostname, this->commport, location);
+        auto fwt = std::make_shared<FileWriterThread>(this->_hostname, this->_commport, location);
         fwt->setSimulation(this->simulation_);
         fwt->start(fwt, true, false);
     }
@@ -202,7 +202,7 @@ namespace wrench {
     int DataMovementManager::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Data Movement Manager starting (%s)", this->commport->get_cname());
+        WRENCH_INFO("New Data Movement Manager starting (%s)", this->_commport->get_cname());
 
         while (processNextMessage()) {}
 
@@ -220,7 +220,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &e) {
             WRENCH_INFO("Oops... somebody tried to send a message, but that failed...");
             return true;

@@ -41,7 +41,7 @@ namespace wrench {
      */
     std::shared_ptr<JobManager> ExecutionController::createJobManager() {
         auto job_manager = std::shared_ptr<JobManager>(
-                new JobManager(this->_hostname, this->commport));
+                new JobManager(this->_hostname, this->_commport));
         job_manager->simulation_ = this->simulation_;
         job_manager->start(job_manager, true, false);// Always daemonize, no auto-restart
 
@@ -54,7 +54,7 @@ namespace wrench {
     */
     std::shared_ptr<FunctionManager> ExecutionController::createFunctionManager() {
         auto function_manager = std::shared_ptr<FunctionManager>(
-                new FunctionManager(this->_hostname, this->commport));
+                new FunctionManager(this->_hostname, this->_commport));
         function_manager->simulation_ = this->simulation_;
         function_manager->start(function_manager, true, false);// Always daemonize, no auto-restart
 
@@ -67,7 +67,7 @@ namespace wrench {
      */
     std::shared_ptr<DataMovementManager> ExecutionController::createDataMovementManager() {
         auto data_movement_manager = std::shared_ptr<DataMovementManager>(
-                new DataMovementManager(this->_hostname, this->commport));
+                new DataMovementManager(this->_hostname, this->_commport));
         data_movement_manager->simulation_ = this->simulation_;
         data_movement_manager->start(data_movement_manager, true, false);// Always daemonize, no auto-restart
 
@@ -141,7 +141,7 @@ namespace wrench {
      * @param message: a string message that will be in the generated TimerEvent
      */
     void ExecutionController::setTimer(double date, std::string message) {
-        Alarm::createAndStartAlarm(this->simulation_, date, this->_hostname, this->commport,
+        Alarm::createAndStartAlarm(this->simulation_, date, this->_hostname, this->_commport,
                                    new ExecutionControllerAlarmTimerMessage(std::move(message), 0), "wms_timer");
     }
 
@@ -151,7 +151,7 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent(double timeout) {
-        auto event = ExecutionEvent::waitForNextExecutionEvent(this->commport, timeout);
+        auto event = ExecutionEvent::waitForNextExecutionEvent(this->_commport, timeout);
         return event;
     }
 

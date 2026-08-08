@@ -150,7 +150,7 @@ private:
         // Create a file copy action executor
         auto file_copy_action_executor = std::make_shared<wrench::ActionExecutor>(
                 "Host2", 0, 0.0, 0, false,
-                this->commport, nullptr, file_copy_action, nullptr);
+                this->_commport, nullptr, file_copy_action, nullptr);
         // Start it
         file_copy_action_executor->setSimulation(this->getSimulation());
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -158,7 +158,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
@@ -276,7 +276,7 @@ private:
 
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->commport, nullptr, file_copy_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->_commport, nullptr, file_copy_action, nullptr));
         // Start it
         file_copy_action_executor->setSimulation(this->getSimulation());
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -284,7 +284,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause());
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());

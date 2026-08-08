@@ -245,7 +245,7 @@ private:
             ram,
             thread_overhead,
             false,
-            this->commport,
+            this->_commport,
             nullptr,
             action, nullptr);
 

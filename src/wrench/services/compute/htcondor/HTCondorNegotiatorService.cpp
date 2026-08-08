@@ -89,7 +89,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on commport %s",
-                    this->_hostname.c_str(), this->commport->get_cname());
+                    this->_hostname.c_str(), this->_commport->get_cname());
 
         std::set<std::shared_ptr<Job>> scheduled_jobs;
 

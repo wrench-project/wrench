@@ -61,7 +61,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->commport->putMessage(new FileRegistryFileLookupRequestMessage(
+        this->_commport->putMessage(new FileRegistryFileLookupRequestMessage(
                 answer_commport, file,
                 this->getMessagePayloadValue(
                         FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
@@ -101,7 +101,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new FileRegistryFileLookupByProximityRequestMessage(
                         answer_commport, file,
                         reference_host,
@@ -136,7 +136,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new FileRegistryAddEntryRequestMessage(
                         answer_commport, location,
                         this->getMessagePayloadValue(
@@ -171,7 +171,7 @@ namespace wrench {
 
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
 
-        this->commport->putMessage(
+        this->_commport->putMessage(
                 new FileRegistryRemoveEntryRequestMessage(
                         answer_commport, location,
                         this->getMessagePayloadValue(
@@ -216,7 +216,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = this->commport->getMessage();
+            message = this->_commport->getMessage();
         } catch (ExecutionException &e) {
             return true;
         }

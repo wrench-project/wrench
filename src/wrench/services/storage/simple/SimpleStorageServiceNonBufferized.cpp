@@ -155,7 +155,7 @@ namespace wrench {
         this->stream_to_transactions.clear();
         this->pending_transactions.clear();
         this->running_transactions.clear();
-        this->commport->reset();
+        this->_commport->reset();
         this->recv_commport->reset();
 
         for (auto const &part: this->file_system->get_partitions()) {
@@ -208,7 +208,7 @@ namespace wrench {
             // Create an async recv on the mailbox if needed
             if (not comm_has_been_posted) {
                 try {
-                    comm_ptr = this->commport->s4u_mb->get_async<void>(reinterpret_cast<void**>(&(simulation_message)));
+                    comm_ptr = this->_commport->s4u_mb->get_async<void>(reinterpret_cast<void**>(&(simulation_message)));
                 } catch (wrench::ExecutionException &e) {
                     // oh well
                     continue;
@@ -218,7 +218,7 @@ namespace wrench {
 
             // Create an async recv on the message queue if needed
             if (not mess_has_been_posted) {
-                mess_ptr = this->commport->s4u_mq->get_async<void>(reinterpret_cast<void**>(&(simulation_message)));
+                mess_ptr = this->_commport->s4u_mq->get_async<void>(reinterpret_cast<void**>(&(simulation_message)));
                 mess_has_been_posted = true;
             } else {
 
