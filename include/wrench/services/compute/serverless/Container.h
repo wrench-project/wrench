@@ -60,6 +60,8 @@ namespace wrench {
         void spawn();
         void shutdown();
 
+        void freeDiskAndMemoryResources();
+
 
         const RegisteredFunction* _registered_function;
         const ServerlessComputeNode *_compute_node;
