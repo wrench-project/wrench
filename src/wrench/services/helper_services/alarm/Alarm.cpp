@@ -48,7 +48,7 @@ namespace wrench {
      */
     int Alarm::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-        WRENCH_INFO("Alarm Service starting with alarm date = %.20f", this->date);
+        // WRENCH_INFO("Alarm Service starting with alarm date = %.20f", this->date);
 
         double time_to_sleep = this->date - S4U_Simulation::getClock();
         if (time_to_sleep > 0) {

@@ -909,16 +909,24 @@ private:
         function_manager->wait_one(inv2);
 
         // Sleep more than the idle timeout
-        wrench::Simulation::sleep(
+        wrench::Simulation::sleep( 10 +
             compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT));
 
         // Place another invocation and wait for it
         auto inv3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv3);
 
-        std::cerr << "INV1: " << inv1->getSubmitDate() << " " << inv1->getContainerStartDate() << " " << inv1->getFunctionStartDate() << std::endl;
-        std::cerr << "INV2: " << inv2->getSubmitDate() << " " << inv2->getContainerStartDate() << " " << inv3->getFunctionStartDate() << std::endl;
-        std::cerr << "INV3: " << inv3->getSubmitDate() << " " << inv3->getContainerStartDate() << " " << inv3->getFunctionStartDate() << std::endl;
+        if (std::abs((inv1->getFunctionStartDate() - inv1->getContainerStartDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation #1 times: " +  std::to_string(inv1->getContainerStartDate()) + " " + std::to_string(inv1->getFunctionStartDate()));
+        }
+
+        if (std::abs(inv2->getFunctionStartDate() - inv2->getContainerStartDate()) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation #2 times: " +  std::to_string(inv2->getContainerStartDate()) + " " + std::to_string(inv2->getFunctionStartDate()));
+        }
+
+        if (std::abs((inv3->getFunctionStartDate() - inv3->getContainerStartDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation #3 times: " +  std::to_string(inv3->getContainerStartDate()) + " " + std::to_string(inv3->getFunctionStartDate()));
+        }
 
         return 0;
     }
@@ -961,7 +969,7 @@ void ServerlessTimingTest::do_HotStart_test(
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessDiskPressureDueToInvocationsController(this, user_host, serverless_provider, storage_service));
+        new ServerlessHotStartController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 

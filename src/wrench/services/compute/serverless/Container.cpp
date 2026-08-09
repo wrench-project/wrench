@@ -30,7 +30,7 @@ namespace wrench {
 
     void Container::makeBusy() {
         _state = State::BUSY;
-        _idle_date = -1;
+        _idle_date = DBL_MAX;
     }
 
     double Container::getIdleTime() const {

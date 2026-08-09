@@ -57,7 +57,7 @@ namespace wrench {
      */
     void ServerlessComputeNode::shutdownContainer(const std::shared_ptr<Container>& container) {
         if (this->busy_containers.find(container) != this->busy_containers.end()) {
-            throw std::runtime_error("Trying to shutdown a non-idle container busy");
+            throw std::runtime_error("Trying to shutdown a non-idle container");
         }
         idle_containers.erase(container);
         container->shutdown();

@@ -892,7 +892,6 @@ namespace wrench {
             // WRENCH_INFO("Admitting an invocation...");
             auto invocation = _state_of_the_system->_new_invocations.front();
             const auto image = invocation->_registered_function->_function->getImage();
-            // std::cerr << "ADMITTING INVOCATION.. " << invocation->_registered_function->_function->_image->getFile()->getID() << std::endl;
 
             // If the image file is already downloaded, make the invocation schedulable immediately
             if (_state_of_the_system->_head_storage_service->hasFile(image->getFile())) {
@@ -941,7 +940,6 @@ namespace wrench {
     void ServerlessComputeService::initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation) {
         // Create a custom action (we could use a simple FileCopyAction here, but we are using a CustomAction
         // to demonstrate its use)
-        // std::cerr << "INITIATING DOWNLOAD FROM REMOTE: " << invocation->_registered_function->_function->_image->getFile()->getID() << std::endl;
         const std::function lambda_execute = [invocation, this
             ](const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the lambda execute!!");
@@ -1106,10 +1104,8 @@ namespace wrench {
                 image);
             try {
                 StorageService::copyFile(src_location, dst_location);
-                // std::cerr << "THE IMAGE LOAD SUCCEEDED\n";
             }
             catch (ExecutionException& e) {
-                // std::cerr << "THE IMAGE LOAD FAILED: " << e.what() << std::endl;
                 throw;
             }
             // WRENCH_INFO("Done with the lambda execute!!");

@@ -16,7 +16,6 @@
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 #include "wrench/services/compute/serverless/Invocation.h"
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 #include "wrench/services/compute/serverless/ServerlessScheduler.h"
