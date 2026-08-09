@@ -642,24 +642,13 @@ namespace wrench {
         // Dispatched the invocations in the order of the schedulable list
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
 
-        // Dispatch invocation on new containers
-        for (const auto& [invocation, compute_node] : decisions->invocations_on_new_container) {
+        // Dispatch invocation
+        for (const auto& [invocation, compute_node, container] : decisions->invocation_dispatches) {
             // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
             //             invocation_to_place->_registered_function->_function->getName().c_str());
-            if (dispatchInvocation(invocation, compute_node, nullptr)) {
+            if (dispatchInvocation(invocation, compute_node, container)) {
                 _state_of_the_system->_running_invocations.insert(invocation);
                 invocation->_compute_node = compute_node;
-                dispatched_invocations.insert(invocation);
-            }
-        }
-
-        // Dispatch invocation on idle containers
-        for (const auto& [invocation, container] : decisions->invocations_on_idle_container) {
-            // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
-            //             invocation_to_place->_registered_function->_function->getName().c_str());
-            if (dispatchInvocation(invocation, nullptr, container)) {
-                _state_of_the_system->_running_invocations.insert(invocation);
-                invocation->_compute_node = container->getComputeNode();
                 dispatched_invocations.insert(invocation);
             }
         }

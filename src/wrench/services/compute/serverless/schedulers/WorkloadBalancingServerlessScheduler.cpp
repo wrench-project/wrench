@@ -108,10 +108,10 @@ namespace wrench {
                     if (state->isImageInRAMAtNode(node, image_file)) {
                         auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get());
                         if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
-                            decisions->invocations_on_idle_container.push_back({inv, idling_container});
+                            decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});
                             claimed_idle_containers.insert(idling_container);
                         } else {
-                            decisions->invocations_on_new_container.push_back({inv, node.get()});
+                            decisions->invocation_dispatches.push_back({inv, node.get(), nullptr});
                         }
                         availableCores[node]--;
                         scheduled++;

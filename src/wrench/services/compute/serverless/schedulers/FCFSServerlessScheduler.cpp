@@ -98,15 +98,16 @@ namespace wrench {
             // Get the image for this invocation
             auto image_file = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
-            for (const auto& [node, num_available_cores] : available_cores) {
+            for (const auto& node : state->getComputeNodes()) {
+                auto num_available_cores = available_cores[node];
                 // Checking if the node has available cores and if the image is on the node
                 if (num_available_cores > 0 && state->isImageInRAMAtNode(node, image_file)) {
                     auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get());
                     if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
-                        decisions->invocations_on_idle_container.push_back({inv, idling_container});
+                        decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});
                         claimed_idle_containers.insert(idling_container);
                     } else {
-                        decisions->invocations_on_new_container.push_back({inv, node.get()});
+                        decisions->invocation_dispatches.push_back({inv, node.get(), nullptr});
                     }
                     available_cores[node]--;
                     // Move on to next invocation

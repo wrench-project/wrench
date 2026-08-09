@@ -132,10 +132,10 @@ namespace wrench {
                 const std::shared_ptr<ServerlessComputeNode>& chosen_node = candidates[dist(rng)];
                 auto idling_container = chosen_node->findIdleContainer(inv->getRegisteredFunction().get());
                 if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
-                    decisions->invocations_on_idle_container.push_back({inv, idling_container});
+                    decisions->invocation_dispatches.push_back({inv, chosen_node.get(), idling_container});
                     claimed_idle_containers.insert(idling_container);
                 } else {
-                    decisions->invocations_on_new_container.push_back({inv, chosen_node.get()});
+                    decisions->invocation_dispatches.push_back({inv, chosen_node.get(), nullptr});
                 }
                 availableCores[chosen_node]--;
             }
