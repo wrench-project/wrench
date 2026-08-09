@@ -46,6 +46,9 @@ namespace wrench
         std::set<std::shared_ptr<DataFile>> getImagesBeingLoaded() const;
         bool isImageInRAM(const std::shared_ptr<DataFile>& image) const;
 
+        [[nodiscard]] bool isInvocationFeasible(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Container>& container) const;
+
+
 
         std::string hostname;
         unsigned long total_cores;

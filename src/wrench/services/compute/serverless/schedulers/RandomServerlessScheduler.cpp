@@ -109,6 +109,8 @@ namespace wrench {
 
         auto availableCores = state->getAvailableCores();
 
+        std::set<std::shared_ptr<Container>> claimed_idle_containers;
+
         // For each invocation, build a list of candidate nodes and pick one at random, always reusing
         // an idle container if there is one
         for (const auto& inv : schedulable_invocations) {
@@ -129,8 +131,9 @@ namespace wrench {
                 std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
                 const std::shared_ptr<ServerlessComputeNode>& chosen_node = candidates[dist(rng)];
                 auto idling_container = chosen_node->findIdleContainer(inv->getRegisteredFunction().get());
-                if (idling_container) {
+                if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
                     decisions->invocations_on_idle_container.push_back({inv, idling_container});
+                    claimed_idle_containers.insert(idling_container);
                 } else {
                     decisions->invocations_on_new_container.push_back({inv, chosen_node.get()});
                 }

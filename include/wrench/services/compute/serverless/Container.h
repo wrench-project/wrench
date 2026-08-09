@@ -17,6 +17,7 @@
 
 namespace wrench {
     class ServerlessComputeNode;
+    class Invocation;
 
     /***********************/
     /** \cond INTERNAL    **/
@@ -39,7 +40,7 @@ namespace wrench {
         [[nodiscard]] unsigned long getIdleSequence() const {return _idle_sequence; }
         [[nodiscard]] const RegisteredFunction *getRegisteredFunction() const { return _registered_function; }
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const { return _tmp_storage_service; }
-        [[nodiscard]] ServerlessComputeNode* getComputeNode() const {return const_cast<ServerlessComputeNode*>(_compute_node); };
+        [[nodiscard]] ServerlessComputeNode* getComputeNode() const {return const_cast<ServerlessComputeNode*>(_compute_node); }
 
     private:
         friend class ServerlessComputeNode;

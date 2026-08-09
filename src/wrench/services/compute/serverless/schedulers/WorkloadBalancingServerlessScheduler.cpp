@@ -84,6 +84,8 @@ namespace wrench {
             invocations_by_function[function_name].push_back(inv);
         }
 
+        std::set<std::shared_ptr<Container>> claimed_idle_containers;
+
         // For each function in our allocation plan
         for (const auto& [node, function_allocation] : allocation_plan) {
             for (const auto& [function_name, cores_allocated] : function_allocation) {
@@ -105,8 +107,9 @@ namespace wrench {
                     auto image_file = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
                     if (state->isImageInRAMAtNode(node, image_file)) {
                         auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get());
-                        if (idling_container) {
+                        if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
                             decisions->invocations_on_idle_container.push_back({inv, idling_container});
+                            claimed_idle_containers.insert(idling_container);
                         } else {
                             decisions->invocations_on_new_container.push_back({inv, node.get()});
                         }

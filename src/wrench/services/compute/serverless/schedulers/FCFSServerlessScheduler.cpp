@@ -91,6 +91,7 @@ namespace wrench {
                                  const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                  const ServerlessStateOfTheSystem* state) {
         auto available_cores = state->getAvailableCores();
+        std::set<std::shared_ptr<Container>> claimed_idle_containers;
 
         for (const auto& inv : schedulable_invocations) {
 
@@ -101,8 +102,9 @@ namespace wrench {
                 // Checking if the node has available cores and if the image is on the node
                 if (num_available_cores > 0 && state->isImageInRAMAtNode(node, image_file)) {
                     auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get());
-                    if (idling_container) {
+                    if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
                         decisions->invocations_on_idle_container.push_back({inv, idling_container});
+                        claimed_idle_containers.insert(idling_container);
                     } else {
                         decisions->invocations_on_new_container.push_back({inv, node.get()});
                     }

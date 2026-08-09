@@ -8,6 +8,7 @@
  */
 
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
+#include <wrench/services/compute/serverless/Invocation.h>
 #include <wrench/services/compute/serverless/Container.h>
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 
@@ -145,5 +146,52 @@ namespace wrench {
         return (this->memory->hasFile(image));
     }
 
+    /**
+     * @brief Helper method to ensure that an invocation can be dispatched
+     * @param invocation: the invocation to start
+     * @param target_container: the target container (nullptr if none)
+     * @return true if the invocation can be dispatched, false otherwise
+     */
+    bool ServerlessComputeNode::isInvocationFeasible(
+        const std::shared_ptr<Invocation>& invocation,
+        const std::shared_ptr<Container>& target_container) const {
+
+        // Sanity checks
+        if (invocation->isDispatched()) {
+            throw std::runtime_error(
+                "ServerlessComputeNode::isInvocationFeasible(): The invocation has already been dispatched!");
+        }
+        if (target_container) {
+            if (invocation->getRegisteredFunction().get() != target_container->getRegisteredFunction()) {
+                throw std::runtime_error(
+                    "ServerlessComputeNode::isInvocationFeasible(): The container isn't for the right function!");
+            }
+            if (_idle_containers.find(target_container) == _idle_containers.end()) {
+                throw std::runtime_error(
+                    "ServerlessComputeNode::isInvocationFeasible(): Internal error - The container does not belong to the compute host!");
+            }
+            if (not target_container->isIdle()) {
+                throw std::runtime_error(
+                    "ServerlessComputeNode::isInvocationFeasible: Internal error - Scheduled invocation cannot be started because the target container is not idle");
+            }
+        }
+
+        // The node has available cores?
+        if (this->available_cores < 1) {
+            WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
+            return false;
+        }
+
+        // The image is in RAM?
+        auto ss_memory = this->memory;
+        auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
+        if (not ss_memory->hasFile(image_file, ss_memory->getBaseRootPath())) {
+            WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",
+                        image_file->getID().c_str(), this->hostname.c_str());
+            return false;
+        }
+
+        return true;
+    }
 
 }; // namespace wrench

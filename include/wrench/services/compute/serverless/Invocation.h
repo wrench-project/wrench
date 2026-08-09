@@ -33,6 +33,7 @@ namespace wrench {
     class Invocation {
 
     public:
+        [[nodiscard]] bool isDispatched() const;
         [[nodiscard]] bool isDone() const;
         [[nodiscard]] bool hasSucceeded() const;
         [[nodiscard]] std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;

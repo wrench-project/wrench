@@ -148,10 +148,6 @@ namespace wrench {
         void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
         void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
 
-        bool invocationCanBeDispatched(const std::shared_ptr<Invocation>& invocation,
-            const ServerlessComputeNode* compute_node,
-            const std::shared_ptr<Container>& target_container) const;
-
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
             ServerlessComputeNode* target_compute_node,
             std::shared_ptr<Container> container);

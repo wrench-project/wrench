@@ -83,6 +83,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Checks if the invocation has been dispatched.
+     * @return True if the invocation has been dispatched, false otherwise.
+     */
+    bool Invocation::isDispatched() const {
+        return _dispatched;
+    }
+
+    /**
      * @brief Checks if the invocation is done.
      * @return True if the invocation is done, false otherwise.
      */
