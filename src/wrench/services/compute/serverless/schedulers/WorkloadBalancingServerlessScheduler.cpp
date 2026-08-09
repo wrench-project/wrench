@@ -38,18 +38,19 @@ namespace wrench {
         createAllocationPlan(state);
 
         for (const auto& [node, function_allocation] : allocation_plan) {
-            std::set<std::string> required_function_names;
+            std::set<std::shared_ptr<RegisteredFunction>> required_functions;
 
             // figure out which functions we need here
-            for (const auto& [function_name, core_count] : function_allocation) {
+            for (const auto& [function , core_count] : function_allocation) {
                 if (core_count > 0) {
-                    required_function_names.insert(function_name);
+                    required_functions.insert(function);
                 }
             }
 
             // only copy each image if it's neither already on the node nor currently being copied
-            for (const auto& function_name : required_function_names) {
-                auto image = function_images[function_name];
+            for (const auto& function : required_functions) {
+                // auto image = function_images[function];
+                auto image = function->getImageFile();
                 if (!state->isImageOnDiskAtNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
                     decisions->image_copies_to_disk.push_back(CopyImage{image, node});
@@ -78,10 +79,9 @@ namespace wrench {
         auto availableCores = state->getAvailableCores();
 
         // Group invocations by function name
-        std::unordered_map<std::string, std::vector<std::shared_ptr<Invocation>>> invocations_by_function;
+        std::unordered_map<std::shared_ptr<RegisteredFunction>, std::vector<std::shared_ptr<Invocation>>> invocations_by_function;
         for (const auto& inv : schedulable_invocations) {
-            std::string function_name = inv->getRegisteredFunction()->getFunction()->getName();
-            invocations_by_function[function_name].push_back(inv);
+            invocations_by_function[inv->getRegisteredFunction()].push_back(inv);
         }
 
         std::set<std::shared_ptr<Container>> claimed_idle_containers;
@@ -131,23 +131,17 @@ namespace wrench {
         // Clear existing data
         function_workloads.clear();
         function_pending_count.clear();
-        function_images.clear();
 
         // Process each invocation
         for (const auto& inv : invocations) {
-            std::string function_name = inv->getRegisteredFunction()->getFunction()->getName();
-
-            // Store image file
-            function_images[function_name] = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
-
             // Get time limit (we use this as runtime)
             const double time_limit = inv->getRegisteredFunction()->getTimeLimit();
 
             // Add to total workload
-            function_workloads[function_name] += time_limit;
+            function_workloads[inv->getRegisteredFunction()] += time_limit;
 
             // Increment count
-            function_pending_count[function_name]++;
+            function_pending_count[inv->getRegisteredFunction()]++;
         }
     }
 
@@ -181,7 +175,7 @@ namespace wrench {
         }
 
         // Allocate cores proportionally to workload
-        std::vector<std::pair<std::string, unsigned>> function_core_allocation;
+        std::vector<std::pair<std::shared_ptr<RegisteredFunction>, unsigned>> function_core_allocation;
 
         for (const auto& [function_name, workload] : function_workloads) {
             const double proportion = workload / total_workload;

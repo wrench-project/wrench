@@ -40,8 +40,7 @@ namespace wrench {
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
         [[nodiscard]] double getSubmitDate() const;
-        [[nodiscard]] double getContainerStartDate() const;
-        [[nodiscard]] double getContainerEndDate() const;
+        [[nodiscard]] double getDispatchDate() const;
         [[nodiscard]] double getFunctionStartDate() const;
         [[nodiscard]] double getFunctionEndDate() const;
 
@@ -66,10 +65,9 @@ namespace wrench {
         S4U_CommPort* _notify_commport; // the communication port for notifications
 
         double _submit_date = -1.0;
-        double _container_start_date = -1.0;
+        double _dispatch_date = -1.0;
         double _function_start_date = -1.0;
         double _function_end_date = -1.0;
-        double _container_end_date = -1.0;
 
         ServerlessComputeNode *_compute_node;
         std::shared_ptr<Container> _container;

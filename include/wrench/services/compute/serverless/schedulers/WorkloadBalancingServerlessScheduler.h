@@ -46,22 +46,19 @@ namespace wrench {
 
 
         // Function type -> total workload (in time units)
-        std::unordered_map<std::string, double> function_workloads;
+        std::unordered_map<std::shared_ptr<RegisteredFunction>, double> function_workloads;
 
         // Function type -> count of pending invocations
-        std::unordered_map<std::string, int> function_pending_count;
+        std::unordered_map<std::shared_ptr<RegisteredFunction>, int> function_pending_count;
 
         // Node -> function -> cores allocated
-        std::unordered_map<std::shared_ptr<ServerlessComputeNode>, std::unordered_map<std::string, unsigned>> allocation_plan;
+        std::unordered_map<std::shared_ptr<ServerlessComputeNode>, std::unordered_map<std::shared_ptr<RegisteredFunction>, unsigned>> allocation_plan;
 
         // Helper to calculate workloads for each function type
         void calculateFunctionWorkloads(const std::vector<std::shared_ptr<Invocation>>& invocations);
 
         // Helper to create allocation plan
         void createAllocationPlan(const ServerlessStateOfTheSystem* state);
-
-        // Map function names to their image files
-        std::unordered_map<std::string, std::shared_ptr<DataFile>> function_images;
 
         /***********************/
         /** \endcond          **/

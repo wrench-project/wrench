@@ -308,16 +308,16 @@ private:
         function_manager->wait_all(invocations);
 
         // for (int i=0; i < num_invocations; i++) {
-        //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
+        //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getDispatchDate() << " -> " << invocations.at(i)->getFunctionStartDate() << " -> " << invocations.at(i)->getFunctionEndDate() << std::endl;
         // }
         for (unsigned long i = 0; i < num_invocations; i += 10) {
-            double start_date = invocations.at(i)->getContainerStartDate();
-            double end_date = invocations.at(i)->getContainerEndDate();
+            double start_date = invocations.at(i)->getFunctionStartDate();
+            double end_date = invocations.at(i)->getFunctionEndDate();
             for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 10, num_invocations); j++) {
-                if (fabs(start_date - invocations.at(j)->getContainerStartDate()) > 0.1) {
+                if (fabs(start_date - invocations.at(j)->getFunctionStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-                if (fabs(end_date - invocations.at(j)->getContainerEndDate()) > 0.1) {
+                if (fabs(end_date - invocations.at(j)->getFunctionEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
             }
@@ -442,24 +442,24 @@ private:
         double expected_invocation_2_start = expected_invocation_1_end + image_load;
         double expected_invocation_2_end = expected_invocation_2_start + compute_time;
 
-        if (fabs(expected_invocation_1_start - invocation_1->getContainerStartDate()) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation_1 start date " +
-                std::to_string(invocation_1->getContainerStartDate()) + " instead of " + std::to_string(
+        if (fabs(expected_invocation_1_start - invocation_1->getDispatchDate()) > EPSILON) {
+            throw std::runtime_error("a) Unexpected invocation_1 start date " +
+                std::to_string(invocation_1->getDispatchDate()) + " instead of " + std::to_string(
                     expected_invocation_1_start));
         }
-        if (fabs(expected_invocation_1_end - invocation_1->getContainerEndDate()) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation_1 end date " +
-                std::to_string(invocation_1->getContainerEndDate()) + " instead of " + std::to_string(
+        if (fabs(expected_invocation_1_end - invocation_1->getFunctionEndDate()) > EPSILON) {
+            throw std::runtime_error("b) Unexpected invocation_1 end date " +
+                std::to_string(invocation_1->getFunctionEndDate()) + " instead of " + std::to_string(
                     expected_invocation_1_end));
         }
-        if (fabs(expected_invocation_2_start - invocation_2->getContainerStartDate()) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation_2 start date " +
-                std::to_string(invocation_2->getContainerStartDate()) + " instead of " + std::to_string(
+        if (fabs(expected_invocation_2_start - invocation_2->getDispatchDate()) > EPSILON) {
+            throw std::runtime_error("c) Unexpected invocation_2 start date " +
+                std::to_string(invocation_2->getDispatchDate()) + " instead of " + std::to_string(
                     expected_invocation_2_start));
         }
-        if (fabs(expected_invocation_2_end - invocation_2->getContainerEndDate()) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation_2 end date " +
-                std::to_string(invocation_2->getContainerEndDate()) + " instead of " + std::to_string(
+        if (fabs(expected_invocation_2_end - invocation_2->getFunctionEndDate()) > EPSILON) {
+            throw std::runtime_error("d) Unexpected invocation_2 end date " +
+                std::to_string(invocation_2->getDispatchDate()) + " instead of " + std::to_string(
                     expected_invocation_2_end));
         }
 
@@ -570,13 +570,13 @@ private:
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
         for (unsigned long i = 0; i < num_invocations; i += 4) {
-            double start_date = invocations.at(i)->getContainerStartDate();
-            double end_date = invocations.at(i)->getContainerEndDate();
+            double start_date = invocations.at(i)->getDispatchDate();
+            double end_date = invocations.at(i)->getFunctionEndDate();
             for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 4, num_invocations); j++) {
-                if (fabs(start_date - invocations.at(j)->getContainerStartDate()) > 0.1) {
+                if (fabs(start_date - invocations.at(j)->getFunctionStartDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-                if (fabs(end_date - invocations.at(j)->getContainerEndDate()) > 0.1) {
+                if (fabs(end_date - invocations.at(j)->getFunctionEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
             }
@@ -688,11 +688,11 @@ private:
         function_manager->wait_one(invocation_2);
 
         // We expect that as soo as invocation_1 has started, then invocation_2 can finally do the copy and load.
-        double expected_invocation_2_start_date = invocation_1->getContainerStartDate() + 2 * (61.0 * GB / (100 * MB));
+        double expected_invocation_2_start_date = invocation_1->getDispatchDate() + 2 * (61.0 * GB / (100 * MB));
 
-        if (fabs(expected_invocation_2_start_date - invocation_2->getContainerStartDate()) > 0.1) {
+        if (fabs(expected_invocation_2_start_date - invocation_2->getDispatchDate()) > 0.1) {
             throw std::runtime_error(
-                "Unexpected start date for invocation_2 " + std::to_string(invocation_2->getContainerStartDate()) +
+                "Unexpected start date for invocation_2 " + std::to_string(invocation_2->getDispatchDate()) +
                 " (expected: " + std::to_string(expected_invocation_2_start_date) + ")");
         }
 
@@ -800,13 +800,13 @@ private:
         //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
         // }
         for (unsigned long i = 0; i < num_invocations; i += 3) {
-            double start_date = invocations.at(i)->getContainerStartDate();
-            double end_date = invocations.at(i)->getContainerEndDate();
+            double start_date = invocations.at(i)->getDispatchDate();
+            double end_date = invocations.at(i)->getFunctionEndDate();
             for (unsigned long j = i + 1; j < std::min<unsigned long>(i + 3, num_invocations); j++) {
-                if (fabs(start_date - invocations.at(j)->getContainerStartDate()) > 0.1) {
+                if (fabs(start_date - invocations.at(j)->getDispatchDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
-                if (fabs(end_date - invocations.at(j)->getContainerEndDate()) > 0.1) {
+                if (fabs(end_date - invocations.at(j)->getFunctionEndDate()) > 0.1) {
                     throw std::runtime_error("Unexpected execution pattern");
                 }
             }
@@ -916,16 +916,16 @@ private:
         auto inv3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv3);
 
-        if (std::abs((inv1->getFunctionStartDate() - inv1->getContainerStartDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation #1 times: " +  std::to_string(inv1->getContainerStartDate()) + " " + std::to_string(inv1->getFunctionStartDate()));
+        if (std::abs((inv1->getFunctionStartDate() - inv1->getDispatchDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation #1 times: " +  std::to_string(inv1->getDispatchDate()) + " " + std::to_string(inv1->getFunctionStartDate()));
         }
 
-        if (std::abs(inv2->getFunctionStartDate() - inv2->getContainerStartDate()) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation #2 times: " +  std::to_string(inv2->getContainerStartDate()) + " " + std::to_string(inv2->getFunctionStartDate()));
+        if (std::abs(inv2->getFunctionStartDate() - inv2->getDispatchDate()) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation #2 times: " +  std::to_string(inv2->getDispatchDate()) + " " + std::to_string(inv2->getFunctionStartDate()));
         }
 
-        if (std::abs((inv3->getFunctionStartDate() - inv3->getContainerStartDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation #3 times: " +  std::to_string(inv3->getContainerStartDate()) + " " + std::to_string(inv3->getFunctionStartDate()));
+        if (std::abs((inv3->getFunctionStartDate() - inv3->getDispatchDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
+            throw std::runtime_error("Unexpected invocation #3 times: " +  std::to_string(inv3->getDispatchDate()) + " " + std::to_string(inv3->getFunctionStartDate()));
         }
 
         return 0;
