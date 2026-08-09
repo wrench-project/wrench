@@ -685,6 +685,7 @@ namespace wrench {
         const std::shared_ptr<Invocation>& invocation,
         const ServerlessComputeNode* compute_node,
         const std::shared_ptr<Container>& target_container) const {
+        
         // Sanity checks
         if (invocation->_dispatched) {
             throw std::runtime_error(
