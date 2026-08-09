@@ -433,7 +433,8 @@ namespace wrench {
                             scsnlc_msg->_image_file->getID().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
             }
             return true;
-        } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
+        }
+        else if (const auto sclcit_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerIdleTimeoutMessage>(message)) {
             processContainerIdleTimeout(sclcit_msg->_container, sclcit_msg->_idle_sequence);
             return true;
@@ -592,14 +593,17 @@ namespace wrench {
         double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
-        } else {
+        }
+        else {
             // Start the timeout alarm
             std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
                                                                           S4U_Simulation::getClock() + idle_timeout,
                                                                           this->_hostname,
                                                                           this->_commport,
-                                                                          new ServerlessComputeServiceContainerIdleTimeoutMessage(
-                                                                              container, container->getIdleSequence()), "container_idle_timout");
+                                                                          new
+                                                                          ServerlessComputeServiceContainerIdleTimeoutMessage(
+                                                                              container, container->getIdleSequence()),
+                                                                          "container_idle_timout");
         }
 
         bool success = action->getState() == Action::State::COMPLETED;
@@ -618,7 +622,8 @@ namespace wrench {
      * @brief Helper method to process a container idle timeout
      * @param container the container that has idle-timed out
      */
-    void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence) {
+    void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container,
+                                                               std::uint64_t idle_sequence) {
         // If this isn't a stale/no-longer-valid message, nevermind
         if (container->getIdleSequence() != idle_sequence) {
             return;
@@ -638,18 +643,18 @@ namespace wrench {
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
 
         // Dispatch invocation on new containers
-        for (const auto &[invocation, compute_node] : decisions->invocations_on_new_container) {
-                // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
-                //             invocation_to_place->_registered_function->_function->getName().c_str());
-                if (dispatchInvocation(invocation, compute_node, nullptr)) {
-                    _state_of_the_system->_running_invocations.insert(invocation);
-                    invocation->_compute_node = compute_node;
-                    dispatched_invocations.insert(invocation);
-                }
+        for (const auto& [invocation, compute_node] : decisions->invocations_on_new_container) {
+            // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
+            //             invocation_to_place->_registered_function->_function->getName().c_str());
+            if (dispatchInvocation(invocation, compute_node, nullptr)) {
+                _state_of_the_system->_running_invocations.insert(invocation);
+                invocation->_compute_node = compute_node;
+                dispatched_invocations.insert(invocation);
+            }
         }
 
         // Dispatch invocation on idle containers
-        for (const auto &[invocation, container] : decisions->invocations_on_idle_container) {
+        for (const auto& [invocation, container] : decisions->invocations_on_idle_container) {
             // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
             //             invocation_to_place->_registered_function->_function->getName().c_str());
             if (dispatchInvocation(invocation, nullptr, container)) {
@@ -680,20 +685,23 @@ namespace wrench {
         const std::shared_ptr<Invocation>& invocation,
         const ServerlessComputeNode* compute_node,
         const std::shared_ptr<Container>& target_container) const {
-
         // Sanity checks
         if (invocation->_dispatched) {
-            throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): The invocation has already been dispatched!");
-        }
-        if (invocation->getRegisteredFunction().get() != target_container->getRegisteredFunction()) {
-            throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): The container isn't for the right function!");
+            throw std::runtime_error(
+                "ServerlessComputeService::invocationCanBeStarted(): The invocation has already been dispatched!");
         }
         if (target_container) {
+            if (invocation->getRegisteredFunction().get() != target_container->getRegisteredFunction()) {
+                throw std::runtime_error(
+                    "ServerlessComputeService::invocationCanBeStarted(): The container isn't for the right function!");
+            }
             if (compute_node->_idle_containers.find(target_container) == compute_node->_idle_containers.end()) {
-                throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): Internal error - The container does not belong to the compute host!");
+                throw std::runtime_error(
+                    "ServerlessComputeService::invocationCanBeStarted(): Internal error - The container does not belong to the compute host!");
             }
             if (not target_container->isIdle()) {
-                throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): Internal error - Scheduled invocation cannot be started because the target container is not idle");
+                throw std::runtime_error(
+                    "ServerlessComputeService::invocationCanBeStarted(): Internal error - Scheduled invocation cannot be started because the target container is not idle");
             }
         }
 
@@ -742,7 +750,8 @@ namespace wrench {
             // Spawn the container
             try {
                 target_container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
-            } catch (ExecutionException& e) {
+            }
+            catch (ExecutionException& e) {
                 WRENCH_INFO("Couldn't spaw a container for an invocation for %s: %s",
                             invocation->_registered_function->_function->getName().c_str(),
                             e.getCause()->toString().c_str());
@@ -798,7 +807,9 @@ namespace wrench {
             target_compute_node->hostname,
             1,
             0,
-            (hot_start ? 0 : this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)),
+            (hot_start
+                 ? 0
+                 : this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)),
             false,
             this->_commport,
             custom_message,
@@ -864,7 +875,6 @@ namespace wrench {
             }
         }
     }
-
 
 
     /**
@@ -1011,7 +1021,7 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLoads(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // For each compute node, load initiate image load from disk into RAM and if space
         for (const auto& [image_file, compute_node] : decisions->images_loads_to_RAM) {
-                initiateImageLoadAtComputeNode(compute_node, image_file);
+            initiateImageLoadAtComputeNode(compute_node, image_file);
         }
     }
 
@@ -1023,7 +1033,7 @@ namespace wrench {
         const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // For each compute node, initiate image copy (from head node) if need be
         for (const auto& [image_file, compute_node] : decisions->image_copies_to_disk) {
-                initiateImageCopyToComputeNode(compute_node, image_file);
+            initiateImageCopyToComputeNode(compute_node, image_file);
         }
     }
 
@@ -1152,5 +1162,4 @@ namespace wrench {
 
         WRENCH_INFO("Initiated image load at compute host [%s]", compute_node->hostname.c_str());
     }
-
 }; // namespace wrench
