@@ -174,9 +174,11 @@ namespace wrench {
     */
     class ServerlessComputeServiceContainerIdleTimeoutMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceContainerIdleTimeoutMessage(std::shared_ptr<Container> container);
+        ServerlessComputeServiceContainerIdleTimeoutMessage(std::shared_ptr<Container> container, std::uint64_t idle_sequence);
         /** @brief The container that idle-timed out */
         std::shared_ptr<Container> _container;
+        /** @brief The container's idle sequence */
+        std::uint64_t _idle_sequence;
     };
 
     /***********************/

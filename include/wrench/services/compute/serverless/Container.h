@@ -35,11 +35,11 @@ namespace wrench {
         };
         [[nodiscard]] bool isIdle() const { return _state == State::IDLE; }
         [[nodiscard]] bool isBusy() const { return _state == State::BUSY; }
-        [[nodiscard]] double getIdleTime() const;
+        // [[nodiscard]] double getIdleTime() const;
+        [[nodiscard]] std::uint64_t getIdleSequence() const {return _idle_sequence; }
         [[nodiscard]] const RegisteredFunction *getRegisteredFunction() const { return _registered_function; }
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const { return _tmp_storage_service; }
         [[nodiscard]] ServerlessComputeNode* getComputeNode() const {return const_cast<ServerlessComputeNode*>(_compute_node); };
-
 
     private:
         friend class ServerlessComputeNode;
@@ -62,7 +62,6 @@ namespace wrench {
 
         void freeDiskAndMemoryResources();
 
-
         const RegisteredFunction* _registered_function;
         const ServerlessComputeNode *_compute_node;
         const ServerlessComputeService* _serverless_compute_service;
@@ -77,6 +76,8 @@ namespace wrench {
 
         std::shared_ptr<FileLocation> _tmp_ram_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
+
+        std::uint64_t _idle_sequence = 0;
 
         /***********************/
         /** \endcond          **/

@@ -58,6 +58,7 @@ namespace wrench {
         const std::shared_ptr<RegisteredFunction> _registered_function; // the registered function to be invoked
         std::shared_ptr<FunctionInput> _function_input; // the input for the function
         bool _done; // whether the invocation is done
+        bool _dispatched; // whether the invocation has been dispatched
         bool _success; // whether the invocation was successful
         std::shared_ptr<FailureCause> _failure_cause; // the cause of failure
         std::shared_ptr<FunctionOutput> _function_output; // the output of the function invocation

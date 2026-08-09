@@ -9,6 +9,7 @@
 
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
 #include <wrench/services/compute/serverless/Container.h>
+#include <wrench/services/storage/simple/SimpleStorageService.h>
 
 #include <wrench/logging/TerminalOutput.h>
 
@@ -22,7 +23,7 @@ namespace wrench {
     *  @param num_cores: number of cores
     */
     ServerlessComputeNode::ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService *service) :
-                hostname(std::move(h)), total_cores(num_cores), available_cores(num_cores), serverless_compute_service(service) {}
+                hostname(std::move(h)), total_cores(num_cores), available_cores(num_cores), _serverless_compute_service(service) {}
 
 
     /**
@@ -30,12 +31,12 @@ namespace wrench {
      * @param container a container
      */
     void ServerlessComputeNode::makeContainerIdle(const std::shared_ptr<Container>& container) {
-        if (this->busy_containers.find(container) == this->busy_containers.end()) {
+        if (_busy_containers.find(container) == _busy_containers.end()) {
             throw std::runtime_error("Trying to make a non-busy container idle");
         }
-        busy_containers.erase(container);
+        _busy_containers.erase(container);
         container->makeIdle();
-        idle_containers.insert(container);
+        _idle_containers.insert(container);
     }
 
     /**
@@ -43,12 +44,12 @@ namespace wrench {
      * @param container a container
      */
     void ServerlessComputeNode::makeContainerBusy(const std::shared_ptr<Container>& container) {
-        if (this->idle_containers.find(container) == this->idle_containers.end()) {
+        if (_idle_containers.find(container) == _idle_containers.end()) {
             throw std::runtime_error("Trying to make a non-idle container busy");
         }
-        idle_containers.erase(container);
+        _idle_containers.erase(container);
         container->makeBusy();
-        busy_containers.insert(container);
+        _busy_containers.insert(container);
     }
 
     /**
@@ -56,10 +57,13 @@ namespace wrench {
      * @param container a container
      */
     void ServerlessComputeNode::shutdownContainer(const std::shared_ptr<Container>& container) {
-        if (this->busy_containers.find(container) != this->busy_containers.end()) {
-            throw std::runtime_error("Trying to shutdown a non-idle container");
+        if (_busy_containers.find(container) != _busy_containers.end()) {
+            throw std::runtime_error("Trying to shutdown a busy container");
         }
-        idle_containers.erase(container);
+        if (_idle_containers.find(container) == _idle_containers.end()) {
+            throw std::runtime_error("Trying to shutdown a container that's not in the idle list?");
+        }
+        _idle_containers.erase(container);
         container->shutdown();
     }
 
@@ -69,7 +73,7 @@ namespace wrench {
      * @return A container, if found, or nullptr
      */
     std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(RegisteredFunction* registered_function) {
-        for (auto const &idle_container : idle_containers) {
+        for (auto const &idle_container : _idle_containers) {
             if (idle_container->getRegisteredFunction() == registered_function) {
                 return idle_container;
             }
@@ -83,10 +87,62 @@ namespace wrench {
      */
     std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(RegisteredFunction *registered_function) {
         // Create a container object
-        auto container = std::shared_ptr<Container>(new Container(registered_function, this, this->serverless_compute_service, Container::State::BUSY));
+        auto container = std::shared_ptr<Container>(new Container(registered_function, this, _serverless_compute_service, Container::State::BUSY));
         container->spawn();
-        busy_containers.insert(container);
+        _busy_containers.insert(container);
         return container;
+    }
+
+    /**
+     * @brief Is an image in the process of being copied to (the disk of) the compute node?
+     * @param image an image file
+     * @return True if the image is being copied
+     */
+    bool ServerlessComputeNode::isImageBeingCopied(const std::shared_ptr<DataFile>& image) const {
+        return (_images_being_copied.find(image) != _images_being_copied.end());
+    }
+
+    /**
+     * @brief Get the set of images being copied to (the disk of) the compute node
+     * @return A set of images
+     */
+    std::set<std::shared_ptr<DataFile>> ServerlessComputeNode::getImagesBeingCopied() const {
+        return _images_being_copied;
+    }
+
+    /**
+     * @brief Is an image on disk?
+     * @param image an image file
+     * @return True if the image is on disk
+     */
+    bool ServerlessComputeNode::isImageOnDisk(const std::shared_ptr<DataFile>& image) const {
+        return (this->disk->hasFile(image));
+    }
+
+    /**
+     * @brief Is an image in the process of being loaded to (the RAM of) the compute node?
+     * @param image an image file
+     * @return True if the image is being loaded
+     */
+    bool ServerlessComputeNode::isImageBeingLoaded(const std::shared_ptr<DataFile>& image) const {
+        return (_images_being_loaded.find(image) != _images_being_loaded.end());
+    }
+
+    /**
+     * @brief Get the set of images being loaded to (the RAM of) the compute node
+     * @return A set of images
+     */
+    std::set<std::shared_ptr<DataFile>> ServerlessComputeNode::getImagesBeingLoaded() const {
+        return _images_being_loaded;
+    }
+
+    /**
+     * @brief Is an image in RAM?
+     * @param image an image file
+     * @return True if the image is in RAM
+     */
+    bool ServerlessComputeNode::isImageInRAM(const std::shared_ptr<DataFile>& image) const {
+        return (this->memory->hasFile(image));
     }
 
 

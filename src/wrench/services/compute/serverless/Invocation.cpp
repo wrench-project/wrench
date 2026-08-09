@@ -14,21 +14,20 @@ WRENCH_LOG_CATEGORY(Invocation, "Log category for Serverless invocations");
 
 
 namespace wrench {
-
     /**
      * @brief Constructor
      * @param registered_function The registered function to be invoked
      * @param function_input The input for the function
      * @param notify_commport The commport to notify upon completion/failure
      */
-    Invocation::Invocation(const std::shared_ptr<RegisteredFunction> &registered_function,
-                           const std::shared_ptr<FunctionInput> &function_input,
+    Invocation::Invocation(const std::shared_ptr<RegisteredFunction>& registered_function,
+                           const std::shared_ptr<FunctionInput>& function_input,
                            S4U_CommPort* notify_commport) : _registered_function(registered_function),
                                                             _function_input(function_input),
                                                             _done(false),
+                                                            _dispatched(false),
                                                             _success(false),
-                                                            _notify_commport(notify_commport)
-    {
+                                                            _notify_commport(notify_commport) {
         // WRENCH_INFO("Invocation created for function %s", _registered_function->getFunction()->getName().c_str());
     }
 
@@ -36,9 +35,9 @@ namespace wrench {
      * @brief Gets the output of the function invocation.
      * @return A shared pointer to the function output.
      */
-    std::shared_ptr<FunctionOutput> Invocation::getOutput() const { 
+    std::shared_ptr<FunctionOutput> Invocation::getOutput() const {
         if (_done) {
-            return _function_output; 
+            return _function_output;
         }
         throw std::runtime_error("Invocation::get_output(): Invocation is not done yet");
     }
@@ -95,7 +94,7 @@ namespace wrench {
      * @brief Checks if the invocation was successful.
      * @return True if the invocation was successful, false otherwise.
      */
-    bool Invocation::hasSucceeded() const { 
+    bool Invocation::hasSucceeded() const {
         if (_done) {
             return _success;
         }
@@ -120,5 +119,4 @@ namespace wrench {
         }
         throw std::runtime_error("Invocation::getFailureCause(): Invocation is not done yet or was successful");
     }
-
 } // namespace wrench

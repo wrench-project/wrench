@@ -38,6 +38,15 @@ namespace wrench
 
         std::shared_ptr<Container> findIdleContainer(RegisteredFunction *registered_function);
 
+        bool isImageBeingCopied(const std::shared_ptr<DataFile>& image) const;
+        std::set<std::shared_ptr<DataFile>> getImagesBeingCopied() const;
+        bool isImageOnDisk(const std::shared_ptr<DataFile>& image) const;
+
+        bool isImageBeingLoaded(const std::shared_ptr<DataFile>& image) const;
+        std::set<std::shared_ptr<DataFile>> getImagesBeingLoaded() const;
+        bool isImageInRAM(const std::shared_ptr<DataFile>& image) const;
+
+
         std::string hostname;
         unsigned long total_cores;
         unsigned int available_cores;
@@ -45,13 +54,16 @@ namespace wrench
         std::shared_ptr<SimpleStorageService> disk;
         std::shared_ptr<SimpleStorageService> memory;
 
-        std::set<std::shared_ptr<DataFile>> images_being_copied;
-        std::set<std::shared_ptr<DataFile>> images_being_loaded;
 
-        std::set<std::shared_ptr<Container>> busy_containers;
-        std::set<std::shared_ptr<Container>> idle_containers;
+    private:
+        friend class ServerlessComputeService;
+        std::set<std::shared_ptr<DataFile>> _images_being_copied;
+        std::set<std::shared_ptr<DataFile>> _images_being_loaded;
 
-        ServerlessComputeService *serverless_compute_service;
+        std::set<std::shared_ptr<Container>> _busy_containers;
+        std::set<std::shared_ptr<Container>> _idle_containers;
+
+        ServerlessComputeService *_serverless_compute_service;
     };
 
     /***********************/

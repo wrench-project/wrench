@@ -68,11 +68,11 @@ namespace wrench {
         // For each compute node, determine the images to copy or load
         for (const auto& node : compute_nodes) {
             for (const auto& image_file : required_images[node]) {
-                if (!state->isImageOnNode(node, image_file) &&
+                if (!state->isImageOnDiskAtNode(node, image_file) &&
                     !state->isImageBeingCopiedToNode(node, image_file)) {
                     decisions->image_copies_to_disk.push_back({image_file, node});
                 }
-                else if (state->isImageOnNode(node, image_file) &&
+                else if (state->isImageOnDiskAtNode(node, image_file) &&
                     !state->isImageInRAMAtNode(node, image_file) &&
                     !state->isImageBeingLoadedAtNode(node, image_file)) {
                     decisions->images_loads_to_RAM.push_back({image_file, node});

@@ -407,8 +407,7 @@ namespace wrench {
         }
         else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
-            scsncc_msg->_compute_node->images_being_copied.erase(
-                scsncc_msg->_image_file);
+            scsncc_msg->_compute_node->_images_being_copied.erase(scsncc_msg->_image_file);
             if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("An image copy has failed (due to disk pressure) for image %s... nevermind",
                             scsncc_msg->_image_file->getID().c_str());
@@ -423,8 +422,7 @@ namespace wrench {
         }
         else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
-            scsnlc_msg->_compute_node->images_being_loaded.erase(
-                scsnlc_msg->_image_file);
+            scsnlc_msg->_compute_node->_images_being_loaded.erase(scsnlc_msg->_image_file);
             if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("An image load has failed (due to memory pressure) for image %s... nevermind",
                             scsnlc_msg->_image_file->getID().c_str());
@@ -437,7 +435,7 @@ namespace wrench {
             return true;
         } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerIdleTimeoutMessage>(message)) {
-            processContainerIdleTimeout(sclcit_msg->_container);
+            processContainerIdleTimeout(sclcit_msg->_container, sclcit_msg->_idle_sequence);
             return true;
         }
         else {
@@ -600,7 +598,8 @@ namespace wrench {
                                                                           S4U_Simulation::getClock() + idle_timeout,
                                                                           this->_hostname,
                                                                           this->_commport,
-                                                                          new ServerlessComputeServiceContainerIdleTimeoutMessage(container), "container_idle_timout");
+                                                                          new ServerlessComputeServiceContainerIdleTimeoutMessage(
+                                                                              container, container->getIdleSequence()), "container_idle_timout");
         }
 
         bool success = action->getState() == Action::State::COMPLETED;
@@ -619,12 +618,13 @@ namespace wrench {
      * @brief Helper method to process a container idle timeout
      * @param container the container that has idle-timed out
      */
-    void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container) {
-        // Is it a real/fresh timeout, terminate the container, otherwise it is spurious and do nothing
-        if (container->getIdleTime() >= this->getPropertyValueAsDouble(
-            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT)) {
-            container->getComputeNode()->shutdownContainer(container);
+    void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence) {
+        // If this isn't a stale/no-longer-valid message, nevermind
+        if (container->getIdleSequence() != idle_sequence) {
+            return;
         }
+        // Shutdown the container
+        container->getComputeNode()->shutdownContainer(container);
     }
 
     /**
@@ -670,16 +670,32 @@ namespace wrench {
     }
 
     /**
-     * @brief Helper method to ensure that an invocation can be started
+     * @brief Helper method to ensure that an invocation can be dispatched
      * @param invocation: the invocation to start
      * @param compute_node: the compute node on which to start it
      * @param target_container: the target container (nullptr if none)
      * @return true if the invocation can be started, false otherwise
      */
-    bool ServerlessComputeService::invocationCanBeStarted(
+    bool ServerlessComputeService::invocationCanBeDispatched(
         const std::shared_ptr<Invocation>& invocation,
         const ServerlessComputeNode* compute_node,
         const std::shared_ptr<Container>& target_container) const {
+
+        // Sanity checks
+        if (invocation->_dispatched) {
+            throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): The invocation has already been dispatched!");
+        }
+        if (invocation->getRegisteredFunction().get() != target_container->getRegisteredFunction()) {
+            throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): The container isn't for the right function!");
+        }
+        if (target_container) {
+            if (compute_node->_idle_containers.find(target_container) == compute_node->_idle_containers.end()) {
+                throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): Internal error - The container does not belong to the compute host!");
+            }
+            if (not target_container->isIdle()) {
+                throw std::runtime_error("ServerlessComputeService::invocationCanBeStarted(): Internal error - Scheduled invocation cannot be started because the target container is not idle");
+            }
+        }
 
         // The node has available cores?
         if (compute_node->available_cores < 1) {
@@ -696,13 +712,6 @@ namespace wrench {
             return false;
         }
 
-        if (target_container) {
-            // The container is idle?
-            if (target_container and not target_container->isIdle()) {
-                WRENCH_INFO("Scheduled invocation cannot be started because the target container is not idle");
-                return false;
-            }
-        }
         return true;
     }
 
@@ -723,7 +732,7 @@ namespace wrench {
         }
 
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
-        if (not invocationCanBeStarted(invocation, target_compute_node, target_container)) {
+        if (not invocationCanBeDispatched(invocation, target_compute_node, target_container)) {
             return false;
         }
 
@@ -739,6 +748,19 @@ namespace wrench {
                             e.getCause()->toString().c_str());
                 return false;
             }
+        }
+
+        // Bookkeeping
+        invocation->_container = target_container;
+        invocation->_container_start_date = Simulation::getCurrentSimulatedDate();
+        invocation->_dispatched = true;
+
+        // Update the core count of the compute node
+        target_compute_node->available_cores -= 1;
+
+        // Make the container busy if it was idling
+        if (hot_start) {
+            target_compute_node->makeContainerBusy(target_container);
         }
 
         // Declare the function invocation's necessary lambdas
@@ -762,7 +784,7 @@ namespace wrench {
             invocation->_function_end_date = S4U_Simulation::getClock();
         };
 
-        // Create the action and run it in an action executor
+        // Create the action and create a corresponding action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
                 "run_invocation_" + invocation->_registered_function->_function->getName(),
@@ -789,18 +811,8 @@ namespace wrench {
         WRENCH_INFO("Dispatched an invocation for function %s",
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
 
-        invocation->_container = target_container;
-        invocation->_container_start_date = Simulation::getCurrentSimulatedDate();
-
-        // Update the core count of the compute node
-        target_compute_node->available_cores -= 1;
-
         // Start the action executor object
         action_executor->start(action_executor, true, false);
-
-        if (hot_start) {
-            target_compute_node->makeContainerBusy(target_container);
-        }
 
         return true;
     }
@@ -1024,7 +1036,7 @@ namespace wrench {
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
         // Add the image to the being_copied_images data structure for this host
-        compute_node->images_being_copied.insert(image);
+        compute_node->_images_being_copied.insert(image);
 
         // std::cerr << "INITIATING IMAGE COPY FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that copies the image (identified by imageID)
@@ -1086,7 +1098,7 @@ namespace wrench {
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
         // Add the image to the being_copied_images data structure for this host
-        compute_node->images_being_loaded.insert(image);
+        compute_node->_images_being_loaded.insert(image);
 
         // std::cerr << "INITIATE IMAGE LOAD FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that simply read the image file from disk

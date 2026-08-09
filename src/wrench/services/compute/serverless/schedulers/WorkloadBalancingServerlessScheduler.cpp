@@ -50,11 +50,11 @@ namespace wrench {
             // only copy each image if it's neither already on the node nor currently being copied
             for (const auto& function_name : required_function_names) {
                 auto image = function_images[function_name];
-                if (!state->isImageOnNode(node, image)
+                if (!state->isImageOnDiskAtNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
                     decisions->image_copies_to_disk.push_back(CopyImage{image, node});
                 }
-                else if (state->isImageOnNode(node, image) &&
+                else if (state->isImageOnDiskAtNode(node, image) &&
                     !state->isImageBeingLoadedAtNode(node, image) &&
                     !state->isImageInRAMAtNode(node, image)) {
                     decisions->images_loads_to_RAM.push_back(LoadImage{image, node});

@@ -94,7 +94,7 @@ namespace wrench {
      */
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
-        return node->images_being_copied;
+        return node->getImagesBeingCopied();
     }
 
     /**
@@ -107,7 +107,7 @@ namespace wrench {
      */
     bool ServerlessStateOfTheSystem::isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                               const std::shared_ptr<DataFile>& image) const {
-        return (node->images_being_copied.find(image) != node->images_being_copied.end());
+        return (node->isImageBeingCopied(image));
     }
 
     /**
@@ -118,9 +118,9 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageOnNode(const std::shared_ptr<ServerlessComputeNode>& node,
+    bool ServerlessStateOfTheSystem::isImageOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                    const std::shared_ptr<DataFile>& image) const {
-        return node->disk->hasFile(image);
+        return node->isImageOnDisk(image);
     }
 
     /**
@@ -131,7 +131,7 @@ namespace wrench {
      */
     std::set<std::shared_ptr<DataFile>> ServerlessStateOfTheSystem::getImagesBeingLoadedAtNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
-        return node->images_being_loaded;
+        return node->getImagesBeingLoaded();
     }
 
     /**
@@ -144,7 +144,7 @@ namespace wrench {
      */
     bool ServerlessStateOfTheSystem::isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                               const std::shared_ptr<DataFile>& image) const {
-        return node->images_being_loaded.find(image) != node->images_being_loaded.end();
+        return node->isImageBeingLoaded(image);
     }
 
     /**
@@ -157,6 +157,6 @@ namespace wrench {
      */
     bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                         const std::shared_ptr<DataFile>& image) const {
-        return node->memory->hasFile(image, node->memory->getBaseRootPath());
+        return node->isImageInRAM(image);
     }
 }; // namespace wrench

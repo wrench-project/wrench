@@ -29,7 +29,6 @@ namespace wrench {
      */
     void Container::makeIdle() {
         _state = State::IDLE;
-        _idle_date = S4U_Simulation::getClock();
     }
 
     /**
@@ -37,15 +36,7 @@ namespace wrench {
      */
     void Container::makeBusy() {
         _state = State::BUSY;
-        _idle_date = DBL_MAX;
-    }
-
-    /**
-     * @brief Get the length of time for which the container has been idle
-     * @return a time in seconds
-     */
-    double Container::getIdleTime() const {
-        return S4U_Simulation::getClock() - _idle_date;
+        _idle_sequence += 1;
     }
 
     /**
@@ -151,6 +142,7 @@ namespace wrench {
      * @brief Shutdown the container
      */
     void Container::shutdown() {
+        _idle_sequence += 1; // to invalidate any future timeouts
         this->freeDiskAndMemoryResources();
     }
 

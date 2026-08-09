@@ -125,7 +125,7 @@ namespace wrench {
 
         void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Action>& action);
 
-        void processContainerIdleTimeout(const std::shared_ptr<Container>& container);
+        void processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence);
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
@@ -148,7 +148,7 @@ namespace wrench {
         void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
         void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
 
-        bool invocationCanBeStarted(const std::shared_ptr<Invocation>& invocation,
+        bool invocationCanBeDispatched(const std::shared_ptr<Invocation>& invocation,
             const ServerlessComputeNode* compute_node,
             const std::shared_ptr<Container>& target_container) const;
 

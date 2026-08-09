@@ -84,11 +84,11 @@ namespace wrench {
             // In manageImages, while iterating over each required image for a node:
             for (const auto& df : requiredImageFiles) {
                 // Schedule copying only if the image isn't on the node and isn't already being copied.
-                if (!state->isImageOnNode(node, df) &&
+                if (!state->isImageOnDiskAtNode(node, df) &&
                     !state->isImageBeingCopiedToNode(node, df)) {
                     decisions->image_copies_to_disk.push_back({df, node});
                 }
-                else if (state->isImageOnNode(node, df) &&
+                else if (state->isImageOnDiskAtNode(node, df) &&
                     !state->isImageBeingLoadedAtNode(node, df) &&
                     !state->isImageInRAMAtNode(node, df)) {
                     decisions->images_loads_to_RAM.push_back({df, node});
