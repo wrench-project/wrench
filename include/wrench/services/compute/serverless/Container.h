@@ -77,7 +77,7 @@ namespace wrench {
         std::shared_ptr<FileLocation> _tmp_ram_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
 
-        std::uint64_t _idle_sequence = 0;
+        unsigned long _idle_sequence = 0;
 
         /***********************/
         /** \endcond          **/
