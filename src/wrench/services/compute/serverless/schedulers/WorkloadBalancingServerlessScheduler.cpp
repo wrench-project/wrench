@@ -106,7 +106,7 @@ namespace wrench {
                     // Make sure the image is on this node
                     auto image_file = inv->getRegisteredFunction()->getFunction()->getImage()->getFile();
                     if (state->isImageInRAMAtNode(node, image_file)) {
-                        auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get());
+                        auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
                         if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
                             decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});
                             claimed_idle_containers.insert(idling_container);

@@ -24,7 +24,7 @@ namespace wrench {
     *  @param num_cores: number of cores
     */
     ServerlessComputeNode::ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService *service) :
-                hostname(std::move(h)), total_cores(num_cores), available_cores(num_cores), _serverless_compute_service(service) {}
+                hostname(std::move(h)), _total_cores(num_cores), _available_cores(num_cores), _serverless_compute_service(service) {}
 
 
     /**
@@ -71,10 +71,16 @@ namespace wrench {
     /**
      * @brief Method to see if there is an appropriate idle container
      * @param registered_function the target function
+     * @param excluded_container set containers to ignore
      * @return A container, if found, or nullptr
      */
-    std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(const RegisteredFunction* registered_function) const {
+    std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(
+        const RegisteredFunction* registered_function,
+        const std::set<std::shared_ptr<Container>>& excluded_container) const {
         for (auto const &idle_container : _idle_containers) {
+            if (excluded_container.find(idle_container) != excluded_container.end()) {
+                continue;
+            }
             if (idle_container->getRegisteredFunction() == registered_function) {
                 return idle_container;
             }
@@ -117,7 +123,7 @@ namespace wrench {
      * @return True if the image is on disk
      */
     bool ServerlessComputeNode::isImageOnDisk(const std::shared_ptr<DataFile>& image) const {
-        return (this->disk->hasFile(image));
+        return (this->_disk->hasFile(image));
     }
 
     /**
@@ -143,7 +149,7 @@ namespace wrench {
      * @return True if the image is in RAM
      */
     bool ServerlessComputeNode::isImageInRAM(const std::shared_ptr<DataFile>& image) const {
-        return (this->memory->hasFile(image));
+        return (this->_memory->hasFile(image));
     }
 
     /**
@@ -177,13 +183,13 @@ namespace wrench {
         }
 
         // The node has available cores?
-        if (this->available_cores < 1) {
+        if (this->_available_cores < 1) {
             WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
             return false;
         }
 
         // The image is in RAM?
-        auto ss_memory = this->memory;
+        auto ss_memory = this->_memory;
         auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
         if (not ss_memory->hasFile(image_file, ss_memory->getBaseRootPath())) {
             WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",

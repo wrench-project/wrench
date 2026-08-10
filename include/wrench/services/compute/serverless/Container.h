@@ -42,6 +42,8 @@ namespace wrench {
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const { return _tmp_storage_service; }
         [[nodiscard]] ServerlessComputeNode* getComputeNode() const {return const_cast<ServerlessComputeNode*>(_compute_node); }
 
+        void clearPrivateStorage();
+
     private:
         friend class ServerlessComputeNode;
 

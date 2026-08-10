@@ -52,7 +52,7 @@ namespace wrench {
     ServerlessStateOfTheSystem::getAvailableCores() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> to_return;
         for (const auto& compute_node : _compute_nodes) {
-            to_return[compute_node] = compute_node->available_cores;
+            to_return[compute_node] = compute_node->getNumIdleCores();
         }
         return to_return;;
     }
@@ -66,7 +66,7 @@ namespace wrench {
     std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
         for (const auto& compute_node : _compute_nodes) {
-            to_return[compute_node] = compute_node->memory->getTotalFreeSpaceZeroTime();
+            to_return[compute_node] = compute_node->getMemoryStorage()->getTotalFreeSpaceZeroTime();
         }
         return to_return;
     }
@@ -81,7 +81,7 @@ namespace wrench {
     ServerlessStateOfTheSystem::getAvailableDiskSpace() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
         for (const auto& compute_node : _compute_nodes) {
-            to_return[compute_node] = compute_node->disk->getTotalFreeSpaceZeroTime();
+            to_return[compute_node] = compute_node->getDiskStorage()->getTotalFreeSpaceZeroTime();
         }
         return to_return;
     }

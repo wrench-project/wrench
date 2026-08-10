@@ -206,7 +206,7 @@ namespace wrench {
             // Num cores per hosts
             std::map<std::string, double> num_cores;
             for (auto const& compute_node : this->_state_of_the_system->_compute_nodes) {
-                num_cores[compute_node->hostname] = static_cast<double>(compute_node->total_cores);
+                num_cores[compute_node->hostname] = static_cast<double>(compute_node->_total_cores);
             }
             return num_cores;
         }
@@ -214,7 +214,7 @@ namespace wrench {
             // Num idle cores per hosts
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : this->_state_of_the_system->_compute_nodes) {
-                num_idle_cores[compute_node->hostname] = static_cast<double>(compute_node->available_cores);
+                num_idle_cores[compute_node->hostname] = static_cast<double>(compute_node->_available_cores);
             }
             return num_idle_cores;
         }
@@ -230,7 +230,7 @@ namespace wrench {
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
             for (const auto& compute_node : this->_state_of_the_system->_compute_nodes) {
-                ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->memory->getTotalSpace());
+                ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
             }
             return ram_capacities;
         }
@@ -238,7 +238,7 @@ namespace wrench {
             // RAM availability per host
             std::map<std::string, double> ram_availability;
             for (auto const& compute_node : this->_state_of_the_system->_compute_nodes) {
-                ram_availability[compute_node->hostname] = static_cast<double>(compute_node->memory->
+                ram_availability[compute_node->hostname] = static_cast<double>(compute_node->_memory->
                     getTotalFreeSpaceZeroTime());
             }
             return ram_availability;
@@ -535,7 +535,7 @@ namespace wrench {
             _state_of_the_system->_new_invocations.push(invocation);
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 true, invocation, nullptr, this->getMessagePayloadValue(
-                ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
+                    ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answerMessage);
         }
     }
@@ -583,7 +583,7 @@ namespace wrench {
 
         auto compute_node = invocation->_compute_node;
         // Free up the core
-        compute_node->available_cores++;
+        compute_node->_available_cores++;
 
         // Make container idle (TODO: make this cleaner?)
         auto container = invocation->_container;
@@ -648,7 +648,6 @@ namespace wrench {
             //             invocation_to_place->_registered_function->_function->getName().c_str());
             if (dispatchInvocation(invocation, compute_node, container)) {
                 _state_of_the_system->_running_invocations.insert(invocation);
-                invocation->_compute_node = compute_node;
                 dispatched_invocations.insert(invocation);
             }
         }
@@ -674,10 +673,6 @@ namespace wrench {
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                                       ServerlessComputeNode* target_compute_node,
                                                       std::shared_ptr<Container> target_container) {
-        if (not target_compute_node) {
-            target_compute_node = target_container->getComputeNode();
-        }
-
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
         if (not target_compute_node->isInvocationFeasible(invocation, target_container)) {
             return false;
@@ -700,11 +695,12 @@ namespace wrench {
 
         // Bookkeeping
         invocation->_container = target_container;
+        invocation->_compute_node = target_compute_node;
         invocation->_dispatch_date = Simulation::getCurrentSimulatedDate();
         invocation->_dispatched = true;
 
         // Update the core count of the compute node
-        target_compute_node->available_cores -= 1;
+        target_compute_node->_available_cores -= 1;
 
         // Make the container busy if it was idling
         if (hot_start) {
@@ -715,10 +711,7 @@ namespace wrench {
         const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
             // Clear up all files from the tmp storage service, if any, so that if a next
             // invocation reuses this container, it won't "see" the previous invocation's data, if any
-            for (auto const& partition :
-                 invocation->_container->getPrivateStorageService()->getFileSystem()->get_partitions()) {
-                partition->erase_all_content();
-            }
+            invocation->_container->clearPrivateStorage();
         };
 
         const std::function lambda_execute = [invocation](
@@ -732,6 +725,7 @@ namespace wrench {
                                                                  invocation->_container->getPrivateStorageService());
             }
             catch (ExecutionException& e) {
+                invocation->_container->clearPrivateStorage();
                 invocation->_function_end_date = S4U_Simulation::getClock();
                 throw;
             }
@@ -768,7 +762,13 @@ namespace wrench {
                     invocation->getRegisteredFunction()->getFunction()->getName().c_str());
 
         // Start the action executor object
-        action_executor->start(action_executor, true, false);
+        try {
+            action_executor->start(action_executor, true, false);
+        }
+        catch (ExecutionException& e) {
+            throw std::runtime_error(
+                "ServerlessComputeService::dispatchInvocation(): Action executor could not be started - internal error");
+        }
 
         return true;
     }
@@ -793,7 +793,7 @@ namespace wrench {
                         {{SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}},
                         {})));
                 ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
-                compute_node->disk = ss;
+                compute_node->_disk = ss;
             }
 
             // Start a compute service, with LRU caching, to implement compute-node memory
@@ -816,7 +816,7 @@ namespace wrench {
                         {{SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}},
                         {})));
                 ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
-                compute_node->memory = ss;
+                compute_node->_memory = ss;
             }
         }
     }
@@ -941,7 +941,12 @@ namespace wrench {
 
         action_executor->setSimulation(this->simulation_);
         // WRENCH_INFO("Starting an action executor for downloading from remote...");
-        action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
+        try {
+            action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
+        } catch (const std::exception& e) {
+            throw std::runtime_error(
+                "ServerlessComputeService::initiateImageDownloadFromRemote(): Action executor could not be started - internal error");
+        }
     }
 
     /**
@@ -990,7 +995,6 @@ namespace wrench {
     void ServerlessComputeService::initiateImageCopyToComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
-
         // std::cerr << "INITIATING IMAGE COPY FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that copies the image (identified by imageID)
         // from the head node storage service to the compute node's storage service.
@@ -1005,7 +1009,7 @@ namespace wrench {
             // Copy the image file from the head host to the current host's storage service
             auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service, image);
             auto local_image_path = wrench::FileLocation::LOCATION(
-                compute_node->disk,
+                compute_node->_disk,
                 image);
             StorageService::copyFile(head_host_image_path, local_image_path);
             // WRENCH_INFO("Done with the lambda execute!!");
@@ -1036,7 +1040,12 @@ namespace wrench {
 
         action_executor->setSimulation(this->simulation_);
         // WRENCH_INFO("Starting an action executor for copying image...");
-        action_executor->start(action_executor, true, false);
+        try {
+            action_executor->start(action_executor, true, false);
+        } catch (const std::exception& e) {
+            throw std::runtime_error(
+                "ServerlessComputeService::initiateImageCopyToComputeNode(): Action executor could not be started - internal error");
+        }
 
         // Add the image to the being_copied_images data structure for this host
         compute_node->_images_being_copied.insert(image);
@@ -1053,7 +1062,6 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
-
         // std::cerr << "INITIATE IMAGE LOAD FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that simply read the image file from disk
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
@@ -1063,10 +1071,10 @@ namespace wrench {
             const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the image load lambda execute!!");
             auto src_location = wrench::FileLocation::LOCATION(
-                compute_node->disk, image);
+                compute_node->_disk, image);
             auto dst_location = wrench::FileLocation::LOCATION(
-                compute_node->memory,
-                compute_node->memory->getBaseRootPath(),
+                compute_node->_memory,
+                compute_node->_memory->getBaseRootPath(),
                 image);
             try {
                 StorageService::copyFile(src_location, dst_location);
@@ -1102,7 +1110,12 @@ namespace wrench {
 
         action_executor->setSimulation(this->simulation_);
         // WRENCH_INFO("Starting an action executor for copying image...");
-        action_executor->start(action_executor, true, false);
+        try {
+            action_executor->start(action_executor, true, false);
+        } catch (const std::exception& e) {
+            throw std::runtime_error(
+                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Action executor could not be started - internal error");
+        }
 
         // Add the image to the being_copied_images data structure for this host
         compute_node->_images_being_loaded.insert(image);

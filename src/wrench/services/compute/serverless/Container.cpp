@@ -28,13 +28,13 @@ namespace wrench {
      * @param registered_function
      * @param compute_node
      * @param serverless_compute_service
-     * @param initial_state 
+     * @param initial_state
      * @return
      */
     Container::Container(const RegisteredFunction* registered_function,
-              const ServerlessComputeNode* compute_node,
-              const ServerlessComputeService* serverless_compute_service,
-              State initial_state) {
+                         const ServerlessComputeNode* compute_node,
+                         const ServerlessComputeService* serverless_compute_service,
+                         State initial_state) {
         _registered_function = registered_function;
         _compute_node = compute_node;
         _serverless_compute_service = serverless_compute_service;
@@ -58,7 +58,6 @@ namespace wrench {
     }
 
 
-
     /**
      * @brief Method to spawn a container
      *
@@ -69,20 +68,37 @@ namespace wrench {
 
         /** This method's implementation is overly paranoid exception-wise, but it's likely a good thing **/
 
+        // Open the image memory file (do this first to pin it to RAM - would
+        // be weird if, due to LRU, the container itself kicked out the image!)
+        auto compute_ram_ss = _compute_node->getMemoryStorage();
+        try {
+            _opened_image_ram_file = compute_ram_ss->openFile(
+                FileLocation::LOCATION(compute_ram_ss, _registered_function->getOriginalImageLocation()->getFile()));
+        }
+        catch (ExecutionException& e) {
+            this->freeDiskAndMemoryResources();
+            throw;
+        } catch (simgrid::Exception& e) {
+            this->freeDiskAndMemoryResources();
+            throw ExecutionException(std::make_shared<FatalFailure>("Can't open image in RAM"));
+        }
+
         // Reserve disk space on the compute node's storage service
         try {
-            _tmp_file_location = wrench::FileLocation::LOCATION(_compute_node->disk,
-                                                      Simulation::addFile(
-                                                          "tmp_" + std::to_string(
-                                                              ++ServerlessComputeService::sequence_number),
-                                                          _registered_function->getDiskSpaceLimit()));
+            _tmp_file_location = wrench::FileLocation::LOCATION(_compute_node->getDiskStorage(),
+                                                                Simulation::addFile(
+                                                                    "tmp_" + std::to_string(
+                                                                        ++ServerlessComputeService::sequence_number),
+                                                                    _registered_function->getDiskSpaceLimit()));
             StorageService::createFileAtLocation(_tmp_file_location);
-            _opened_tmp_file = _compute_node->disk->openFile(_tmp_file_location);
-        } catch (ExecutionException& e) {
+            _opened_tmp_file = _compute_node->getDiskStorage()->openFile(_tmp_file_location);
+        }
+        catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             auto cause = std::dynamic_pointer_cast<StorageServiceNotEnoughSpace>(e.getCause());
             if (cause) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>("Not enough storage space on compute node for container"));
+                throw ExecutionException(
+                    std::make_shared<NotEnoughResources>("Not enough storage space on compute node for container"));
             }
             throw;
         } catch (simgrid::Exception& e) {
@@ -102,7 +118,8 @@ namespace wrench {
             fs = simgrid::fsmod::FileSystem::create(
                 "fs" + std::to_string(ServerlessComputeService::sequence_number));
             fs->mount_partition("/", ods, _registered_function->getDiskSpaceLimit());
-        } catch (simgrid::Exception& e) {
+        }
+        catch (simgrid::Exception& e) {
             this->freeDiskAndMemoryResources();
             throw ExecutionException(std::make_shared<NotEnoughResources>(e.what()));
         } catch (ExecutionException& e) {
@@ -118,7 +135,8 @@ namespace wrench {
             _tmp_storage_service->setSimulation(_serverless_compute_service->getSimulation());
             _tmp_storage_service->setNetworkTimeoutValue(_serverless_compute_service->getNetworkTimeoutValue());
             _tmp_storage_service->start(_tmp_storage_service, true, false);
-        } catch (ExecutionException& e) {
+        }
+        catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             throw;
         }
@@ -127,34 +145,23 @@ namespace wrench {
         auto tmp_memory_file = Simulation::addFile(
             "tmp_ram_file_" + std::to_string(++ServerlessComputeService::sequence_number),
             _registered_function->getRAMLimit());
-        auto compute_ram_ss = _compute_node->memory;
         try {
             auto file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
             StorageService::createFileAtLocation(file_location);
             _tmp_ram_file_location = file_location;
             _opened_tmp_ram_file = compute_ram_ss->openFile(_tmp_ram_file_location);
-        } catch (ExecutionException& e) {
+        }
+        catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             auto cause = std::dynamic_pointer_cast<StorageServiceNotEnoughSpace>(e.getCause());
             if (cause) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>("Not enough RAM space on compute node for container"));
+                throw ExecutionException(
+                    std::make_shared<NotEnoughResources>("Not enough RAM space on compute node for container"));
             }
             throw;
         } catch (simgrid::Exception& e) {
             this->freeDiskAndMemoryResources();
             throw ExecutionException(std::make_shared<FatalFailure>("Can't create container's RAM space"));
-        }
-
-        // Open the image memory file
-        try {
-            _opened_image_ram_file = compute_ram_ss->openFile(
-                FileLocation::LOCATION(compute_ram_ss, _registered_function->getOriginalImageLocation()->getFile()));
-        } catch (ExecutionException& e) {
-            this->freeDiskAndMemoryResources();
-            throw;
-        } catch (simgrid::Exception& e) {
-            this->freeDiskAndMemoryResources();
-            throw ExecutionException(std::make_shared<FatalFailure>("Can't open image in RAM"));
         }
     }
 
@@ -167,37 +174,69 @@ namespace wrench {
     }
 
     /**
+     * @brief Clear the private storage's content
+     */
+    void Container::clearPrivateStorage() {
+        for (auto const& partition :
+             _tmp_storage_service->getFileSystem()->get_partitions()) {
+            partition->erase_all_content();
+        }
+    }
+
+    /**
      * @brief Helper method to release the disk and memory resource of the container
      */
     void Container::freeDiskAndMemoryResources() {
         // Clearing disk space
-        if (_tmp_storage_service and (_tmp_storage_service->getState() == Service::State::UP)) {
-            _tmp_storage_service->stop();
-            _tmp_storage_service = nullptr;
-        }
-        if (_opened_tmp_file) {
-            _opened_tmp_file->close();
-        }
-        if (_tmp_file_location) {
-            if (StorageService::hasFileAtLocation(_tmp_file_location)) {
-                StorageService::removeFileAtLocation(_tmp_file_location);
+        try {
+            if (_tmp_storage_service and (_tmp_storage_service->getState() == Service::State::UP)) {
+                _tmp_storage_service->stop();
             }
-        }
+        } catch (ExecutionException& ignore) {}
+
+        try {
+            if (_opened_tmp_file) {
+                _opened_tmp_file->close();
+            }
+        } catch (simgrid::Exception& ignore) {}
+
+        try {
+            if (_tmp_file_location) {
+                if (StorageService::hasFileAtLocation(_tmp_file_location)) {
+                    StorageService::removeFileAtLocation(_tmp_file_location);
+                }
+            }
+        } catch (ExecutionException& ignore) {}
 
         // Clearing RAM space
-        if (_opened_tmp_ram_file) {
-            _opened_tmp_ram_file->close();
-        }
-        if (_tmp_ram_file_location) {
-            if (StorageService::hasFileAtLocation(_tmp_ram_file_location)) {
-                StorageService::removeFileAtLocation(_tmp_ram_file_location);
+        try {
+            if (_opened_tmp_ram_file) {
+                _opened_tmp_ram_file->close();
             }
-        }
+        } catch (simgrid::Exception& ignore) {}
+
+        try {
+            if (_tmp_ram_file_location) {
+                if (StorageService::hasFileAtLocation(_tmp_ram_file_location)) {
+                    StorageService::removeFileAtLocation(_tmp_ram_file_location);
+                }
+            }
+        } catch (ExecutionException& ignore) {}
 
         // Close the image ram file
-        if (_opened_image_ram_file) {
-            _opened_image_ram_file->close();
-        }
+        try {
+            if (_opened_image_ram_file) {
+                _opened_image_ram_file->close();
+            }
+        } catch (simgrid::Exception& ignore) {}
+
+        // Reset all pointers, just to be safe
+        _tmp_storage_service.reset();
+        _opened_tmp_file.reset();
+        _tmp_file_location.reset();
+        _opened_tmp_ram_file.reset();
+        _tmp_ram_file_location.reset();
+        _opened_image_ram_file.reset();
     }
 
 }

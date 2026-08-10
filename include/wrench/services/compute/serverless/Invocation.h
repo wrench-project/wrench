@@ -18,7 +18,6 @@
 #include <wrench/failure_causes/FailureCause.h>
 
 #include "Container.h"
-#include "ServerlessComputeNode.h"
 
 namespace wrench {
 

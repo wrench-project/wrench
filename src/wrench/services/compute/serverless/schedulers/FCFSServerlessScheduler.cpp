@@ -50,7 +50,8 @@ namespace wrench {
         for (const auto& invocation : schedulable_invocations) {
             auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
 
-            for (const auto& [compute_node, num_available_cores] : available_cores) {
+            for (const auto& compute_node : compute_nodes) {
+                auto num_available_cores = available_cores.at(compute_node);
                 if (num_available_cores > 0) {
                     // Pick the first available node
                     // Decrement our own available core count for chosen node
@@ -91,7 +92,9 @@ namespace wrench {
                                  const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
                                  const ServerlessStateOfTheSystem* state) {
         auto available_cores = state->getAvailableCores();
+
         std::set<std::shared_ptr<Container>> claimed_idle_containers;
+
 
         for (const auto& inv : schedulable_invocations) {
 
@@ -102,7 +105,7 @@ namespace wrench {
                 auto num_available_cores = available_cores[node];
                 // Checking if the node has available cores and if the image is on the node
                 if (num_available_cores > 0 && state->isImageInRAMAtNode(node, image_file)) {
-                    auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get());
+                    auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
                     if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
                         decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});
                         claimed_idle_containers.insert(idling_container);

@@ -36,29 +36,36 @@ namespace wrench
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
-        std::shared_ptr<Container> findIdleContainer(const RegisteredFunction *registered_function) const;
+        std::shared_ptr<Container> findIdleContainer(
+            const RegisteredFunction *registered_function,
+            const std::set<std::shared_ptr<Container>>& excluded_container) const;
 
-        bool isImageBeingCopied(const std::shared_ptr<DataFile>& image) const;
-        std::set<std::shared_ptr<DataFile>> getImagesBeingCopied() const;
-        bool isImageOnDisk(const std::shared_ptr<DataFile>& image) const;
+        [[nodiscard]] bool isImageBeingCopied(const std::shared_ptr<DataFile>& image) const;
+        [[nodiscard]] std::set<std::shared_ptr<DataFile>> getImagesBeingCopied() const;
+        [[nodiscard]] bool isImageOnDisk(const std::shared_ptr<DataFile>& image) const;
 
-        bool isImageBeingLoaded(const std::shared_ptr<DataFile>& image) const;
-        std::set<std::shared_ptr<DataFile>> getImagesBeingLoaded() const;
-        bool isImageInRAM(const std::shared_ptr<DataFile>& image) const;
+        [[nodiscard]] bool isImageBeingLoaded(const std::shared_ptr<DataFile>& image) const;
+        [[nodiscard]] std::set<std::shared_ptr<DataFile>> getImagesBeingLoaded() const;
+        [[nodiscard]] bool isImageInRAM(const std::shared_ptr<DataFile>& image) const;
 
         [[nodiscard]] bool isInvocationFeasible(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Container>& container) const;
 
+        [[nodiscard]] std::shared_ptr<SimpleStorageService> getDiskStorage() const { return _disk; }
+        [[nodiscard]] std::shared_ptr<SimpleStorageService> getMemoryStorage() const { return _memory; }
 
+        [[nodiscard]] unsigned int getNumCores() const {return _total_cores; }
+        [[nodiscard]] unsigned int getNumIdleCores() const {return _available_cores; }
 
-        std::string hostname;
-        unsigned int total_cores;
-        unsigned int available_cores;
-
-        std::shared_ptr<SimpleStorageService> disk;
-        std::shared_ptr<SimpleStorageService> memory;
-
+        const std::string hostname;
 
     private:
+        unsigned int _total_cores;
+        unsigned int _available_cores;
+
+        std::shared_ptr<SimpleStorageService> _disk;
+        std::shared_ptr<SimpleStorageService> _memory;
+
+
         friend class ServerlessComputeService;
         std::set<std::shared_ptr<DataFile>> _images_being_copied;
         std::set<std::shared_ptr<DataFile>> _images_being_loaded;
