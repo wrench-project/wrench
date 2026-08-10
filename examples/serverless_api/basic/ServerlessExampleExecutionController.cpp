@@ -146,8 +146,8 @@ namespace wrench {
             const auto& invocation = invocations[i];
             bool succeeded = invocation->hasSucceeded();
             double submit_date = invocation->getSubmitDate();
-            double start_date = invocation->getContainerStartDate();
-            double finish_date = invocation->getContainerEndDate();
+            double start_date = invocation->getDispatchDate();
+            double finish_date = invocation->getFunctionEndDate();
             WRENCH_INFO("  - Invocation #%lu: [%s] submitted: %.2lf  started: %.2lf  finished: %.2lf",
                 i, (succeeded ? "SUCCEEDED" : "FAILED"), submit_date, start_date, finish_date);
             if (not succeeded) {
