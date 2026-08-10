@@ -96,7 +96,7 @@ namespace wrench
         : ServerlessComputeServiceMessage(payload)
     {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_commport == nullptr) || (function == nullptr))
+        if ((answer_commport == nullptr) || (registered_function == nullptr) || (notify_commport == nullptr))
         {
             throw std::invalid_argument(
                 "ServerlessComputeServiceFunctionRegisterRequestMessage::ServerlessComputeServiceFunctionRegisterRequestMessage(): Invalid arguments");

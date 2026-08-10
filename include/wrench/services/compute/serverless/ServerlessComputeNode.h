@@ -36,7 +36,7 @@ namespace wrench
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
-        std::shared_ptr<Container> findIdleContainer(RegisteredFunction *registered_function);
+        std::shared_ptr<Container> findIdleContainer(const RegisteredFunction *registered_function) const;
 
         bool isImageBeingCopied(const std::shared_ptr<DataFile>& image) const;
         std::set<std::shared_ptr<DataFile>> getImagesBeingCopied() const;
@@ -51,7 +51,7 @@ namespace wrench
 
 
         std::string hostname;
-        unsigned long total_cores;
+        unsigned int total_cores;
         unsigned int available_cores;
 
         std::shared_ptr<SimpleStorageService> disk;

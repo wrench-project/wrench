@@ -58,7 +58,7 @@ namespace wrench {
                 else if (state->isImageOnDiskAtNode(node, image) &&
                     !state->isImageBeingLoadedAtNode(node, image) &&
                     !state->isImageInRAMAtNode(node, image)) {
-                    decisions->images_loads_to_RAM.push_back(LoadImage{image, node});
+                    decisions->image_loads_to_RAM.push_back(LoadImage{image, node});
 
                 }
             }

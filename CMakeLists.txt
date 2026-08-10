@@ -7,8 +7,6 @@ project(wrench CXX)
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 #add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 
-
-
 # Make Release the default build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

@@ -102,8 +102,8 @@ namespace wrench {
             double speed = S4U_Simulation::getHostFlopRate(hostname);
             sg_size_t ram_available = S4U_Simulation::getHostMemoryCapacity(hostname);
             sg_size_t disk_capacity;
-            sg_size_t disk_read_bandwidth;
-            sg_size_t disk_write_bandwidth;
+            // sg_size_t disk_read_bandwidth;
+            // sg_size_t disk_write_bandwidth;
             try {
                 disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
             }
@@ -534,8 +534,8 @@ namespace wrench {
             invocation->_submit_date = Simulation::getCurrentSimulatedDate();
             _state_of_the_system->_new_invocations.push(invocation);
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                true, invocation, nullptr,
-                ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD);
+                true, invocation, nullptr, this->getMessagePayloadValue(
+                ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answerMessage);
         }
     }
@@ -549,7 +549,8 @@ namespace wrench {
     void ServerlessComputeService::processImageDownloadCompletion(const std::shared_ptr<Action>& action,
                                                                   const std::shared_ptr<DataFile>& image_file) {
         if (action->getFailureCause()) {
-            _state_of_the_system->_free_space_on_head_storage -= image_file->getSize();
+            _state_of_the_system->_free_space_on_head_storage += image_file->getSize();
+            _state_of_the_system->_being_downloaded_image_files.erase(image_file);
             throw std::runtime_error("ServerlessComputeService::processImageDownloadCompletion(): "
                 "An image download (from remote) has failed. Handling of such failures is currently not implemented");
         }
@@ -690,7 +691,7 @@ namespace wrench {
                 target_container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
             }
             catch (ExecutionException& e) {
-                WRENCH_INFO("Couldn't spaw a container for an invocation for %s: %s",
+                WRENCH_INFO("Couldn't spawn a container for an invocation for %s: %s",
                             invocation->_registered_function->_function->getName().c_str(),
                             e.getCause()->toString().c_str());
                 return false;
@@ -712,9 +713,15 @@ namespace wrench {
 
         // Declare the function invocation's necessary lambdas
         const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
+            // Clear up all files from the tmp storage service, if any, so that if a next
+            // invocation reuses this container, it won't "see" the previous invocation's data, if any
+            for (auto const& partition :
+                 invocation->_container->getPrivateStorageService()->getFileSystem()->get_partitions()) {
+                partition->erase_all_content();
+            }
         };
 
-        const std::function lambda_execute = [invocation, target_container](
+        const std::function lambda_execute = [invocation](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             const auto function = invocation->_registered_function->_function;
 
@@ -722,7 +729,7 @@ namespace wrench {
             invocation->_function_start_date = S4U_Simulation::getClock();
             try {
                 invocation->_function_output = function->execute(invocation->_function_input,
-                                                                 target_container->getPrivateStorageService());
+                                                                 invocation->_container->getPrivateStorageService());
             }
             catch (ExecutionException& e) {
                 invocation->_function_end_date = S4U_Simulation::getClock();
@@ -958,7 +965,7 @@ namespace wrench {
      */
     void ServerlessComputeService::initiateImageLoads(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
         // For each compute node, load initiate image load from disk into RAM and if space
-        for (const auto& [image_file, compute_node] : decisions->images_loads_to_RAM) {
+        for (const auto& [image_file, compute_node] : decisions->image_loads_to_RAM) {
             initiateImageLoadAtComputeNode(compute_node, image_file);
         }
     }
@@ -983,8 +990,6 @@ namespace wrench {
     void ServerlessComputeService::initiateImageCopyToComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
-        // Add the image to the being_copied_images data structure for this host
-        compute_node->_images_being_copied.insert(image);
 
         // std::cerr << "INITIATING IMAGE COPY FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that copies the image (identified by imageID)
@@ -1033,6 +1038,9 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         action_executor->start(action_executor, true, false);
 
+        // Add the image to the being_copied_images data structure for this host
+        compute_node->_images_being_copied.insert(image);
+
         WRENCH_INFO("Initiated image copy for image [%s] from head host to compute host [%s]", image->getID().c_str(),
                     compute_node->hostname.c_str());
     }
@@ -1045,8 +1053,6 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
-        // Add the image to the being_copied_images data structure for this host
-        compute_node->_images_being_loaded.insert(image);
 
         // std::cerr << "INITIATE IMAGE LOAD FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that simply read the image file from disk
@@ -1097,6 +1103,9 @@ namespace wrench {
         action_executor->setSimulation(this->simulation_);
         // WRENCH_INFO("Starting an action executor for copying image...");
         action_executor->start(action_executor, true, false);
+
+        // Add the image to the being_copied_images data structure for this host
+        compute_node->_images_being_loaded.insert(image);
 
         WRENCH_INFO("Initiated image load at compute host [%s]", compute_node->hostname.c_str());
     }

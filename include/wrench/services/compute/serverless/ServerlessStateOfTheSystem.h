@@ -14,6 +14,7 @@
 #include <map>
 #include <queue>
 #include <set>
+#include <unordered_set>
 #include <memory>
 #include <string>
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>

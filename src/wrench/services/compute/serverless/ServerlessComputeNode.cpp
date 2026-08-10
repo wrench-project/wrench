@@ -73,7 +73,7 @@ namespace wrench {
      * @param registered_function the target function
      * @return A container, if found, or nullptr
      */
-    std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(RegisteredFunction* registered_function) {
+    std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(const RegisteredFunction* registered_function) const {
         for (auto const &idle_container : _idle_containers) {
             if (idle_container->getRegisteredFunction() == registered_function) {
                 return idle_container;

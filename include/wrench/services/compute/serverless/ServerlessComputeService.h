@@ -140,9 +140,6 @@ namespace wrench {
 
         void startHeadStorageService();
         void startComputeHostsServices();
-        std::shared_ptr<StorageService> startInvocationStorageService(
-            const std::shared_ptr<Invocation>& invocation,
-            const std::shared_ptr<ServerlessComputeNode>& target_compute_node);
 
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
         void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);

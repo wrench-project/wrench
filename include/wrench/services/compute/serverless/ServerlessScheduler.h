@@ -47,7 +47,7 @@ namespace wrench {
 	    /** @brief The list of image copies to storage at compute nodes */
         std::vector<CopyImage> image_copies_to_disk;
 	    /** @brief The list of image loads in RAM at compute nodes */
-        std::vector<LoadImage> images_loads_to_RAM;
+        std::vector<LoadImage> image_loads_to_RAM;
 	    /** @brief The list of function invocations at compute nodes */
         std::vector<DispatchInvocation> invocation_dispatches;
     };

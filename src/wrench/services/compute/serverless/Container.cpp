@@ -23,6 +23,24 @@ WRENCH_LOG_CATEGORY(Container, "Log category for Container");
 
 
 namespace wrench {
+    /**
+     * @brief Constructor
+     * @param registered_function
+     * @param compute_node
+     * @param serverless_compute_service
+     * @param initial_state 
+     * @return
+     */
+    Container::Container(const RegisteredFunction* registered_function,
+              const ServerlessComputeNode* compute_node,
+              const ServerlessComputeService* serverless_compute_service,
+              State initial_state) {
+        _registered_function = registered_function;
+        _compute_node = compute_node;
+        _serverless_compute_service = serverless_compute_service;
+        _state = initial_state;
+        _idle_date = DBL_MAX;
+    }
 
     /**
      * @brief Make the container idle

@@ -194,8 +194,6 @@ namespace wrench {
         /** @brief Whether the service is bufferized */
         bool is_bufferized;
 
-
-
         /** @brief File system */
         std::shared_ptr<simgrid::fsmod::FileSystem> file_system;
 
