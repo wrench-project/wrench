@@ -37,13 +37,20 @@ namespace wrench {
         std::shared_ptr<Container> container; // nullptr if none
     };
 
+    struct TerminateContainer {
+        std::shared_ptr<Container> container;
+    };
+
     /**
      * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
-     *        - Which images should be copied from the head node to compute nodes' disks
-     *        - Which images should be loaded into compute node's RAMs
+     *        - Which idle containers should be terminated right now
+     *        - Which images should be copied from the head node to compute nodes' disks, initiated right now
+     *        - Which images should be loaded into compute node's RAMs, initiated right now
      *        - Which invocations should be dispatched right now
      */
     struct ServerlessSchedulingDecisions {
+        /** @brief The list of idle containers to terminate */
+        std::vector<TerminateContainer> container_terminations;
 	    /** @brief The list of image copies to storage at compute nodes */
         std::vector<CopyImage> image_copies_to_disk;
 	    /** @brief The list of image loads in RAM at compute nodes */
@@ -62,6 +69,7 @@ namespace wrench {
 
         /**
          * @brief Given the list of schedulable invocations and the current system state, decide:
+         *   - which idle containers to terminate
          *   - which images to copy to compute nodes
          *   - which images to load into memory at compute nodes
          *   - which invocations to start at compute nodes

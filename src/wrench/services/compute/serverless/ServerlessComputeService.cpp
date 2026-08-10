@@ -42,13 +42,14 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    ServerlessComputeService::ServerlessComputeService(const std::string& hostname,
-                                                       const std::string& head_node_storage_mount_point,
-                                                       const std::vector<std::string>& compute_hosts,
-                                                       const std::shared_ptr<ServerlessScheduler>& scheduler,
-                                                       const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                                                       const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
-                                                       messagepayload_list) :
+    ServerlessComputeService::ServerlessComputeService(
+        const std::string& hostname,
+        const std::string& head_node_storage_mount_point,
+        const std::vector<std::string>& compute_hosts,
+        const std::shared_ptr<ServerlessScheduler>& scheduler,
+        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
+        messagepayload_list) :
         ComputeService(hostname,
                        "ServerlessComputeService", "") {
         // Check that there is at least one compute host
@@ -345,9 +346,10 @@ namespace wrench {
                 // Implement the scheduler's decisions, if possible.
                 // It's important to do things in this order below so that files get open(), and thus
                 // unevictable, thus preventing ping-pong effects.
-                dispatchInvocations(decisions);
-                initiateImageLoads(decisions);
-                initiateImageCopies(decisions);
+                terminateIdleContainers(decisions->container_terminations);
+                dispatchInvocations(decisions->invocation_dispatches);
+                initiateImageLoads(decisions->image_loads_to_RAM);
+                initiateImageCopies(decisions->image_copies_to_disk);
             }
         }
         return 0;
@@ -596,14 +598,15 @@ namespace wrench {
         }
         else {
             // Start the timeout alarm
-            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation_,
-                                                                          S4U_Simulation::getClock() + idle_timeout,
-                                                                          this->_hostname,
-                                                                          this->_commport,
-                                                                          new
-                                                                          ServerlessComputeServiceContainerIdleTimeoutMessage(
-                                                                              container, container->getIdleSequence()),
-                                                                          "container_idle_timout");
+            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
+                this->simulation_,
+                S4U_Simulation::getClock() + idle_timeout,
+                this->_hostname,
+                this->_commport,
+                new
+                ServerlessComputeServiceContainerIdleTimeoutMessage(
+                    container, container->getIdleSequence()),
+                "container_idle_timout");
         }
 
         bool success = action->getState() == Action::State::COMPLETED;
@@ -633,17 +636,32 @@ namespace wrench {
     }
 
     /**
+     * @brief Terminates idle containers if need me
+     * @param decisions scheduling decisions
+     */
+    void ServerlessComputeService::terminateIdleContainers(const std::vector<TerminateContainer>& decisions) {
+        for (const auto& [container] : decisions) {
+            if (container->isBusy()) {
+                throw std::runtime_error(
+                    "ServerlessComputeService::terminateIdleContainers(): container to terminate is not idle!");
+            }
+            // Shutdown the container
+            container->getComputeNode()->shutdownContainer(container);
+        }
+    }
+
+    /**
      * @brief Dispatches scheduled function invocations to compute hosts
      * @param decisions Scheduling decisions
      * @return true if at least one invocation was dispatched
      */
     void ServerlessComputeService::dispatchInvocations(
-        const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
+        const std::vector<DispatchInvocation>& decisions) {
         // Dispatched the invocations in the order of the schedulable list
         std::set<std::shared_ptr<Invocation>> dispatched_invocations;
 
         // Dispatch invocation
-        for (const auto& [invocation, compute_node, container] : decisions->invocation_dispatches) {
+        for (const auto& [invocation, compute_node, container] : decisions) {
             // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
             //             invocation_to_place->_registered_function->_function->getName().c_str());
             if (dispatchInvocation(invocation, compute_node, container)) {
@@ -943,7 +961,8 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for downloading from remote...");
         try {
             action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e) {
             throw std::runtime_error(
                 "ServerlessComputeService::initiateImageDownloadFromRemote(): Action executor could not be started - internal error");
         }
@@ -957,10 +976,6 @@ namespace wrench {
         // Invoke the scheduler so that it manages images
         auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
                                               _state_of_the_system.get());
-        // std::cerr << "DECISIONS:  COPY=" <<
-        //     decisions->images_to_copy_to_compute_node.size() << " LOAD=" <<
-        //     decisions->images_to_load_into_RAM_at_compute_node.size() << " INVOKE=" <<
-        //     decisions->invocations_to_start_at_compute_node.size() << "\n";
         return decisions;
     }
 
@@ -968,9 +983,9 @@ namespace wrench {
      * @brief Helper method to initiate image loads
      * @param decisions scheduling decisions
      */
-    void ServerlessComputeService::initiateImageLoads(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
+    void ServerlessComputeService::initiateImageLoads(const std::vector<LoadImage>& decisions) {
         // For each compute node, load initiate image load from disk into RAM and if space
-        for (const auto& [image_file, compute_node] : decisions->image_loads_to_RAM) {
+        for (const auto& [image_file, compute_node] : decisions) {
             initiateImageLoadAtComputeNode(compute_node, image_file);
         }
     }
@@ -980,9 +995,9 @@ namespace wrench {
     * @param decisions scheduling decisions
     */
     void ServerlessComputeService::initiateImageCopies(
-        const std::shared_ptr<ServerlessSchedulingDecisions>& decisions) {
+        const std::vector<CopyImage>& decisions) {
         // For each compute node, initiate image copy (from head node) if need be
-        for (const auto& [image_file, compute_node] : decisions->image_copies_to_disk) {
+        for (const auto& [image_file, compute_node] : decisions) {
             initiateImageCopyToComputeNode(compute_node, image_file);
         }
     }
@@ -1042,7 +1057,8 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         try {
             action_executor->start(action_executor, true, false);
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e) {
             throw std::runtime_error(
                 "ServerlessComputeService::initiateImageCopyToComputeNode(): Action executor could not be started - internal error");
         }
@@ -1112,7 +1128,8 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         try {
             action_executor->start(action_executor, true, false);
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e) {
             throw std::runtime_error(
                 "ServerlessComputeService::initiateImageLoadAtComputeNode(): Action executor could not be started - internal error");
         }

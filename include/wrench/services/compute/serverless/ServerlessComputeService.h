@@ -129,9 +129,10 @@ namespace wrench {
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
-        void dispatchInvocations(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions);
-        void initiateImageLoads(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions);
-        void initiateImageCopies(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions);
+        void terminateIdleContainers(const std::vector<TerminateContainer>& decisions);
+        void dispatchInvocations(const std::vector<DispatchInvocation>& decisions);
+        void initiateImageLoads(const std::vector<LoadImage>& decisions);
+        void initiateImageCopies(const std::vector<CopyImage>& decisions);
 
         bool processNextMessage(bool& do_scheduling);
 
