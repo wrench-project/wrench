@@ -55,14 +55,14 @@ namespace wrench {
 
         bool isUp() const;
 
-        std::string getPropertyValueAsString(WRENCH_PROPERTY_TYPE);
-        double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
-        unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE);
-        bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
+        std::string getPropertyValueAsString(WRENCH_PROPERTY_TYPE) const;
+        double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE) const;
+        unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE) const;
+        bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE) const;
 
-        double getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE);
-        sg_size_t getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE);
-        double getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE);
+        double getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE) const;
+        sg_size_t getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE) const;
+        double getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE) const;
 
         const WRENCH_PROPERTY_COLLECTION_TYPE &getPropertyList() const;
 
@@ -83,7 +83,7 @@ namespace wrench {
         simgrid::s4u::Host *getHost();
 
 
-        sg_size_t getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
+        sg_size_t getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE) const;
         const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE &getMessagePayloadList() const;
 
         void setStateToDown();
@@ -145,7 +145,7 @@ namespace wrench {
     private:
         double getPropertyValueWithUnitsAsValue(
                 WRENCH_PROPERTY_TYPE property,
-                const std::function<double(std::string &s)> &unit_parsing_function);
+                const std::function<double(std::string &s)> &unit_parsing_function) const;
 
         static std::set<std::shared_ptr<Service>> servicesSetToAutoRestart;
 

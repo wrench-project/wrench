@@ -31,6 +31,10 @@ namespace wrench {
         /** @brief The timeout before an idle container is terminated and its disk/resources reclaimed.
          **/
         DECLARE_PROPERTY_NAME(CONTAINER_IDLE_TIMEOUT);
+
+        /** @brief The buffer size used by all internal storage services.
+         **/
+        DECLARE_PROPERTY_NAME(STORAGE_SERVICES_BUFFER_SIZE);
     };
 
 }// namespace wrench

@@ -550,12 +550,26 @@ namespace wrench {
      */
     void ServerlessComputeService::processImageDownloadCompletion(const std::shared_ptr<Action>& action,
                                                                   const std::shared_ptr<DataFile>& image_file) {
+        // If the download has failed, fail all corresponding admitted function invocations
         if (action->getFailureCause()) {
             _state_of_the_system->_free_space_on_head_storage += image_file->getSize();
             _state_of_the_system->_being_downloaded_image_files.erase(image_file);
-            throw std::runtime_error("ServerlessComputeService::processImageDownloadCompletion(): "
-                "An image download (from remote) has failed. Handling of such failures is currently not implemented");
+
+            while (not _state_of_the_system->_admitted_invocations[image_file].empty()) {
+                auto invocation = _state_of_the_system->_admitted_invocations[image_file].front();
+                invocation->_notify_commport->dputMessage(
+                    new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                        false,
+                        invocation,
+                        action->getFailureCause(), this->getMessagePayloadValue(
+                            ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+                _state_of_the_system->_admitted_invocations[image_file].pop();
+            }
+            _state_of_the_system->_admitted_invocations[image_file] = std::queue<std::shared_ptr<Invocation>>();
+            _state_of_the_system->_admitted_invocations.erase(image_file);
+            return;
         }
+
         WRENCH_INFO("ServerlessComputeService::processImageDownloadCompletion(): Image file %s was downloaded",
                     image_file->getID().c_str());
         _state_of_the_system->_being_downloaded_image_files.erase(image_file);
@@ -808,7 +822,14 @@ namespace wrench {
                     SimpleStorageService::createSimpleStorageService(
                         compute_node->hostname,
                         {"/"},
-                        {{SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}},
+                        {
+                            {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"},
+                            {
+                                SimpleStorageServiceProperty::BUFFER_SIZE,
+                                this->getPropertyValueAsString(
+                                    ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
+                            }
+                        },
                         {})));
                 ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
                 compute_node->_disk = ss;
@@ -831,7 +852,14 @@ namespace wrench {
                     SimpleStorageService::createSimpleStorageService(
                         compute_node->hostname,
                         {ram_mount_point},
-                        {{SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"}},
+                        {
+                            {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"},
+                            {
+                                SimpleStorageServiceProperty::BUFFER_SIZE,
+                                this->getPropertyValueAsString(
+                                    ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
+                            }
+                        },
                         {})));
                 ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
                 compute_node->_memory = ss;
@@ -850,8 +878,8 @@ namespace wrench {
             {_state_of_the_system->_head_storage_service_mount_point},
             {
                 {
-                    wrench::SimpleStorageServiceProperty::BUFFER_SIZE,
-                    this->getPropertyValueAsString(ComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE)
+                    SimpleStorageServiceProperty::BUFFER_SIZE,
+                    this->getPropertyValueAsString(ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
                 }
             },
             {});

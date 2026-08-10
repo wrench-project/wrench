@@ -78,13 +78,13 @@ namespace wrench {
      * @return the property value as a string
      *
      */
-    std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) {
+    std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) const {
         if (this->property_list.find(property) == this->property_list.end()) {
             throw std::invalid_argument(
                     "Service::getPropertyValueAsString(): Cannot find value for property " + ServiceProperty::translatePropertyType(property) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
-        return this->property_list[property];
+        return this->property_list.at(property);
     }
 
     /**
@@ -93,7 +93,7 @@ namespace wrench {
      * @return the property value as a double
      *
      */
-    double Service::getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE property) {
+    double Service::getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE property) const {
         double value;
         std::string string_value;
         string_value = this->getPropertyValueAsString(property);
@@ -119,7 +119,7 @@ namespace wrench {
      * @return the property value as a double, in the basic unit
      */
     double Service::getPropertyValueWithUnitsAsValue(WRENCH_PROPERTY_TYPE property,
-                                                     const std::function<double(std::string &s)> &unit_parsing_function) {
+                                                     const std::function<double(std::string &s)> &unit_parsing_function) const {
         std::string string_value;
         string_value = this->getPropertyValueAsString(property);
 
@@ -137,7 +137,7 @@ namespace wrench {
      * @param property: the property
      * @return the time in second
      */
-    double Service::getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE property) {
+    double Service::getPropertyValueAsTimeInSecond(WRENCH_PROPERTY_TYPE property) const {
         return this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_time);
     }
 
@@ -146,7 +146,7 @@ namespace wrench {
      * @param property: the property
      * @return the size in byte
      */
-    sg_size_t Service::getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE property) {
+    sg_size_t Service::getPropertyValueAsSizeInByte(WRENCH_PROPERTY_TYPE property) const {
         sg_size_t value;
         std::string string_value;
         string_value = this->getPropertyValueAsString(property);
@@ -166,7 +166,7 @@ namespace wrench {
      * @param property: the property
      * @return the bandwidth in byte/sec
      */
-    double Service::getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE property) {
+    double Service::getPropertyValueAsBandwidthInBytePerSecond(WRENCH_PROPERTY_TYPE property) const {
         return this->getPropertyValueWithUnitsAsValue(property, UnitParser::parse_bandwidth);
     }
 
@@ -176,7 +176,7 @@ namespace wrench {
     * @return the property value as an unsigned long
     *
     */
-    unsigned long Service::getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE property) {
+    unsigned long Service::getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE property) const {
         unsigned long value;
         std::string string_value;
         string_value = this->getPropertyValueAsString(property);
@@ -201,7 +201,7 @@ namespace wrench {
      * @return the message payload value as a double
      *
      */
-    sg_size_t Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
+    sg_size_t Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) const {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             try {
                 throw std::invalid_argument(
@@ -213,7 +213,7 @@ namespace wrench {
                         "Service::getMessagePayloadValue(): invalid message_payload index");
             }
         }
-        return this->messagepayload_list[message_payload];
+        return this->messagepayload_list.at(message_payload);
     }
 
     /**
@@ -238,7 +238,7 @@ namespace wrench {
      * @return the property value as a boolean
      *
      */
-    bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
+    bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) const {
         std::string string_value;
         string_value = this->getPropertyValueAsString(property);
         if (string_value == "true" or string_value == "True") {

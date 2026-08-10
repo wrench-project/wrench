@@ -626,7 +626,10 @@ namespace wrench {
             }
 
             // Wait for final ack
-            request_answer_commport->getMessage<StorageServiceAckMessage>(10, "StorageService::downloadFileFromStorageService(): Received an");
+            auto ack_msg = request_answer_commport->getMessage<StorageServiceAckMessage>(10, "StorageService::downloadFileFromStorageService(): Received an");
+            if (ack_msg->failure_cause) {
+                throw ExecutionException(ack_msg->failure_cause);
+            }
 #endif
         } catch (ExecutionException &e) {
             throw;

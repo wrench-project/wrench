@@ -33,9 +33,8 @@ namespace wrench {
      * @param service_name: the name of the storage service
      *
      */
-    StorageService::StorageService(const std::string &hostname,
-                                   const std::string &service_name) : Service(hostname, service_name) {
-
+    StorageService::StorageService(const std::string& hostname,
+                                   const std::string& service_name) : Service(hostname, service_name) {
         this->state = StorageService::UP;
         this->is_scratch_ = false;
     }
@@ -101,34 +100,35 @@ namespace wrench {
      * @param wait_for_answer: whether to wait for the answer
      *
      */
-    void StorageService::writeFile(S4U_CommPort *answer_commport,
-                                   const std::shared_ptr<FileLocation> &location,
+    void StorageService::writeFile(S4U_CommPort* answer_commport,
+                                   const std::shared_ptr<FileLocation>& location,
                                    sg_size_t num_bytes_to_write,
                                    bool wait_for_answer) {
-
         if (location == nullptr) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
 
         if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
-            throw std::invalid_argument("StorageService::writeFile(): Can only read from a location at that same storage service");
+            throw std::invalid_argument(
+                "StorageService::writeFile(): Can only read from a location at that same storage service");
         }
 
         this->assertServiceIsUp();
 
         this->_commport->putMessage(
-                new StorageServiceFileWriteRequestMessage(
-                        answer_commport,
-                        simgrid::s4u::this_actor::get_host(),
-                        location,
-                        num_bytes_to_write,
-                        this->getMessagePayloadValue(
-                                StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+            new StorageServiceFileWriteRequestMessage(
+                answer_commport,
+                simgrid::s4u::this_actor::get_host(),
+                location,
+                num_bytes_to_write,
+                this->getMessagePayloadValue(
+                    StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
 
         {
-            auto msg = answer_commport->getMessage<StorageServiceFileWriteAnswerMessage>(this->network_timeout, "StorageService::writeFile(): Received a totally");
+            auto msg = answer_commport->getMessage<StorageServiceFileWriteAnswerMessage>(
+                this->network_timeout, "StorageService::writeFile(): Received a totally");
 
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
@@ -139,26 +139,32 @@ namespace wrench {
 
             if (buffer_size < 1) {
                 // just wait for the final ack (no timeout!)
-                answer_commport->getMessage<StorageServiceAckMessage>("StorageService::writeFile(): Received an");
-
-
-            } else {
+                auto ack_msg = answer_commport->getMessage<StorageServiceAckMessage>(
+                    "StorageService::writeFile(): Received an");
+                if (ack_msg->failure_cause) {
+                    throw ExecutionException(ack_msg->failure_cause);
+                }
+            }
+            else {
                 auto file = location->getFile();
-                for (auto const &dwmb: msg->data_write_commport_and_bytes) {
+                for (auto const& dwmb : msg->data_write_commport_and_bytes) {
                     // Bufferized
                     sg_size_t remaining = dwmb.second;
                     while (remaining > buffer_size) {
-
                         dwmb.first->putMessage(
-                                new StorageServiceFileContentChunkMessage(
-                                        file, buffer_size, false));
+                            new StorageServiceFileContentChunkMessage(
+                                file, buffer_size, false));
                         remaining -= buffer_size;
                     }
                     dwmb.first->putMessage(new StorageServiceFileContentChunkMessage(
-                            file, remaining, true));
+                        file, remaining, true));
 
                     //Waiting for the final ack
-                    answer_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::writeFile(): Received an");
+                    auto ack_msg = answer_commport->getMessage<StorageServiceAckMessage>(
+                        this->network_timeout, "StorageService::writeFile(): Received an");
+                    if (ack_msg->failure_cause) {
+                        throw ExecutionException(ack_msg->failure_cause);
+                    }
                 }
             }
         }
@@ -187,19 +193,20 @@ namespace wrench {
      *
      *  @return A number of bytes (or 0 if the path is invalid)
      */
-    sg_size_t StorageService::getTotalFreeSpaceAtPath(const std::string &path) {
+    sg_size_t StorageService::getTotalFreeSpaceAtPath(const std::string& path) {
         assertServiceIsUp();
 
         // Send a message to the daemon
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
         this->_commport->putMessage(new StorageServiceFreeSpaceRequestMessage(
-                answer_commport,
-                path,
-                this->getMessagePayloadValue(
-                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+            answer_commport,
+            path,
+            this->getMessagePayloadValue(
+                StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
-        auto msg = answer_commport->getMessage<StorageServiceFreeSpaceAnswerMessage>(this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
+        auto msg = answer_commport->getMessage<StorageServiceFreeSpaceAnswerMessage>(
+            this->network_timeout, "StorageService::getTotalFreeSpaceAtPath() Received an");
 
         return msg->free_space;
     }
@@ -212,9 +219,8 @@ namespace wrench {
      *
      * @return true if the file is present, false otherwise
      */
-    bool StorageService::lookupFile(S4U_CommPort *answer_commport,
-                                    const std::shared_ptr<FileLocation> &location) {
-
+    bool StorageService::lookupFile(S4U_CommPort* answer_commport,
+                                    const std::shared_ptr<FileLocation>& location) {
         if (!answer_commport or !location) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid nullptr arguments");
         }
@@ -223,14 +229,15 @@ namespace wrench {
 
         // Send a message to the daemon
         this->_commport->putMessage(
-                new StorageServiceFileLookupRequestMessage(
-                        answer_commport,
-                        location,
-                        this->getMessagePayloadValue(
-                                StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+            new StorageServiceFileLookupRequestMessage(
+                answer_commport,
+                location,
+                this->getMessagePayloadValue(
+                    StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
-        auto msg = answer_commport->getMessage<StorageServiceFileLookupAnswerMessage>(this->network_timeout, "StorageService::lookupFile():");
+        auto msg = answer_commport->getMessage<StorageServiceFileLookupAnswerMessage>(
+            this->network_timeout, "StorageService::lookupFile():");
 
         return msg->file_is_available;
     }
@@ -244,33 +251,34 @@ namespace wrench {
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
      */
-    void StorageService::readFile(S4U_CommPort *answer_commport,
-                                  const std::shared_ptr<FileLocation> &location,
+    void StorageService::readFile(S4U_CommPort* answer_commport,
+                                  const std::shared_ptr<FileLocation>& location,
                                   sg_size_t num_bytes,
                                   bool wait_for_answer) {
-
         if (!answer_commport or !location or (num_bytes < 0.0)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid nullptr/0 arguments");
         }
 
         if (location->getStorageService() != this->getSharedPtr<StorageService>()) {
-            throw std::invalid_argument("StorageService::readFile(): Can only read from a location at that same storage service");
+            throw std::invalid_argument(
+                "StorageService::readFile(): Can only read from a location at that same storage service");
         }
 
         assertServiceIsUp(this->getSharedPtr<Service>());
 
         this->_commport->putMessage(
-                new StorageServiceFileReadRequestMessage(
-                        answer_commport,
-                        simgrid::s4u::this_actor::get_host(),
-                        location,
-                        num_bytes,
-                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+            new StorageServiceFileReadRequestMessage(
+                answer_commport,
+                simgrid::s4u::this_actor::get_host(),
+                location,
+                num_bytes,
+                this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
 
         if (wait_for_answer) {
             // Wait for a reply
-            auto msg = answer_commport->getMessage<StorageServiceFileReadAnswerMessage>(this->network_timeout, "StorageService::readFile(): Received an");
+            auto msg = answer_commport->getMessage<StorageServiceFileReadAnswerMessage>(
+                this->network_timeout, "StorageService::readFile(): Received an");
 
             // If it's not a success, throw an exception
             if (not msg->success) {
@@ -281,8 +289,12 @@ namespace wrench {
             if (msg->buffer_size < 1) {
                 // Non-Bufferized
                 // Just wait for the final ack (no timeout!)
-                answer_commport->getMessage<StorageServiceAckMessage>("StorageService::readFile(): Received an");
-            } else {
+                auto ack_msg = answer_commport->getMessage<StorageServiceAckMessage>("StorageService::readFile(): Received an");
+                if (ack_msg->failure_cause) {
+                    throw ExecutionException(ack_msg->failure_cause);
+                }
+            }
+            else {
                 unsigned long number_of_sources = msg->number_of_sources;
 
                 // Otherwise, retrieve the file chunks until the last one is received
@@ -291,8 +303,10 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<StorageServiceFileContentChunkMessage> file_content_chunk_msg = nullptr;
                     try {
-                        file_content_chunk_msg = msg->commport_to_receive_the_file_content->getMessage<StorageServiceFileContentChunkMessage>("StorageService::readFile(): Received an");
-                    } catch (...) {
+                        file_content_chunk_msg = msg->commport_to_receive_the_file_content->getMessage<
+                            StorageServiceFileContentChunkMessage>("StorageService::readFile(): Received an");
+                    }
+                    catch (...) {
                         S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
                         throw;
                     }
@@ -306,7 +320,11 @@ namespace wrench {
 
                 //Waiting for all the final acks
                 for (unsigned long source = 0; source < number_of_sources; source++) {
-                    answer_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readFile(): Received an");
+                    auto ack_msg = answer_commport->getMessage<StorageServiceAckMessage>(
+                        this->network_timeout, "StorageService::readFile(): Received an");
+                    if (ack_msg->failure_cause) {
+                        throw ExecutionException(ack_msg->failure_cause);
+                    }
                 }
 
                 S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
@@ -343,8 +361,9 @@ namespace wrench {
  *
  */
     void StorageService::writeOrReadFiles(FileOperation action,
-                                          std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
-        for (auto const &f: locations) {
+                                          std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>
+                                          locations) {
+        for (auto const& f : locations) {
             if ((f.first == nullptr) or (f.second == nullptr)) {
                 throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid argument");
             }
@@ -352,11 +371,11 @@ namespace wrench {
 
         // Create a temporary sorted list of files so that the order in which files are read/written is deterministic!
         std::map<std::string, std::shared_ptr<DataFile>> sorted_files;
-        for (auto const &f: locations) {
+        for (auto const& f : locations) {
             sorted_files[f.first->getID()] = f.first;
         }
 
-        for (auto const &f: sorted_files) {
+        for (auto const& f : sorted_files) {
             auto file = f.second;
             auto location = locations[file];
 
@@ -367,8 +386,8 @@ namespace wrench {
                 StorageService::readFileAtLocation(location);
 
                 WRENCH_INFO("File %s read", file->getID().c_str());
-
-            } else {
+            }
+            else {
                 WRENCH_INFO("Writing file %s to location %s",
                             file->getID().c_str(),
                             location->toString().c_str());
@@ -386,8 +405,8 @@ namespace wrench {
      * @param location: the location to delete
      * @param wait_for_answer: whether this call should
      */
-    void StorageService::deleteFile(S4U_CommPort *answer_commport,
-                                    const std::shared_ptr<FileLocation> &location,
+    void StorageService::deleteFile(S4U_CommPort* answer_commport,
+                                    const std::shared_ptr<FileLocation>& location,
                                     bool wait_for_answer) {
         if (!answer_commport or !location) {
             throw std::invalid_argument("StorageService::deleteFile(): Invalid nullptr arguments");
@@ -401,17 +420,17 @@ namespace wrench {
 
         // Send a message to the storage service's daemon
         this->_commport->putMessage(
-                new StorageServiceFileDeleteRequestMessage(
-                        answer_commport,
-                        location,
-                        this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+            new StorageServiceFileDeleteRequestMessage(
+                answer_commport,
+                location,
+                this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
 
         if (wait_for_answer) {
-
             // Wait for a reply
             std::unique_ptr<SimulationMessage> message = nullptr;
 
-            auto msg = answer_commport->getMessage<StorageServiceFileDeleteAnswerMessage>(this->network_timeout, "StorageService::deleteFile():");
+            auto msg = answer_commport->getMessage<StorageServiceFileDeleteAnswerMessage>(
+                this->network_timeout, "StorageService::deleteFile():");
             // On failure, throw an exception
             if (!msg->success) {
                 throw ExecutionException(std::move(msg->failure_cause));
@@ -427,13 +446,14 @@ namespace wrench {
      * @param dst_location: the location where to write the file
      *
      */
-    void StorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
-                                  const std::shared_ptr<FileLocation> &dst_location) {
+    void StorageService::copyFile(const std::shared_ptr<FileLocation>& src_location,
+                                  const std::shared_ptr<FileLocation>& dst_location) {
         if ((src_location == nullptr) || (dst_location == nullptr)) {
             throw std::invalid_argument("StorageService::copyFile(): Invalid nullptr arguments");
         }
         if (src_location->getFile() != dst_location->getFile()) {
-            throw std::invalid_argument("StorageService::copyFile(): src and dst locations should be for the same file");
+            throw std::invalid_argument(
+                "StorageService::copyFile(): src and dst locations should be for the same file");
         }
 
         if (std::dynamic_pointer_cast<CompoundStorageService>(src_location->getStorageService()) or
@@ -454,28 +474,31 @@ namespace wrench {
         //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
         //        }
 
-        S4U_CommPort *commport_to_contact;
+        S4U_CommPort* commport_to_contact;
         if (dst_is_non_bufferized) {
             commport_to_contact = dst_location->getStorageService()->_commport;
-        } else if (src_is_non_bufferized) {
+        }
+        else if (src_is_non_bufferized) {
             commport_to_contact = src_location->getStorageService()->_commport;
-        } else {
+        }
+        else {
             commport_to_contact = dst_location->getStorageService()->_commport;
         }
 
 
         // Send a message to the daemon of the dst service
         auto answer_commport = S4U_Daemon::getRunningActorRecvCommPort();
-        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
-                                                                                             src_location,
-                                                                                             dst_location);
+        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(
+            Simulation::getCurrentSimulatedDate(), file,
+            src_location,
+            dst_location);
         commport_to_contact->putMessage(
-                new StorageServiceFileCopyRequestMessage(
-                        answer_commport,
-                        src_location,
-                        dst_location,
-                        dst_location->getStorageService()->getMessagePayloadValue(
-                                StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+            new StorageServiceFileCopyRequestMessage(
+                answer_commport,
+                src_location,
+                dst_location,
+                dst_location->getStorageService()->getMessagePayloadValue(
+                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
 
         // Wait for a reply
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -497,14 +520,15 @@ namespace wrench {
      * @param dst_location: the destination location
      *
      */
-    void StorageService::initiateFileCopy(S4U_CommPort *answer_commport,
-                                          const std::shared_ptr<FileLocation> &src_location,
-                                          const std::shared_ptr<FileLocation> &dst_location) {
+    void StorageService::initiateFileCopy(S4U_CommPort* answer_commport,
+                                          const std::shared_ptr<FileLocation>& src_location,
+                                          const std::shared_ptr<FileLocation>& dst_location) {
         if ((src_location == nullptr) || (dst_location == nullptr)) {
             throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid nullptr arguments");
         }
         if (src_location->getFile() != dst_location->getFile()) {
-            throw std::invalid_argument("StorageService::initiateFileCopy(): src and dst locations should be for the same file");
+            throw std::invalid_argument(
+                "StorageService::initiateFileCopy(): src and dst locations should be for the same file");
         }
 
         assertServiceIsUp(src_location->getStorageService());
@@ -520,27 +544,30 @@ namespace wrench {
         //            throw std::runtime_error("Cannot copy a file from a non-bufferized storage service to a bufferized storage service (not implemented, yet)");
         //        }
 
-        S4U_CommPort *commport_to_contact;
+        S4U_CommPort* commport_to_contact;
         if (dst_is_non_bufferized) {
             commport_to_contact = dst_location->getStorageService()->_commport;
-        } else if (src_is_non_bufferized) {
+        }
+        else if (src_is_non_bufferized) {
             commport_to_contact = src_location->getStorageService()->_commport;
-        } else {
+        }
+        else {
             commport_to_contact = dst_location->getStorageService()->_commport;
         }
 
-        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
-                                                                                             src_location,
-                                                                                             dst_location);
+        src_location->getStorageService()->getSimulation()->getOutput().addTimestampFileCopyStart(
+            Simulation::getCurrentSimulatedDate(), file,
+            src_location,
+            dst_location);
 
         // Send a message to the daemon on the dst location
         commport_to_contact->putMessage(
-                new StorageServiceFileCopyRequestMessage(
-                        answer_commport,
-                        src_location,
-                        dst_location,
-                        dst_location->getStorageService()->getMessagePayloadValue(
-                                StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+            new StorageServiceFileCopyRequestMessage(
+                answer_commport,
+                src_location,
+                dst_location,
+                dst_location->getStorageService()->getMessagePayloadValue(
+                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
     }
 
 
@@ -602,6 +629,4 @@ namespace wrench {
     //    bool StorageService::hasFile(const shared_ptr<DataFile> &file) {
     //        return this->hasFile(file, this->getMountPoint());
     //    }
-
-
-}// namespace wrench
+} // namespace wrench

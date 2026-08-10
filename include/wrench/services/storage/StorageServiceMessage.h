@@ -282,11 +282,16 @@ namespace wrench {
 	 * @brief Constructor
 	 *
 	 * @param location: the file location
+	 * @param fc: the success status
 	 **/
-        explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location) : StorageServiceMessage(S4U_CommPort::default_control_message_size), location(std::move(location)) {}
+        explicit StorageServiceAckMessage(std::shared_ptr<FileLocation> location,
+std::shared_ptr<FailureCause> fc = nullptr) : StorageServiceMessage(S4U_CommPort::default_control_message_size),
+        location(std::move(location)), failure_cause(std::move(fc)) {}
 
         /** @brief The location */
         std::shared_ptr<FileLocation> location;
+        /** @brief The success status */
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
 

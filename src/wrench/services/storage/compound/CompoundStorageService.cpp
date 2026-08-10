@@ -930,7 +930,10 @@ namespace wrench {
 
         WRENCH_INFO("CSS::writeFile(): Waiting for final acks");
         for (const auto &mailbox_msg: messages) {
-            recv_commport->getMessage<StorageServiceAckMessage>("CSS::writeFile(): ");
+            auto ack_msg = recv_commport->getMessage<StorageServiceAckMessage>("CSS::writeFile(): ");
+            if (ack_msg->failure_cause) {
+                throw ExecutionException(ack_msg->failure_cause);
+            }
         }
         S4U_CommPort::retireTemporaryCommPort(recv_commport);
 
@@ -1048,7 +1051,10 @@ namespace wrench {
         for (const auto &msg: messages) {
             if (msg->buffer_size < 1) {
                 // Non-Bufferized ; just wait for an ack for this message (note this may not be THE ack to this precise message, but it doesn't matter)
-                recv_commport->getMessage<StorageServiceAckMessage>("CSS::readFile(): ");
+                auto ack_msg = recv_commport->getMessage<StorageServiceAckMessage>("CSS::readFile(): ");
+                if (ack_msg->failure_cause) {
+                    throw ExecutionException(ack_msg->failure_cause);
+                }
             } else {
                 unsigned long number_of_sources = msg->number_of_sources;
 
@@ -1075,7 +1081,10 @@ namespace wrench {
 
                 // Waiting for all the final acks (same thing as for un buffered sources : we're waiting on N ack messages, not necessarily the ones corresponding to this exact message)
                 for (unsigned long source = 0; source < number_of_sources; source++) {
-                    recv_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readFile(): Received an");
+                    auto ack_msg = recv_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readFile(): Received an");
+                    if (ack_msg->failure_cause) {
+                        throw ExecutionException(ack_msg->failure_cause);
+                    }
                 }
             }
         }

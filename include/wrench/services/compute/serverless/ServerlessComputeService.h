@@ -31,7 +31,7 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0"},
-            {ServerlessComputeServiceProperty::SCRATCH_SPACE_BUFFER_SIZE, "0"}
+            {ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "0"}
         };
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {

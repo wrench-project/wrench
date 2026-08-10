@@ -131,7 +131,11 @@ namespace wrench {
         try {
             _tmp_storage_service = std::shared_ptr<SimpleStorageService>(
                 SimpleStorageService::createSimpleStorageServiceWithExistingFileSystem(
-                    _compute_node->hostname, fs, {}, {}));
+                    _compute_node->hostname, fs, {
+                        {SimpleStorageServiceProperty::BUFFER_SIZE,
+                            _serverless_compute_service->getPropertyValueAsString(
+                                ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)}
+                    }, {}));
             _tmp_storage_service->setSimulation(_serverless_compute_service->getSimulation());
             _tmp_storage_service->setNetworkTimeoutValue(_serverless_compute_service->getNetworkTimeoutValue());
             _tmp_storage_service->start(_tmp_storage_service, true, false);
@@ -192,13 +196,17 @@ namespace wrench {
             if (_tmp_storage_service and (_tmp_storage_service->getState() == Service::State::UP)) {
                 _tmp_storage_service->stop();
             }
-        } catch (ExecutionException& ignore) {}
+        }
+        catch (ExecutionException& ignore) {
+        }
 
         try {
             if (_opened_tmp_file) {
                 _opened_tmp_file->close();
             }
-        } catch (simgrid::Exception& ignore) {}
+        }
+        catch (simgrid::Exception& ignore) {
+        }
 
         try {
             if (_tmp_file_location) {
@@ -206,14 +214,18 @@ namespace wrench {
                     StorageService::removeFileAtLocation(_tmp_file_location);
                 }
             }
-        } catch (ExecutionException& ignore) {}
+        }
+        catch (ExecutionException& ignore) {
+        }
 
         // Clearing RAM space
         try {
             if (_opened_tmp_ram_file) {
                 _opened_tmp_ram_file->close();
             }
-        } catch (simgrid::Exception& ignore) {}
+        }
+        catch (simgrid::Exception& ignore) {
+        }
 
         try {
             if (_tmp_ram_file_location) {
@@ -221,14 +233,18 @@ namespace wrench {
                     StorageService::removeFileAtLocation(_tmp_ram_file_location);
                 }
             }
-        } catch (ExecutionException& ignore) {}
+        }
+        catch (ExecutionException& ignore) {
+        }
 
         // Close the image ram file
         try {
             if (_opened_image_ram_file) {
                 _opened_image_ram_file->close();
             }
-        } catch (simgrid::Exception& ignore) {}
+        }
+        catch (simgrid::Exception& ignore) {
+        }
 
         // Reset all pointers, just to be safe
         _tmp_storage_service.reset();
@@ -238,5 +254,4 @@ namespace wrench {
         _tmp_ram_file_location.reset();
         _opened_image_ram_file.reset();
     }
-
 }

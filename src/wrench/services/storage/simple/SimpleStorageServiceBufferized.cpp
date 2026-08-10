@@ -448,10 +448,10 @@ namespace wrench {
         // But there is something perhaps fishy here... 
 //        if ((success or (not std::dynamic_pointer_cast<NetworkError>(failure_cause))) and ftt->dst_location == nullptr) {
         if (ftt->dst_location == nullptr) {
-            ftt->answer_commport_if_read->dputMessage(new StorageServiceAckMessage(ftt->src_location));
+            ftt->answer_commport_if_read->dputMessage(new StorageServiceAckMessage(ftt->src_location, failure_cause));
 //        } else if ((success or (not std::dynamic_pointer_cast<NetworkError>(failure_cause))) and ftt->src_location == nullptr) {
         } else if (ftt->src_location == nullptr) {
-            ftt->answer_commport_if_write->dputMessage(new StorageServiceAckMessage(ftt->dst_location));
+            ftt->answer_commport_if_write->dputMessage(new StorageServiceAckMessage(ftt->dst_location, failure_cause));
         } else {
             if (success and ftt->dst_location->getStorageService() == shared_from_this()) {
                 WRENCH_INFO("File %s stored", ftt->dst_location->getFile()->getID().c_str());
@@ -470,7 +470,7 @@ namespace wrench {
                             ftt->src_location,
                             ftt->dst_location,
                             success,
-                            nullptr,
+                            failure_cause,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }
