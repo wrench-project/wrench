@@ -1,0 +1,8 @@
+.. _NotEnoughResourcesForJob:
+wrench::NotEnoughResourcesForJob
+********************************
+
+.. doxygenclass:: wrench::NotEnoughResourcesForJob
+   :project: internal
+   :members:
+

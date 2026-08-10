@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wrench::ServerlessComputeServiceProperty &mdash; WRENCH 2.9-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
 
   
@@ -16,8 +16,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e9981f3b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -270,6 +270,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_request_message.html">wrench::NextContactDaemonRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -289,6 +290,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html">wrench::ServerlessComputeNode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
@@ -302,7 +304,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessComputeServiceProperty</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServicePropertyE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessComputeServiceProperty</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE"><code class="docutils literal notranslate"><span class="pre">STORAGE_SERVICES_BUFFER_SIZE</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -457,9 +461,21 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"></span><span id="wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1ad830e1f44f716bc3a817d776e01e825c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></span></span><br /></dt>
+<dd><p>The timeout before an idle container is terminated and its disk/resources reclaimed. </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"></span><span id="wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a37d489688aadebff1b97c5ac819f584a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></span></span><br /></dt>
 <dd><p>The overhead to start a container after the image has been loaded into RAM (default value: “0”, default unit: seconds): Examples: “5”, “5s”, “5000ms”, etc. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE"></span><span id="wrench::ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a7acd406e1300d9676fac1da52bea9697"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STORAGE_SERVICES_BUFFER_SIZE</span></span></span><br /></dt>
+<dd><p>The buffer size used by all internal storage services. </p>
 </dd></dl>
 
 </div>

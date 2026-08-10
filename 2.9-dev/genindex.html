@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Index &mdash; WRENCH 2.9-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=8b628ae0" />
 
   
@@ -15,8 +15,8 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=e9981f3b"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -1207,6 +1207,8 @@
 </li>
       <li><a href="api_internal/classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE">wrench::Container (C++ class)</a>
 </li>
+      <li><a href="api_internal/classwrench_1_1_container.html#_CPPv4N6wrench9Container19clearPrivateStorageEv">wrench::Container::clearPrivateStorage (C++ function)</a>
+</li>
       <li><a href="api_internal/classwrench_1_1_coordinate_lookup_answer_message.html#_CPPv4N6wrench29CoordinateLookupAnswerMessageE">wrench::CoordinateLookupAnswerMessage (C++ class)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_coordinate_lookup_answer_message.html#_CPPv4N6wrench29CoordinateLookupAnswerMessage29CoordinateLookupAnswerMessageENSt6stringEbRKNSt4pairIddEEd9sg_size_t">wrench::CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage (C++ function)</a>
@@ -2011,9 +2013,7 @@
 </li>
       <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE">wrench::Invocation (C++ class)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation19getContainerEndDateEv">wrench::Invocation::getContainerEndDate (C++ function)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation19getContainerEndDateEv">[1]</a>
-</li>
-      <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation21getContainerStartDateEv">wrench::Invocation::getContainerStartDate (C++ function)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation21getContainerStartDateEv">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation15getDispatchDateEv">wrench::Invocation::getDispatchDate (C++ function)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation15getDispatchDateEv">[1]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation15getFailureCauseEv">wrench::Invocation::getFailureCause (C++ function)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation15getFailureCauseEv">[1]</a>
 </li>
@@ -2030,6 +2030,8 @@
       <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation12hasSucceededEv">wrench::Invocation::hasSucceeded (C++ function)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation12hasSucceededEv">[1]</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_invocation.html#_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI18RegisteredFunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort">wrench::Invocation::Invocation (C++ function)</a>
+</li>
+      <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation12isDispatchedEv">wrench::Invocation::isDispatched (C++ function)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation12isDispatchedEv">[1]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation6isDoneEv">wrench::Invocation::isDone (C++ function)</a>, <a href="api_internal/classwrench_1_1_invocation.html#_CPPv4NK6wrench10Invocation6isDoneEv">[1]</a>
 </li>
@@ -2265,8 +2267,6 @@
 </li>
       <li><a href="api_developer/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayloadE">wrench::NetworkProximityServiceMessagePayload (C++ class)</a>, <a href="api_internal/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayloadE">[1]</a>, <a href="api_user/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayloadE">[2]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_developer/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayload37NETWORK_DAEMON_CONTACT_ANSWER_PAYLOADE">wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD (C++ member)</a>, <a href="api_internal/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayload37NETWORK_DAEMON_CONTACT_ANSWER_PAYLOADE">[1]</a>, <a href="api_user/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayload37NETWORK_DAEMON_CONTACT_ANSWER_PAYLOADE">[2]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayload38NETWORK_DAEMON_CONTACT_REQUEST_PAYLOADE">wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD (C++ member)</a>, <a href="api_internal/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayload38NETWORK_DAEMON_CONTACT_REQUEST_PAYLOADE">[1]</a>, <a href="api_user/classwrench_1_1_network_proximity_service_message_payload.html#_CPPv4N6wrench37NetworkProximityServiceMessagePayload38NETWORK_DAEMON_CONTACT_REQUEST_PAYLOADE">[2]</a>
@@ -2287,6 +2287,8 @@
 </li>
       <li><a href="api_developer/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty46NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISEE">wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE (C++ member)</a>, <a href="api_internal/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty46NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISEE">[1]</a>, <a href="api_user/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty46NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISEE">[2]</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_developer/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty47NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEEDE">wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED (C++ member)</a>, <a href="api_internal/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty47NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEEDE">[1]</a>, <a href="api_user/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty47NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEEDE">[2]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty30NETWORK_PROXIMITY_MESSAGE_SIZEE">wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE (C++ member)</a>, <a href="api_internal/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty30NETWORK_PROXIMITY_MESSAGE_SIZEE">[1]</a>, <a href="api_user/classwrench_1_1_network_proximity_service_property.html#_CPPv4N6wrench31NetworkProximityServiceProperty30NETWORK_PROXIMITY_MESSAGE_SIZEE">[2]</a>
@@ -2325,13 +2327,19 @@
 </li>
       <li><a href="api_developer/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResourcesE">wrench::NotEnoughResources (C++ class)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResourcesE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources6getJobEv">wrench::NotEnoughResources::getJob (C++ function)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources6getJobEv">[1]</a>
-</li>
-      <li><a href="api_developer/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources10getServiceEv">wrench::NotEnoughResources::getService (C++ function)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources10getServiceEv">[1]</a>
-</li>
-      <li><a href="api_internal/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt10shared_ptrI3JobEENSt10shared_ptrI7ServiceEE">wrench::NotEnoughResources::NotEnoughResources (C++ function)</a>
+      <li><a href="api_internal/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt6stringE">wrench::NotEnoughResources::NotEnoughResources (C++ function)</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources8toStringEv">wrench::NotEnoughResources::toString (C++ function)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources.html#_CPPv4N6wrench18NotEnoughResources8toStringEv">[1]</a>
+</li>
+      <li><a href="api_developer/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJobE">wrench::NotEnoughResourcesForJob (C++ class)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJobE">[1]</a>
+</li>
+      <li><a href="api_developer/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJob6getJobEv">wrench::NotEnoughResourcesForJob::getJob (C++ function)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJob6getJobEv">[1]</a>
+</li>
+      <li><a href="api_developer/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJob10getServiceEv">wrench::NotEnoughResourcesForJob::getService (C++ function)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJob10getServiceEv">[1]</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJob24NotEnoughResourcesForJobENSt10shared_ptrI3JobEENSt10shared_ptrI7ServiceEE">wrench::NotEnoughResourcesForJob::NotEnoughResourcesForJob (C++ function)</a>
+</li>
+      <li><a href="api_developer/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJob8toStringEv">wrench::NotEnoughResourcesForJob::toString (C++ function)</a>, <a href="api_internal/classwrench_1_1_not_enough_resources_for_job.html#_CPPv4N6wrench24NotEnoughResourcesForJob8toStringEv">[1]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_operation_timeout.html#_CPPv4N6wrench16OperationTimeoutE">wrench::OperationTimeout (C++ class)</a>, <a href="api_internal/classwrench_1_1_operation_timeout.html#_CPPv4N6wrench16OperationTimeoutE">[1]</a>
 </li>
@@ -2455,11 +2463,13 @@
 </li>
       <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_DaemonE">wrench::S4U_Daemon (C++ class)</a>
 </li>
+      <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_Daemon9_commportE">wrench::S4U_Daemon::_commport (C++ member)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_Daemon9_hostnameE">wrench::S4U_Daemon::_hostname (C++ member)</a>
+</li>
       <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4NK6wrench10S4U_Daemon17acquireDaemonLockEv">wrench::S4U_Daemon::acquireDaemonLock (C++ function)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_Daemon7cleanupEbi">wrench::S4U_Daemon::cleanup (C++ function)</a>
-</li>
-      <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_Daemon8commportE">wrench::S4U_Daemon::commport (C++ member)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_Daemon15createLifeSaverENSt10shared_ptrI10S4U_DaemonEE">wrench::S4U_Daemon::createLifeSaver (C++ function)</a>
 </li>
@@ -2476,8 +2486,6 @@
       <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4NK6wrench10S4U_Daemon8getStateEv">wrench::S4U_Daemon::getState (C++ function)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4NK6wrench10S4U_Daemon19hasReturnedFromMainEv">wrench::S4U_Daemon::hasReturnedFromMain (C++ function)</a>
-</li>
-      <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4N6wrench10S4U_Daemon8hostnameE">wrench::S4U_Daemon::hostname (C++ member)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_s4_u___daemon.html#_CPPv4NK6wrench10S4U_Daemon12isDaemonizedEv">wrench::S4U_Daemon::isDaemonized (C++ function)</a>
 </li>
@@ -2725,6 +2733,32 @@
 </li>
       <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE">wrench::ServerlessComputeNode (C++ class)</a>
 </li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE">wrench::ServerlessComputeNode::findIdleContainer (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv">wrench::ServerlessComputeNode::getImagesBeingCopied (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv">wrench::ServerlessComputeNode::getImagesBeingLoaded (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI8DataFileEE">wrench::ServerlessComputeNode::isImageBeingCopied (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingLoadedERKNSt10shared_ptrI8DataFileEE">wrench::ServerlessComputeNode::isImageBeingLoaded (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode12isImageInRAMERKNSt10shared_ptrI8DataFileEE">wrench::ServerlessComputeNode::isImageInRAM (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode13isImageOnDiskERKNSt10shared_ptrI8DataFileEE">wrench::ServerlessComputeNode::isImageOnDisk (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4NK6wrench21ServerlessComputeNode20isInvocationFeasibleERKNSt10shared_ptrI10InvocationEERKNSt10shared_ptrI9ContainerEE">wrench::ServerlessComputeNode::isInvocationFeasible (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNode17makeContainerBusyERKNSt10shared_ptrI9ContainerEE">wrench::ServerlessComputeNode::makeContainerBusy (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNode17makeContainerIdleERKNSt10shared_ptrI9ContainerEE">wrench::ServerlessComputeNode::makeContainerIdle (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService">wrench::ServerlessComputeNode::ServerlessComputeNode (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNode17shutdownContainerERKNSt10shared_ptrI9ContainerEE">wrench::ServerlessComputeNode::shutdownContainer (C++ function)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNode14spawnContainerEP18RegisteredFunction">wrench::ServerlessComputeNode::spawnContainer (C++ function)</a>
+</li>
       <li><a href="api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE">wrench::ServerlessComputeService (C++ class)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE">[2]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService24ServerlessComputeServiceERKNSt6stringERKNSt6stringERKNSt6vectorINSt6stringEEERKNSt10shared_ptrI19ServerlessSchedulerEERK31WRENCH_PROPERTY_COLLECTION_TYPERK38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE">wrench::ServerlessComputeService::ServerlessComputeService (C++ function)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService24ServerlessComputeServiceERKNSt6stringERKNSt6stringERKNSt6vectorINSt6stringEEERKNSt10shared_ptrI19ServerlessSchedulerEERK31WRENCH_PROPERTY_COLLECTION_TYPERK38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService24ServerlessComputeServiceERKNSt6stringERKNSt6stringERKNSt6vectorINSt6stringEEERKNSt10shared_ptrI19ServerlessSchedulerEERK31WRENCH_PROPERTY_COLLECTION_TYPERK38WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE">[2]</a>
@@ -2736,6 +2770,12 @@
       <li><a href="api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService17supportsPilotJobsEv">wrench::ServerlessComputeService::supportsPilotJobs (C++ function)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService17supportsPilotJobsEv">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService17supportsPilotJobsEv">[2]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService20supportsStandardJobsEv">wrench::ServerlessComputeService::supportsStandardJobs (C++ function)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService20supportsStandardJobsEv">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeService20supportsStandardJobsEv">[2]</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html#_CPPv4N6wrench51ServerlessComputeServiceContainerIdleTimeoutMessageE">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage (C++ class)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html#_CPPv4N6wrench51ServerlessComputeServiceContainerIdleTimeoutMessage10_containerE">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage::_container (C++ member)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html#_CPPv4N6wrench51ServerlessComputeServiceContainerIdleTimeoutMessage14_idle_sequenceE">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage::_idle_sequence (C++ member)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_serverless_compute_service_download_complete_message.html#_CPPv4N6wrench47ServerlessComputeServiceDownloadCompleteMessageE">wrench::ServerlessComputeServiceDownloadCompleteMessage (C++ class)</a>
 </li>
@@ -2841,11 +2881,15 @@
 </li>
       <li><a href="api_developer/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServicePropertyE">wrench::ServerlessComputeServiceProperty (C++ class)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServicePropertyE">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServicePropertyE">[2]</a>
 </li>
+      <li><a href="api_developer/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE">wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT (C++ member)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE">[2]</a>
+</li>
       <li><a href="api_developer/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE">wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD (C++ member)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE">[2]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE">wrench::ServerlessScheduler (C++ class)</a>, <a href="api_internal/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE">wrench::ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE (C++ member)</a>, <a href="api_internal/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE">[1]</a>, <a href="api_user/classwrench_1_1_serverless_compute_service_property.html#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE">[2]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem">wrench::ServerlessScheduler::schedule (C++ function)</a>, <a href="api_internal/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem">[1]</a>
+      <li><a href="api_internal/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE">wrench::ServerlessScheduler (C++ class)</a>
+</li>
+      <li><a href="api_internal/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem">wrench::ServerlessScheduler::schedule (C++ function)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_serverless_state_of_the_system.html#_CPPv4N6wrench26ServerlessStateOfTheSystemE">wrench::ServerlessStateOfTheSystem (C++ class)</a>
 </li>
@@ -2867,7 +2911,7 @@
 </li>
       <li><a href="api_internal/classwrench_1_1_serverless_state_of_the_system.html#_CPPv4NK6wrench26ServerlessStateOfTheSystem18isImageInRAMAtNodeERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI8DataFileEE">wrench::ServerlessStateOfTheSystem::isImageInRAMAtNode (C++ function)</a>
 </li>
-      <li><a href="api_internal/classwrench_1_1_serverless_state_of_the_system.html#_CPPv4NK6wrench26ServerlessStateOfTheSystem13isImageOnNodeERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI8DataFileEE">wrench::ServerlessStateOfTheSystem::isImageOnNode (C++ function)</a>
+      <li><a href="api_internal/classwrench_1_1_serverless_state_of_the_system.html#_CPPv4NK6wrench26ServerlessStateOfTheSystem19isImageOnDiskAtNodeERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI8DataFileEE">wrench::ServerlessStateOfTheSystem::isImageOnDiskAtNode (C++ function)</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7ServiceE">wrench::Service (C++ class)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7ServiceE">[1]</a>, <a href="api_user/classwrench_1_1_service.html#_CPPv4N6wrench7ServiceE">[2]</a>
 </li>
@@ -2879,7 +2923,7 @@
 </li>
       <li><a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service21getMessagePayloadListEv">wrench::Service::getMessagePayloadList (C++ function)</a>
 </li>
-      <li><a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE">wrench::Service::getMessagePayloadValue (C++ function)</a>
+      <li><a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE">wrench::Service::getMessagePayloadValue (C++ function)</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service22getNetworkTimeoutValueEv">wrench::Service::getNetworkTimeoutValue (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service22getNetworkTimeoutValueEv">[1]</a>
 </li>
@@ -2887,19 +2931,19 @@
 </li>
       <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service15getPropertyListEv">wrench::Service::getPropertyList (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service15getPropertyListEv">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsBandwidthInBytePerSecond (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsBandwidthInBytePerSecond (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsBoolean (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsBoolean (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsDouble (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsDouble (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsSizeInByte (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsSizeInByte (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsString (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsString (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsTimeInSecond (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsTimeInSecond (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE">[1]</a>
 </li>
-      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsUnsignedLong (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE">[1]</a>
+      <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE">wrench::Service::getPropertyValueAsUnsignedLong (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE">[1]</a>
 </li>
       <li><a href="api_developer/classwrench_1_1_service.html#_CPPv4NK6wrench7Service4isUpEv">wrench::Service::isUp (C++ function)</a>, <a href="api_internal/classwrench_1_1_service.html#_CPPv4NK6wrench7Service4isUpEv">[1]</a>
 </li>
@@ -3617,9 +3661,11 @@
 </li>
       <li><a href="api_internal/classwrench_1_1_storage_service_ack_message.html#_CPPv4N6wrench24StorageServiceAckMessageE">wrench::StorageServiceAckMessage (C++ class)</a>
 </li>
+      <li><a href="api_internal/classwrench_1_1_storage_service_ack_message.html#_CPPv4N6wrench24StorageServiceAckMessage13failure_causeE">wrench::StorageServiceAckMessage::failure_cause (C++ member)</a>
+</li>
       <li><a href="api_internal/classwrench_1_1_storage_service_ack_message.html#_CPPv4N6wrench24StorageServiceAckMessage8locationE">wrench::StorageServiceAckMessage::location (C++ member)</a>
 </li>
-      <li><a href="api_internal/classwrench_1_1_storage_service_ack_message.html#_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEE">wrench::StorageServiceAckMessage::StorageServiceAckMessage (C++ function)</a>
+      <li><a href="api_internal/classwrench_1_1_storage_service_ack_message.html#_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEENSt10shared_ptrI12FailureCauseEE">wrench::StorageServiceAckMessage::StorageServiceAckMessage (C++ function)</a>
 </li>
       <li><a href="api_internal/classwrench_1_1_storage_service_file_content_chunk_message.html#_CPPv4N6wrench37StorageServiceFileContentChunkMessageE">wrench::StorageServiceFileContentChunkMessage (C++ class)</a>
 </li>

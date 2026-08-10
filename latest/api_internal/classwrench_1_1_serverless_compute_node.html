@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wrench::ServerlessComputeNode &mdash; WRENCH 2.9-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
 
   
@@ -16,8 +16,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e9981f3b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -270,6 +270,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_request_message.html">wrench::NextContactDaemonRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -288,10 +289,26 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___virtual_machine.html">wrench::S4U_VirtualMachine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessComputeNode</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNodeE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessComputeNode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNodeE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessComputeNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService"><code class="docutils literal notranslate"><span class="pre">ServerlessComputeNode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE"><code class="docutils literal notranslate"><span class="pre">findIdleContainer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv"><code class="docutils literal notranslate"><span class="pre">getImagesBeingCopied()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv"><code class="docutils literal notranslate"><span class="pre">getImagesBeingLoaded()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">isImageBeingCopied()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingLoadedERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">isImageBeingLoaded()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode12isImageInRAMERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">isImageInRAM()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode13isImageOnDiskERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">isImageOnDisk()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode20isInvocationFeasibleERKNSt10shared_ptrI10InvocationEERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">isInvocationFeasible()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode17makeContainerBusyERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">makeContainerBusy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode17makeContainerIdleERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">makeContainerIdle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode17shutdownContainerERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">shutdownContainer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode14spawnContainerEP18RegisteredFunction"><code class="docutils literal notranslate"><span class="pre">spawnContainer()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
@@ -451,6 +468,179 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNodeE">
 <span id="_CPPv3N6wrench21ServerlessComputeNodeE"></span><span id="_CPPv2N6wrench21ServerlessComputeNodeE"></span><span id="wrench::ServerlessComputeNode"></span><span class="target" id="classwrench_1_1_serverless_compute_node"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessComputeNode</span></span></span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNodeE" title="Link to this definition"></a><br /></dt>
 <dd><p>A class that stores the state of a serverless compute node. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService">
+<span id="_CPPv3N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService"></span><span id="_CPPv2N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService"></span><span id="wrench::ServerlessComputeNode::ServerlessComputeNode__ss.unsigned-i.ServerlessComputeServiceP"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a0f03e3a0ce6c69aa3844a55ba6f7d724"></span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessComputeNode</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_cores</span></span>, <a class="reference internal" href="../api_developer/classwrench_1_1_serverless_compute_service.html#_CPPv4N6wrench24ServerlessComputeServiceE" title="wrench::ServerlessComputeService"><span class="n"><span class="pre">ServerlessComputeService</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">service</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h</strong> – hostname </p></li>
+<li><p><strong>num_cores</strong> – number of cores </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE"></span><span id="wrench::ServerlessComputeNode::findIdleContainer__RegisteredFunctionCP.std::set:std::shared_ptr:Container::CRC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a37e32266037806a34316dc1f43fa6ef3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">findIdleContainer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api_developer/classwrench_1_1_registered_function.html#_CPPv4N6wrench18RegisteredFunctionE" title="wrench::RegisteredFunction"><span class="n"><span class="pre">RegisteredFunction</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">registered_function</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">excluded_container</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Method to see if there is an appropriate idle container. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>registered_function</strong> – the target function </p></li>
+<li><p><strong>excluded_container</strong> – set containers to ignore </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A container, if found, or nullptr </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv"></span><span id="wrench::ServerlessComputeNode::getImagesBeingCopiedC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a932315e77989d43055367655fa283ed5"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getImagesBeingCopied</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the set of images being copied to (the disk of) the compute node. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A set of images </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv"></span><span id="wrench::ServerlessComputeNode::getImagesBeingLoadedC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1accdeac4fa303892bc9c4d5987a6b9afa"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getImagesBeingLoaded</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the set of images being loaded to (the RAM of) the compute node. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A set of images </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI8DataFileEE">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI8DataFileEE"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI8DataFileEE"></span><span id="wrench::ServerlessComputeNode::isImageBeingCopied__std::shared_ptr:DataFile:CRC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a973f16317cf96218e4954add1e1c1ea1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isImageBeingCopied</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI8DataFileEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is an image in the process of being copied to (the disk of) the compute node? </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – an image file </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the image is being copied </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingLoadedERKNSt10shared_ptrI8DataFileEE">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode18isImageBeingLoadedERKNSt10shared_ptrI8DataFileEE"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode18isImageBeingLoadedERKNSt10shared_ptrI8DataFileEE"></span><span id="wrench::ServerlessComputeNode::isImageBeingLoaded__std::shared_ptr:DataFile:CRC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a720fbbeb8b15d0c8f8c1b8fa98be7663"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isImageBeingLoaded</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingLoadedERKNSt10shared_ptrI8DataFileEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is an image in the process of being loaded to (the RAM of) the compute node? </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – an image file </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the image is being loaded </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode12isImageInRAMERKNSt10shared_ptrI8DataFileEE">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode12isImageInRAMERKNSt10shared_ptrI8DataFileEE"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode12isImageInRAMERKNSt10shared_ptrI8DataFileEE"></span><span id="wrench::ServerlessComputeNode::isImageInRAM__std::shared_ptr:DataFile:CRC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a0adad17aabaeeba8a80e5a8866074964"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isImageInRAM</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode12isImageInRAMERKNSt10shared_ptrI8DataFileEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is an image in RAM? </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – an image file </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the image is in RAM </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode13isImageOnDiskERKNSt10shared_ptrI8DataFileEE">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode13isImageOnDiskERKNSt10shared_ptrI8DataFileEE"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode13isImageOnDiskERKNSt10shared_ptrI8DataFileEE"></span><span id="wrench::ServerlessComputeNode::isImageOnDisk__std::shared_ptr:DataFile:CRC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1ae4d44d1ef53f8c1d6412ca97d809f193"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isImageOnDisk</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode13isImageOnDiskERKNSt10shared_ptrI8DataFileEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Is an image on disk? </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – an image file </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the image is on disk </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode20isInvocationFeasibleERKNSt10shared_ptrI10InvocationEERKNSt10shared_ptrI9ContainerEE">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode20isInvocationFeasibleERKNSt10shared_ptrI10InvocationEERKNSt10shared_ptrI9ContainerEE"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode20isInvocationFeasibleERKNSt10shared_ptrI10InvocationEERKNSt10shared_ptrI9ContainerEE"></span><span id="wrench::ServerlessComputeNode::isInvocationFeasible__std::shared_ptr:Invocation:CR.std::shared_ptr:Container:CRC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a96bab77e51e5bcc3fdf5b78ff4167967"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isInvocationFeasible</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">invocation</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">container</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode20isInvocationFeasibleERKNSt10shared_ptrI10InvocationEERKNSt10shared_ptrI9ContainerEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Helper method to ensure that an invocation can be dispatched. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>invocation</strong> – the invocation to start </p></li>
+<li><p><strong>target_container</strong> – the target container (nullptr if none) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if the invocation can be dispatched, false otherwise </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNode17makeContainerBusyERKNSt10shared_ptrI9ContainerEE">
+<span id="_CPPv3N6wrench21ServerlessComputeNode17makeContainerBusyERKNSt10shared_ptrI9ContainerEE"></span><span id="_CPPv2N6wrench21ServerlessComputeNode17makeContainerBusyERKNSt10shared_ptrI9ContainerEE"></span><span id="wrench::ServerlessComputeNode::makeContainerBusy__std::shared_ptr:Container:CR"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1ac3251c95943e2ba2ea7d290c596a6557"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeContainerBusy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">container</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNode17makeContainerBusyERKNSt10shared_ptrI9ContainerEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Make a container busy. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>container</strong> – a container </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNode17makeContainerIdleERKNSt10shared_ptrI9ContainerEE">
+<span id="_CPPv3N6wrench21ServerlessComputeNode17makeContainerIdleERKNSt10shared_ptrI9ContainerEE"></span><span id="_CPPv2N6wrench21ServerlessComputeNode17makeContainerIdleERKNSt10shared_ptrI9ContainerEE"></span><span id="wrench::ServerlessComputeNode::makeContainerIdle__std::shared_ptr:Container:CR"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a639044861ecbc784bff2df476115c4e1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeContainerIdle</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">container</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNode17makeContainerIdleERKNSt10shared_ptrI9ContainerEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Make a container idle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>container</strong> – a container </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNode17shutdownContainerERKNSt10shared_ptrI9ContainerEE">
+<span id="_CPPv3N6wrench21ServerlessComputeNode17shutdownContainerERKNSt10shared_ptrI9ContainerEE"></span><span id="_CPPv2N6wrench21ServerlessComputeNode17shutdownContainerERKNSt10shared_ptrI9ContainerEE"></span><span id="wrench::ServerlessComputeNode::shutdownContainer__std::shared_ptr:Container:CR"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1afa5aafc1ec65ebc2c89d653eb3a8e71f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shutdownContainer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">container</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNode17shutdownContainerERKNSt10shared_ptrI9ContainerEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Shutdown a container. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>container</strong> – a container </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNode14spawnContainerEP18RegisteredFunction">
+<span id="_CPPv3N6wrench21ServerlessComputeNode14spawnContainerEP18RegisteredFunction"></span><span id="_CPPv2N6wrench21ServerlessComputeNode14spawnContainerEP18RegisteredFunction"></span><span id="wrench::ServerlessComputeNode::spawnContainer__RegisteredFunctionP"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a09f7756e7c1902b3ffac7de5d877d559"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">spawnContainer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../api_developer/classwrench_1_1_registered_function.html#_CPPv4N6wrench18RegisteredFunctionE" title="wrench::RegisteredFunction"><span class="n"><span class="pre">RegisteredFunction</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">registered_function</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNode14spawnContainerEP18RegisteredFunction" title="Link to this definition"></a><br /></dt>
+<dd><p>Spawn a container. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>registered_function</strong> – a registered function </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 </section>

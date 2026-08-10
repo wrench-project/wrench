@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wrench::NotEnoughResources &mdash; WRENCH 2.9-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
 
   
@@ -16,12 +16,12 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e9981f3b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="wrench::OperationTimeout" href="classwrench_1_1_operation_timeout.html" />
+    <link rel="next" title="wrench::NotEnoughResourcesForJob" href="classwrench_1_1_not_enough_resources_for_job.html" />
     <link rel="prev" title="wrench::NotAllowed" href="classwrench_1_1_not_allowed.html" /> 
 </head>
 
@@ -271,14 +271,13 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::NotEnoughResources</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench18NotEnoughResourcesE"><code class="docutils literal notranslate"><span class="pre">wrench::NotEnoughResources</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt10shared_ptrI3JobEENSt10shared_ptrI7ServiceEE"><code class="docutils literal notranslate"><span class="pre">NotEnoughResources()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18NotEnoughResources6getJobEv"><code class="docutils literal notranslate"><span class="pre">getJob()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18NotEnoughResources10getServiceEv"><code class="docutils literal notranslate"><span class="pre">getService()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt6stringE"><code class="docutils literal notranslate"><span class="pre">NotEnoughResources()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18NotEnoughResources8toStringEv"><code class="docutils literal notranslate"><span class="pre">toString()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -298,6 +297,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html">wrench::ServerlessComputeNode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
@@ -456,41 +456,16 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench18NotEnoughResourcesE">
 <span id="_CPPv3N6wrench18NotEnoughResourcesE"></span><span id="_CPPv2N6wrench18NotEnoughResourcesE"></span><span id="wrench::NotEnoughResources"></span><span class="target" id="classwrench_1_1_not_enough_resources"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NotEnoughResources</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_failure_cause.html#_CPPv4N6wrench12FailureCauseE" title="wrench::FailureCause"><span class="n"><span class="pre">FailureCause</span></span></a><br /></dt>
-<dd><p>A “compute service doesn’t have enough cores” failure cause. </p>
+<dd><p>A generic “not enough resources” failure cause. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt10shared_ptrI3JobEENSt10shared_ptrI7ServiceEE">
-<span id="_CPPv3N6wrench18NotEnoughResources18NotEnoughResourcesENSt10shared_ptrI3JobEENSt10shared_ptrI7ServiceEE"></span><span id="_CPPv2N6wrench18NotEnoughResources18NotEnoughResourcesENSt10shared_ptrI3JobEENSt10shared_ptrI7ServiceEE"></span><span id="wrench::NotEnoughResources::NotEnoughResources__std::shared_ptr:Job:.std::shared_ptr:Service:"></span><span class="target" id="classwrench_1_1_not_enough_resources_1aaa9dd35344b33d3e9d49c4625dbbdbb9"></span><span class="sig-name descname"><span class="n"><span class="pre">NotEnoughResources</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_job.html#_CPPv4N6wrench3JobE" title="wrench::Job"><span class="n"><span class="pre">Job</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">job</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7ServiceE" title="wrench::Service"><span class="n"><span class="pre">Service</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">service</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt10shared_ptrI3JobEENSt10shared_ptrI7ServiceEE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt6stringE">
+<span id="_CPPv3N6wrench18NotEnoughResources18NotEnoughResourcesENSt6stringE"></span><span id="_CPPv2N6wrench18NotEnoughResources18NotEnoughResourcesENSt6stringE"></span><span id="wrench::NotEnoughResources::NotEnoughResources__ss"></span><span class="target" id="classwrench_1_1_not_enough_resources_1ae34082a870f87ce9164a42d53ea41053"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NotEnoughResources</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">message</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench18NotEnoughResources18NotEnoughResourcesENSt6stringE" title="Link to this definition"></a><br /></dt>
 <dd><p>Constructor. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>job</strong> – the job that could not be executed (or nullptr if no job was involved) </p></li>
-<li><p><strong>service</strong> – the compute service that didn’t have enough cores or ram </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench18NotEnoughResources6getJobEv">
-<span id="_CPPv3N6wrench18NotEnoughResources6getJobEv"></span><span id="_CPPv2N6wrench18NotEnoughResources6getJobEv"></span><span id="wrench::NotEnoughResources::getJob"></span><span class="target" id="classwrench_1_1_not_enough_resources_1a8e847cdbe29e87fe602f951a42f12d97"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_job.html#_CPPv4N6wrench3JobE" title="wrench::Job"><span class="n"><span class="pre">Job</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getJob</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Getter. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the job </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench18NotEnoughResources10getServiceEv">
-<span id="_CPPv3N6wrench18NotEnoughResources10getServiceEv"></span><span id="_CPPv2N6wrench18NotEnoughResources10getServiceEv"></span><span id="wrench::NotEnoughResources::getService"></span><span class="target" id="classwrench_1_1_not_enough_resources_1a84a82f7bcd83f4a1690b7f81e8bd2750"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_service.html#_CPPv4N6wrench7ServiceE" title="wrench::Service"><span class="n"><span class="pre">Service</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getService</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Getter. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the compute service </p>
+<dd class="field-odd"><p><strong>message</strong> – a message </p>
 </dd>
 </dl>
 </dd></dl>
@@ -516,7 +491,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="classwrench_1_1_not_allowed.html" class="btn btn-neutral float-left" title="wrench::NotAllowed" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="classwrench_1_1_operation_timeout.html" class="btn btn-neutral float-right" title="wrench::OperationTimeout" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="classwrench_1_1_not_enough_resources_for_job.html" class="btn btn-neutral float-right" title="wrench::NotEnoughResourcesForJob" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

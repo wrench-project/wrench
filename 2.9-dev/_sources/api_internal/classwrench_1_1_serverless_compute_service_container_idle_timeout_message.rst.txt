@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceContainerIdleTimeoutMessage:
+wrench::ServerlessComputeServiceContainerIdleTimeoutMessage
+***********************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceContainerIdleTimeoutMessage
+   :project: internal
+   :members:
+

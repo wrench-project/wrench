@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wrench::StorageServiceAckMessage &mdash; WRENCH 2.9-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
 
   
@@ -16,8 +16,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e9981f3b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -270,6 +270,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_request_message.html">wrench::NextContactDaemonRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -289,6 +290,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html">wrench::ServerlessComputeNode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
@@ -364,7 +366,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_storage_service.html">wrench::StorageService</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::StorageServiceAckMessage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench24StorageServiceAckMessageE"><code class="docutils literal notranslate"><span class="pre">wrench::StorageServiceAckMessage</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">StorageServiceAckMessage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEENSt10shared_ptrI12FailureCauseEE"><code class="docutils literal notranslate"><span class="pre">StorageServiceAckMessage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench24StorageServiceAckMessage13failure_causeE"><code class="docutils literal notranslate"><span class="pre">failure_cause</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench24StorageServiceAckMessage8locationE"><code class="docutils literal notranslate"><span class="pre">location</span></code></a></li>
 </ul>
 </li>
@@ -458,12 +461,15 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEE">
-<span id="_CPPv3N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEE"></span><span id="wrench::StorageServiceAckMessage::StorageServiceAckMessage__std::shared_ptr:FileLocation:"></span><span class="target" id="classwrench_1_1_storage_service_ack_message_1af9df5b7ce4131d394b5f50ea32649b42"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StorageServiceAckMessage</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">location</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEENSt10shared_ptrI12FailureCauseEE">
+<span id="_CPPv3N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEENSt10shared_ptrI12FailureCauseEE"></span><span id="_CPPv2N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEENSt10shared_ptrI12FailureCauseEE"></span><span id="wrench::StorageServiceAckMessage::StorageServiceAckMessage__std::shared_ptr:FileLocation:.std::shared_ptr:FailureCause:"></span><span class="target" id="classwrench_1_1_storage_service_ack_message_1a59d8cdceadb61d6e539b7e43cc76838c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StorageServiceAckMessage</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">location</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_failure_cause.html#_CPPv4N6wrench12FailureCauseE" title="wrench::FailureCause"><span class="n"><span class="pre">FailureCause</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fc</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench24StorageServiceAckMessage24StorageServiceAckMessageENSt10shared_ptrI12FileLocationEENSt10shared_ptrI12FailureCauseEE" title="Link to this definition"></a><br /></dt>
 <dd><p>Constructor. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>location</strong> – the file location </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> – the file location </p></li>
+<li><p><strong>fc</strong> – the success status </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -471,6 +477,12 @@
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench24StorageServiceAckMessage13failure_causeE">
+<span id="_CPPv3N6wrench24StorageServiceAckMessage13failure_causeE"></span><span id="_CPPv2N6wrench24StorageServiceAckMessage13failure_causeE"></span><span id="wrench::StorageServiceAckMessage::failure_cause__std::shared_ptr:FailureCause:"></span><span class="target" id="classwrench_1_1_storage_service_ack_message_1aeb3ba39944e60e089eaf8618a6f35229"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_failure_cause.html#_CPPv4N6wrench12FailureCauseE" title="wrench::FailureCause"><span class="n"><span class="pre">FailureCause</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">failure_cause</span></span></span><a class="headerlink" href="#_CPPv4N6wrench24StorageServiceAckMessage13failure_causeE" title="Link to this definition"></a><br /></dt>
+<dd><p>The success status. </p>
+</dd></dl>
+
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench24StorageServiceAckMessage8locationE">
 <span id="_CPPv3N6wrench24StorageServiceAckMessage8locationE"></span><span id="_CPPv2N6wrench24StorageServiceAckMessage8locationE"></span><span id="wrench::StorageServiceAckMessage::location__std::shared_ptr:FileLocation:"></span><span class="target" id="classwrench_1_1_storage_service_ack_message_1a9cf8c3c84c91c401c451f40bd00b4c8f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">location</span></span></span><a class="headerlink" href="#_CPPv4N6wrench24StorageServiceAckMessage8locationE" title="Link to this definition"></a><br /></dt>

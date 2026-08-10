@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wrench::S4U_Daemon &mdash; WRENCH 2.9-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
 
   
@@ -16,8 +16,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e9981f3b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -270,6 +270,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_request_message.html">wrench::NextContactDaemonRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -306,8 +307,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon19setupOnExitFunctionEv"><code class="docutils literal notranslate"><span class="pre">setupOnExitFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon11startDaemonEbb"><code class="docutils literal notranslate"><span class="pre">startDaemon()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10S4U_Daemon12suspendActorEv"><code class="docutils literal notranslate"><span class="pre">suspendActor()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon8commportE"><code class="docutils literal notranslate"><span class="pre">commport</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon8hostnameE"><code class="docutils literal notranslate"><span class="pre">hostname</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon9_commportE"><code class="docutils literal notranslate"><span class="pre">_commport</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon9_hostnameE"><code class="docutils literal notranslate"><span class="pre">_hostname</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon10life_saverE"><code class="docutils literal notranslate"><span class="pre">life_saver</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon12process_nameE"><code class="docutils literal notranslate"><span class="pre">process_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon13recv_commportE"><code class="docutils literal notranslate"><span class="pre">recv_commport</span></code></a></li>
@@ -326,6 +327,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html">wrench::ServerlessComputeNode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
@@ -755,14 +757,14 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon8commportE">
-<span id="_CPPv3N6wrench10S4U_Daemon8commportE"></span><span id="_CPPv2N6wrench10S4U_Daemon8commportE"></span><span id="wrench::S4U_Daemon::commport__S4U_CommPortP"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a6bbde8fe08132e3575d16060579db181"></span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">commport</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon8commportE" title="Link to this definition"></a><br /></dt>
-<dd><p>The daemon’s commport_name. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon9_commportE">
+<span id="_CPPv3N6wrench10S4U_Daemon9_commportE"></span><span id="_CPPv2N6wrench10S4U_Daemon9_commportE"></span><span id="wrench::S4U_Daemon::_commport__S4U_CommPortP"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a6d4b18e09566ff92252e34f346c5627f"></span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">_commport</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon9_commportE" title="Link to this definition"></a><br /></dt>
+<dd><p>The daemon’s commport. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon8hostnameE">
-<span id="_CPPv3N6wrench10S4U_Daemon8hostnameE"></span><span id="_CPPv2N6wrench10S4U_Daemon8hostnameE"></span><span id="wrench::S4U_Daemon::hostname__ss"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a52bc0b9a6cd248310749dac086819f00"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hostname</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon8hostnameE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon9_hostnameE">
+<span id="_CPPv3N6wrench10S4U_Daemon9_hostnameE"></span><span id="_CPPv2N6wrench10S4U_Daemon9_hostnameE"></span><span id="wrench::S4U_Daemon::_hostname__ss"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a070c7713a75264eb4f7ee77de0df8583"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_hostname</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon9_hostnameE" title="Link to this definition"></a><br /></dt>
 <dd><p>The name of the host on which the daemon is running. </p>
 </dd></dl>
 
@@ -781,7 +783,7 @@
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon13recv_commportE">
 <span id="_CPPv3N6wrench10S4U_Daemon13recv_commportE"></span><span id="_CPPv2N6wrench10S4U_Daemon13recv_commportE"></span><span id="wrench::S4U_Daemon::recv_commport__S4U_CommPortP"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a2a0adb6361b584126f95b83054932f4a"></span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">recv_commport</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon13recv_commportE" title="Link to this definition"></a><br /></dt>
-<dd><p>The daemon’s receive commport_name (to send to another daemon so that that daemon can reply) </p>
+<dd><p>The daemon’s receive commport (to send to another daemon so that that daemon can reply) </p>
 </dd></dl>
 
 </div>

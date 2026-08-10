@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wrench::Service &mdash; WRENCH 2.9-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=8b628ae0" />
 
   
@@ -16,8 +16,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e9981f3b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -270,6 +270,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_next_contact_daemon_request_message.html">wrench::NextContactDaemonRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -289,6 +290,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s_m_p_i_executor.html">wrench::SMPIExecutor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html">wrench::ServerlessComputeNode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_container_idle_timeout_message.html">wrench::ServerlessComputeServiceContainerIdleTimeoutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_download_complete_message.html">wrench::ServerlessComputeServiceDownloadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_answer_message.html">wrench::ServerlessComputeServiceFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_invocation_complete_message.html">wrench::ServerlessComputeServiceFunctionInvocationCompleteMessage</a></li>
@@ -309,17 +311,17 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service7getHostEv"><code class="docutils literal notranslate"><span class="pre">getHost()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service11getHostnameEv"><code class="docutils literal notranslate"><span class="pre">getHostname()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service21getMessagePayloadListEv"><code class="docutils literal notranslate"><span class="pre">getMessagePayloadList()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"><code class="docutils literal notranslate"><span class="pre">getMessagePayloadValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"><code class="docutils literal notranslate"><span class="pre">getMessagePayloadValue()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service22getNetworkTimeoutValueEv"><code class="docutils literal notranslate"><span class="pre">getNetworkTimeoutValue()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service19getPhysicalHostnameEv"><code class="docutils literal notranslate"><span class="pre">getPhysicalHostname()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service15getPropertyListEv"><code class="docutils literal notranslate"><span class="pre">getPropertyList()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsBandwidthInBytePerSecond()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsBoolean()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsDouble()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsSizeInByte()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsString()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsTimeInSecond()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsUnsignedLong()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsBandwidthInBytePerSecond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsBoolean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsDouble()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsSizeInByte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsTimeInSecond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"><code class="docutils literal notranslate"><span class="pre">getPropertyValueAsUnsignedLong()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench7Service4isUpEv"><code class="docutils literal notranslate"><span class="pre">isUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service6resumeEv"><code class="docutils literal notranslate"><span class="pre">resume()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench7Service22setNetworkTimeoutValueEd"><code class="docutils literal notranslate"><span class="pre">setNetworkTimeoutValue()</span></code></a></li>
@@ -518,8 +520,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE">
-<span id="_CPPv3N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"></span><span id="_CPPv2N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"></span><span id="wrench::Service::getMessagePayloadValue__WRENCH_MESSAGEPAYLOAD_TYPE"></span><span class="target" id="classwrench_1_1_service_1a77abd63c5c02e684ef3f8dfbc03333d0"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMessagePayloadValue</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_MESSAGEPAYLOAD_TYPE</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE">
+<span id="_CPPv3NK6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"></span><span id="_CPPv2NK6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE"></span><span id="wrench::Service::getMessagePayloadValue__WRENCH_MESSAGEPAYLOAD_TYPEC"></span><span class="target" id="classwrench_1_1_service_1aff0151ba32d690c97fe1e2718336d9c2"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMessagePayloadValue</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_MESSAGEPAYLOAD_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench7Service22getMessagePayloadValueE26WRENCH_MESSAGEPAYLOAD_TYPE" title="Link to this definition"></a><br /></dt>
 <dd><p>Get a message payload of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a double. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -565,8 +567,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE">
-<span id="_CPPv3N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsBandwidthInBytePerSecond__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1a22687fa1fafca2b9431398d04255bc28"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsBandwidthInBytePerSecond</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3NK6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2NK6wrench7Service42getPropertyValueAsBandwidthInBytePerSecondE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsBandwidthInBytePerSecond__WRENCH_PROPERTY_TYPEC"></span><span class="target" id="classwrench_1_1_service_1abcd370b4c90c6266af0e75074b6fe6cd"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsBandwidthInBytePerSecond</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Method to parse a property value that is a bandwidth with (optional) units. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -579,8 +581,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE">
-<span id="_CPPv3N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsBoolean__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1a36ba97418f788522484c0909674eb7c0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsBoolean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3NK6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2NK6wrench7Service25getPropertyValueAsBooleanE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsBoolean__WRENCH_PROPERTY_TYPEC"></span><span class="target" id="classwrench_1_1_service_1aa49270eb088a4ed11f2d32b35fdd44ca"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsBoolean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a boolean. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -593,8 +595,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE">
-<span id="_CPPv3N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsDouble__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1af18638d4222d036ed84347412616b8c0"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsDouble</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3NK6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2NK6wrench7Service24getPropertyValueAsDoubleE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsDouble__WRENCH_PROPERTY_TYPEC"></span><span class="target" id="classwrench_1_1_service_1a07694c144de9bb089e1306f744f63594"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsDouble</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a double. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -607,8 +609,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE">
-<span id="_CPPv3N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsSizeInByte__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1ababbe8fae7d1fac1da588686936d4b2b"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsSizeInByte</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3NK6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2NK6wrench7Service28getPropertyValueAsSizeInByteE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsSizeInByte__WRENCH_PROPERTY_TYPEC"></span><span class="target" id="classwrench_1_1_service_1aec43faebb967f07af996ecd521312bfe"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsSizeInByte</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Method to parse a property value that is a date size with (optional) units. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -621,8 +623,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE">
-<span id="_CPPv3N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsString__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1afa9e6582b11ada0a1c118922143a3990"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3NK6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2NK6wrench7Service24getPropertyValueAsStringE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsString__WRENCH_PROPERTY_TYPEC"></span><span class="target" id="classwrench_1_1_service_1ad4d001b8340c6f1c1bb930a092e16ca1"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as a string. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -635,8 +637,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE">
-<span id="_CPPv3N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsTimeInSecond__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1abe29df374cdd83b09c68dfe14e5684db"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsTimeInSecond</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3NK6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2NK6wrench7Service30getPropertyValueAsTimeInSecondE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsTimeInSecond__WRENCH_PROPERTY_TYPEC"></span><span class="target" id="classwrench_1_1_service_1a63f8f4919dec6aadd2ad16e4becffc85"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsTimeInSecond</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Method to parse a property value that is a time with (optional) units. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -649,8 +651,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE">
-<span id="_CPPv3N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2N6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsUnsignedLong__WRENCH_PROPERTY_TYPE"></span><span class="target" id="classwrench_1_1_service_1ac00d55c518314c0b66776ef486356e04"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsUnsignedLong</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE">
+<span id="_CPPv3NK6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"></span><span id="_CPPv2NK6wrench7Service30getPropertyValueAsUnsignedLongE20WRENCH_PROPERTY_TYPE"></span><span id="wrench::Service::getPropertyValueAsUnsignedLong__WRENCH_PROPERTY_TYPEC"></span><span class="target" id="classwrench_1_1_service_1a4605916ec96a6483177254636d73f199"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPropertyValueAsUnsignedLong</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">WRENCH_PROPERTY_TYPE</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Get a property of the <a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> as an unsigned long. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
