@@ -245,7 +245,7 @@ namespace wrench {
 
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), batchsched_query_commport,
+                        new BatschedNetworkListener(this->cs->_hostname, this->cs->getSharedPtr<BatchComputeService>(), batchsched_query_commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
@@ -347,7 +347,7 @@ namespace wrench {
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->_commport,
+                        new BatschedNetworkListener(this->cs->_hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->_commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
@@ -415,7 +415,7 @@ namespace wrench {
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(),
+                        new BatschedNetworkListener(this->cs->_hostname, this->cs->getSharedPtr<BatchComputeService>(),
                                                     this->cs->_commport,
                                                     std::to_string(this->batsched_port),
                                                     data));
@@ -524,7 +524,7 @@ namespace wrench {
         try {
             std::shared_ptr<BatschedNetworkListener> network_listener =
                     std::shared_ptr<BatschedNetworkListener>(
-                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->_commport,
+                            new BatschedNetworkListener(this->cs->_hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->_commport,
                                                         std::to_string(this->batsched_port),
                                                         data));
             network_listener->setSimulation(this->cs->getSimulation());
