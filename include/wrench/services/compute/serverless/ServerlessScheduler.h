@@ -21,6 +21,10 @@ namespace wrench {
     /** \cond INTERNAL    **/
     /***********************/
 
+    struct TerminateContainer {
+        std::shared_ptr<Container> container;
+    };
+
     struct CopyImage {
         std::shared_ptr<DataFile> image;
         std::shared_ptr<ServerlessComputeNode> compute_node;
@@ -35,10 +39,6 @@ namespace wrench {
         std::shared_ptr<Invocation> invocation;
         ServerlessComputeNode* compute_node;
         std::shared_ptr<Container> container; // nullptr if none
-    };
-
-    struct TerminateContainer {
-        std::shared_ptr<Container> container;
     };
 
     /**
@@ -57,6 +57,37 @@ namespace wrench {
         std::vector<LoadImage> image_loads_to_RAM;
 	    /** @brief The list of function invocations at compute nodes */
         std::vector<DispatchInvocation> invocation_dispatches;
+
+        void print() {
+            if (container_terminations.empty() and image_copies_to_disk.empty() and image_loads_to_RAM.empty() and invocation_dispatches.empty()) {
+                return;
+            }
+
+            std::cerr << "** SCHEDULING DECISIONS **" << std::endl;
+            if (not container_terminations.empty()) {
+                for (const auto& [container] : container_terminations) {
+                    std::cerr << "  Container termination: " << container->getRegisteredFunction()->getImageFile()->getID() <<
+                        "(" <<container->getComputeNode()->hostname << ")" << std::endl;
+                }
+            }
+            if (not image_copies_to_disk.empty()) {
+                for (const auto& [image_file, node] : image_copies_to_disk) {
+                    std::cerr << "  Image copy: " << image_file->getID() << " at " << node->hostname << std::endl;
+                }
+            }
+            if (not image_loads_to_RAM.empty()) {
+                for (const auto& [image_file, node] : image_loads_to_RAM) {
+                    std::cerr << "  Image load: " << image_file->getID() << " at " << node->hostname << std::endl;
+                }
+            }
+            if (not invocation_dispatches.empty()) {
+                for (const auto& [invocation, node, container] : invocation_dispatches) {
+                    std::cerr << "  Invocation dispatch: for " << invocation->getRegisteredFunction()->getImageFile()->getID() <<
+                        " at " << node->hostname << " (" << (container ? "on an idle container" : "on a new container") << ")" << std::endl;
+                }
+            }
+
+        }
     };
 
     /**

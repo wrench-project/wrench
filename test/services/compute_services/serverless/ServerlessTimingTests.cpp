@@ -40,6 +40,7 @@ public:
     void do_DiskPressureDueToImages_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_DiskPressureDueToInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_HotStart_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_SimpleImageEvictionFromDisk_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_SimpleImageEvictionFromRAM_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
@@ -982,12 +983,12 @@ void ServerlessTimingTest::do_HotStart_test(
 
 
 /**********************************************************************/
-/**  HOT START TEST                                                  **/
+/**  EVICTION FROM DISK TEST                                         **/
 /**********************************************************************/
 
-class ServerlessSimpleImageEvictionFromRAMController : public wrench::ExecutionController {
+class ServerlessSimpleImageEvictionFromDiskController : public wrench::ExecutionController {
 public:
-    ServerlessSimpleImageEvictionFromRAMController(ServerlessTimingTest* test,
+    ServerlessSimpleImageEvictionFromDiskController(ServerlessTimingTest* test,
                                  const std::string& hostname,
                                  const std::shared_ptr<wrench::ServerlessComputeService>
                                  & compute_service,
@@ -1028,14 +1029,14 @@ private:
         auto inv1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv1);
         // Keep track of time for invocation when image is not on disk at compute node
-        auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getDispatchDate();
+        auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getSubmitDate();
 
         // At this point, the image is on disk at the compute node (and on RAM, but we don't care)
         // Place an invocation to function 1 and wait for it
         auto inv2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv2);
         // Keep track of time for invocation when image is on disk at compute node
-        auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getDispatchDate();
+        auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getSubmitDate();
 
         // Register that function with ANOTHER 50GB image file that takes %50 of the node disk space
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
@@ -1055,7 +1056,142 @@ private:
         auto inv4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv4);
         // Keep track of time for invocation when image is not on disk at compute node
+        auto inv4_elapsed = inv4->getFunctionEndDate() - inv4->getSubmitDate();
+
+        if ((std::abs(inv1_elapsed - inv4_elapsed) > EPSILON) or (std::abs(inv1_elapsed - inv4_elapsed) < EPSILON)){
+            throw std::runtime_error("Unexpected times: " + std::to_string(inv1_elapsed) + " " + std::to_string(inv2_elapsed) + " " + std::to_string(inv4_elapsed));
+        }
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_SimpleImageEvictionFromDisk_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_SimpleImageEvictionFromDisk_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 2;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNodeSmallDisk"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, scheduler,
+        {
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0.00"}
+        },
+        {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessSimpleImageEvictionFromDiskController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  EVICTION FROM RAM TEST                                         **/
+/**********************************************************************/
+
+class ServerlessSimpleImageEvictionFromRAMController : public wrench::ExecutionController {
+public:
+    ServerlessSimpleImageEvictionFromRAMController(ServerlessTimingTest* test,
+                                 const std::string& hostname,
+                                 const std::shared_ptr<wrench::ServerlessComputeService>
+                                 & compute_service,
+                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(10);
+            return std::make_shared<MyFunctionOutput>("Processed!");
+        };
+
+        // Register that function with a 32GB image file that takes %50 of the node disk space
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        30 * GB, 10 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation to function 1 and wait for it
+        auto inv1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv1);
+        // Keep track of time for invocation when image is not on disk at compute node
+        auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getDispatchDate();
+
+        // At this point, the image is on disk at the compute node (and on RAM, but we don't care)
+        // Place an invocation to function 1 and wait for it
+        auto inv2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv2);
+        // Keep track of time for invocation when image is on disk at compute node
+        auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getDispatchDate();
+
+        // Register that function with ANOTHER 50GB image file that takes %50 of the node disk space
+        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
+        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
+        wrench::StorageService::createFileAtLocation(image_location_2);
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
+        auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
+                                                                        30 * GB, 10 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation to function 2 and wait for it
+        auto inv3 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+        function_manager->wait_one(inv3);
+
+        // At this point image_1 should have been kicked out of the node disk
+        // Place an invocation to function 1 and wait for it
+        auto inv4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv4);
+        // Keep track of time for invocation when image is not on disk at compute node
         auto inv4_elapsed = inv4->getFunctionEndDate() - inv4->getDispatchDate();
+
+        std::cerr << "INV1: " << inv1_elapsed << std::endl;
+        std::cerr << "INV2: " << inv2_elapsed << std::endl;
+        std::cerr << "INV4: " << inv4_elapsed << std::endl;
 
         if (std::abs(inv1_elapsed - inv4_elapsed) > EPSILON) {
             throw std::runtime_error("Unexpected times: " + std::to_string(inv1_elapsed) + " " + std::to_string(inv4_elapsed));
@@ -1077,10 +1213,10 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromRAM) {
 
 void ServerlessTimingTest::do_SimpleImageEvictionFromRAM_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 1;
+    int argc = 2;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    // argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1090,12 +1226,12 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromRAM_test(
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
         "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
 
-    std::vector<std::string> compute_nodes = {"ServerlessComputeNodeSmallDisk"};
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", "/", compute_nodes, scheduler,
         {
-            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},
-            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "60.00"}
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0.0"}
         },
         {}));
 

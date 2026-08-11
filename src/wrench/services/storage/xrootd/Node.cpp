@@ -50,7 +50,7 @@ namespace wrench {
             while (this->processNextMessage()) {
             }
 
-            WRENCH_INFO("XRootD Node %s on host %s cleanly terminating!",
+            WRENCH_DEBUG("XRootD Node %s on host %s cleanly terminating!",
                         this->getName().c_str(),
                         S4U_Simulation::getHostName().c_str());
 

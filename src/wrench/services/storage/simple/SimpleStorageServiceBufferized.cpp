@@ -113,7 +113,7 @@ namespace wrench {
             this->startPendingFileTransferThread();
         }
 
-        WRENCH_INFO("Simple Storage Service %s on host %s cleanly terminating!",
+        WRENCH_DEBUG("Simple Storage Service %s on host %s cleanly terminating!",
                     this->getName().c_str(),
                     S4U_Simulation::getHostName().c_str());
 

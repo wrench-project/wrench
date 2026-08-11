@@ -155,7 +155,7 @@ namespace wrench {
             }
         }
 
-        WRENCH_INFO("HTCondorCentralManager Service on host %s cleanly terminating!",
+        WRENCH_DEBUG("HTCondorCentralManager Service on host %s cleanly terminating!",
                     S4U_Simulation::getHostName().c_str());
         return 0;
     }

@@ -133,7 +133,7 @@ namespace wrench {
                 break;
         }
 
-        WRENCH_INFO("Compound Storage Service %s on host %s cleanly terminating!",
+        WRENCH_DEBUG("Compound Storage Service %s on host %s cleanly terminating!",
                     this->getName().c_str(),
                     S4U_Simulation::getHostName().c_str());
 

@@ -195,6 +195,8 @@ namespace wrench {
             WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",
                         image_file->getID().c_str(), this->hostname.c_str());
             return false;
+        } else {
+            std::cerr << "NODE " << this->hostname << " HAS IMAGE " << image_file->getID().c_str() << " IN RAM!" << std::endl;
         }
 
         return true;

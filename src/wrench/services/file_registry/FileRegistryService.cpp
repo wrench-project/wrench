@@ -201,7 +201,7 @@ namespace wrench {
         while (this->processNextMessage()) {
         }
 
-        WRENCH_INFO("File Registry Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
+        WRENCH_DEBUG("File Registry Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;
     }
 

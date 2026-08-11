@@ -217,7 +217,7 @@ namespace wrench {
         /** Main loop **/
         while (this->processNextMessage()) {}
 
-        WRENCH_INFO("Network Proximity Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
+        WRENCH_DEBUG("Network Proximity Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;
     }
 

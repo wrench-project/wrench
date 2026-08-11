@@ -277,7 +277,7 @@ namespace wrench {
             }
         }
 
-        WRENCH_INFO("Simple Storage Service (Non-Bufferized) %s on host %s cleanly terminating!",
+        WRENCH_DEBUG("Simple Storage Service (Non-Bufferized) %s on host %s cleanly terminating!",
                     this->getName().c_str(),
                     S4U_Simulation::getHostName().c_str());
 

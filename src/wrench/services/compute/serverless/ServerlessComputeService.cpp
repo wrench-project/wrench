@@ -416,7 +416,7 @@ namespace wrench {
                 do_scheduling = false;
             }
             else {
-                WRENCH_INFO("ServerlessComputeService::processNextMessage(): Image file %s was stored at %s",
+                WRENCH_INFO("Image file %s was stored at %s",
                             scsncc_msg->_image_file->getID().c_str(), scsncc_msg->_compute_node->hostname.c_str());
             }
             // _state_of_the_system->_copied_images[scsncc_msg->_compute_host].insert(scsncc_msg->_image_file);
@@ -431,7 +431,7 @@ namespace wrench {
                 do_scheduling = false;
             }
             else {
-                WRENCH_INFO("ServerlessComputeService::processNextMessage(): Image file %s was loaded at %s",
+                WRENCH_INFO("Image file %s was loaded at %s",
                             scsnlc_msg->_image_file->getID().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
             }
             return true;
@@ -1004,6 +1004,9 @@ namespace wrench {
         // Invoke the scheduler so that it manages images
         auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
                                               _state_of_the_system.get());
+#if 1
+        decisions->print();
+#endif
         return decisions;
     }
 
@@ -1038,10 +1041,16 @@ namespace wrench {
     void ServerlessComputeService::initiateImageCopyToComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
-        // std::cerr << "INITIATING IMAGE COPY FOR " << image->getID() << std::endl;
-        // Initiate an asynchronous action that copies the image (identified by imageID)
-        // from the head node storage service to the compute node's storage service.
-        // This might involve creating and starting a dedicated ActionExecutor.
+        std::cerr << "INITIATING IMAGE COPY FOR " << image->getID() << std::endl;
+
+        // Sanity check
+        if (compute_node->_disk->hasFile(image)) {
+            throw std::runtime_error("ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to copy image " +
+                image->getID() + " to node " + compute_node->hostname +", but the image is already on disk!");
+        } else {
+            std::cerr << "IMAGE IS NOT ON DISK AT THE COMPUTE NODE\n";
+        }
+
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
 
@@ -1106,6 +1115,13 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<DataFile>& image) {
+
+        // Sanity check
+        if (compute_node->_memory->hasFile(image)) {
+            throw std::runtime_error("ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image " +
+                image->getID() + " at node " + compute_node->hostname +", but the image is already in RAM!");
+        }
+
         // std::cerr << "INITIATE IMAGE LOAD FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that simply read the image file from disk
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
