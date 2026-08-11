@@ -12,14 +12,12 @@
 #define INVOCATION_H
 
 #include <memory>
-#include <wrench/managers/function_manager/Function.h>
-#include <wrench/managers/function_manager/RegisteredFunction.h>
-#include <wrench/managers/function_manager/FunctionOutput.h>
-#include <wrench/failure_causes/FailureCause.h>
 
 #include "Container.h"
 
 namespace wrench {
+    class S4U_CommPort;
+    class FailureCause;
 
     /***********************/
     /** \cond DEVELOPER   **/

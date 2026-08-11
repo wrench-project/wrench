@@ -39,7 +39,6 @@ namespace wrench {
         _compute_node = compute_node;
         _serverless_compute_service = serverless_compute_service;
         _state = initial_state;
-        _idle_date = DBL_MAX;
     }
 
     /**

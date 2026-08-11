@@ -63,7 +63,6 @@ namespace wrench {
         const ServerlessComputeNode *_compute_node;
         const ServerlessComputeService* _serverless_compute_service;
         State _state;
-        double _idle_date;
 
         std::shared_ptr<FileLocation> _tmp_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
