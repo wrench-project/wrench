@@ -10,10 +10,10 @@
 #ifndef SERVERLESSCOMPUTESERVICEMESSAGE_H
 #define SERVERLESSCOMPUTESERVICEMESSAGE_H
 
-#include "Invocation.h"
+#include "wrench/function/Invocation.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/failure_causes/FailureCause.h"
-#include "wrench/managers/function_manager/Function.h"
+#include "wrench/function/Function.h"
 
 namespace wrench {
 
@@ -26,7 +26,7 @@ namespace wrench {
      */
     class ServerlessComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        ServerlessComputeServiceMessage(sg_size_t payload);
+        explicit ServerlessComputeServiceMessage(sg_size_t payload);
     };
 
     /**

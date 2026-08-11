@@ -7,7 +7,8 @@
  * (at your option) any later version.
  */
 
-#include "wrench/managers/function_manager/Function.h"
+#include "wrench/function/Function.h"
+#include "wrench/function/Image.h"
 
 namespace wrench {
 
@@ -15,11 +16,11 @@ namespace wrench {
      * @brief Constructs a Function object.
      * @param name The name of the function.
      * @param lambda The function logic implemented as a lambda.
-     * @param image The file location of the function's container image.
+     * @param image The image for the function
      */
     Function::Function(const std::string &name,
                        const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
-                       const std::shared_ptr<FileLocation> &image)
+                       const std::shared_ptr<Image> &image)
         : _name(name), _lambda(lambda), _image(image) {}
 
     /**
@@ -32,11 +33,20 @@ namespace wrench {
 
     /**
      * @brief Gets the image associated to the function
-     * @return An image's file location
+     * @return An image
      */
-    std::shared_ptr<FileLocation> Function::getImage() const {
+    std::shared_ptr<Image> Function::getImage() const {
         return _image;
     }
+
+    /**
+     * @brief Gets the image file associated to the function
+     * @return A file
+     */
+    std::shared_ptr<DataFile> Function::getImageFile() const {
+        return _image->getFile();
+    }
+
 
     /**
      * @brief Executes the function with the provided input and storage service.

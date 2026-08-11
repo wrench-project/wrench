@@ -10,11 +10,11 @@
 #ifndef SERVERLESSCOMPUTESERVICE_H
 #define SERVERLESSCOMPUTESERVICE_H
 
-#include <wrench/managers/function_manager/Function.h>
+#include <wrench/function/Function.h>
 #include <wrench/managers/function_manager/FunctionManager.h>
-#include <wrench/managers/function_manager/RegisteredFunction.h>
+#include <wrench/function/RegisteredFunction.h>
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
-#include "wrench/services/compute/serverless/Invocation.h"
+#include "wrench/function/Invocation.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"

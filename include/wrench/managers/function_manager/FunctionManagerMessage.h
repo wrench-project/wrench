@@ -12,7 +12,7 @@
 
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/compute/serverless/ServerlessComputeService.h"
-#include "wrench/managers/function_manager/Function.h"
+#include "wrench/function/Function.h"
 #include "wrench-dev.h"
 
 namespace wrench {

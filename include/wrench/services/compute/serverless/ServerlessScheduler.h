@@ -10,7 +10,8 @@
 #ifndef WRENCH_SERVERLESSSCHEDULER_H
 #define WRENCH_SERVERLESSSCHEDULER_H
 
-#include <wrench/services/compute/serverless/Invocation.h>
+#include <wrench/function/Invocation.h>
+#include <wrench/function/Image.h>
 #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
 #include <vector>
 #include <string>
@@ -66,7 +67,7 @@ namespace wrench {
             std::cerr << "** SCHEDULING DECISIONS **" << std::endl;
             if (not container_terminations.empty()) {
                 for (const auto& [container] : container_terminations) {
-                    std::cerr << "  Container termination: " << container->getRegisteredFunction()->getImageFile()->getID() <<
+                    std::cerr << "  Container termination: " << container->getRegisteredFunction()->getImage()->getName() <<
                         "(" <<container->getComputeNode()->hostname << ")" << std::endl;
                 }
             }
@@ -82,7 +83,7 @@ namespace wrench {
             }
             if (not invocation_dispatches.empty()) {
                 for (const auto& [invocation, node, container] : invocation_dispatches) {
-                    std::cerr << "  Invocation dispatch: for " << invocation->getRegisteredFunction()->getImageFile()->getID() <<
+                    std::cerr << "  Invocation dispatch: for " << invocation->getRegisteredFunction()->getImage()->getName() <<
                         " at " << node->hostname << " (" << (container ? "on an idle container" : "on a new container") << ")" << std::endl;
                 }
             }

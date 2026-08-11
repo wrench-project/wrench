@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/serverless/Invocation.h"
+#include "wrench/function/Invocation.h"
 #include "wrench/logging/TerminalOutput.h"
 
 WRENCH_LOG_CATEGORY(Invocation, "Log category for Serverless invocations");

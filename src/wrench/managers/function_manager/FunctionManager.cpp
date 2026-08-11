@@ -18,14 +18,13 @@
 
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
 
-#include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/ServiceMessage.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
-#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
 #include "wrench/managers/function_manager/FunctionManagerMessage.h"
+#include "wrench/function/Function.h"
+#include "wrench/function/Image.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_function_manager, "Log category for Function Manager");
 
@@ -68,19 +67,33 @@ namespace wrench {
      */
     FunctionManager::~FunctionManager() = default;
 
+
+    /**
+     *
+     * @param name
+     * @param location
+     * @param ram_foot_print
+     * @return
+     */
+    std::shared_ptr<Image> FunctionManager::createImage(const std::string& name,
+                                                           const std::shared_ptr<FileLocation>& location, sg_size_t ram_foot_print) {
+        return std::shared_ptr<Image>(new Image(name, location, ram_foot_print));
+    }
+
+
     /**
      * @brief Creates a shared pointer to a Function object and returns it
      *
      * @param name the name of the function
      * @param lambda the code of the function
-     * @param image the location of image to execute the function on
+     * @param image the image for the function
      * @return std::shared_ptr<Function> a shared pointer to the Function object created
      */
     std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
                                                               const std::function<std::shared_ptr<FunctionOutput>(
                                                               const std::shared_ptr<FunctionInput>&,
                                                               const std::shared_ptr<StorageService>&)>& lambda,
-                                                              const std::shared_ptr<FileLocation>& image) {
+                                                              const std::shared_ptr<Image>& image) {
         // Create the notion of a function
         return std::make_shared<Function>(name, lambda, image);
     }

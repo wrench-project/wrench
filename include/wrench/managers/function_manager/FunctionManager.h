@@ -14,22 +14,20 @@
 #include <map>
 #include <string>
 #include <memory>
-#include <wrench/services/compute/serverless/Invocation.h>
 
 #include "wrench/services/Service.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
-#include "wrench/managers/function_manager/FunctionInput.h"
 
 namespace wrench {
 
+    class Image;
     class Function;
-
+    class FunctionInput;
+    class FunctionOutput;
     class RegisteredFunction;
-
+    class Invocation;
     class ServerlessComputeService;
-
     class StorageService;
-
     class FailureCause;
 
     /***********************/
@@ -45,10 +43,14 @@ namespace wrench {
 
         void kill();
 
+        static std::shared_ptr<Image> createImage(const std::string& name,
+                                                     const std::shared_ptr<FileLocation>& location,
+                                                     sg_size_t ram_foot_print);
+
         static std::shared_ptr<Function> createFunction(const std::string& name,
                                                         const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput>&,
                                                         const std::shared_ptr<StorageService>&)>& lambda,
-                                                        const std::shared_ptr<FileLocation>& image);
+                                                        const std::shared_ptr<Image>& image);
 
         std::shared_ptr<RegisteredFunction> registerFunction(const std::shared_ptr<Function>& function,
                               const std::shared_ptr<ServerlessComputeService>& compute_service,

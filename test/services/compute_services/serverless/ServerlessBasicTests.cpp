@@ -241,8 +241,9 @@ private:
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * GB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        auto image = function_manager->createImage("image", image_location, image_file->getSize());
         wrench::StorageService::createFileAtLocation(image_location);
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
         try {
             function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
                                                1 * MB);
@@ -370,13 +371,14 @@ private:
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
         wrench::StorageService::createFileAtLocation(image_location);
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
 
         // Trying to create a function with the same name
         try {
-            auto function_duplicate = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+            auto function_duplicate = wrench::FunctionManager::createFunction("Function 1", lambda, image);
             throw std::runtime_error("Redundant function creation should have failed");
         }
         catch (const std::exception& expected) {
@@ -384,14 +386,14 @@ private:
 
         function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
-        auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image_location);
+        auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image);
 
         auto registered_function2 = function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
         if (registered_function2->getFunction() != function2) {
             throw std::runtime_error("Registered function should be function2");
         }
-        if (registered_function2->getOriginalImageLocation() != image_location) {
+        if (registered_function2->getImage() != image) {
             throw std::runtime_error("Registered function image should be image location");
         }
         if (registered_function2->getTimeLimit() != 10.0) {
@@ -471,8 +473,10 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
+        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
 
         // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
@@ -491,7 +495,7 @@ private:
             if (invocation->getRegisteredFunction()->getTimeLimit() != 10.00) {
                 throw std::runtime_error("Invocation's associated time limit should be 10.0");
             }
-            if (invocation->getRegisteredFunction()->getOriginalImageLocation() != image_location) {
+            if (invocation->getRegisteredFunction()->getImage() != image) {
                 throw std::runtime_error("Invocation's associated image should be the image location");
             }
 
@@ -619,8 +623,9 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
+        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
@@ -725,13 +730,15 @@ private:
         // Create a datafile that's nowhere
         this->data_file = wrench::Simulation::addFile("data_file", 100 * MB);
 
+        auto function_manager = this->createFunctionManager();
+
         // Create other files
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
+        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
 
         // Create a function code
-        auto function_manager = this->createFunctionManager();
         std::function lambda = [this](const std::shared_ptr<wrench::FunctionInput>& input,
                                       const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
             wrench::FunctionOutput> {
@@ -744,7 +751,7 @@ private:
                 MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
 
         // Registering a function with one of the two compute services
         auto input = std::make_shared<MyFunctionInput>(1, 2);

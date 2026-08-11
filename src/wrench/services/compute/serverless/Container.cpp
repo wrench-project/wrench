@@ -72,7 +72,7 @@ namespace wrench {
         auto compute_ram_ss = _compute_node->getMemoryStorage();
         try {
             _opened_image_ram_file = compute_ram_ss->openFile(
-                FileLocation::LOCATION(compute_ram_ss, _registered_function->getOriginalImageLocation()->getFile()));
+                FileLocation::LOCATION(compute_ram_ss, _registered_function->getImageFile()));
         }
         catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();

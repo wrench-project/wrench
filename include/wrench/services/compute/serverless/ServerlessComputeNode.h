@@ -19,6 +19,8 @@
 namespace wrench
 {
 
+    class SimpleStorageService;
+
     /***********************/
     /** \cond INTERNAL     */
     /***********************/

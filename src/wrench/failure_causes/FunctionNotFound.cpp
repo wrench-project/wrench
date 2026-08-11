@@ -8,8 +8,8 @@
  */
 
 #include <wrench/failure_causes/FunctionNotFound.h>
-#include <wrench/managers/function_manager/Function.h>
-#include <wrench/managers/function_manager/RegisteredFunction.h>
+#include <wrench/function/Function.h>
+#include <wrench/function/RegisteredFunction.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/failure_causes/FailureCause.h>
 

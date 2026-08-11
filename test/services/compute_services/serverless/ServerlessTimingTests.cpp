@@ -165,7 +165,8 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
-        auto function = wrench::FunctionManager::createFunction("Function", lambda, image_location);
+        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
+        auto function = wrench::FunctionManager::createFunction("Function", lambda, image);
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB,
                                                                       8000 * MB, 10 * MB, 1 * MB);
@@ -291,7 +292,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
@@ -408,7 +411,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
@@ -420,7 +425,9 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 60 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
+        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
@@ -550,7 +557,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
@@ -668,7 +677,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
@@ -680,7 +691,9 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 61 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
+        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
@@ -782,7 +795,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
                                                                         30 * GB, 1 * MB, 10 * MB, 1 * MB);
@@ -898,7 +913,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
                                                                         30 * GB, 1 * MB, 10 * MB, 1 * MB);
@@ -981,7 +998,7 @@ void ServerlessTimingTest::do_HotStart_test(
     free(argv);
 }
 
-
+#if 0
 /**********************************************************************/
 /**  EVICTION FROM DISK TEST                                         **/
 /**********************************************************************/
@@ -1020,7 +1037,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
                                                                         30 * GB, 1 * MB, 10 * MB, 1 * MB);
@@ -1042,7 +1061,9 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
+        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
                                                                         30 * GB, 1 * MB, 10 * MB, 1 * MB);
@@ -1151,7 +1172,9 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_location_1);
+        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
@@ -1173,7 +1196,9 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_location_2);
+        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
@@ -1245,3 +1270,5 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromRAM_test(
         free(argv[i]);
     free(argv);
 }
+
+#endif

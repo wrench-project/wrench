@@ -95,7 +95,8 @@ namespace wrench {
         StorageService::createFileAtLocation(image_file_location);
 
         // Create the function object
-        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image_file_location);
+        auto image = wrench::FunctionManager::createImage("my_image", image_file_location, image_file->getSize());
+        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image);
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 

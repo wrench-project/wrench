@@ -53,6 +53,7 @@
 // Managers
 #include "wrench/managers/job_manager/JobManager.h"
 #include "wrench/managers/data_movement_manager/DataMovementManager.h"
+#include "wrench/managers/function_manager/FunctionManager.h"
 
 // Logging
 #include "wrench/logging/TerminalOutput.h"
@@ -85,6 +86,13 @@
 #include "wrench/job/CompoundJob.h"
 #include "wrench/job/StandardJob.h"
 #include "wrench/job/PilotJob.h"
+
+// Function
+#include "wrench/function/Image.h"
+#include "wrench/function/Function.h"
+#include "wrench/function/FunctionInput.h"
+#include "wrench/function/FunctionOutput.h"
+#include "wrench/function/Invocation.h"
 
 // Simgrid Util
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"

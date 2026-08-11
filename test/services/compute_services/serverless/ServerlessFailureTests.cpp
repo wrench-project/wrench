@@ -163,8 +163,10 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
+        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image_location);
+
+        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
 
         // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);

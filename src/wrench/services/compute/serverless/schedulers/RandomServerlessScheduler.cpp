@@ -50,7 +50,7 @@ namespace wrench {
 
         // For each invocation, randomly assign it to a compute node that has an available core
         for (const auto& inv : schedulable_invocations) {
-            auto imageFile = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
+            auto imageFile = inv->getRegisteredFunction()->getImageFile();
             // std::string imageID = imageFile->getID();
 
             // Build list of nodes with available cores
@@ -114,7 +114,7 @@ namespace wrench {
         // For each invocation, build a list of candidate nodes and pick one at random, always reusing
         // an idle container if there is one
         for (const auto& inv : schedulable_invocations) {
-            auto imageFile = inv->getRegisteredFunction()->getOriginalImageLocation()->getFile();
+            auto imageFile = inv->getRegisteredFunction()->getImageFile();
 
             std::vector<std::shared_ptr<ServerlessComputeNode>> candidates;
             for (const auto& [hostname, num_available_cores

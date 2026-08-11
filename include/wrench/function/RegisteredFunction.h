@@ -13,12 +13,15 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include "wrench/services/storage/storage_helpers/FileLocation.h"
-#include "wrench/managers/function_manager/Function.h"
+#include <simgrid/forward.h>
 
 namespace wrench {
 
     class ServerlessComputeService;
+    class Function;
+    class Image;
+    class FileLocation;
+    class DataFile;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -44,7 +47,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-        [[nodiscard]] std::shared_ptr<FileLocation> getOriginalImageLocation() const;
+        [[nodiscard]] std::shared_ptr<Image> getImage() const;
         [[nodiscard]] std::shared_ptr<DataFile> getImageFile() const;
         std::shared_ptr<Function> getFunction();
         [[nodiscard]] double getTimeLimit() const;

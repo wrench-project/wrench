@@ -10,10 +10,10 @@
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h>
-#include <wrench/services/compute/serverless/Invocation.h>
+#include <wrench/function/Invocation.h>
 #include <wrench/services/compute/serverless/Container.h>
 #include <wrench/services/helper_services/alarm/Alarm.h>
-#include <wrench/managers/function_manager/Function.h>
+#include <wrench/function/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/failure_causes/NotAllowed.h>
@@ -466,8 +466,8 @@ namespace wrench {
                                                                       sg_size_t egress_in_bytes) {
         // Check that function can ever run!
         {
-            sg_size_t needed_disk_space = function->getImage()->getFile()->getSize() + disk_space_limit_in_bytes;
-            sg_size_t needed_ram_space = function->getImage()->getFile()->getSize() + ram_limit_in_bytes;
+            sg_size_t needed_disk_space = function->getImageFile()->getSize() + disk_space_limit_in_bytes;
+            sg_size_t needed_ram_space = function->getImageFile()->getSize() + ram_limit_in_bytes;
 
             if (needed_disk_space > this->disk_space_of_compute_host) {
                 const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
@@ -956,7 +956,7 @@ namespace wrench {
         const std::function lambda_execute = [invocation, this
             ](const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the lambda execute!!");
-            const auto src_location = invocation->_registered_function->_function->getImage();
+            const auto src_location = invocation->_registered_function->_function->getImage()->getLocation();
             const auto dst_location = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
                                                              src_location->getFile());
             StorageService::copyFile(src_location, dst_location);

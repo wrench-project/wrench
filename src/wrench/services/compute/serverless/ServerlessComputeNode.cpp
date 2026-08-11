@@ -8,7 +8,8 @@
  */
 
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
-#include <wrench/services/compute/serverless/Invocation.h>
+#include <wrench/function/Invocation.h>
+#include <wrench/function/Image.h>
 #include <wrench/services/compute/serverless/Container.h>
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 
@@ -190,7 +191,7 @@ namespace wrench {
 
         // The image is in RAM?
         auto ss_memory = this->_memory;
-        auto image_file = invocation->getRegisteredFunction()->getOriginalImageLocation()->getFile();
+        auto image_file = invocation->getRegisteredFunction()->getImageFile();
         if (not ss_memory->hasFile(image_file, ss_memory->getBaseRootPath())) {
             WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",
                         image_file->getID().c_str(), this->hostname.c_str());

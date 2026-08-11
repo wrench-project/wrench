@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/managers/function_manager/FunctionOutput.h"
+#include "wrench/function/FunctionOutput.h"
 
 namespace wrench {
 

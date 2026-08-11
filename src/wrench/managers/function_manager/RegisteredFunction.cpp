@@ -7,7 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "wrench/managers/function_manager/RegisteredFunction.h"
+#include "wrench/function/Function.h"
+#include "wrench/function/Image.h"
+#include "wrench/function/RegisteredFunction.h"
 
 namespace wrench {
 
@@ -31,11 +33,11 @@ namespace wrench {
         _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
 
     /**
-     * @brief Get the authoritative (i.e., in a repo) location of the registered function's image
-     * @return A file location
+     * @brief Get the registered function's image
+     * @return A file
      */
-    std::shared_ptr<FileLocation> RegisteredFunction::getOriginalImageLocation() const {
-            return _function->getImage();
+    std::shared_ptr<Image> RegisteredFunction::getImage() const {
+        return _function->getImage();
     }
 
     /**

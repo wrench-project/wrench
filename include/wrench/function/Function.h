@@ -13,13 +13,16 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include "wrench/services/storage/storage_helpers/FileLocation.h"
-#include "wrench/managers/function_manager/FunctionInput.h"
-#include "wrench/managers/function_manager/FunctionOutput.h"
 
 namespace wrench {
 
+    class Image;
+    class FunctionInput;
+    class FunctionOutput;
     class ServerlessComputeService;
+    class StorageService;
+    class FileLocation;
+    class DataFile;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -38,7 +41,7 @@ namespace wrench {
 
         Function(const std::string &name,
                  const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> &lambda,
-                 const std::shared_ptr<FileLocation> &image);
+                 const std::shared_ptr<Image> &image);
 
         [[nodiscard]] std::shared_ptr<FunctionOutput> execute(const std::shared_ptr<FunctionInput> &input, const std::shared_ptr<StorageService> &storage_service) const;
 
@@ -47,7 +50,8 @@ namespace wrench {
         /***********************/
 
         [[nodiscard]] std::string getName() const;
-        [[nodiscard]] std::shared_ptr<FileLocation> getImage() const;
+        [[nodiscard]] std::shared_ptr<Image> getImage() const;
+        [[nodiscard]] std::shared_ptr<DataFile> getImageFile() const;
 
 
     private:
@@ -55,9 +59,9 @@ namespace wrench {
 
         std::string _name; // the name of the function
         std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> _lambda; // the function logic
-        std::shared_ptr<FileLocation> _image; // the file location of the function's container image
+        std::shared_ptr<Image> _image;
     };
-    
+
     /***********************/
     /** \endcond           */
     /***********************/

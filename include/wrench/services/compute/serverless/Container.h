@@ -13,11 +13,12 @@
 
 #include <memory>
 #include <fsmod/File.hpp>
-#include <wrench/managers/function_manager/RegisteredFunction.h>
+#include <wrench/function/RegisteredFunction.h>
 
 namespace wrench {
     class ServerlessComputeNode;
     class Invocation;
+    class StorageService;
 
     /***********************/
     /** \cond INTERNAL    **/

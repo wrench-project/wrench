@@ -13,11 +13,14 @@
 
 #include <memory>
 
-#include "Container.h"
-
 namespace wrench {
     class S4U_CommPort;
     class FailureCause;
+    class RegisteredFunction;
+    class FunctionInput;
+    class FunctionOutput;
+    class ServerlessComputeNode;
+    class Container;
 
     /***********************/
     /** \cond DEVELOPER   **/

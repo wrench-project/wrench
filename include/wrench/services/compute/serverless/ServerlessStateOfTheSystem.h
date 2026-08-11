@@ -18,7 +18,7 @@
 #include <memory>
 #include <string>
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
-#include <wrench/services/compute/serverless/Invocation.h>
+#include <wrench/function/Invocation.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/data_file/DataFile.h>
 
