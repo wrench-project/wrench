@@ -42,6 +42,7 @@ public:
     void do_HotStart_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_SimpleImageEvictionFromDisk_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_SimpleImageEvictionFromRAM_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_TwoIdleContainers_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
     ~ServerlessTimingTest() override {
@@ -165,7 +166,7 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
-        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
         auto function = wrench::FunctionManager::createFunction("Function", lambda, image);
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB,
@@ -292,7 +293,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -411,7 +412,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -425,7 +426,7 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 61 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
 
         auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
@@ -530,7 +531,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -650,7 +651,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -664,7 +665,7 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 61 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
 
         auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
@@ -768,7 +769,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -886,7 +887,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -1010,7 +1011,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -1034,7 +1035,7 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
 
         auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
@@ -1149,7 +1150,7 @@ private:
         auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
         auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
         wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = function_manager->createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
 
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
@@ -1166,7 +1167,7 @@ private:
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
 
         auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
@@ -1252,6 +1253,152 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromRAM_test(
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessSimpleImageEvictionFromRAMController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**  TWO IDLE CONTAINERS TEST                                        **/
+/**********************************************************************/
+
+class ServerlessTwoIdleContainersController : public wrench::ExecutionController {
+public:
+    ServerlessTwoIdleContainersController(ServerlessTimingTest* test,
+                                 const std::string& hostname,
+                                 const std::shared_ptr<wrench::ServerlessComputeService>
+                                 & compute_service,
+                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(10);
+            return std::make_shared<MyFunctionOutput>("Processed!");
+        };
+
+        // Register that function with a 32GB image file that takes %50 of the node disk space
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        30 * GB, 10 * MB, 10 * MB, 1 * MB);
+
+        // Place two invocation to function 1 and wait for them
+        auto inv1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv1);
+        function_manager->wait_one(inv2);
+        auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getSubmitDate();
+        auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getSubmitDate();
+
+        // Do it again immediately
+        auto inv3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv3);
+        function_manager->wait_one(inv4);
+        auto inv3_elapsed = inv3->getFunctionEndDate() - inv3->getSubmitDate();
+        auto inv4_elapsed = inv4->getFunctionEndDate() - inv4->getSubmitDate();
+
+        // Do it again much later
+        wrench::Simulation::sleep(1000);
+        auto inv5 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv6 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv5);
+        function_manager->wait_one(inv6);
+        auto inv5_elapsed = inv5->getFunctionEndDate() - inv5->getSubmitDate();
+        auto inv6_elapsed = inv6->getFunctionEndDate() - inv6->getSubmitDate();
+        
+        // std::cerr << "INV1: " << inv1_elapsed << std::endl;
+        // std::cerr << "INV2: " << inv2_elapsed << std::endl;
+        // std::cerr << "INV3: " << inv3_elapsed << std::endl;
+        // std::cerr << "INV4: " << inv4_elapsed << std::endl;
+        // std::cerr << "INV5: " << inv5_elapsed << std::endl;
+        // std::cerr << "INV6: " << inv6_elapsed << std::endl;
+
+        if (std::abs(inv1_elapsed - inv2_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed times: inv1: " + std::to_string(inv1_elapsed) + "   inv2: " + std::to_string(inv2_elapsed));
+        }
+        if (std::abs(inv3_elapsed - inv4_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed times: inv1: " + std::to_string(inv3_elapsed) + "   inv2: " + std::to_string(inv4_elapsed));
+        }
+        if (std::abs(inv5_elapsed - inv6_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed times: inv1: " + std::to_string(inv5_elapsed) + "   inv2: " + std::to_string(inv6_elapsed));
+        }
+
+        if (std::abs(inv3_elapsed - 10.0) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time: inv3: " + std::to_string(inv3_elapsed));
+        }
+
+        if (std::abs(inv5_elapsed - (10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD))) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time: inv5: " + std::to_string(inv5_elapsed));
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, TwoIdleContainers) {
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_TwoIdleContainers_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_TwoIdleContainers_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, scheduler,
+        {
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "10.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "100.0"}
+        },
+        {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessTwoIdleContainersController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 
