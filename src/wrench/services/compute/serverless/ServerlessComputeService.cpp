@@ -32,6 +32,9 @@ WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless
 
 namespace wrench {
     unsigned long ServerlessComputeService::_sequence_number = 0;
+
+    const std::function lambda_noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {};
+
     /**
      * @brief Constructor
      *
@@ -254,18 +257,17 @@ namespace wrench {
      * @param time_limit_in_seconds the time limit for execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
      * @param RAM_limit_in_bytes the RAM limit for the function
-     * @param ingress_in_bytes the ingress data limit
-     * @param egress_in_bytes the egress data limit
+     * @param ingress_in_bytes the ingress data limit (ignored for now)
+     * @param egress_in_bytes the egress data limit (ignored for now)
      * @return A RegisteredFunction object
      * @throw ExecutionException if the function registration fails
      */
     std::shared_ptr<RegisteredFunction> ServerlessComputeService::registerFunction(
         const std::shared_ptr<Function>& function, const double time_limit_in_seconds,
         const sg_size_t disk_space_limit_in_bytes, const sg_size_t RAM_limit_in_bytes,
-        const sg_size_t ingress_in_bytes, const sg_size_t egress_in_bytes) {
+        const sg_size_t ingress_in_bytes, const sg_size_t egress_in_bytes) const {
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
-        //  send a "register my function" message to the daemon's commport
         _commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
                 answer_commport, function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes,
@@ -275,8 +277,7 @@ namespace wrench {
 
         // Get the answer
         const auto msg = answer_commport->getMessage<ServerlessComputeServiceFunctionRegisterAnswerMessage>(
-            this->network_timeout,
-            "ServerlessComputeService::registerFunction(): Received an");
+            this->network_timeout, "ServerlessComputeService::registerFunction(): Received an");
 
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -294,7 +295,7 @@ namespace wrench {
      */
     std::shared_ptr<Invocation> ServerlessComputeService::invokeFunction(
         const std::shared_ptr<RegisteredFunction>& registered_function, const std::shared_ptr<FunctionInput>& input,
-        S4U_CommPort* notify_commport) {
+        S4U_CommPort* notify_commport) const {
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
         _commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
@@ -302,10 +303,9 @@ namespace wrench {
                                                                          notify_commport, this->getMessagePayloadValue(
                                                                              ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_REQUEST_MESSAGE_PAYLOAD)));
 
-        // Block here for return, if non-blocking then function manager has to check up on it? or send a message
+        // Get the answer
         const auto msg = answer_commport->getMessage<ServerlessComputeServiceFunctionInvocationAnswerMessage>(
-            this->network_timeout,
-            "ServerlessComputeService::invokeFunction(): Received an");
+            this->network_timeout, "ServerlessComputeService::invokeFunction(): Received an");
 
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -327,24 +327,34 @@ namespace wrench {
 
         // Start the Head Storage Service
         startHeadStorageService();
+
         // Start a storage service on each compute node.
-        startComputeHostsServices();
+        startComputeNodeServices();
 
         bool do_scheduling;
         while (processNextMessage(do_scheduling)) {
             if (do_scheduling) {
+
                 // Make invocations whose images have downloaded schedulable
                 admitInvocations();
 
                 // Invoke the scheduler
                 auto decisions = invokeScheduler();
 
-                // Implement the scheduler's decisions, if possible.
-                // It's important to do things in this order below so that files get open(), and thus
-                // unevictable, thus preventing ping-pong effects.
+                // Implement the scheduler's decisions, if possible. Note that
+                // some decision can be invalid, and that's ok. For instance, the scheduler
+                // could be simple and not sure any knowledge of the LRU behavior on compute node
+                // disk and RAM, and of which files are currently unevictable. The idea is that
+                // even a super naive scheduler can be used, even though most of its scheduling
+                // decisions are not feasible. It will just be invoked again later.
+
+                // First, terminate containers
                 terminateIdleContainers(decisions->container_terminations);
+                // Second, do invocations (before the image loads/copies to avoid LRU evictions)
                 dispatchInvocations(decisions->invocation_dispatches);
+                // Do the image loads (before image copies to avoid LRU evictions)
                 initiateImageLoads(decisions->image_loads_to_RAM);
+                // Do the image copies last
                 initiateImageCopies(decisions->image_copies_to_disk);
             }
         }
@@ -360,7 +370,8 @@ namespace wrench {
     bool ServerlessComputeService::processNextMessage(bool& do_scheduling) {
         S4U_Simulation::computeZeroFlop();
 
-        // By default, set do_scheduling to true
+        // By default, set do_scheduling to true so that a new
+        // scheduling round will be triggered
         do_scheduling = true;
 
         // Wait for a message
@@ -414,7 +425,6 @@ namespace wrench {
             else {
                 WRENCH_INFO("Image [%s] was stored on disk at [%s]",
                             scsncc_msg->_image->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
-                std::cerr << "FREE SPACE REMAINING: " << scsncc_msg->_compute_node->getFreeDiskSpace() << "\n";
             }
             return true;
         }
@@ -453,7 +463,8 @@ namespace wrench {
      * @param ingress_in_bytes the ingress data limit
      * @param egress_in_bytes the egress data limit
      */
-    void ServerlessComputeService::processFunctionRegistrationRequest(S4U_CommPort* answer_commport,
+    void ServerlessComputeService::processFunctionRegistrationRequest(
+        S4U_CommPort* answer_commport,
                                                                       const std::shared_ptr<Function>& function,
                                                                       double time_limit,
                                                                       sg_size_t disk_space_limit_in_bytes,
@@ -488,7 +499,6 @@ namespace wrench {
             }
         }
 
-
         // At this point, we can register the function
         auto registered_function = std::make_shared<RegisteredFunction>(
             function,
@@ -519,6 +529,7 @@ namespace wrench {
                                                                     & registered_function,
                                                                     const std::shared_ptr<FunctionInput>& input,
                                                                     S4U_CommPort* notify_commport) {
+        // If the function is not registered answer with some error
         if (_state_of_the_system->_registered_functions.find(registered_function) ==
             _state_of_the_system->_registered_functions.end()) {
             // Not found
@@ -528,6 +539,7 @@ namespace wrench {
             answer_commport->dputMessage(answerMessage);
         }
         else {
+            // Put the invocation in the "new invocations" list
             auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
             invocation->_submit_date = Simulation::getCurrentSimulatedDate();
             _state_of_the_system->_new_invocations.push(invocation);
@@ -658,6 +670,7 @@ namespace wrench {
             // Shutdown the container
             container->getComputeNode()->shutdownContainer(container);
         }
+        // TODO: Should this method ensure that we do a second round of scheduling?
     }
 
     /**
@@ -805,10 +818,10 @@ namespace wrench {
      * @brief Start a SimpleStorageService for each compute node. We don't start a bare-metal
      *        service as we'll do everything ourselves with action executor services.
      */
-    void ServerlessComputeService::startComputeHostsServices() {
+    void ServerlessComputeService::startComputeNodeServices() {
         for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
             if (not S4U_Simulation::hostHasMountPoint(compute_node->hostname, "/")) {
-                throw std::invalid_argument("ServerlessComputeService::startComputeHostsServices(): "
+                throw std::invalid_argument("ServerlessComputeService::startComputeNodeServices(): "
                     "each compute node in a serverless compute service should have a \"/\" mountpoint");
             }
 
@@ -934,12 +947,8 @@ namespace wrench {
                     "An invocation cannot be admitted because there is not enough space on the head storage to download its (remote) image. "
                     "Currently, no mechanism is implemented to manage the head storage (just make it bigger).");
             }
-
-            // If we're here, we couldn't admit invocations, and so we stop
-            break;
         }
     }
-
 
     /**
      * @brief Helper method to initiate an image download
@@ -957,8 +966,7 @@ namespace wrench {
                                                              src_location->getFile());
             StorageService::copyFile(src_location, dst_location);
         };
-        const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
-        };
+        const std::function lambda_terminate = lambda_noop;
 
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
@@ -982,7 +990,7 @@ namespace wrench {
             nullptr);
 
         action_executor->setSimulation(this->simulation_);
-        // WRENCH_INFO("Starting an action executor for downloading from remote...");
+        // WRENCH_INFO("Starting an action executor for downloading a remove image...");
         try {
             action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
         }
@@ -1040,12 +1048,11 @@ namespace wrench {
         // Sanity checks
         if (compute_node->isImageOnDisk(image)) {
             throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to copy image " +
-                image->getName() + " to node " + compute_node->hostname + ", but the image is already on disk!");
+                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to copy image [" +
+                image->getName() + "] to node [" + compute_node->hostname + "], but the image is already on disk!");
         }
 
-        const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
-        };
+        const std::function lambda_terminate = lambda_noop;
 
         const std::function lambda_execute = [compute_node, image, this](
             const std::shared_ptr<ActionExecutor>& action_executor) {
@@ -1111,13 +1118,12 @@ namespace wrench {
         // Sanity check
         if (compute_node->isImageInRAM(image)) {
             throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image " +
-                image->getName() + " at node " + compute_node->hostname + ", but the image is already in RAM!");
+                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image [" +
+                image->getName() + "] at node [" + compute_node->hostname + "], but the image is already in RAM!");
         }
 
         // Initiate an asynchronous action that simply read the image file from disk
-        const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
-        };
+        const std::function lambda_terminate = lambda_noop;
 
         const std::function lambda_execute = [compute_node, image](
             const std::shared_ptr<ActionExecutor>& action_executor) {
@@ -1127,23 +1133,34 @@ namespace wrench {
             auto dst_location = wrench::FileLocation::LOCATION(
                 compute_node->_memory, compute_node->_memory->getBaseRootPath(),
                 image->getRAMFile());
-            // Read the RAM portion only
-            // Create and open a tmp file to "reserve" space
+
+            // This below is a "hack" to implement the "read only the RAM portion of the on-disk image",
+            // for which StorageService implementations don't provide an API
+            // Create and open a tmp file to "reserve" space while the reading occurs
             auto tmp_file = Simulation::addTmpFile(image->getRAMFootprint());
             auto tmp_file_location = wrench::FileLocation::LOCATION(compute_node->_memory, tmp_file);
+            std::shared_ptr<simgrid::fsmod::File> open_tmp_file;
             try {
-                compute_node->_memory->createFileAtLocation(tmp_file_location);
-                auto open_tmp_file = compute_node->_memory->openFile(tmp_file_location);
+                SimpleStorageService::createFileAtLocation(tmp_file_location);
+                open_tmp_file = compute_node->_memory->openFile(tmp_file_location);
                 // Simulate the read of the RAM portion of the image on disk
                 compute_node->_disk->readFile(src_location, image->getRAMFootprint());
                 // Close and remove the tmp file
                 open_tmp_file->close();
-                compute_node->_memory->removeFileAtLocation(tmp_file_location);
+                open_tmp_file.reset();
+                SimpleStorageService::removeFileAtLocation(tmp_file_location);
                 Simulation::removeFile(tmp_file);
                 // Create the RAM file in its place
                 compute_node->_memory->createFile(image->getRAMFile());
             }
             catch (ExecutionException& e) {
+                // Remove/close the tmp file if failed
+                if (open_tmp_file) {
+                    open_tmp_file->close();
+                }
+                if (SimpleStorageService::hasFileAtLocation(tmp_file_location)) {
+                    SimpleStorageService::removeFileAtLocation(tmp_file_location);
+                }
                 Simulation::removeFile(tmp_file);
                 throw;
             }

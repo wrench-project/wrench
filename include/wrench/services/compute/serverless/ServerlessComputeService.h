@@ -81,14 +81,14 @@ namespace wrench {
 
         std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction>& registered_function,
                                                    const std::shared_ptr<FunctionInput>& input,
-                                                   S4U_CommPort* notify_commport);
+                                                   S4U_CommPort* notify_commport) const;
 
         std::shared_ptr<RegisteredFunction> registerFunction(const std::shared_ptr<Function>& function,
                                                              double time_limit_in_seconds,
                                                              sg_size_t disk_space_limit_in_bytes,
                                                              sg_size_t RAM_limit_in_bytes,
                                                              sg_size_t ingress_in_bytes,
-                                                             sg_size_t egress_in_bytes);
+                                                             sg_size_t egress_in_bytes) const;
 
     private:
 
@@ -140,7 +140,7 @@ namespace wrench {
 
 
         void startHeadStorageService();
-        void startComputeHostsServices();
+        void startComputeNodeServices();
 
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
         void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<Image>& image);
