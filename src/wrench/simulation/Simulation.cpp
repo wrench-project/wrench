@@ -49,6 +49,9 @@ namespace wrench {
 
     std::map<std::string, std::shared_ptr<DataFile>> Simulation::data_files;
 
+    unsigned long Simulation::_tmp_file_sequence_number = 0;
+
+
 
     /**
      * \cond
@@ -1631,6 +1634,21 @@ namespace wrench {
     }
 
     /**
+     * @brief Add a new file to the simulation (use at your own peril if you're using the workflow API - use Workflow::addFile() instead),
+     *        with a file id picked to be unique
+     *
+     * @param size: a file size in bytes
+     *
+     * @return the DataFile instance
+     *
+     */
+    std::shared_ptr<DataFile> Simulation::addTmpFile(sg_size_t size) {
+        // Pick a file name
+        std::string id = "tmp_file_" + std::to_string(_tmp_file_sequence_number++);
+        return addFile(id, size);
+    }
+
+    /**
      * @brief Add a new file to the simulation (use at your own peril if you're using the workflow API - use Workflow::addFile() instead)
      *
      * @param id: a unique string id
@@ -1640,7 +1658,20 @@ namespace wrench {
      *
      */
     std::shared_ptr<DataFile> Simulation::addFile(const std::string &id, const std::string &size) {
-        return Simulation::addFile(id, UnitParser::parse_size(size));
+        return addFile(id, UnitParser::parse_size(size));
+    }
+
+    /**
+     * @brief Add a new file to the simulation (use at your own peril if you're using the workflow API - use Workflow::addFile() instead),
+     *        with a file id picked to be unique
+     *
+     * @param size: a size as a unit string (e.g., "10MB")
+     *w
+     * @return the DataFile instance
+     *
+     */
+    std::shared_ptr<DataFile> Simulation::addTmpFile(const std::string &size) {
+        return addTmpFile(UnitParser::parse_size(size));
     }
 
     /**

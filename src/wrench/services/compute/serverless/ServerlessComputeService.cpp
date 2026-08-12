@@ -281,7 +281,6 @@ namespace wrench {
             this->network_timeout,
             "ServerlessComputeService::registerFunction(): Received an");
 
-        // TODO: Deal with failures later
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
         }
@@ -399,7 +398,7 @@ namespace wrench {
         }
         else if (const auto scsdc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceDownloadCompleteMessage>(message)) {
-            processImageDownloadCompletion(scsdc_msg->_action, scsdc_msg->_image_file);
+            processImageDownloadCompletion(scsdc_msg->_action, scsdc_msg->_image);
             return true;
         }
         else if (const auto scsiec_msg = std::dynamic_pointer_cast<
@@ -409,30 +408,30 @@ namespace wrench {
         }
         else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
-            scsncc_msg->_compute_node->_images_being_copied.erase(scsncc_msg->_image_file);
+            scsncc_msg->_compute_node->_images_being_copied.erase(scsncc_msg->_image);
             if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("An image copy has failed (due to disk pressure) for image %s... nevermind",
-                            scsncc_msg->_image_file->getID().c_str());
+                            scsncc_msg->_image->getName().c_str());
                 do_scheduling = false;
             }
             else {
-                WRENCH_INFO("Image file %s was stored at %s",
-                            scsncc_msg->_image_file->getID().c_str(), scsncc_msg->_compute_node->hostname.c_str());
+                WRENCH_INFO("Image %s was stored at compute node %s",
+                            scsncc_msg->_image->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
+                std::cerr << "FREE SPACE REMAINING: " << scsncc_msg->_compute_node->getFreeDiskSpace() << "\n";
             }
-            // _state_of_the_system->_copied_images[scsncc_msg->_compute_host].insert(scsncc_msg->_image_file);
             return true;
         }
         else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
-            scsnlc_msg->_compute_node->_images_being_loaded.erase(scsnlc_msg->_image_file);
+            scsnlc_msg->_compute_node->_images_being_loaded.erase(scsnlc_msg->_image);
             if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("An image load has failed (due to memory pressure) for image %s... nevermind",
-                            scsnlc_msg->_image_file->getID().c_str());
+                            scsnlc_msg->_image->getName().c_str());
                 do_scheduling = false;
             }
             else {
-                WRENCH_INFO("Image file %s was loaded at %s",
-                            scsnlc_msg->_image_file->getID().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
+                WRENCH_INFO("Image %s was loaded at compute node %s",
+                            scsnlc_msg->_image->getName().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
             }
             return true;
         }
@@ -546,43 +545,43 @@ namespace wrench {
      * @brief Helper method to process an "image download completion" message
      *
      * @param action to get failure cause from
-     * @param image_file The image file that was downloaded, used as key to map downloading functions
+     * @param image The image that was downloaded, used as key to map downloading functions
      */
     void ServerlessComputeService::processImageDownloadCompletion(const std::shared_ptr<Action>& action,
-                                                                  const std::shared_ptr<DataFile>& image_file) {
+                                                                  const std::shared_ptr<Image>& image) {
         // If the download has failed, fail all corresponding admitted function invocations
         if (action->getFailureCause()) {
-            _state_of_the_system->_free_space_on_head_storage += image_file->getSize();
-            _state_of_the_system->_being_downloaded_image_files.erase(image_file);
+            _state_of_the_system->_free_space_on_head_storage += image->getFile()->getSize();
+            _state_of_the_system->_being_downloaded_images.erase(image);
 
-            while (not _state_of_the_system->_admitted_invocations[image_file].empty()) {
-                auto invocation = _state_of_the_system->_admitted_invocations[image_file].front();
+            while (not _state_of_the_system->_admitted_invocations[image].empty()) {
+                auto invocation = _state_of_the_system->_admitted_invocations[image].front();
                 invocation->_notify_commport->dputMessage(
                     new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                         false,
                         invocation,
                         action->getFailureCause(), this->getMessagePayloadValue(
                             ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-                _state_of_the_system->_admitted_invocations[image_file].pop();
+                _state_of_the_system->_admitted_invocations[image].pop();
             }
-            _state_of_the_system->_admitted_invocations[image_file] = std::queue<std::shared_ptr<Invocation>>();
-            _state_of_the_system->_admitted_invocations.erase(image_file);
+            _state_of_the_system->_admitted_invocations[image] = std::queue<std::shared_ptr<Invocation>>();
+            _state_of_the_system->_admitted_invocations.erase(image);
             return;
         }
 
-        WRENCH_INFO("ServerlessComputeService::processImageDownloadCompletion(): Image file %s was downloaded",
-                    image_file->getID().c_str());
-        _state_of_the_system->_being_downloaded_image_files.erase(image_file);
+        WRENCH_INFO("ServerlessComputeService::processImageDownloadCompletion(): Image %s was downloaded",
+                    image->getName().c_str());
+        _state_of_the_system->_being_downloaded_images.erase(image);
         // _state_of_the_system->_downloaded_image_files.insert(image_file);
 
         // Move all relevant invocations from the admitted to the schedulable queue
-        auto& queue = _state_of_the_system->_admitted_invocations.at(image_file);
+        auto& queue = _state_of_the_system->_admitted_invocations.at(image);
         while (not queue.empty()) {
             _state_of_the_system->_schedulable_invocations.emplace(
                 _state_of_the_system->_schedulable_invocations.end(), std::move(queue.front()));
             queue.pop();
         }
-        _state_of_the_system->_admitted_invocations.erase(image_file);
+        _state_of_the_system->_admitted_invocations.erase(image);
     }
 
     /**
@@ -601,7 +600,7 @@ namespace wrench {
         // Free up the core
         compute_node->_available_cores++;
 
-        // Make container idle (TODO: make this cleaner?)
+        // Make container idle
         auto container = invocation->_container;
         compute_node->makeContainerIdle(container);
 
@@ -914,10 +913,10 @@ namespace wrench {
             }
 
             // If the image file is being downloaded, make the invocation admitted
-            if (_state_of_the_system->_being_downloaded_image_files.find(image->getFile()) != _state_of_the_system->
-                _being_downloaded_image_files.end()) {
+            if (_state_of_the_system->_being_downloaded_images.find(image) != _state_of_the_system->
+                                                                              _being_downloaded_images.end()) {
                 _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_admitted_invocations[image->getFile()].push(invocation);
+                _state_of_the_system->_admitted_invocations[image].push(invocation);
                 continue;
             }
 
@@ -927,10 +926,10 @@ namespace wrench {
                 // "Reserve" space on the storage service
                 _state_of_the_system->_free_space_on_head_storage -= image->getFile()->getSize();
                 // initiate the download
-                _state_of_the_system->_being_downloaded_image_files.insert(image->getFile());
+                _state_of_the_system->_being_downloaded_images.insert(image);
                 initiateImageDownloadFromRemote(invocation);
                 _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_admitted_invocations[image->getFile()].push(invocation);
+                _state_of_the_system->_admitted_invocations[image].push(invocation);
                 continue;
             }
             else {
@@ -972,7 +971,7 @@ namespace wrench {
         // Spin up an ActionExecutor service, and have it send us back a custom message
         auto custom_message = new ServerlessComputeServiceDownloadCompleteMessage(
             action,
-            invocation->_registered_function->_function->getImage()->getFile(), 0);
+            invocation->_registered_function->_function->getImage(), 0);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             this->getHostname(),
@@ -1004,7 +1003,7 @@ namespace wrench {
         // Invoke the scheduler so that it manages images
         auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
                                               _state_of_the_system.get());
-#if 1
+#if 0
         decisions->print();
 #endif
         return decisions;
@@ -1016,8 +1015,8 @@ namespace wrench {
      */
     void ServerlessComputeService::initiateImageLoads(const std::vector<LoadImage>& decisions) {
         // For each compute node, load initiate image load from disk into RAM and if space
-        for (const auto& [image_file, compute_node] : decisions) {
-            initiateImageLoadAtComputeNode(compute_node, image_file);
+        for (const auto& [image, compute_node] : decisions) {
+            initiateImageLoadAtComputeNode(compute_node, image);
         }
     }
 
@@ -1040,15 +1039,12 @@ namespace wrench {
      */
     void ServerlessComputeService::initiateImageCopyToComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
-        const std::shared_ptr<DataFile>& image) {
-        std::cerr << "INITIATING IMAGE COPY FOR " << image->getID() << std::endl;
-
-        // Sanity check
-        if (compute_node->_disk->hasFile(image)) {
-            throw std::runtime_error("ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to copy image " +
-                image->getID() + " to node " + compute_node->hostname +", but the image is already on disk!");
-        } else {
-            std::cerr << "IMAGE IS NOT ON DISK AT THE COMPUTE NODE\n";
+        const std::shared_ptr<Image>& image) {
+        // Sanity checks
+        if (compute_node->isImageOnDisk(image)) {
+            throw std::runtime_error(
+                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to copy image " +
+                image->getName() + " to node " + compute_node->hostname + ", but the image is already on disk!");
         }
 
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
@@ -1059,10 +1055,9 @@ namespace wrench {
             // WRENCH_INFO("In the image copy lambda execute!!");
 
             // Copy the image file from the head host to the current host's storage service
-            auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service, image);
-            auto local_image_path = wrench::FileLocation::LOCATION(
-                compute_node->_disk,
-                image);
+            auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
+                                                               image->getFile());
+            auto local_image_path = wrench::FileLocation::LOCATION(compute_node->_disk, image->getFile());
             StorageService::copyFile(head_host_image_path, local_image_path);
             // WRENCH_INFO("Done with the lambda execute!!");
         };
@@ -1070,7 +1065,7 @@ namespace wrench {
         // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "copy_image_" + image->getID() + "_to_" + compute_node->hostname,
+                "copy_image_" + image->getName() + "_to_" + compute_node->hostname,
                 0, 0, lambda_execute, lambda_terminate));
 
         auto custom_message = new ServerlessComputeServiceNodeCopyCompleteMessage(
@@ -1103,7 +1098,7 @@ namespace wrench {
         // Add the image to the being_copied_images data structure for this host
         compute_node->_images_being_copied.insert(image);
 
-        WRENCH_INFO("Initiated image copy for image [%s] from head host to compute host [%s]", image->getID().c_str(),
+        WRENCH_INFO("Initiated image copy for image [%s] from head host to compute host [%s]", image->getName().c_str(),
                     compute_node->hostname.c_str());
     }
 
@@ -1114,15 +1109,16 @@ namespace wrench {
      */
     void ServerlessComputeService::initiateImageLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
-        const std::shared_ptr<DataFile>& image) {
+        const std::shared_ptr<Image>& image) {
+        unsigned long sequence_number = 0;
 
         // Sanity check
-        if (compute_node->_memory->hasFile(image)) {
-            throw std::runtime_error("ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image " +
-                image->getID() + " at node " + compute_node->hostname +", but the image is already in RAM!");
+        if (compute_node->isImageInRAM(image)) {
+            throw std::runtime_error(
+                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image " +
+                image->getName() + " at node " + compute_node->hostname + ", but the image is already in RAM!");
         }
 
-        // std::cerr << "INITIATE IMAGE LOAD FOR " << image->getID() << std::endl;
         // Initiate an asynchronous action that simply read the image file from disk
         const std::function lambda_terminate = [](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
@@ -1131,15 +1127,28 @@ namespace wrench {
             const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the image load lambda execute!!");
             auto src_location = wrench::FileLocation::LOCATION(
-                compute_node->_disk, image);
+                compute_node->_disk, image->getFile());
             auto dst_location = wrench::FileLocation::LOCATION(
-                compute_node->_memory,
-                compute_node->_memory->getBaseRootPath(),
-                image);
+                compute_node->_memory, compute_node->_memory->getBaseRootPath(),
+                image->getRAMFile());
+            // Read the RAM portion only
+            // Create and open a tmp file to "reserve" space
+            auto tmp_file = Simulation::addTmpFile(image->getRAMFootprint());
+            auto tmp_file_location = wrench::FileLocation::LOCATION(compute_node->_memory, tmp_file);
             try {
-                StorageService::copyFile(src_location, dst_location);
+                compute_node->_memory->createFileAtLocation(tmp_file_location);
+                auto open_tmp_file = compute_node->_memory->openFile(tmp_file_location);
+                // Simulate the read of the RAM portion of the image on disk
+                compute_node->_disk->readFile(src_location, image->getRAMFootprint());
+                // Close and remove the tmp file
+                open_tmp_file->close();
+                compute_node->_memory->removeFileAtLocation(tmp_file_location);
+                Simulation::removeFile(tmp_file);
+                // Create the RAM file in its place
+                compute_node->_memory->createFile(image->getRAMFile());
             }
             catch (ExecutionException& e) {
+                Simulation::removeFile(tmp_file);
                 throw;
             }
             // WRENCH_INFO("Done with the lambda execute!!");
@@ -1148,7 +1157,7 @@ namespace wrench {
         // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "load_image_" + image->getID() + "_at_" + compute_node->hostname,
+                "load_image_" + image->getName() + "_at_" + compute_node->hostname,
                 0, 0, lambda_execute, lambda_terminate));
 
         auto custom_message = new ServerlessComputeServiceNodeLoadCompleteMessage(
@@ -1181,6 +1190,7 @@ namespace wrench {
         // Add the image to the being_copied_images data structure for this host
         compute_node->_images_being_loaded.insert(image);
 
-        WRENCH_INFO("Initiated image load at compute host [%s]", compute_node->hostname.c_str());
+        WRENCH_INFO("Initiated image load for image [%s] at compute host [%s]", image->getName().c_str(),
+                    compute_node->hostname.c_str());
     }
 }; // namespace wrench

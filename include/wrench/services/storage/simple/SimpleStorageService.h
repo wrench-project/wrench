@@ -85,7 +85,6 @@ namespace wrench {
                                                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                                                 const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
 
-
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
@@ -150,18 +149,16 @@ namespace wrench {
             return this->file_system;
         }
 
-//        void decrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
-//
-//        void incrementNumRunningOperationsForLocation(const std::shared_ptr<FileLocation> &location) override;
+        std::shared_ptr<simgrid::fsmod::File> openFile(const std::shared_ptr<FileLocation> &location);
+
         /***********************/
         /** \endcond          **/
         /***********************/
-
-
     protected:
 
         friend class SimpleStorageServiceBufferized;
         friend class SimpleStorageServiceNonBufferized;
+        friend class Container;
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -204,15 +201,14 @@ namespace wrench {
         std::shared_ptr<FailureCause> validateFileCopyRequest(const std::shared_ptr<FileLocation> &src_location, std::shared_ptr<FileLocation> &dst_location,
                                                               std::shared_ptr<simgrid::fsmod::File> &src_opened_file, std::shared_ptr<simgrid::fsmod::File> &dst_opened_file);
 
+
         /***********************/
         /** \endcond          **/
         /***********************/
 
     private:
         friend class Simulation;
-        friend class Container;
 
-        std::shared_ptr<simgrid::fsmod::File> openFile(const std::shared_ptr<FileLocation> &location);
 
         void validateProperties();
 

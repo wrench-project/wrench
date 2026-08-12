@@ -59,7 +59,6 @@ namespace wrench {
 
     /**
      * @brief Method to spawn a container
-     *
      */
     void Container::spawn() {
         // WRENCH_INFO("Spawning a new container for an invocation of function %s",
@@ -67,12 +66,27 @@ namespace wrench {
 
         /** This method's implementation is overly paranoid exception-wise, but it's likely a good thing **/
 
+        // Open the image disk file (do this first to pin it to RAM - would
+        // be weird if, due to LRU, the container itself kicked out the image!)
+        auto compute_disk_ss = _compute_node->getDiskStorage();
+        try {
+            _opened_image_disk_file = compute_disk_ss->openFile(
+                FileLocation::LOCATION(compute_disk_ss, _registered_function->getImageFile()));
+        }
+        catch (ExecutionException& e) {
+            this->freeDiskAndMemoryResources();
+            throw;
+        } catch (simgrid::Exception& e) {
+            this->freeDiskAndMemoryResources();
+            throw ExecutionException(std::make_shared<FatalFailure>("Can't open image in RAM"));
+        }
+
         // Open the image memory file (do this first to pin it to RAM - would
         // be weird if, due to LRU, the container itself kicked out the image!)
         auto compute_ram_ss = _compute_node->getMemoryStorage();
         try {
             _opened_image_ram_file = compute_ram_ss->openFile(
-                FileLocation::LOCATION(compute_ram_ss, _registered_function->getImageFile()));
+                FileLocation::LOCATION(compute_ram_ss, _registered_function->getImage()->getRAMFile()));
         }
         catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
@@ -84,11 +98,10 @@ namespace wrench {
 
         // Reserve disk space on the compute node's storage service
         try {
-            _tmp_file_location = wrench::FileLocation::LOCATION(_compute_node->getDiskStorage(),
-                                                                Simulation::addFile(
-                                                                    "tmp_" + std::to_string(
-                                                                        ++ServerlessComputeService::sequence_number),
-                                                                    _registered_function->getDiskSpaceLimit()));
+            _tmp_file_location = wrench::FileLocation::LOCATION(
+                _compute_node->getDiskStorage(),
+                Simulation::addTmpFile(
+                    _registered_function->getDiskSpaceLimit()));
             StorageService::createFileAtLocation(_tmp_file_location);
             _opened_tmp_file = _compute_node->getDiskStorage()->openFile(_tmp_file_location);
         }
@@ -131,9 +144,11 @@ namespace wrench {
             _tmp_storage_service = std::shared_ptr<SimpleStorageService>(
                 SimpleStorageService::createSimpleStorageServiceWithExistingFileSystem(
                     _compute_node->hostname, fs, {
-                        {SimpleStorageServiceProperty::BUFFER_SIZE,
+                        {
+                            SimpleStorageServiceProperty::BUFFER_SIZE,
                             _serverless_compute_service->getPropertyValueAsString(
-                                ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)}
+                                ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
+                        }
                     }, {}));
             _tmp_storage_service->setSimulation(_serverless_compute_service->getSimulation());
             _tmp_storage_service->setNetworkTimeoutValue(_serverless_compute_service->getNetworkTimeoutValue());
@@ -145,9 +160,7 @@ namespace wrench {
         }
 
         // Create and open a tmp memory file in RAM for the invocation's RAM space
-        auto tmp_memory_file = Simulation::addFile(
-            "tmp_ram_file_" + std::to_string(++ServerlessComputeService::sequence_number),
-            _registered_function->getRAMLimit());
+        auto tmp_memory_file = Simulation::addTmpFile(_registered_function->getRAMLimit());
         try {
             auto file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
             StorageService::createFileAtLocation(file_location);
@@ -236,6 +249,15 @@ namespace wrench {
         catch (ExecutionException& ignore) {
         }
 
+        // Close the image disk file
+        try {
+            if (_opened_image_disk_file) {
+                _opened_image_disk_file->close();
+            }
+        }
+        catch (simgrid::Exception& ignore) {
+        }
+
         // Close the image ram file
         try {
             if (_opened_image_ram_file) {
@@ -251,6 +273,7 @@ namespace wrench {
         _tmp_file_location.reset();
         _opened_tmp_ram_file.reset();
         _tmp_ram_file_location.reset();
+        _opened_image_disk_file.reset();
         _opened_image_ram_file.reset();
     }
 }

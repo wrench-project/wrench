@@ -25,7 +25,7 @@ namespace wrench {
     *  @param num_cores: number of cores
     */
     ServerlessComputeNode::ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService *service) :
-                hostname(std::move(h)), _total_cores(num_cores), _available_cores(num_cores), _serverless_compute_service(service) {}
+                hostname(std::move(h)), _serverless_compute_service(service), _total_cores(num_cores), _available_cores(num_cores) {}
 
 
     /**
@@ -106,7 +106,7 @@ namespace wrench {
      * @param image an image file
      * @return True if the image is being copied
      */
-    bool ServerlessComputeNode::isImageBeingCopied(const std::shared_ptr<DataFile>& image) const {
+    bool ServerlessComputeNode::isImageBeingCopied(const std::shared_ptr<Image>& image) const {
         return (_images_being_copied.find(image) != _images_being_copied.end());
     }
 
@@ -114,17 +114,17 @@ namespace wrench {
      * @brief Get the set of images being copied to (the disk of) the compute node
      * @return A set of images
      */
-    std::set<std::shared_ptr<DataFile>> ServerlessComputeNode::getImagesBeingCopied() const {
+    std::set<std::shared_ptr<Image>> ServerlessComputeNode::getImagesBeingCopied() const {
         return _images_being_copied;
     }
 
     /**
      * @brief Is an image on disk?
-     * @param image an image file
+     * @param image an image
      * @return True if the image is on disk
      */
-    bool ServerlessComputeNode::isImageOnDisk(const std::shared_ptr<DataFile>& image) const {
-        return (this->_disk->hasFile(image));
+    bool ServerlessComputeNode::isImageOnDisk(const std::shared_ptr<Image>& image) const {
+        return (this->_disk->hasFile(image->getFile()));
     }
 
     /**
@@ -132,7 +132,7 @@ namespace wrench {
      * @param image an image file
      * @return True if the image is being loaded
      */
-    bool ServerlessComputeNode::isImageBeingLoaded(const std::shared_ptr<DataFile>& image) const {
+    bool ServerlessComputeNode::isImageBeingLoaded(const std::shared_ptr<Image>& image) const {
         return (_images_being_loaded.find(image) != _images_being_loaded.end());
     }
 
@@ -140,7 +140,7 @@ namespace wrench {
      * @brief Get the set of images being loaded to (the RAM of) the compute node
      * @return A set of images
      */
-    std::set<std::shared_ptr<DataFile>> ServerlessComputeNode::getImagesBeingLoaded() const {
+    std::set<std::shared_ptr<Image>> ServerlessComputeNode::getImagesBeingLoaded() const {
         return _images_being_loaded;
     }
 
@@ -149,8 +149,8 @@ namespace wrench {
      * @param image an image file
      * @return True if the image is in RAM
      */
-    bool ServerlessComputeNode::isImageInRAM(const std::shared_ptr<DataFile>& image) const {
-        return (this->_memory->hasFile(image));
+    bool ServerlessComputeNode::isImageInRAM(const std::shared_ptr<Image>& image) const {
+        return (this->_memory->hasFile(image->getRAMFile()));
     }
 
     /**
@@ -189,15 +189,20 @@ namespace wrench {
             return false;
         }
 
-        // The image is in RAM?
-        auto ss_memory = this->_memory;
-        auto image_file = invocation->getRegisteredFunction()->getImageFile();
-        if (not ss_memory->hasFile(image_file, ss_memory->getBaseRootPath())) {
-            WRENCH_INFO("Scheduled invocation cannot be started because image %s is not loaded at node %s",
-                        image_file->getID().c_str(), this->hostname.c_str());
+        // The image is on disk?
+        auto image = invocation->getRegisteredFunction()->getImage();
+
+        if (not this->isImageOnDisk(image)) {
+            WRENCH_INFO("Scheduled invocation cannot be started because image %s is not on disk at node %s",
+                        image->getName().c_str(), this->hostname.c_str());
             return false;
-        } else {
-            std::cerr << "NODE " << this->hostname << " HAS IMAGE " << image_file->getID().c_str() << " IN RAM!" << std::endl;
+        }
+
+        // Is image in RAM
+        if (not this->isImageInRAM(image)) {
+            WRENCH_INFO("Scheduled invocation cannot be started because image %s is not in RAM at node %s",
+                        image->getName().c_str(), this->hostname.c_str());
+            return false;
         }
 
         return true;

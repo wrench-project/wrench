@@ -13,6 +13,7 @@
 #include <wrench/function/Invocation.h>
 #include <wrench/function/Image.h>
 #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
+#include <wrench/services/compute/serverless/Container.h>
 #include <vector>
 #include <string>
 
@@ -27,12 +28,12 @@ namespace wrench {
     };
 
     struct CopyImage {
-        std::shared_ptr<DataFile> image;
+        std::shared_ptr<Image> image;
         std::shared_ptr<ServerlessComputeNode> compute_node;
     };
 
     struct LoadImage {
-        std::shared_ptr<DataFile> image;
+        std::shared_ptr<Image> image;
         std::shared_ptr<ServerlessComputeNode> compute_node;
     };
 
@@ -72,13 +73,13 @@ namespace wrench {
                 }
             }
             if (not image_copies_to_disk.empty()) {
-                for (const auto& [image_file, node] : image_copies_to_disk) {
-                    std::cerr << "  Image copy: " << image_file->getID() << " at " << node->hostname << std::endl;
+                for (const auto& [image, node] : image_copies_to_disk) {
+                    std::cerr << "  Image copy: " << image->getName() << " at " << node->hostname << std::endl;
                 }
             }
             if (not image_loads_to_RAM.empty()) {
-                for (const auto& [image_file, node] : image_loads_to_RAM) {
-                    std::cerr << "  Image load: " << image_file->getID() << " at " << node->hostname << std::endl;
+                for (const auto& [image, node] : image_loads_to_RAM) {
+                    std::cerr << "  Image load: " << image->getName() << " at " << node->hostname << std::endl;
                 }
             }
             if (not invocation_dispatches.empty()) {

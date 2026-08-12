@@ -44,11 +44,11 @@ namespace wrench {
         // idle core on the compute nodes (going in order as well), we declare our intent to run that
         // invocation on the compute node.
 
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<DataFile>>> required_images;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Image>>> required_images;
 
         // For each invocation, assign it to the first compute node with an available core
         for (const auto& invocation : schedulable_invocations) {
-            auto image_file = invocation->getRegisteredFunction()->getImageFile();
+            auto image = invocation->getRegisteredFunction()->getImage();
 
             for (const auto& compute_node : compute_nodes) {
                 auto num_available_cores = available_cores.at(compute_node);
@@ -58,7 +58,7 @@ namespace wrench {
                     available_cores[compute_node]--;
 
                     // Record that this node requires the image (avoiding duplicates by using a set)
-                    required_images[compute_node].insert(image_file);
+                    required_images[compute_node].insert(image);
 
                     // Move to next invocation
                     break;
@@ -99,12 +99,12 @@ namespace wrench {
         for (const auto& inv : schedulable_invocations) {
 
             // Get the image for this invocation
-            auto image_file = inv->getRegisteredFunction()->getImageFile();
+            auto image = inv->getRegisteredFunction()->getImage();
 
             for (const auto& node : state->getComputeNodes()) {
                 auto num_available_cores = available_cores[node];
                 // Checking if the node has available cores and if the image is on the node
-                if (num_available_cores > 0 && state->isImageInRAMAtNode(node, image_file)) {
+                if (num_available_cores > 0 && state->isImageInRAMAtNode(node, image)) {
                     auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
                     if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
                         decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});

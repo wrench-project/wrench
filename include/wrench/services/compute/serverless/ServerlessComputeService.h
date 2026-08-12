@@ -121,7 +121,7 @@ namespace wrench {
                                               S4U_CommPort* notify_commport);
 
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action,
-                                            const std::shared_ptr<DataFile>& image_file);
+                                            const std::shared_ptr<Image>& image);
 
         void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Action>& action);
 
@@ -143,8 +143,8 @@ namespace wrench {
         void startComputeHostsServices();
 
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
-        void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
-        void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<DataFile>& image);
+        void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<Image>& image);
+        void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<Image>& image);
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
             ServerlessComputeNode* target_compute_node,

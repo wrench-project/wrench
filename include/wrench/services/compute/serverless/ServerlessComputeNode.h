@@ -13,13 +13,23 @@
 #include <set>
 #include <memory>
 #include <string>
-#include <wrench/data_file/DataFile.h>
-#include <wrench/services/compute/serverless/Container.h>
+#include <simgrid/forward.h>
+
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+
+namespace simgrid::fsmod {
+    class File;
+}
 
 namespace wrench
 {
 
+    class ServerlessComputeService;
+    class RegisteredFunction;
     class SimpleStorageService;
+    class Image;
+    class Invocation;
+    class Container;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -38,44 +48,50 @@ namespace wrench
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
+
+        [[nodiscard]] unsigned int getNumCores() const {return _total_cores; }
+        [[nodiscard]] unsigned int getNumIdleCores() const {return _available_cores; }
+        [[nodiscard]] sg_size_t getFreeDiskSpace() const { return _disk->getTotalFreeSpaceZeroTime(); }
+        [[nodiscard]] sg_size_t getFreeRAMSpace() const { return _memory->getTotalFreeSpaceZeroTime(); }
+
         std::shared_ptr<Container> findIdleContainer(
             const RegisteredFunction *registered_function,
             const std::set<std::shared_ptr<Container>>& excluded_container) const;
 
-        [[nodiscard]] bool isImageBeingCopied(const std::shared_ptr<DataFile>& image) const;
-        [[nodiscard]] std::set<std::shared_ptr<DataFile>> getImagesBeingCopied() const;
-        [[nodiscard]] bool isImageOnDisk(const std::shared_ptr<DataFile>& image) const;
+        [[nodiscard]] bool isImageBeingCopied(const std::shared_ptr<Image>& image) const;
+        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingCopied() const;
+        [[nodiscard]] bool isImageOnDisk(const std::shared_ptr<Image>& image) const;
 
-        [[nodiscard]] bool isImageBeingLoaded(const std::shared_ptr<DataFile>& image) const;
-        [[nodiscard]] std::set<std::shared_ptr<DataFile>> getImagesBeingLoaded() const;
-        [[nodiscard]] bool isImageInRAM(const std::shared_ptr<DataFile>& image) const;
+        [[nodiscard]] bool isImageBeingLoaded(const std::shared_ptr<Image>& image) const;
+        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingLoaded() const;
+        [[nodiscard]] bool isImageInRAM(const std::shared_ptr<Image>& image) const;
 
         [[nodiscard]] bool isInvocationFeasible(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Container>& container) const;
 
         [[nodiscard]] std::shared_ptr<SimpleStorageService> getDiskStorage() const { return _disk; }
         [[nodiscard]] std::shared_ptr<SimpleStorageService> getMemoryStorage() const { return _memory; }
 
-        [[nodiscard]] unsigned int getNumCores() const {return _total_cores; }
-        [[nodiscard]] unsigned int getNumIdleCores() const {return _available_cores; }
-
         const std::string hostname;
 
     private:
+        ServerlessComputeService *_serverless_compute_service;
+
         unsigned int _total_cores;
         unsigned int _available_cores;
 
         std::shared_ptr<SimpleStorageService> _disk;
         std::shared_ptr<SimpleStorageService> _memory;
 
-
         friend class ServerlessComputeService;
-        std::set<std::shared_ptr<DataFile>> _images_being_copied;
-        std::set<std::shared_ptr<DataFile>> _images_being_loaded;
+        std::set<std::shared_ptr<Image>> _images_being_copied;
+        std::set<std::shared_ptr<Image>> _images_being_loaded;
 
         std::set<std::shared_ptr<Container>> _busy_containers;
         std::set<std::shared_ptr<Container>> _idle_containers;
 
-        ServerlessComputeService *_serverless_compute_service;
+        std::unordered_map<std::shared_ptr<Image>, std::shared_ptr<simgrid::fsmod::File>> _disk_image_pins;
+        std::unordered_map<std::shared_ptr<Image>, std::shared_ptr<simgrid::fsmod::File>> _ram_image_pins;
+
     };
 
     /***********************/

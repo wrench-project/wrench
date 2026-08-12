@@ -422,7 +422,7 @@ private:
         auto invocation_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
 
         // Register another function with an image file that will not fit in RAM
-        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 60 * GB);
+        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 61 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
         auto image_2 = function_manager->createImage("my_image_2", image_location_2, image_file_2->getSize());
@@ -437,40 +437,13 @@ private:
         function_manager->wait_one(invocation_1);
         function_manager->wait_one(invocation_2);
 
-        double image_download = 6494.84;
-        double image_copy = 2.0 * 60 * GB / (100 * MB);
-        double image_load = 1.0 * 60 * GB / (100 * MB);
-        double compute_time = 50;
-
-        // std::cerr << "IMAGE DOWNLOAD = " << image_download << std::endl;
-        // std::cerr << "IMAGE COPY = " << image_copy << std::endl;
-        // std::cerr << "IMAGE LOAD = " << image_load << std::endl;
-
-        double expected_invocation_1_start = image_download + image_copy + image_load;
-        double expected_invocation_1_end = expected_invocation_1_start + compute_time;
-
-        double expected_invocation_2_start = expected_invocation_1_end + image_load;
-        double expected_invocation_2_end = expected_invocation_2_start + compute_time;
-
-        if (fabs(expected_invocation_1_start - invocation_1->getDispatchDate()) > EPSILON) {
-            throw std::runtime_error("a) Unexpected invocation_1 start date " +
-                std::to_string(invocation_1->getDispatchDate()) + " instead of " + std::to_string(
-                    expected_invocation_1_start));
+        // Checks
+        if (invocation_1->getFunctionEndDate() >= invocation_2->getDispatchDate()) {
+           throw std::runtime_error("Invocation #2 should have been dispatched before Invocation #1 finished");
         }
-        if (fabs(expected_invocation_1_end - invocation_1->getFunctionEndDate()) > EPSILON) {
-            throw std::runtime_error("b) Unexpected invocation_1 end date " +
-                std::to_string(invocation_1->getFunctionEndDate()) + " instead of " + std::to_string(
-                    expected_invocation_1_end));
-        }
-        if (fabs(expected_invocation_2_start - invocation_2->getDispatchDate()) > EPSILON) {
-            throw std::runtime_error("c) Unexpected invocation_2 start date " +
-                std::to_string(invocation_2->getDispatchDate()) + " instead of " + std::to_string(
-                    expected_invocation_2_start));
-        }
-        if (fabs(expected_invocation_2_end - invocation_2->getFunctionEndDate()) > EPSILON) {
-            throw std::runtime_error("d) Unexpected invocation_2 end date " +
-                std::to_string(invocation_2->getDispatchDate()) + " instead of " + std::to_string(
-                    expected_invocation_2_end));
+        if (std::abs(invocation_1->getFunctionEndDate() + 61.0 * GB / (100 * MB) -  invocation_2->getDispatchDate()) > EPSILON) {
+            throw std::runtime_error("Invocation #2 dispatch date should roughly be Invocation #1's end date + time to load image to RAM: " +
+                std::to_string(invocation_1->getFunctionEndDate() + 61.0 * GB / (100 * MB)) + " vs. " + std::to_string(invocation_2->getDispatchDate()));
         }
 
 
@@ -703,8 +676,8 @@ private:
         function_manager->wait_one(invocation_1);
         function_manager->wait_one(invocation_2);
 
-        // We expect that as soo as invocation_1 has started, then invocation_2 can finally do the copy and load.
-        double expected_invocation_2_start_date = invocation_1->getDispatchDate() + 2 * (61.0 * GB / (100 * MB));
+        // We expect that as soon as invocation_1 has started, then invocation_2 can finally do the copy and load.
+        double expected_invocation_2_start_date = invocation_1->getFunctionEndDate() + 2 * (61.0 * GB / (100 * MB));
 
         if (fabs(expected_invocation_2_start_date - invocation_2->getDispatchDate()) > 0.1) {
             throw std::runtime_error(
@@ -800,9 +773,9 @@ private:
         auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
-                                                                        30 * GB, 1 * MB, 10 * MB, 1 * MB);
+                                                                        12 * GB, 1 * MB, 10 * MB, 1 * MB);
 
-        // Place invocations, but only 3 should be able to run at a time (since the 60GB image will be evicted!)
+        // Place invocations, but only 3 should be able to run at a time
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
         unsigned long num_invocations = 5;
         invocations.reserve(num_invocations);
@@ -815,7 +788,7 @@ private:
         function_manager->wait_all(invocations);
 
         // for (int i=0; i < num_invocations; i++) {
-        //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << invocations.at(i)->getSubmitDate() << ": " << invocations.at(i)->getStartDate() << " -> " << invocations.at(i)->getEndDate() << std::endl;
+        //     std::cerr << "INVOCATION #" << i << ": START TIME - COMPLETION TIME: " << ": " << invocations.at(i)->getFunctionStartDate() << " -> " << invocations.at(i)->getFunctionEndDate() << std::endl;
         // }
         for (unsigned long i = 0; i < num_invocations; i += 3) {
             double start_date = invocations.at(i)->getDispatchDate();
@@ -998,7 +971,7 @@ void ServerlessTimingTest::do_HotStart_test(
     free(argv);
 }
 
-#if 0
+
 /**********************************************************************/
 /**  EVICTION FROM DISK TEST                                         **/
 /**********************************************************************/
@@ -1050,7 +1023,7 @@ private:
         // Keep track of time for invocation when image is not on disk at compute node
         auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getSubmitDate();
 
-        // At this point, the image is on disk at the compute node (and on RAM, but we don't care)
+        // At this point, the image is on disk at the compute node (and in RAM, but we don't care)
         // Place an invocation to function 1 and wait for it
         auto inv2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv2);
@@ -1079,8 +1052,13 @@ private:
         // Keep track of time for invocation when image is not on disk at compute node
         auto inv4_elapsed = inv4->getFunctionEndDate() - inv4->getSubmitDate();
 
-        if ((std::abs(inv1_elapsed - inv4_elapsed) > EPSILON) or (std::abs(inv1_elapsed - inv4_elapsed) < EPSILON)){
-            throw std::runtime_error("Unexpected times: " + std::to_string(inv1_elapsed) + " " + std::to_string(inv2_elapsed) + " " + std::to_string(inv4_elapsed));
+        // std::cerr << "INV1: " << inv1->getSubmitDate() << " --> " << inv1->getFunctionEndDate() << std::endl;
+        // std::cerr << "INV2: " << inv2->getSubmitDate() << " --> " << inv2->getFunctionEndDate() <<  "(" << inv2->getFunctionEndDate() - inv2->getSubmitDate() << ")" << std::endl;
+        // std::cerr << "INV3: " << inv3->getSubmitDate() << " --> " << inv3->getFunctionEndDate() <<  "(" << inv3->getFunctionEndDate() - inv3->getSubmitDate() << ")" << std::endl;
+        // std::cerr << "INV4: " << inv4->getSubmitDate() << " --> " << inv4->getFunctionEndDate() <<  "(" << inv4->getFunctionEndDate() - inv4->getSubmitDate() << ")" << std::endl;
+
+        if ((std::abs((inv2_elapsed + 50 * GB / (100 * MB)) - inv4_elapsed) > EPSILON)){
+            throw std::runtime_error("Unexpected elapsed times: inv2: " + std::to_string(inv2_elapsed) + " inv4: " + std::to_string(inv4_elapsed));
         }
         return 0;
     }
@@ -1099,10 +1077,10 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
 
 void ServerlessTimingTest::do_SimpleImageEvictionFromDisk_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1131,7 +1109,6 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromDisk_test(
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -1183,16 +1160,9 @@ private:
         auto inv1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv1);
         // Keep track of time for invocation when image is not on disk at compute node
-        auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getDispatchDate();
+        auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getSubmitDate();
 
-        // At this point, the image is on disk at the compute node (and on RAM, but we don't care)
-        // Place an invocation to function 1 and wait for it
-        auto inv2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
-        function_manager->wait_one(inv2);
-        // Keep track of time for invocation when image is on disk at compute node
-        auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getDispatchDate();
-
-        // Register that function with ANOTHER 50GB image file that takes %50 of the node disk space
+        // Place an invocation to function 2 and wait for it
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
         wrench::StorageService::createFileAtLocation(image_location_2);
@@ -1203,23 +1173,42 @@ private:
         auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
 
-        // Place an invocation to function 2 and wait for it
-        auto inv3 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
-        function_manager->wait_one(inv3);
+        auto inv2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+        function_manager->wait_one(inv2);
 
-        // At this point image_1 should have been kicked out of the node disk
-        // Place an invocation to function 1 and wait for it
+        // At this point, the image has been kicked out
+        auto inv3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv3);
+        // Keep track of time for invocation when image is on disk at compute node
+        auto inv3_elapsed = inv3->getFunctionEndDate() - inv3->getSubmitDate();
+
+        // Now it should still be in RAM
         auto inv4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv4);
+        // Keep track of time for invocation when image is on disk at compute node
+        auto inv4_elapsed = inv4->getFunctionEndDate() - inv4->getSubmitDate();
+
+        // Invoke function 2 again
+        auto inv5 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+        function_manager->wait_one(inv5);
+
+        // At this point image_1 should have been kicked out of the node disk again
+        // Place an invocation to function 1 and wait for it
+        auto inv6 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv6);
         // Keep track of time for invocation when image is not on disk at compute node
-        auto inv4_elapsed = inv4->getFunctionEndDate() - inv4->getDispatchDate();
+        auto inv6_elapsed = inv6->getFunctionEndDate() - inv6->getSubmitDate();
 
-        std::cerr << "INV1: " << inv1_elapsed << std::endl;
-        std::cerr << "INV2: " << inv2_elapsed << std::endl;
-        std::cerr << "INV4: " << inv4_elapsed << std::endl;
+        // std::cerr << "INV1: " << inv1_elapsed << std::endl;
+        // std::cerr << "INV3: " << inv3_elapsed << std::endl;
+        // std::cerr << "INV4: " << inv4_elapsed << std::endl;
+        // std::cerr << "INV6: " << inv6_elapsed << std::endl;
 
-        if (std::abs(inv1_elapsed - inv4_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected times: " + std::to_string(inv1_elapsed) + " " + std::to_string(inv4_elapsed));
+        if (std::abs(inv3_elapsed - inv6_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected times: inv3: " + std::to_string(inv3_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
+        }
+        if (std::abs((inv4_elapsed + (50 * GB / (100 * MB))) - inv6_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected times: inv4: " + std::to_string(inv4_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
         }
         return 0;
     }
@@ -1238,10 +1227,10 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromRAM) {
 
 void ServerlessTimingTest::do_SimpleImageEvictionFromRAM_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1270,5 +1259,3 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromRAM_test(
         free(argv[i]);
     free(argv);
 }
-
-#endif

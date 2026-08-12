@@ -50,7 +50,7 @@ namespace wrench {
             // only copy each image if it's neither already on the node nor currently being copied
             for (const auto& function : required_functions) {
                 // auto image = function_images[function];
-                auto image = function->getImage()->getFile();
+                auto image = function->getImage();
                 if (!state->isImageOnDiskAtNode(node, image)
                     && !state->isImageBeingCopiedToNode(node, image)) {
                     decisions->image_copies_to_disk.push_back(CopyImage{image, node});
@@ -104,8 +104,8 @@ namespace wrench {
                     invocations.pop_back();
 
                     // Make sure the image is on this node
-                    auto image_file = inv->getRegisteredFunction()->getImage()->getFile();
-                    if (state->isImageInRAMAtNode(node, image_file)) {
+                    auto image = inv->getRegisteredFunction()->getImage();
+                    if (state->isImageInRAMAtNode(node, image)) {
                         auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
                         if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
                             decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});

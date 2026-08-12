@@ -34,14 +34,22 @@ namespace wrench {
 
     private:
         friend class FunctionManager;
+        friend class RegisteredFunction;
+        friend class Function;
+        friend class Container;
+        friend class ServerlessComputeNode;
+        friend class ServerlessComputeService;
 
         Image(const std::string& name,
               const std::shared_ptr<FileLocation>& location,
               sg_size_t ram_foot_print);
 
+        [[nodiscard]] std::shared_ptr<DataFile> getRAMFile() const;
+
         std::string _name;
         std::shared_ptr<FileLocation> _location;
         sg_size_t _ram_footprint;
+        std::shared_ptr<DataFile> _ram_file;
     };
 } // namespace wrench
 

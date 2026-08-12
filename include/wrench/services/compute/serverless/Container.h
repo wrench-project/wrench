@@ -69,6 +69,7 @@ namespace wrench {
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
         std::shared_ptr<StorageService> _tmp_storage_service;
 
+        std::shared_ptr<simgrid::fsmod::File> _opened_image_disk_file;
         std::shared_ptr<simgrid::fsmod::File> _opened_image_ram_file;
 
         std::shared_ptr<FileLocation> _tmp_ram_file_location;

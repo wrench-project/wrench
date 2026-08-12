@@ -139,16 +139,16 @@ namespace wrench
         : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
     ServerlessComputeServiceDownloadCompleteMessage::ServerlessComputeServiceDownloadCompleteMessage(
-        std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image_file(std::move(image_file)) {}
+        std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)) {}
 
     ServerlessComputeServiceInvocationExecutionCompleteMessage::ServerlessComputeServiceInvocationExecutionCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<Invocation> invocation, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _invocation(std::move(invocation)) {}
 
     ServerlessComputeServiceNodeCopyCompleteMessage::ServerlessComputeServiceNodeCopyCompleteMessage(
-        std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image_file(std::move(image_file)), _compute_node(std::move(compute_node)) {}
+        std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)), _compute_node(std::move(compute_node)) {}
 
     ServerlessComputeServiceNodeLoadCompleteMessage::ServerlessComputeServiceNodeLoadCompleteMessage(
-        std::shared_ptr<CustomAction> action, std::shared_ptr<DataFile> image_file, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image_file(std::move(image_file)), _compute_node(std::move(compute_node)) {}
+        std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)), _compute_node(std::move(compute_node)) {}
 
     ServerlessComputeServiceContainerIdleTimeoutMessage::ServerlessComputeServiceContainerIdleTimeoutMessage(
         std::shared_ptr<Container> container, std::uint64_t idle_sequence) : ServerlessComputeServiceMessage(0), _container(std::move(container)), _idle_sequence(idle_sequence) {}

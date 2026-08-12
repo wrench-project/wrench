@@ -10,6 +10,7 @@
 #include "wrench/function/Image.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/simulation/Simulation.h"
 
 WRENCH_LOG_CATEGORY(Image, "Log category for Serverless image");
 
@@ -24,7 +25,8 @@ namespace wrench {
      */
     Image::Image(const std::string& name,
                  const std::shared_ptr<FileLocation>& location,
-                 const sg_size_t ram_footprint) : _location(location), _ram_footprint(ram_footprint) {
+                 const sg_size_t ram_footprint) : _name(name), _location(location), _ram_footprint(ram_footprint) {
+        _ram_file = Simulation::addFile(location->getFile()->getID() + "_RAM", _ram_footprint);
     }
 
     /**
@@ -32,6 +34,13 @@ namespace wrench {
      */
     std::shared_ptr<DataFile> Image::getFile() const {
         return _location->getFile();
+    }
+
+    /**
+     * @return The image RAM space (as a file)
+     */
+    std::shared_ptr<DataFile> Image::getRAMFile() const {
+        return _ram_file;
     }
 
 } // namespace wrench

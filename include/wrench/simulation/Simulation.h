@@ -88,7 +88,9 @@ namespace wrench {
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
         static std::shared_ptr<DataFile> getFileByIDOrNull(const std::string &id);
         static std::shared_ptr<DataFile> addFile(const std::string &id, sg_size_t size);
+        static std::shared_ptr<DataFile> addTmpFile(sg_size_t size);
         static std::shared_ptr<DataFile> addFile(const std::string &id, const std::string &size);
+        static std::shared_ptr<DataFile> addTmpFile(const std::string &size);
 
 
         void launch();
@@ -272,6 +274,8 @@ namespace wrench {
 
         /* Map of files */
         static std::map<std::string, std::shared_ptr<DataFile>> data_files;
+
+        static unsigned long _tmp_file_sequence_number;
     };
 
 

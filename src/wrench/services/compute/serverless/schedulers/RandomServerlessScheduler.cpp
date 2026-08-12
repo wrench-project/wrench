@@ -46,11 +46,11 @@ namespace wrench {
 
 
         // Mapping: compute node -> vector of required DataFile pointers
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<DataFile>>> requiredImages;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Image>>> requiredImages;
 
         // For each invocation, randomly assign it to a compute node that has an available core
         for (const auto& inv : schedulable_invocations) {
-            auto imageFile = inv->getRegisteredFunction()->getImageFile();
+            auto image = inv->getRegisteredFunction()->getImage();
             // std::string imageID = imageFile->getID();
 
             // Build list of nodes with available cores
@@ -69,7 +69,7 @@ namespace wrench {
                 availableCores[chosenNode]--;
 
                 // Record that this node requires the image
-                requiredImages[chosenNode].insert(imageFile);
+                requiredImages[chosenNode].insert(image);
             }
             // If no node is available, this invocation is skipped for assignment
         }
@@ -114,14 +114,14 @@ namespace wrench {
         // For each invocation, build a list of candidate nodes and pick one at random, always reusing
         // an idle container if there is one
         for (const auto& inv : schedulable_invocations) {
-            auto imageFile = inv->getRegisteredFunction()->getImageFile();
+            auto image = inv->getRegisteredFunction()->getImage();
 
             std::vector<std::shared_ptr<ServerlessComputeNode>> candidates;
             for (const auto& [hostname, num_available_cores
                 ] : availableCores) {
                 if (num_available_cores > 0) {
                     // Only consider nodes that have the image already in RAM
-                    if (state->isImageInRAMAtNode(hostname, imageFile)) {
+                    if (state->isImageInRAMAtNode(hostname, image)) {
                         candidates.push_back(hostname);
                     }
                 }

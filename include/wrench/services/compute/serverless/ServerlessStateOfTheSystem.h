@@ -40,13 +40,13 @@ namespace wrench
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAM() const;
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
-        std::set<std::shared_ptr<DataFile>> getImagesBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool isImageOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<DataFile> &image) const;
-        bool isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<DataFile>& image) const;
+        std::set<std::shared_ptr<Image>> getImagesBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        bool isImageOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
+        bool isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Image>& image) const;
 
-        std::set<std::shared_ptr<DataFile>> getImagesBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<DataFile> &image) const;
-        bool isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<DataFile> &image) const;
+        std::set<std::shared_ptr<Image>> getImagesBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        bool isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
+        bool isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
 
         ~ServerlessStateOfTheSystem() = default;
 
@@ -61,7 +61,7 @@ namespace wrench
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _new_invocations;
         // queues of function invocations whose images are being downloaded
-        std::map<std::shared_ptr<DataFile>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
+        std::map<std::shared_ptr<Image>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
         // queue of function invocations whose images have been downloaded
         std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
         // set of function invocations currently running
@@ -69,7 +69,7 @@ namespace wrench
 
         std::string _head_storage_service_mount_point;
         std::shared_ptr<StorageService> _head_storage_service;
-        std::set<std::shared_ptr<DataFile>> _being_downloaded_image_files;
+        std::set<std::shared_ptr<Image>> _being_downloaded_images;
         sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shenanigans
 
         // list of compute nodes
