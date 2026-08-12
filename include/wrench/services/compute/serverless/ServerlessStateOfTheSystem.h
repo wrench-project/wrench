@@ -78,7 +78,6 @@ namespace wrench
         // The compute service this is for
         ServerlessComputeService *_serverless_compute_service;
 
-
     };
 
     /***********************/
