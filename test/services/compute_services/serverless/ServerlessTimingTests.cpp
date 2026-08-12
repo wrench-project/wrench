@@ -43,6 +43,8 @@ public:
     void do_SimpleImageEvictionFromDisk_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_SimpleImageEvictionFromRAM_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_TwoIdleContainers_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_OneIdleContainerTwoInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_TmpStorageClearing_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
     ~ServerlessTimingTest() override {
@@ -126,6 +128,8 @@ class MyFunctionOutput : public wrench::FunctionOutput {
 public:
     explicit MyFunctionOutput(std::string msg) : msg_(std::move(msg)) {
     }
+
+    std::string toString() const { return msg_; }
 
     std::string msg_;
 };
@@ -1399,6 +1403,250 @@ void ServerlessTimingTest::do_TwoIdleContainers_test(
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessTwoIdleContainersController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  ONE IDLE CONTAINER TWO INVOCATIONS TEST                         **/
+/**********************************************************************/
+
+class ServerlessOneIdleContainerTwoInvocationsController : public wrench::ExecutionController {
+public:
+    ServerlessOneIdleContainerTwoInvocationsController(ServerlessTimingTest* test,
+                                 const std::string& hostname,
+                                 const std::shared_ptr<wrench::ServerlessComputeService>
+                                 & compute_service,
+                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(10);
+            return std::make_shared<MyFunctionOutput>("Processed!");
+        };
+
+        // Register that function with a 32GB image file that takes %50 of the node disk space
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        30 * GB, 10 * MB, 10 * MB, 1 * MB);
+
+        // Place one invocation, so that there will be one idle container
+        auto inv1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv1);
+        auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getSubmitDate();
+
+
+        // Place two invocations, one of them should run on a idle container, the other should pay the container startup overhead
+        auto inv2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv2);
+        function_manager->wait_one(inv3);
+        auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getSubmitDate();
+        auto inv3_elapsed = inv3->getFunctionEndDate() - inv3->getSubmitDate();
+
+
+
+        // std::cerr << "INV1: " << inv1_elapsed << std::endl;
+        // std::cerr << "INV2: " << inv2_elapsed << std::endl;
+        // std::cerr << "INV3: " << inv3_elapsed << std::endl;
+        // std::cerr << "INV4: " << inv4_elapsed << std::endl;
+        // std::cerr << "INV5: " << inv5_elapsed << std::endl;
+        // std::cerr << "INV6: " << inv6_elapsed << std::endl;
+
+        if (std::abs(inv2->getDispatchDate() - inv3->getDispatchDate()) > EPSILON) {
+            throw std::runtime_error("Unexpected dispatch times: inv2: " + std::to_string(inv2->getDispatchDate()) + "   inv3: " + std::to_string(inv3->getDispatchDate()));
+        }
+        if (std::abs((inv2_elapsed + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) - (inv3_elapsed)) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed times: inv2: " + std::to_string(inv2_elapsed) + "   inv3: dispatch: " + std::to_string(inv3_elapsed));
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, OneIdleContainerTwoInvocations) {
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_OneIdleContainerTwoInvocations_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_OneIdleContainerTwoInvocations_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, scheduler,
+        {
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "10.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "100.0"}
+        },
+        {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessOneIdleContainerTwoInvocationsController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  TMP STORAGE CLEARING TEST                                       **/
+/**********************************************************************/
+
+class ServerlessTmpStorageClearingController : public wrench::ExecutionController {
+public:
+    ServerlessTmpStorageClearingController(ServerlessTimingTest* test,
+                                 const std::string& hostname,
+                                 const std::shared_ptr<wrench::ServerlessComputeService>
+                                 & compute_service,
+                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto free_storage_space_begin = service->getTotalFreeSpace();
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(service, wrench::Simulation::addTmpFile(1 * GB)));
+            wrench::Simulation::sleep(10);
+            auto free_storage_space_end = service->getTotalFreeSpace();
+            return std::make_shared<MyFunctionOutput>("FREE SPACE: " + std::to_string(free_storage_space_begin) +" " + std::to_string(free_storage_space_end));
+        };
+
+        // Register that function with a 32GB image file that takes %50 of the node disk space
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        30 * GB, 10 * MB, 10 * MB, 1 * MB);
+
+        // Place one invocation, so that there will be one idle container to reuse
+        auto inv1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv1);
+
+        // Place another invocation that will reuse the idle container
+        auto inv2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_one(inv2);
+
+        // Both invocations should have the same output
+        auto inv1_output = std::dynamic_pointer_cast<MyFunctionOutput>(inv1->getOutput());
+        auto inv2_output = std::dynamic_pointer_cast<MyFunctionOutput>(inv2->getOutput());
+
+        if (inv1_output->toString() != inv2_output->toString()) {
+            throw std::runtime_error("Both invocations should produce the same output, instead: " +  inv1_output->toString() + " != " + inv2_output->toString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, TmpStorageClearing) {
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_TmpStorageClearing_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_TmpStorageClearing_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, scheduler,
+        {
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "10.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "100.0"}
+        },
+        {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessTmpStorageClearingController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 
