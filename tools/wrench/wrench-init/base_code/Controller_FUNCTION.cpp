@@ -51,8 +51,8 @@ namespace wrench {
         auto function_manager = this->createFunctionManager();
 
         /* Create a function image file on the storage at the user's host */
-        auto some_file = wrench::Simulation::addFile("image_file", 10 * GB);
-        auto image_file_location = wrench::FileLocation::LOCATION(this->storage_service, some_file);
+        auto image_file = wrench::Simulation::addFile("image_file", 10 * GB);
+        auto image_file_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_file_location);
 
         // Create the code for a function. This function computes a fixed amount of flops.
@@ -66,7 +66,8 @@ namespace wrench {
         };
 
         // Create a function object
-        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image_file_location);
+	auto image = wrench::FunctionManager::createImage("my_image", image_file_location, image_file->getSize() / 2);
+        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image);
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 
