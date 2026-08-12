@@ -150,10 +150,10 @@ namespace wrench {
             ServerlessComputeNode* target_compute_node,
             std::shared_ptr<Container> container);
 
-        unsigned long num_cores_of_compute_host;
-        double speed_of_compute_core;
-        sg_size_t ram_of_compute_host;
-        sg_size_t disk_space_of_compute_host;
+        unsigned long _compute_node_num_cores;
+        double _compute_node_core_speed;
+        sg_size_t _compute_node_ram;
+        sg_size_t _compute_node_disk_space;
 
         /***********************/
         /** \endcond          **/

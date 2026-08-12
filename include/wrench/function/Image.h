@@ -29,6 +29,7 @@ namespace wrench {
     public:
         [[nodiscard]] std::string getName() const { return _name; }
         [[nodiscard]] sg_size_t getRAMFootprint() const { return _ram_footprint; }
+        [[nodiscard]] sg_size_t getDiskFootprint() const;
         [[nodiscard]] std::shared_ptr<FileLocation> getLocation() const { return _location; }
         [[nodiscard]] std::shared_ptr<DataFile> getFile() const;
 

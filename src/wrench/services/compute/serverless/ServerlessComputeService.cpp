@@ -88,11 +88,11 @@ namespace wrench {
     void ServerlessComputeService::check_homogeneity(const std::vector<std::string>& compute_hosts) {
         // Check Platform homogeneity
         auto first_hostname = *(compute_hosts.begin());
-        this->num_cores_of_compute_host = S4U_Simulation::getHostNumCores(first_hostname);
-        this->speed_of_compute_core = S4U_Simulation::getHostFlopRate(first_hostname);
-        this->ram_of_compute_host = S4U_Simulation::getHostMemoryCapacity(first_hostname);
+        _compute_node_num_cores = S4U_Simulation::getHostNumCores(first_hostname);
+        _compute_node_core_speed = S4U_Simulation::getHostFlopRate(first_hostname);
+        _compute_node_ram = S4U_Simulation::getHostMemoryCapacity(first_hostname);
         try {
-            this->disk_space_of_compute_host = S4U_Simulation::getDiskCapacity(first_hostname, "/");
+            _compute_node_disk_space = S4U_Simulation::getDiskCapacity(first_hostname, "/");
         }
         catch (std::invalid_argument& e) {
             throw std::invalid_argument("Compute hosts for a serverless compute service must have a '/' mountpoint");
@@ -114,22 +114,22 @@ namespace wrench {
             }
 
             // Compute speed
-            if (std::abs(speed - this->speed_of_compute_core) > DBL_EPSILON) {
+            if (std::abs(speed - _compute_node_core_speed) > DBL_EPSILON) {
                 throw std::invalid_argument(
                     "Compute hosts for a serverless compute service need to be homogeneous (different flop rates detected)");
             }
             // RAM
-            if (ram_available != this->ram_of_compute_host) {
+            if (ram_available != _compute_node_ram) {
                 throw std::invalid_argument(
                     "Compute hosts for a serverless compute service need to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
-            if (num_cores_available != this->num_cores_of_compute_host) {
+            if (num_cores_available != _compute_node_num_cores) {
                 throw std::invalid_argument(
                     "Compute hosts for a serverless service need to be homogeneous (different number of cores detected)");
             }
             // Disk capacity
-            if (disk_capacity != this->disk_space_of_compute_host) {
+            if (disk_capacity != _compute_node_disk_space) {
                 throw std::invalid_argument(
                     "Compute hosts for a serverless service need to be homogeneous (different disk capacities detected)");
             }
@@ -200,13 +200,13 @@ namespace wrench {
         if (key == "num_hosts") {
             // Num hosts
             std::map<std::string, double> num_hosts;
-            num_hosts.insert(std::make_pair(this->getName(), this->_state_of_the_system->_compute_nodes.size()));
+            num_hosts.insert(std::make_pair(this->getName(), _state_of_the_system->_compute_nodes.size()));
             return num_hosts;
         }
         else if (key == "num_cores") {
             // Num cores per hosts
             std::map<std::string, double> num_cores;
-            for (auto const& compute_node : this->_state_of_the_system->_compute_nodes) {
+            for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
                 num_cores[compute_node->hostname] = static_cast<double>(compute_node->_total_cores);
             }
             return num_cores;
@@ -214,7 +214,7 @@ namespace wrench {
         else if (key == "num_idle_cores") {
             // Num idle cores per hosts
             std::map<std::string, double> num_idle_cores;
-            for (const auto& compute_node : this->_state_of_the_system->_compute_nodes) {
+            for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 num_idle_cores[compute_node->hostname] = static_cast<double>(compute_node->_available_cores);
             }
             return num_idle_cores;
@@ -222,7 +222,7 @@ namespace wrench {
         else if (key == "flop_rates") {
             // Flop rate per host
             std::map<std::string, double> flop_rates;
-            for (const auto& compute_node : this->_state_of_the_system->_compute_nodes) {
+            for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 flop_rates[compute_node->hostname] = S4U_Simulation::getHostFlopRate(compute_node->hostname);
             }
             return flop_rates;
@@ -230,7 +230,7 @@ namespace wrench {
         else if (key == "ram_capacities") {
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
-            for (const auto& compute_node : this->_state_of_the_system->_compute_nodes) {
+            for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
             }
             return ram_capacities;
@@ -238,7 +238,7 @@ namespace wrench {
         else if (key == "ram_availabilities") {
             // RAM availability per host
             std::map<std::string, double> ram_availability;
-            for (auto const& compute_node : this->_state_of_the_system->_compute_nodes) {
+            for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
                 ram_availability[compute_node->hostname] = static_cast<double>(compute_node->_memory->
                     getTotalFreeSpaceZeroTime());
             }
@@ -269,7 +269,7 @@ namespace wrench {
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         //  send a "run a standard job" message to the daemon's commport
-        this->_commport->putMessage(
+        _commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
                 answer_commport, function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes,
                 ingress_in_bytes, egress_in_bytes,
@@ -299,7 +299,7 @@ namespace wrench {
         const std::shared_ptr<RegisteredFunction>& registered_function, const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
-        this->_commport->dputMessage(
+        _commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationRequestMessage(answer_commport,
                                                                          registered_function, input,
                                                                          notify_commport, this->getMessagePayloadValue(
@@ -326,7 +326,7 @@ namespace wrench {
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-        WRENCH_INFO("Serverless provider starting (%s)", this->_commport->get_cname());
+        WRENCH_INFO("Serverless provider starting (%s)", _commport->get_cname());
 
         // Start the Head Storage Service
         startHeadStorageService();
@@ -369,7 +369,7 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = this->_commport->getMessage();
+            message = _commport->getMessage();
         }
         catch (ExecutionException& e) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
@@ -466,9 +466,9 @@ namespace wrench {
         // Check that function can ever run!
         {
             sg_size_t needed_disk_space = function->getImageFile()->getSize() + disk_space_limit_in_bytes;
-            sg_size_t needed_ram_space = function->getImageFile()->getSize() + ram_limit_in_bytes;
+            sg_size_t needed_ram_space = function->getImage()->getRAMFootprint() + ram_limit_in_bytes;
 
-            if (needed_disk_space > this->disk_space_of_compute_host) {
+            if (needed_disk_space > _compute_node_disk_space) {
                 const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
                     false, nullptr,
                     std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
@@ -479,7 +479,7 @@ namespace wrench {
                 return;
             }
 
-            if (needed_ram_space > this->ram_of_compute_host) {
+            if (needed_ram_space > _compute_node_ram) {
                 const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
                     false, nullptr,
                     std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
@@ -551,7 +551,7 @@ namespace wrench {
                                                                   const std::shared_ptr<Image>& image) {
         // If the download has failed, fail all corresponding admitted function invocations
         if (action->getFailureCause()) {
-            _state_of_the_system->_free_space_on_head_storage += image->getFile()->getSize();
+            _state_of_the_system->_free_space_on_head_storage += image->getDiskFootprint();
             _state_of_the_system->_being_downloaded_images.erase(image);
 
             while (not _state_of_the_system->_admitted_invocations[image].empty()) {
@@ -614,8 +614,8 @@ namespace wrench {
             std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
                 this->simulation_,
                 S4U_Simulation::getClock() + idle_timeout,
-                this->_hostname,
-                this->_commport,
+                _hostname,
+                _commport,
                 new
                 ServerlessComputeServiceContainerIdleTimeoutMessage(
                     container, container->getIdleSequence()),
@@ -781,7 +781,7 @@ namespace wrench {
                  ? 0
                  : this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)),
             false,
-            this->_commport,
+            _commport,
             custom_message,
             action,
             nullptr);
@@ -922,9 +922,9 @@ namespace wrench {
 
             // Otherwise, if there is enough space on the head node storage service to store it,
             // then launch the downloaded and admit the invocation
-            if (_state_of_the_system->_free_space_on_head_storage >= image->getFile()->getSize()) {
+            if (_state_of_the_system->_free_space_on_head_storage >= image->getDiskFootprint()) {
                 // "Reserve" space on the storage service
-                _state_of_the_system->_free_space_on_head_storage -= image->getFile()->getSize();
+                _state_of_the_system->_free_space_on_head_storage -= image->getDiskFootprint();
                 // initiate the download
                 _state_of_the_system->_being_downloaded_images.insert(image);
                 initiateImageDownloadFromRemote(invocation);
@@ -965,7 +965,7 @@ namespace wrench {
 
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "download_image_" + invocation->_registered_function->_function->getImage()->getFile()->getID(),
+                "download_image_" + invocation->_registered_function->_function->getImageFile()->getID(),
                 0, 0, lambda_execute, lambda_terminate));
 
         // Spin up an ActionExecutor service, and have it send us back a custom message
@@ -979,7 +979,7 @@ namespace wrench {
             0,
             0,
             false,
-            this->_commport,
+            _commport,
             custom_message,
             action,
             nullptr);
@@ -1080,7 +1080,7 @@ namespace wrench {
             0,
             0,
             false,
-            this->_commport,
+            _commport,
             custom_message,
             action,
             nullptr);
@@ -1172,7 +1172,7 @@ namespace wrench {
             0,
             0,
             false,
-            this->_commport,
+            _commport,
             custom_message,
             action,
             nullptr);

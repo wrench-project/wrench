@@ -30,6 +30,13 @@ namespace wrench {
     }
 
     /**
+     * @return The image's disk footprint
+     */
+    sg_size_t Image::getDiskFootprint() const {
+        return _location->getFile()->getSize();
+    }
+
+    /**
      * @return The image file
      */
     std::shared_ptr<DataFile> Image::getFile() const {
