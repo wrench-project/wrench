@@ -23,7 +23,7 @@
 
 namespace wrench {
     /**
-     * @brief A serverless compute service that manages a set of compute hosts and
+     * @brief A serverless compute service that manages a set of compute nodes and
      *        controls access to their resource via function registration/invocation operations.
      */
     class ServerlessComputeService : public ComputeService {
@@ -60,7 +60,7 @@ namespace wrench {
     public:
         ServerlessComputeService(const std::string& hostname,
                                  const std::string& head_node_storage_mount_point,
-                                 const std::vector<std::string>& compute_hosts,
+                                 const std::vector<std::string>& compute_nodes,
                                  const std::shared_ptr<ServerlessScheduler>& scheduler,
                                  const WRENCH_PROPERTY_COLLECTION_TYPE& property_list = {},
                                  const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list = {});
@@ -74,7 +74,7 @@ namespace wrench {
     /** \cond INTERNAL    **/
     /***********************/
 
-        static unsigned long sequence_number;
+        static unsigned long _sequence_number;
 
     protected:
         friend class FunctionManager;
@@ -97,7 +97,7 @@ namespace wrench {
 
         int main() override;
 
-        void check_homogeneity(const std::vector<std::string>& compute_hosts);
+        void check_homogeneity(const std::vector<std::string>& compute_nodes) const;
 
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,

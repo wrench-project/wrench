@@ -31,13 +31,13 @@
 WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
 
 namespace wrench {
-    unsigned long ServerlessComputeService::sequence_number = 0;
+    unsigned long ServerlessComputeService::_sequence_number = 0;
     /**
      * @brief Constructor
      *
      * @param hostname name of the head host on which the service runs
      * @param head_node_storage_mount_point the mount point of storage at the head host (where images will be stored)
-     * @param compute_hosts list of (homogeneous) compute node hostnames
+     * @param compute_nodes list of (homogeneous) compute node hostnames
      * @param scheduler the scheduler used to decide which invocations should be executed and when
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -45,7 +45,7 @@ namespace wrench {
     ServerlessComputeService::ServerlessComputeService(
         const std::string& hostname,
         const std::string& head_node_storage_mount_point,
-        const std::vector<std::string>& compute_hosts,
+        const std::vector<std::string>& compute_nodes,
         const std::shared_ptr<ServerlessScheduler>& scheduler,
         const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
         const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE&
@@ -53,7 +53,7 @@ namespace wrench {
         ComputeService(hostname,
                        "ServerlessComputeService", "") {
         // Check that there is at least one compute host
-        if (compute_hosts.empty()) {
+        if (compute_nodes.empty()) {
             throw std::invalid_argument(
                 "ServerlessComputeService::ServerlessComputeService(): The list of compute hosts cannot be empty");
         }
@@ -63,8 +63,18 @@ namespace wrench {
             throw std::invalid_argument(
                 "ServerlessComputeService::ServerlessComputeService(): A non-null scheduler must be provided");
         }
+
         // Check platform homogeneity
-        check_homogeneity(compute_hosts);
+        auto first_hostname = *(compute_nodes.begin());
+        _compute_node_num_cores = S4U_Simulation::getHostNumCores(first_hostname);
+        _compute_node_core_speed = S4U_Simulation::getHostFlopRate(first_hostname);
+        _compute_node_ram = S4U_Simulation::getHostMemoryCapacity(first_hostname);
+        try {
+            _compute_node_disk_space = S4U_Simulation::getDiskCapacity(first_hostname, "/");
+        } catch (std::invalid_argument& e) {
+            throw std::invalid_argument("Compute nodes for a serverless compute service must have a '/' mountpoint");
+        }
+        check_homogeneity(compute_nodes);
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
@@ -74,31 +84,19 @@ namespace wrench {
 
         // Create the state of the system object
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
-            new ServerlessStateOfTheSystem(compute_hosts, this));
+            new ServerlessStateOfTheSystem(compute_nodes, this));
         _state_of_the_system->_head_storage_service_mount_point = head_node_storage_mount_point;
 
         _scheduler = scheduler;
     }
 
-
     /**
-     * @brief Helper method to check homogeneity of the compute hosts
-     * @param compute_hosts a list of compute hosts
+     * @brief Helper method to check homogeneity of the compute nodes
+     * @param compute_nodes a list of compute node hostnames
      */
-    void ServerlessComputeService::check_homogeneity(const std::vector<std::string>& compute_hosts) {
-        // Check Platform homogeneity
-        auto first_hostname = *(compute_hosts.begin());
-        _compute_node_num_cores = S4U_Simulation::getHostNumCores(first_hostname);
-        _compute_node_core_speed = S4U_Simulation::getHostFlopRate(first_hostname);
-        _compute_node_ram = S4U_Simulation::getHostMemoryCapacity(first_hostname);
-        try {
-            _compute_node_disk_space = S4U_Simulation::getDiskCapacity(first_hostname, "/");
-        }
-        catch (std::invalid_argument& e) {
-            throw std::invalid_argument("Compute hosts for a serverless compute service must have a '/' mountpoint");
-        }
+    void ServerlessComputeService::check_homogeneity(const std::vector<std::string>& compute_nodes) const {
 
-        for (auto const& hostname : compute_hosts) {
+        for (auto const& hostname : compute_nodes) {
             auto num_cores_available = S4U_Simulation::getHostNumCores(hostname);
             double speed = S4U_Simulation::getHostFlopRate(hostname);
             sg_size_t ram_available = S4U_Simulation::getHostMemoryCapacity(hostname);
@@ -110,28 +108,28 @@ namespace wrench {
             }
             catch (std::invalid_argument& e) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless compute service must have a '/' mountpoint");
+                    "Compute nodes for a serverless compute service must have a '/' mountpoint");
             }
 
             // Compute speed
             if (std::abs(speed - _compute_node_core_speed) > DBL_EPSILON) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless compute service need to be homogeneous (different flop rates detected)");
+                    "Compute nodes for a serverless compute service need to be homogeneous (different flop rates detected)");
             }
             // RAM
             if (ram_available != _compute_node_ram) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless compute service need to be homogeneous (different RAM capacities detected)");
+                    "Compute nodes for a serverless compute service need to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
             if (num_cores_available != _compute_node_num_cores) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless service need to be homogeneous (different number of cores detected)");
+                    "Compute nodes for a serverless service need to be homogeneous (different number of cores detected)");
             }
             // Disk capacity
             if (disk_capacity != _compute_node_disk_space) {
                 throw std::invalid_argument(
-                    "Compute hosts for a serverless service need to be homogeneous (different disk capacities detected)");
+                    "Compute nodes for a serverless service need to be homogeneous (different disk capacities detected)");
             }
         }
     }
@@ -204,7 +202,7 @@ namespace wrench {
             return num_hosts;
         }
         else if (key == "num_cores") {
-            // Num cores per hosts
+            // Num cores per host
             std::map<std::string, double> num_cores;
             for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
                 num_cores[compute_node->hostname] = static_cast<double>(compute_node->_total_cores);
@@ -212,7 +210,7 @@ namespace wrench {
             return num_cores;
         }
         else if (key == "num_idle_cores") {
-            // Num idle cores per hosts
+            // Num idle cores per host
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 num_idle_cores[compute_node->hostname] = static_cast<double>(compute_node->_available_cores);
@@ -265,10 +263,9 @@ namespace wrench {
         const std::shared_ptr<Function>& function, const double time_limit_in_seconds,
         const sg_size_t disk_space_limit_in_bytes, const sg_size_t RAM_limit_in_bytes,
         const sg_size_t ingress_in_bytes, const sg_size_t egress_in_bytes) {
-        // WRENCH_INFO("Serverless Provider Registered function %s", function->getName().c_str());
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
-        //  send a "run a standard job" message to the daemon's commport
+        //  send a "register my function" message to the daemon's commport
         _commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
                 answer_commport, function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes,
@@ -330,7 +327,7 @@ namespace wrench {
 
         // Start the Head Storage Service
         startHeadStorageService();
-        // Start a storage service on each host.
+        // Start a storage service on each compute node.
         startComputeHostsServices();
 
         bool do_scheduling;
@@ -410,12 +407,12 @@ namespace wrench {
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
             scsncc_msg->_compute_node->_images_being_copied.erase(scsncc_msg->_image);
             if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("An image copy has failed (due to disk pressure) for image %s... nevermind",
+                WRENCH_INFO("An image copy has failed (due to disk pressure) for image [%s]... oh well",
                             scsncc_msg->_image->getName().c_str());
                 do_scheduling = false;
             }
             else {
-                WRENCH_INFO("Image %s was stored at compute node %s",
+                WRENCH_INFO("Image [%s] was stored on disk at [%s]",
                             scsncc_msg->_image->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
                 std::cerr << "FREE SPACE REMAINING: " << scsncc_msg->_compute_node->getFreeDiskSpace() << "\n";
             }
@@ -425,12 +422,12 @@ namespace wrench {
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
             scsnlc_msg->_compute_node->_images_being_loaded.erase(scsnlc_msg->_image);
             if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("An image load has failed (due to memory pressure) for image %s... nevermind",
+                WRENCH_INFO("A memory load has failed (due to memory pressure) for image [%s]... oh well",
                             scsnlc_msg->_image->getName().c_str());
                 do_scheduling = false;
             }
             else {
-                WRENCH_INFO("Image %s was loaded at compute node %s",
+                WRENCH_INFO("Image [%s] was loaded in RAM at [%s]",
                             scsnlc_msg->_image->getName().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
             }
             return true;
@@ -472,7 +469,7 @@ namespace wrench {
                 const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
                     false, nullptr,
                     std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                                                 "Function cannot be registered because no compute host has sufficient disk space to execute it"),
+                                                 "Function cannot be registered because no compute node has sufficient disk space to execute it"),
                     this->getMessagePayloadValue(
                         ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
                 answer_commport->dputMessage(answerMessage);
@@ -483,7 +480,7 @@ namespace wrench {
                 const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
                     false, nullptr,
                     std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                                                 "Function cannot be registered because no compute host has sufficient RAM space to execute it"),
+                                                 "Function cannot be registered because no compute node has sufficient RAM space to execute it"),
                     this->getMessagePayloadValue(
                         ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
                 answer_commport->dputMessage(answerMessage);
@@ -569,7 +566,7 @@ namespace wrench {
             return;
         }
 
-        WRENCH_INFO("ServerlessComputeService::processImageDownloadCompletion(): Image %s was downloaded",
+        WRENCH_INFO("ServerlessComputeService::processImageDownloadCompletion(): Image [%s] was downloaded",
                     image->getName().c_str());
         _state_of_the_system->_being_downloaded_images.erase(image);
         // _state_of_the_system->_downloaded_image_files.insert(image_file);
@@ -664,7 +661,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Dispatches scheduled function invocations to compute hosts
+     * @brief Dispatches scheduled function invocations to compute nodes
      * @param decisions Scheduling decisions
      * @return true if at least one invocation was dispatched
      */
@@ -717,7 +714,7 @@ namespace wrench {
                 target_container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
             }
             catch (ExecutionException& e) {
-                WRENCH_INFO("Couldn't spawn a container for an invocation for %s: %s",
+                WRENCH_INFO("Couldn't spawn a container for an invocation for function %s: %s",
                             invocation->_registered_function->_function->getName().c_str(),
                             e.getCause()->toString().c_str());
                 return false;
@@ -805,14 +802,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Start a SimpleStorageService for each compute host. We don't start a bare-metal
+     * @brief Start a SimpleStorageService for each compute node. We don't start a bare-metal
      *        service as we'll do everything ourselves with action executor services.
      */
     void ServerlessComputeService::startComputeHostsServices() {
         for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
             if (not S4U_Simulation::hostHasMountPoint(compute_node->hostname, "/")) {
                 throw std::invalid_argument("ServerlessComputeService::startComputeHostsServices(): "
-                    "each compute host in a serverless compute service should have a \"/\" mountpoint");
+                    "each compute node in a serverless compute service should have a \"/\" mountpoint");
             }
 
             // Start a compute service, with LRU caching, to implement compute-node storage
@@ -836,10 +833,10 @@ namespace wrench {
 
             // Start a compute service, with LRU caching, to implement compute-node memory
             {
-                // Create a RAM disk on the host
+                // Create a RAM disk on the compute node
                 auto host = simgrid::s4u::Engine::get_instance()->host_by_name(compute_node->hostname);
                 auto ram_disk = host->add_disk(
-                    "ram_disk_" + std::to_string(ServerlessComputeService::sequence_number++),
+                    "ram_disk_" + std::to_string(_sequence_number++),
                     S4U_Simulation::RAM_READ_BANDWIDTH,
                     S4U_Simulation::RAM_WRITE_BANDWIDTH);
                 auto ram_capacity = S4U_Simulation::getHostMemoryCapacity(compute_node->hostname);
@@ -1033,7 +1030,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to initiate an image copy from the head host to a compute host
+     * @brief Method to initiate an image copy from the head host to a compute node
      * @param compute_node The compute node
      * @param image The image
      */
@@ -1054,7 +1051,7 @@ namespace wrench {
             const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the image copy lambda execute!!");
 
-            // Copy the image file from the head host to the current host's storage service
+            // Copy the image file from the head host to the current compute node's storage service
             auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
                                                                image->getFile());
             auto local_image_path = wrench::FileLocation::LOCATION(compute_node->_disk, image->getFile());
@@ -1095,15 +1092,14 @@ namespace wrench {
                 "ServerlessComputeService::initiateImageCopyToComputeNode(): Action executor could not be started - internal error");
         }
 
-        // Add the image to the being_copied_images data structure for this host
+        // Add the image to the being_copied_images data structure for this compute node
         compute_node->_images_being_copied.insert(image);
 
-        WRENCH_INFO("Initiated image copy for image [%s] from head host to compute host [%s]", image->getName().c_str(),
-                    compute_node->hostname.c_str());
+        WRENCH_INFO("Initiated image copy: [%s] to [%s]", image->getName().c_str(), compute_node->hostname.c_str());
     }
 
     /**
-     * @brief Method to initiate an image load from disk to RAM at a compute host
+     * @brief Method to initiate an image load from disk to RAM at a compute node
      * @param compute_node The compute node
      * @param image The image
      */
@@ -1187,10 +1183,10 @@ namespace wrench {
                 "ServerlessComputeService::initiateImageLoadAtComputeNode(): Action executor could not be started - internal error");
         }
 
-        // Add the image to the being_copied_images data structure for this host
+        // Add the image to the being_copied_images data structure for this compute node
         compute_node->_images_being_loaded.insert(image);
 
-        WRENCH_INFO("Initiated image load for image [%s] at compute host [%s]", image->getName().c_str(),
+        WRENCH_INFO("Initiated image load: [%s] at [%s]", image->getName().c_str(),
                     compute_node->hostname.c_str());
     }
 }; // namespace wrench

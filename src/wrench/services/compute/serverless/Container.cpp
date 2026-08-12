@@ -126,9 +126,9 @@ namespace wrench {
                 throw ExecutionException(std::make_shared<FatalFailure>("Compute node should have a '/' mount point!"));
             }
             const auto ods = simgrid::fsmod::OneDiskStorage::create(
-                "is_" + std::to_string(ServerlessComputeService::sequence_number), disk);
+                "is_" + std::to_string(ServerlessComputeService::_sequence_number), disk);
             fs = simgrid::fsmod::FileSystem::create(
-                "fs" + std::to_string(ServerlessComputeService::sequence_number));
+                "fs" + std::to_string(ServerlessComputeService::_sequence_number));
             fs->mount_partition("/", ods, _registered_function->getDiskSpaceLimit());
         }
         catch (simgrid::Exception& e) {
