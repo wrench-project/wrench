@@ -129,6 +129,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_error.html">wrench::HostError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image.html">wrench::Image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
@@ -158,8 +159,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench18RegisteredFunctionE"><code class="docutils literal notranslate"><span class="pre">wrench::RegisteredFunction</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction17getDiskSpaceLimitEv"><code class="docutils literal notranslate"><span class="pre">getDiskSpaceLimit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench18RegisteredFunction11getFunctionEv"><code class="docutils literal notranslate"><span class="pre">getFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction8getImageEv"><code class="docutils literal notranslate"><span class="pre">getImage()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction12getImageFileEv"><code class="docutils literal notranslate"><span class="pre">getImageFile()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction24getOriginalImageLocationEv"><code class="docutils literal notranslate"><span class="pre">getOriginalImageLocation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction11getRAMLimitEv"><code class="docutils literal notranslate"><span class="pre">getRAMLimit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench18RegisteredFunction12getTimeLimitEv"><code class="docutils literal notranslate"><span class="pre">getTimeLimit()</span></code></a></li>
 </ul>
@@ -298,9 +299,9 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench18RegisteredFunction12getImageFileEv">
-<span id="_CPPv3NK6wrench18RegisteredFunction12getImageFileEv"></span><span id="_CPPv2NK6wrench18RegisteredFunction12getImageFileEv"></span><span id="wrench::RegisteredFunction::getImageFileC"></span><span class="target" id="classwrench_1_1_registered_function_1a4015897a94836815991f1dc3b1a1c723"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getImageFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench18RegisteredFunction12getImageFileEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the registered function’s image file. </p>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench18RegisteredFunction8getImageEv">
+<span id="_CPPv3NK6wrench18RegisteredFunction8getImageEv"></span><span id="_CPPv2NK6wrench18RegisteredFunction8getImageEv"></span><span id="wrench::RegisteredFunction::getImageC"></span><span class="target" id="classwrench_1_1_registered_function_1acb14742d1a910a8ac4e0e41fe81cbb8c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getImage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench18RegisteredFunction8getImageEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the registered function’s image. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A file </p>
@@ -309,12 +310,12 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench18RegisteredFunction24getOriginalImageLocationEv">
-<span id="_CPPv3NK6wrench18RegisteredFunction24getOriginalImageLocationEv"></span><span id="_CPPv2NK6wrench18RegisteredFunction24getOriginalImageLocationEv"></span><span id="wrench::RegisteredFunction::getOriginalImageLocationC"></span><span class="target" id="classwrench_1_1_registered_function_1a4b457964f79a82151cca6ddf70b9d040"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getOriginalImageLocation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench18RegisteredFunction24getOriginalImageLocationEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the authoritative (i.e., in a repo) location of the registered function’s image. </p>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench18RegisteredFunction12getImageFileEv">
+<span id="_CPPv3NK6wrench18RegisteredFunction12getImageFileEv"></span><span id="_CPPv2NK6wrench18RegisteredFunction12getImageFileEv"></span><span id="wrench::RegisteredFunction::getImageFileC"></span><span class="target" id="classwrench_1_1_registered_function_1a4015897a94836815991f1dc3b1a1c723"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getImageFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench18RegisteredFunction12getImageFileEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the registered function’s image file. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A file location </p>
+<dd class="field-odd"><p>A file </p>
 </dd>
 </dl>
 </dd></dl>

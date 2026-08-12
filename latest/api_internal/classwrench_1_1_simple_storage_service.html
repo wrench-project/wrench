@@ -235,6 +235,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector.html">wrench::HostStateChangeDetector</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_message.html">wrench::HostStateChangeDetectorMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_property.html">wrench::HostStateChangeDetectorProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image.html">wrench::Image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
@@ -348,6 +349,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench20SimpleStorageService10lookupFileERKNSt10shared_ptrI8DataFileEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">lookupFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench20SimpleStorageService10lookupFileERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">lookupFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench20SimpleStorageService10lookupFileEP12S4U_CommPortRKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">lookupFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench20SimpleStorageService8openFileERKNSt10shared_ptrI12FileLocationEE"><code class="docutils literal notranslate"><span class="pre">openFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench20SimpleStorageService8readFileERKNSt10shared_ptrI8DataFileEE"><code class="docutils literal notranslate"><span class="pre">readFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench20SimpleStorageService8readFileERKNSt10shared_ptrI8DataFileEERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">readFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench20SimpleStorageService8readFileERKNSt10shared_ptrI8DataFileEERKNSt6stringE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">readFile()</span></code></a></li>
@@ -893,6 +895,17 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if the file is present, false otherwise </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench20SimpleStorageService8openFileERKNSt10shared_ptrI12FileLocationEE">
+<span id="_CPPv3N6wrench20SimpleStorageService8openFileERKNSt10shared_ptrI12FileLocationEE"></span><span id="_CPPv2N6wrench20SimpleStorageService8openFileERKNSt10shared_ptrI12FileLocationEE"></span><span id="wrench::SimpleStorageService::openFile__std::shared_ptr:FileLocation:CR"></span><span class="target" id="classwrench_1_1_simple_storage_service_1a37931f0d892c4bc575dfd729cebf059e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">simgrid</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">fsmod</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">File</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">openFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">location</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench20SimpleStorageService8openFileERKNSt10shared_ptrI12FileLocationEE" title="Link to this definition"></a><br /></dt>
+<dd><p>A method to open a file, which really doesn’t do anything besides making the file unevictable, in case the storage service implements caching. Calling close() on the returned file will decrement the file’s refcount, thus possibly making it evictable again. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>location</strong> – the file’s location </p>
 </dd>
 </dl>
 </dd></dl>

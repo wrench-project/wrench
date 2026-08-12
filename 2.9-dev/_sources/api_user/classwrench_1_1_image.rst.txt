@@ -1,0 +1,8 @@
+.. _Image:
+wrench::Image
+*************
+
+.. doxygenclass:: wrench::Image
+   :project: user
+   :members:
+

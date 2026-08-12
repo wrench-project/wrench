@@ -129,6 +129,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_property.html">wrench::HTCondorComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_error.html">wrench::HostError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image.html">wrench::Image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
@@ -193,6 +194,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation15startNewServiceEP14StorageService"><code class="docutils literal notranslate"><span class="pre">startNewService()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation7addFileERKNSt6stringERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">addFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation7addFileERKNSt6stringE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">addFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation10addTmpFileERKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">addTmpFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation10addTmpFileE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">addTmpFile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation7computeEd"><code class="docutils literal notranslate"><span class="pre">compute()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation20computeMultiThreadedEmddd"><code class="docutils literal notranslate"><span class="pre">computeMultiThreaded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Simulation13createNewDiskERKNSt6stringERKNSt6stringEdd9sg_size_tRKNSt6stringE"><code class="docutils literal notranslate"><span class="pre">createNewDisk()</span></code></a></li>
@@ -638,6 +641,34 @@
 <li><p><strong>id</strong> – a unique string id </p></li>
 <li><p><strong>size</strong> – a file size in bytes</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <a class="reference internal" href="../api_user/classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> instance </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation10addTmpFileERKNSt6stringE">
+<span id="_CPPv3N6wrench10Simulation10addTmpFileERKNSt6stringE"></span><span id="_CPPv2N6wrench10Simulation10addTmpFileERKNSt6stringE"></span><span id="wrench::Simulation::addTmpFile__ssCR"></span><span class="target" id="classwrench_1_1_simulation_1a0c1e622d8a88cf8797c3ef4bd30ecc54"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addTmpFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10Simulation10addTmpFileERKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new file to the simulation (use at your own peril if you’re using the workflow API - use Workflow::addFile() instead), with a file id picked to be unique. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> – a size as a unit string (e.g., “10MB”) w </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the <a class="reference internal" href="../api_user/classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> instance </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Simulation10addTmpFileE9sg_size_t">
+<span id="_CPPv3N6wrench10Simulation10addTmpFileE9sg_size_t"></span><span id="_CPPv2N6wrench10Simulation10addTmpFileE9sg_size_t"></span><span id="wrench::Simulation::addTmpFile__sg_size_t"></span><span class="target" id="classwrench_1_1_simulation_1a47f15c58d92e6efd6a9621c55955ee0d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addTmpFile</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10Simulation10addTmpFileE9sg_size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Add a new file to the simulation (use at your own peril if you’re using the workflow API - use Workflow::addFile() instead), with a file id picked to be unique. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> – a file size in bytes</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the <a class="reference internal" href="../api_user/classwrench_1_1_data_file.html#classwrench_1_1_data_file"><span class="std std-ref">DataFile</span></a> instance </p>
