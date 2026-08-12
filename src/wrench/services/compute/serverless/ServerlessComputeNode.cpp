@@ -23,6 +23,7 @@ namespace wrench {
     *  @brief Constructor
     *  @param h: hostname
     *  @param num_cores: number of cores
+    *  @param service: the ServerlessComputeService that owns this compute node
     */
     ServerlessComputeNode::ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService *service) :
                 hostname(std::move(h)), _serverless_compute_service(service), _total_cores(num_cores), _available_cores(num_cores) {}
@@ -93,7 +94,7 @@ namespace wrench {
      * @brief Spawn a container
      * @param registered_function a registered function
      */
-    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(RegisteredFunction *registered_function) {
+    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const RegisteredFunction *registered_function) {
         // Create a container object
         auto container = std::shared_ptr<Container>(new Container(registered_function, this, _serverless_compute_service, Container::State::BUSY));
         container->spawn();
@@ -208,4 +209,4 @@ namespace wrench {
         return true;
     }
 
-}; // namespace wrench
+} // namespace wrench

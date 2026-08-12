@@ -35,25 +35,25 @@ namespace wrench
     class ServerlessStateOfTheSystem {
 
     public:
-        std::vector<std::shared_ptr<ServerlessComputeNode>> getComputeNodes() const;
-        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> getAvailableCores() const;
-        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAM() const;
-        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
+        [[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>> getComputeNodes() const;
+        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> getAvailableCores() const;
+        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAM() const;
+        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
-        std::set<std::shared_ptr<Image>> getImagesBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool isImageOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
-        bool isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Image>& image) const;
+        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool isImageOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
+        [[nodiscard]] bool isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Image>& image) const;
 
-        std::set<std::shared_ptr<Image>> getImagesBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
-        bool isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
+        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
+        [[nodiscard]] bool isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
 
         ~ServerlessStateOfTheSystem() = default;
 
     private:
         friend class ServerlessComputeService;
 
-        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts, ServerlessComputeService *serverless_compute_service);
+        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts, ServerlessComputeService *service);
 
         // set of Registered functions
         std::set<std::shared_ptr<RegisteredFunction>> _registered_functions;

@@ -43,7 +43,7 @@ namespace wrench
     public:
         ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService *service);
 
-        std::shared_ptr<Container> spawnContainer(RegisteredFunction *registered_function);
+        std::shared_ptr<Container> spawnContainer(const RegisteredFunction *registered_function);
         void makeContainerIdle(const std::shared_ptr<Container>& container);
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
@@ -66,7 +66,7 @@ namespace wrench
         [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingLoaded() const;
         [[nodiscard]] bool isImageInRAM(const std::shared_ptr<Image>& image) const;
 
-        [[nodiscard]] bool isInvocationFeasible(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Container>& container) const;
+        [[nodiscard]] bool isInvocationFeasible(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Container>& target_container) const;
 
         [[nodiscard]] std::shared_ptr<SimpleStorageService> getDiskStorage() const { return _disk; }
         [[nodiscard]] std::shared_ptr<SimpleStorageService> getMemoryStorage() const { return _memory; }

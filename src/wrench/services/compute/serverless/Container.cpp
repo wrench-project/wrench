@@ -73,10 +73,10 @@ namespace wrench {
             _opened_image_disk_file = compute_disk_ss->openFile(
                 FileLocation::LOCATION(compute_disk_ss, _registered_function->getImageFile()));
         }
-        catch (ExecutionException& e) {
+        catch (ExecutionException&) {
             this->freeDiskAndMemoryResources();
             throw;
-        } catch (simgrid::Exception& e) {
+        } catch (simgrid::Exception&) {
             this->freeDiskAndMemoryResources();
             throw ExecutionException(std::make_shared<FatalFailure>("Can't open image in RAM"));
         }
@@ -98,7 +98,7 @@ namespace wrench {
 
         // Reserve disk space on the compute node's storage service
         try {
-            _tmp_file_location = wrench::FileLocation::LOCATION(
+            _tmp_file_location = FileLocation::LOCATION(
                 _compute_node->getDiskStorage(),
                 Simulation::addTmpFile(
                     _registered_function->getDiskSpaceLimit()));

@@ -148,7 +148,7 @@ namespace wrench {
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
             ServerlessComputeNode* target_compute_node,
-            std::shared_ptr<Container> container);
+            std::shared_ptr<Container> target_container);
 
         unsigned long _compute_node_num_cores;
         double _compute_node_core_speed;

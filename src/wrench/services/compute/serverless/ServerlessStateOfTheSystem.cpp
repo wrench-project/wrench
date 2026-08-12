@@ -21,16 +21,17 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param compute_hosts the list of compute hosts
+     * @param service the ServerlessComputeService whose state this is
      */
     ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts,
-                                                           ServerlessComputeService* serverless_compute_service)
+                                                           ServerlessComputeService* service)
         : _head_storage_service(nullptr),
           _free_space_on_head_storage(0),
-          _serverless_compute_service(serverless_compute_service) {
+          _serverless_compute_service(service) {
         for (const auto& hostname : compute_hosts) {
             auto num_cores = S4U_Simulation::getHostNumCores(hostname);
             auto compute_node = std::make_shared<
-                ServerlessComputeNode>(hostname, num_cores, serverless_compute_service);
+                ServerlessComputeNode>(hostname, num_cores, service);
             _compute_nodes.push_back(compute_node);
         }
     }
@@ -54,7 +55,7 @@ namespace wrench {
         for (const auto& compute_node : _compute_nodes) {
             to_return[compute_node] = compute_node->getNumIdleCores();
         }
-        return to_return;;
+        return to_return;
     }
 
     /**
@@ -159,4 +160,4 @@ namespace wrench {
                                                         const std::shared_ptr<Image>& image) const {
         return node->isImageInRAM(image);
     }
-}; // namespace wrench
+} // namespace wrench
