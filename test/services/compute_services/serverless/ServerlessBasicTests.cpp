@@ -652,14 +652,25 @@ private:
             if (invocation->hasSucceeded()) {
                 throw std::runtime_error("Invocation should NOT have succeeded");
             }
+
             if (not invocation->getFailureCause()) {
                 throw std::runtime_error("There should be a failure cause");
             }
+
             if (not std::dynamic_pointer_cast<wrench::OperationTimeout>(invocation->getFailureCause())) {
                 throw std::runtime_error("Unexpected failure cause: " + invocation->getFailureCause()->toString());
             }
             auto operation_timeout_failure_cause = std::dynamic_pointer_cast<wrench::OperationTimeout>(invocation->getFailureCause());
             operation_timeout_failure_cause->toString(); // Coverage
+
+            // Check time stamps
+            if (std::abs(invocation->getFunctionStartDate() - invocation->getDispatchDate()) > DBL_EPSILON) {
+                throw std::runtime_error("Unexpected dispatch / start dates: " + std::to_string(invocation->getDispatchDate()) + " / " + std::to_string(invocation->getFunctionStartDate()));
+            }
+
+            if (invocation->getFunctionEndDate() != -1.0) {
+                throw std::runtime_error("Unexpected end date: " + std::to_string(invocation->getFunctionEndDate()));
+            }
         }
 
         return 0;

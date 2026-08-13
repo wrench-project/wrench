@@ -76,7 +76,7 @@ namespace wrench {
      * @brief Get the registered function's RAM limit
      * @return A RAN limit in bytes
      */
-    sg_size_t RegisteredFunction::getRAMLimit() const {
+    sg_size_t RegisteredFunction::getRAMSpaceLimit() const {
         return _ram_limit;
     }
 

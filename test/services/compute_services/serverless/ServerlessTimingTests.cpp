@@ -45,6 +45,7 @@ public:
     void do_TwoIdleContainers_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_OneIdleContainerTwoInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_TmpStorageClearing_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_IdleContainerEviction_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
     ~ServerlessTimingTest() override {
@@ -185,7 +186,7 @@ private:
             double remote_download = 5.4; // estimated (bottleneck = wide area)
             double copy_to_compute_node = 1; // estimated (bottleneck = disk)
             double local_image_read = 1; // estimated (bottleneck = disk)
-            double compute = 5; // estimate (bottleneck = sleep)
+            double compute = this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD) + 5; // estimate (bottleneck = sleep)
             double expected_elapsed = remote_download + copy_to_compute_node + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
@@ -195,7 +196,7 @@ private:
             }
         }
 
-        // Place another invocation (which saves on some stuff)
+        // Place another invocation (which will reuse the same idle container)
         {
             auto now = wrench::Simulation::getCurrentSimulatedDate();
             auto invocation = function_manager->invokeFunction(registered_function, this->compute_service, input);
@@ -204,7 +205,7 @@ private:
             double remote_download = 0; // cached
             double local_copy = 0; // ALREADY ON DISK!
             double local_image_read = 0; // ALREADY IN RAM!
-            double compute = 5; // extimate (bottleneck = sleep)
+            double compute = 5; // estimate (bottleneck = sleep)
             double expected_elapsed = remote_download + local_copy + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
@@ -213,6 +214,30 @@ private:
                         expected_elapsed) + ")");
             }
         }
+
+        // Register another function for that same image and invoke it (will reuse the image, but NOT the container)
+        {
+            auto function2 = wrench::FunctionManager::createFunction("Function2", lambda, image);
+            auto input2 = std::make_shared<MyFunctionInput>(1, 2);
+            auto registered_function2 = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB,
+                                                                          8000 * MB, 10 * MB, 1 * MB);
+            auto now = wrench::Simulation::getCurrentSimulatedDate();
+            auto invocation = function_manager->invokeFunction(registered_function2, this->compute_service, input2);
+            function_manager->wait_one(invocation);
+            auto elapsed = wrench::Simulation::getCurrentSimulatedDate() - now;
+            double remote_download = 0; // cached
+            double local_copy = 0; // ALREADY ON DISK!
+            double local_image_read = 0; // ALREADY IN RAM!
+            double compute = this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD) + 5; // estimate (bottleneck = sleep)
+            double expected_elapsed = remote_download + local_copy + local_image_read + compute;
+
+            if (fabs(elapsed - expected_elapsed) > 0.05) {
+                throw std::runtime_error(
+                    "2) Unexpected elapsed time " + std::to_string(elapsed) + " (expected: " + std::to_string(
+                        expected_elapsed) + ")");
+            }
+        }
+
 
         return 0;
     }
@@ -245,7 +270,11 @@ void ServerlessTimingTest::do_ImageReuse_test(const std::shared_ptr<wrench::Serv
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, scheduler, {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, scheduler,
+        {
+                {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "10.0"},
+                {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "1000.0"}
+            }, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -1611,7 +1640,7 @@ private:
 TEST_F(ServerlessTimingTest, TmpStorageClearing) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(),
         // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
     };
     for (auto& scheduler : schedulers) {
@@ -1625,7 +1654,6 @@ void ServerlessTimingTest::do_TmpStorageClearing_test(
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
     // argv[1] = strdup("--wrench-full-log");
-
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1647,6 +1675,201 @@ void ServerlessTimingTest::do_TmpStorageClearing_test(
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessTmpStorageClearingController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  IDLE CONTAINER EVICTION TEST                                    **/
+/**********************************************************************/
+
+class ServerlessIdleContainerEvictionController : public wrench::ExecutionController {
+public:
+    ServerlessIdleContainerEvictionController(ServerlessTimingTest* test,
+                                 const std::string& hostname,
+                                 const std::shared_ptr<wrench::ServerlessComputeService>
+                                 & compute_service,
+                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+
+        // Create a function
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(10);
+            return std::make_shared<MyFunctionOutput>("output");
+        };
+
+        // Compute node has 64GB of RAM
+
+        // Register a function_1 with a 30GB image file, and a 1GB container RAM space
+        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 30 * GB);
+        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
+        wrench::StorageService::createFileAtLocation(image_location_1);
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+
+        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        // 1 GB Container RAM SPACE
+        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
+                                                                        1 * GB, 1 * GB, 10 * MB, 1 * MB);
+
+        // Register a function_2 with a 30GB image file, and a 1GB container RAM space
+        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 30 * GB);
+        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
+        wrench::StorageService::createFileAtLocation(image_location_2);
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
+
+        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
+        auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
+        // 1 GB Container RAM SPACE
+        auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
+                                                                        1 * GB, 1 * GB, 10 * MB, 1 * MB);
+
+
+        // Place three invocations to function_1 and one invocation to function_2
+        auto inv1_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv1_2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv1_3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv2_1 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+        function_manager->wait_all({inv1_1, inv1_2, inv1_3, inv2_1});
+
+        // Now, both images are in RAM, and we have 3 idle containers for function_1 and 1 idle container for function_2: RAM is full
+        // std::cerr << "\n\n*** AT THIS POINT MEMORY SHOULD BE FULL WITH 3 IDLE CONTAINERS FOR F1 AND 1 IDLE CONTAINER FOR F2 ***\n\n\n";
+
+        // Place one invocation to function_1 to re-use one of the idle containers for function_1
+        auto inv1_4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        // Place three invocations to function_2, which should:
+        //   1) reuse one idle container;
+        //   2) kick out 2 idle containers (for function_1);
+        //   3) start two new containers (for function_2)
+        auto inv2_2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+        auto inv2_3 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+        auto inv2_4 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
+
+        function_manager->wait_all({inv1_4, inv2_2, inv2_3, inv2_4});
+
+        // For good measure, re-submit two invocations to function_1, and one of them should pay the startup_overhead
+        auto inv1_5 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        auto inv1_6 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        function_manager->wait_all({inv1_5, inv1_6});
+        
+
+        auto inv1_1_elapsed = inv1_1->getFunctionEndDate() - inv1_1->getSubmitDate();
+        auto inv1_2_elapsed = inv1_2->getFunctionEndDate() - inv1_2->getSubmitDate();
+        auto inv1_3_elapsed = inv1_3->getFunctionEndDate() - inv1_3->getSubmitDate();
+        auto inv1_4_elapsed = inv1_4->getFunctionEndDate() - inv1_4->getSubmitDate();
+        auto inv1_5_elapsed = inv1_5->getFunctionEndDate() - inv1_5->getSubmitDate();
+        auto inv1_6_elapsed = inv1_6->getFunctionEndDate() - inv1_6->getSubmitDate();
+        auto inv2_1_elapsed = inv2_1->getFunctionEndDate() - inv2_1->getSubmitDate();
+        auto inv2_2_elapsed = inv2_2->getFunctionEndDate() - inv2_2->getSubmitDate();
+        auto inv2_3_elapsed = inv2_3->getFunctionEndDate() - inv2_3->getSubmitDate();
+        auto inv2_4_elapsed = inv2_4->getFunctionEndDate() - inv2_4->getSubmitDate();
+
+        // std::cerr << "INV1_1: " << inv1_1_elapsed << std::endl;
+        // std::cerr << "INV1_2: " << inv1_2_elapsed << std::endl;
+        // std::cerr << "INV1_3: " << inv1_3_elapsed << std::endl;
+        // std::cerr << "INV1_4: " << inv1_4_elapsed << std::endl;
+        // std::cerr << "INV1_5: " << inv1_5_elapsed << std::endl;
+        // std::cerr << "INV1_6: " << inv1_6_elapsed << std::endl;
+        // std::cerr << "INV2_1: " << inv2_1_elapsed << std::endl;
+        // std::cerr << "INV2_2: " << inv2_2_elapsed << std::endl;
+        // std::cerr << "INV2_3: " << inv2_3_elapsed << std::endl;
+        // std::cerr << "INV2_4: " << inv2_4_elapsed << std::endl;
+
+        double inv1_4_elapsed_expected = 10.0;
+        double inv1_5_elapsed_expected = 10.0;
+        double inv1_6_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
+        double inv2_2_elapsed_expected = 10.0;
+        double inv2_3_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
+        double inv2_4_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
+
+        if (std::abs(inv1_4_elapsed - inv1_4_elapsed_expected) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time inv1_4: " + std::to_string(inv1_4_elapsed) + " instead of " +std::to_string(inv1_4_elapsed_expected));
+        }
+
+        if (std::abs(inv1_5_elapsed - inv1_5_elapsed_expected) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time inv1_5: " + std::to_string(inv1_5_elapsed) + " instead of " +std::to_string(inv1_5_elapsed_expected));
+        }
+
+        if (std::abs(inv1_6_elapsed - inv1_6_elapsed_expected) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time inv1_6: " + std::to_string(inv1_6_elapsed) + " instead of " +std::to_string(inv1_6_elapsed_expected));
+        }
+
+        if (std::abs(inv2_2_elapsed - inv2_2_elapsed_expected) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time inv2_2: " + std::to_string(inv2_2_elapsed) + " instead of " +std::to_string(inv2_2_elapsed_expected));
+        }
+
+        if (std::abs(inv2_3_elapsed - inv2_3_elapsed_expected) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time inv2_3: " + std::to_string(inv2_3_elapsed) + " instead of " +std::to_string(inv2_3_elapsed_expected));
+        }
+
+        if (std::abs(inv2_4_elapsed - inv2_4_elapsed_expected) > EPSILON) {
+            throw std::runtime_error("Unexpected elapsed time inv2_4: " + std::to_string(inv2_4_elapsed) + " instead of " +std::to_string(inv2_4_elapsed_expected));
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, IdleContainerEviction) {
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(),
+        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+    };
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_IdleContainerEviction_test, scheduler);
+    }
+}
+
+void ServerlessTimingTest::do_IdleContainerEviction_test(
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, scheduler,
+        {
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"}
+        },
+        {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessIdleContainerEvictionController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 

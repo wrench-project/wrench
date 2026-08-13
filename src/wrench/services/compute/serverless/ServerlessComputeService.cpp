@@ -357,6 +357,8 @@ namespace wrench {
                 // Do the image copies last
                 initiateImageCopies(decisions->image_copies_to_disk);
             }
+            // std::cerr << "## COMPUTE NODE AVAILABLE RAM: " << _state_of_the_system->_compute_nodes.at(0)->getFreeRAMSpace() << "\n";
+            // std::cerr << "## IDLE CONTAINERS: " << _state_of_the_system->_compute_nodes.at(0)->_idle_containers.size() << "\n";
         }
         return 0;
     }

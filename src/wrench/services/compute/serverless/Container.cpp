@@ -160,7 +160,7 @@ namespace wrench {
         }
 
         // Create and open a tmp memory file in RAM for the invocation's RAM space
-        auto tmp_memory_file = Simulation::addTmpFile(_registered_function->getRAMLimit());
+        auto tmp_memory_file = Simulation::addTmpFile(_registered_function->getRAMSpaceLimit());
         try {
             auto file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
             StorageService::createFileAtLocation(file_location);

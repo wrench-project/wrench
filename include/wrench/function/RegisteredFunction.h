@@ -52,7 +52,7 @@ namespace wrench {
         std::shared_ptr<Function> getFunction();
         [[nodiscard]] double getTimeLimit() const;
         [[nodiscard]] sg_size_t getDiskSpaceLimit() const;
-        [[nodiscard]] sg_size_t getRAMLimit() const;
+        [[nodiscard]] sg_size_t getRAMSpaceLimit() const;
 
     private:
         friend class FunctionManager;

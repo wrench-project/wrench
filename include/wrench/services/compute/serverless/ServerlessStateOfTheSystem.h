@@ -37,7 +37,7 @@ namespace wrench
     public:
         [[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>> getComputeNodes() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> getAvailableCores() const;
-        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAM() const;
+        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
         [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;

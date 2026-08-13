@@ -91,6 +91,58 @@ namespace wrench {
     }
 
     /**
+     * @brief Method to identify which idle containers to terminate to create at least some free RAM space. It
+     *        returns the smallest set possible in terms of number of containers to terminate, trying to
+     *        free up as little memory as possible (it's not optimal in this regard however, as finding
+     *        the smallest set with the smallest sum is NP-hard, and would require dynamic programming, etc.)
+     * @param needed_free_ram_space The RAM space needed in bytes
+     * @param to_terminate The set of containers to terminate
+     * @return a set of idle containers that could be terminated to reach free space
+     */
+    bool ServerlessComputeNode::findIdleContainersToTerminate(sg_size_t needed_free_ram_space,
+                                                              std::set<std::shared_ptr<Container>>& to_terminate) {
+        // Perhaps nothing needs to be done
+        if (needed_free_ram_space <= getFreeRAMSpace()) {
+            return true;
+        }
+
+        // Compute the space to free_up
+        auto space_to_free_up = needed_free_ram_space - getFreeRAMSpace();
+
+        // Compute a list of the containers, sorted by increasing RAM footprint
+        std::vector<std::shared_ptr<Container>> sorted_containers;
+        sorted_containers.reserve(_idle_containers.size());
+        for (auto const &container : _idle_containers) {
+            sorted_containers.push_back(container);
+        }
+        std::sort(sorted_containers.begin(), sorted_containers.end(),
+            [](const std::shared_ptr<Container>& a, const std::shared_ptr<Container>& b) {
+                return a->getRegisteredFunction()->getRAMSpaceLimit() < b->getRegisteredFunction()->getRAMSpaceLimit();
+        });
+
+        // TODO: Use dynamic programming to return the optimal set? (smallest cardinal, and smallest sum) - LIKELY OVERKILL
+        sg_size_t space_freed_up = 0;
+        while (space_freed_up < space_to_free_up) {
+            if (sorted_containers.empty()) {
+                to_terminate.clear();
+                return false;
+            }
+            // Find the smallest container that gets us there, and if non, pick the largest container
+            auto victim = sorted_containers.end();
+            for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
+                if ((*it)->getRegisteredFunction()->getRAMSpaceLimit() >= space_to_free_up) {
+                    victim = it;
+                    break;
+                }
+            }
+            to_terminate.insert(*victim);
+            space_freed_up += (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
+            sorted_containers.erase(victim);
+        }
+        return true;
+    }
+
+    /**
      * @brief Spawn a container
      * @param registered_function a registered function
      */

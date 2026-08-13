@@ -58,6 +58,8 @@ namespace wrench
             const RegisteredFunction *registered_function,
             const std::set<std::shared_ptr<Container>>& excluded_container) const;
 
+        bool findIdleContainersToTerminate(sg_size_t needed_free_ram_space, std::set<std::shared_ptr<Container>>& to_terminate);
+
         [[nodiscard]] bool isImageBeingCopied(const std::shared_ptr<Image>& image) const;
         [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingCopied() const;
         [[nodiscard]] bool isImageOnDisk(const std::shared_ptr<Image>& image) const;

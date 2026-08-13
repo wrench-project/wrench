@@ -64,7 +64,7 @@ namespace wrench {
      *
      * @return The RAM availability map
      */
-    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAM() const {
+    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAMSpace() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
         for (const auto& compute_node : _compute_nodes) {
             to_return[compute_node] = compute_node->getMemoryStorage()->getTotalFreeSpaceZeroTime();
