@@ -4,41 +4,38 @@
 #include <wrench.h>
 #include <random>
 
-#include "wrench/services/compute/serverless/ServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/TwoPassServerlessScheduler.h"
 
 namespace wrench {
-
     /**
      * @brief A class that implements a random scheduler to use in a
-     *        serverless compute service. Likely (hopefully?) not representative
-     *        of any real-world serverless deployment.
+     *        serverless compute service.
      */
-    class RandomServerlessScheduler : public ServerlessScheduler {
+    class RandomServerlessScheduler : public TwoPassServerlessScheduler {
     public:
-
-        RandomServerlessScheduler();
+        RandomServerlessScheduler() : TwoPassServerlessScheduler() {
+            _rng = std::mt19937(std::random_device{}());
+        };
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        ~RandomServerlessScheduler() override = default;
+    protected:
+        std::vector<std::shared_ptr<ServerlessComputeNode>> sortComputeNodesForInvocation(
+            const ServerlessStateOfTheSystem* state,
+            const std::shared_ptr<Invocation>& invocation) override;
 
-        std::shared_ptr<ServerlessSchedulingDecisions> schedule(
-            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-            const ServerlessStateOfTheSystem* state
-        ) override;
+        std::vector<std::shared_ptr<ServerlessComputeNode>> sortComputeNodes(
+            const ServerlessStateOfTheSystem* state) override;
+
+        std::vector<std::shared_ptr<Invocation>> sortSchedulableInvocations(
+            const ServerlessStateOfTheSystem* state,
+            const std::vector<std::shared_ptr<Invocation>>& invocations) override;
 
     private:
-        std::mt19937 rng;
+        std::mt19937 _rng;
 
-        void makeImageDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
-                                const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                const ServerlessStateOfTheSystem* state);
-
-        void makeInvocationDecisions(const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
-                                     const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
-                                     const ServerlessStateOfTheSystem* state);
 
         /***********************/
         /** \endcond          **/
