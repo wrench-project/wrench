@@ -110,7 +110,7 @@ namespace wrench {
                     if (not state->isImageInRAMAtNode(node, image)) {
                         continue;
                     }
-                    
+
                     // First, see if there is an idle container we can re-use
                     auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
                     if (idling_container) {
