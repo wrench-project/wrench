@@ -75,8 +75,10 @@ namespace wrench {
         const std::shared_ptr<ServerlessSchedulingDecisions>& decisions,
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
         const ServerlessStateOfTheSystem* state) {
-        // Get current available cores
-        auto availableCores = state->getAvailableCores();
+        // Get current available resources
+        auto available_cores = state->getAvailableCores();
+        auto available_disk = state->getAvailableDiskSpace();
+        auto available_ram = state->getAvailableRAMSpace();
 
         // Group invocations by function name
         std::unordered_map<std::shared_ptr<RegisteredFunction>, std::vector<std::shared_ptr<Invocation>>> invocations_by_function;
@@ -99,22 +101,55 @@ namespace wrench {
 
                 // Schedule up to cores_allocated invocations of this function to this node
                 unsigned int scheduled = 0;
-                while (scheduled < cores_allocated && !invocations.empty() && availableCores[node] > 0) {
+                while (scheduled < cores_allocated && !invocations.empty() && available_cores[node] > 0) {
                     auto inv = invocations.back();
                     invocations.pop_back();
 
                     // Make sure the image is on this node
                     auto image = inv->getRegisteredFunction()->getImage();
-                    if (state->isImageInRAMAtNode(node, image)) {
-                        auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
-                        if (idling_container and (claimed_idle_containers.find(idling_container) == claimed_idle_containers.end())) {
-                            decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});
-                            claimed_idle_containers.insert(idling_container);
-                        } else {
-                            decisions->invocation_dispatches.push_back({inv, node.get(), nullptr});
-                        }
-                        availableCores[node]--;
+                    if (not state->isImageInRAMAtNode(node, image)) {
+                        continue;
+                    }
+                    
+                    // First, see if there is an idle container we can re-use
+                    auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
+                    if (idling_container) {
+                        decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});
+                        claimed_idle_containers.insert(idling_container);
+                        available_cores[node]--;
                         scheduled++;
+                        continue;
+                    }
+
+                    // Then, see if there is a core on which we can start a new container, given the current RAM / Disk space
+                    auto num_available_cores = available_cores[node];
+                    if ((num_available_cores > 0) and
+                        (available_disk[node] >= inv->getRegisteredFunction()->getDiskSpaceLimit()) and
+                        (available_ram[node] >= inv->getRegisteredFunction()->getRAMSpaceLimit())) {
+                        decisions->invocation_dispatches.push_back({inv, node.get(), nullptr});
+                        available_cores[node]--;
+                        available_disk[node] -= inv->getRegisteredFunction()->getDiskSpaceLimit();
+                        available_ram[node] -= inv->getRegisteredFunction()->getRAMSpaceLimit();
+                        scheduled++;
+                        continue;
+                    }
+
+                    // Then, see if we can terminate idling containers for other images to free up space
+                    std::set<std::shared_ptr<Container>> to_terminate;
+                    bool possible = node->findIdleContainersToTerminate(inv->getRegisteredFunction()->getRAMSpaceLimit(), to_terminate);
+                    if (possible) {
+                        for (const auto& victim : to_terminate) {
+                            decisions->container_terminations.push_back({victim});
+                            available_cores[node]++;
+                            available_disk[node] += victim->getRegisteredFunction()->getDiskSpaceLimit();
+                            available_ram[node] += victim->getRegisteredFunction()->getRAMSpaceLimit();
+                        }
+                        decisions->invocation_dispatches.push_back({inv, node.get(), nullptr});
+                        available_cores[node]--;
+                        available_disk[node] -= inv->getRegisteredFunction()->getDiskSpaceLimit();
+                        available_ram[node] -= inv->getRegisteredFunction()->getRAMSpaceLimit();
+                        scheduled++;
+                        continue;
                     }
                 }
             }

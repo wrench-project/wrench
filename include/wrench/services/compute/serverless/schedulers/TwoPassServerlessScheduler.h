@@ -5,7 +5,7 @@
 
 namespace wrench {
     /**
-     * @brief A class that implements an abstract two-pass scheduler  to use in a
+     * @brief A class that implements an abstract two-pass scheduler to use in a
      *        serverless compute service.
      */
     class TwoPassServerlessScheduler : public ServerlessScheduler {
