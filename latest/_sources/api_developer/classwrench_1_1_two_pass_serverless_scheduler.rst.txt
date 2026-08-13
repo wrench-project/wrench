@@ -1,0 +1,8 @@
+.. _TwoPassServerlessScheduler:
+wrench::TwoPassServerlessScheduler
+**********************************
+
+.. doxygenclass:: wrench::TwoPassServerlessScheduler
+   :project: developer
+   :members:
+

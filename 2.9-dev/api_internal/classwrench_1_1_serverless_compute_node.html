@@ -293,6 +293,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNodeE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessComputeNode</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService"><code class="docutils literal notranslate"><span class="pre">ServerlessComputeNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE"><code class="docutils literal notranslate"><span class="pre">findIdleContainer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode29findIdleContainersToTerminateE9sg_size_tRNSt3setINSt10shared_ptrI9ContainerEEEE"><code class="docutils literal notranslate"><span class="pre">findIdleContainersToTerminate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv"><code class="docutils literal notranslate"><span class="pre">getImagesBeingCopied()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv"><code class="docutils literal notranslate"><span class="pre">getImagesBeingLoaded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI5ImageEE"><code class="docutils literal notranslate"><span class="pre">isImageBeingCopied()</span></code></a></li>
@@ -406,6 +407,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_terminal_output.html">wrench::TerminalOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_timer_event.html">wrench::TimerEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_trace_file_loader.html">wrench::TraceFileLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_two_pass_serverless_scheduler.html">wrench::TwoPassServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser.html">wrench::UnitParser</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser_1_1unit__scale.html">wrench::UnitParser::unit_scale</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
@@ -499,6 +501,23 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A container, if found, or nullptr </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNode29findIdleContainersToTerminateE9sg_size_tRNSt3setINSt10shared_ptrI9ContainerEEEE">
+<span id="_CPPv3N6wrench21ServerlessComputeNode29findIdleContainersToTerminateE9sg_size_tRNSt3setINSt10shared_ptrI9ContainerEEEE"></span><span id="_CPPv2N6wrench21ServerlessComputeNode29findIdleContainersToTerminateE9sg_size_tRNSt3setINSt10shared_ptrI9ContainerEEEE"></span><span id="wrench::ServerlessComputeNode::findIdleContainersToTerminate__sg_size_t.std::set:std::shared_ptr:Container::R"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1aaa5d940bb240a33711cfda0a1df66315"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">findIdleContainersToTerminate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">needed_free_ram_space</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">to_terminate</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNode29findIdleContainersToTerminateE9sg_size_tRNSt3setINSt10shared_ptrI9ContainerEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Method to identify which idle containers to terminate to create at least some free RAM space. It returns the smallest set possible in terms of number of containers to terminate, trying to free up as little memory as possible (it’s not optimal in this regard however, as finding the smallest set with the smallest sum is NP-hard, and would require dynamic programming, etc.) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>needed_free_ram_space</strong> – The RAM space needed in bytes </p></li>
+<li><p><strong>to_terminate</strong> – The set of containers to terminate </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a set of idle containers that could be terminated to reach free space </p>
 </dd>
 </dl>
 </dd></dl>

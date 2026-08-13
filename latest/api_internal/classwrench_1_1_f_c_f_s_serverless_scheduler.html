@@ -169,10 +169,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_exception.html">wrench::ExecutionException</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_batch_scheduler.html">wrench::FCFSBatchScheduler</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::FCFSServerlessScheduler</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench23FCFSServerlessSchedulerE"><code class="docutils literal notranslate"><span class="pre">wrench::FCFSServerlessScheduler</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench23FCFSServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem"><code class="docutils literal notranslate"><span class="pre">schedule()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench23FCFSServerlessSchedulerE"><code class="docutils literal notranslate"><span class="pre">wrench::FCFSServerlessScheduler</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_failure_cause.html">wrench::FailureCause</a></li>
@@ -394,6 +391,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_terminal_output.html">wrench::TerminalOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_timer_event.html">wrench::TimerEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_trace_file_loader.html">wrench::TraceFileLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_two_pass_serverless_scheduler.html">wrench::TwoPassServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser.html">wrench::UnitParser</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser_1_1unit__scale.html">wrench::UnitParser::unit_scale</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
@@ -455,34 +453,8 @@
 <span id="fcfsserverlessscheduler"></span><h1>wrench::FCFSServerlessScheduler<a class="headerlink" href="#wrench-fcfsserverlessscheduler" title="Link to this heading"></a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench23FCFSServerlessSchedulerE">
-<span id="_CPPv3N6wrench23FCFSServerlessSchedulerE"></span><span id="_CPPv2N6wrench23FCFSServerlessSchedulerE"></span><span id="wrench::FCFSServerlessScheduler"></span><span class="target" id="classwrench_1_1_f_c_f_s_serverless_scheduler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FCFSServerlessScheduler</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE" title="wrench::ServerlessScheduler"><span class="n"><span class="pre">ServerlessScheduler</span></span></a><br /></dt>
-<dd><p>A class that implements a First Come First Serve (FCFS) scheduler to use in a serverless compute service. This is likely not representative of any real-world serverless deployment. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench23FCFSServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem">
-<span id="_CPPv3N6wrench23FCFSServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem"></span><span id="_CPPv2N6wrench23FCFSServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem"></span><span id="wrench::FCFSServerlessScheduler::schedule__std::vector:std::shared_ptr:Invocation::CR.ServerlessStateOfTheSystemCP"></span><span class="target" id="classwrench_1_1_f_c_f_s_serverless_scheduler_1a77d90251bb67d0d89c882b9ae80d45ef"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ServerlessSchedulingDecisions</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">schedule</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">schedulable_invocations</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="classwrench_1_1_serverless_state_of_the_system.html#_CPPv4N6wrench26ServerlessStateOfTheSystemE" title="wrench::ServerlessStateOfTheSystem"><span class="n"><span class="pre">ServerlessStateOfTheSystem</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">state</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench23FCFSServerlessScheduler8scheduleERKNSt6vectorINSt10shared_ptrI10InvocationEEEEPK26ServerlessStateOfTheSystem" title="Link to this definition"></a><br /></dt>
-<dd><p>Given the list of schedulable invocations and the current system state, decide: </p>
-<p><ul class="simple">
-<li><p>which images to copy to compute nodes</p></li>
-<li><p>which images to load into memory at compute nodes</p></li>
-<li><p>which invocations to start at compute nodes</p></li>
-</ul>
-</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>schedulable_invocations</strong> – A list of invocations whose images reside on the head node </p></li>
-<li><p><strong>state</strong> – The current system state</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A SchedulingDecisions object </p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
+<span id="_CPPv3N6wrench23FCFSServerlessSchedulerE"></span><span id="_CPPv2N6wrench23FCFSServerlessSchedulerE"></span><span id="wrench::FCFSServerlessScheduler"></span><span class="target" id="classwrench_1_1_f_c_f_s_serverless_scheduler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FCFSServerlessScheduler</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_two_pass_serverless_scheduler.html#_CPPv4N6wrench26TwoPassServerlessSchedulerE" title="wrench::TwoPassServerlessScheduler"><span class="n"><span class="pre">TwoPassServerlessScheduler</span></span></a><br /></dt>
+<dd><p>A class that implements a First-Come-First-Serve (FCFS) scheduler to use in a serverless compute service. </p>
 </dd></dl>
 
 </section>
