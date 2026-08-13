@@ -18,21 +18,6 @@ namespace wrench {
         return state->getComputeNodes();
     }
 
-
-    /**
-     * @brief Sort compute nodes for an invocation, where the first compute nodes
-     *        are considered first when making scheduling decisions for this invocation
-     * @param state the state of the system
-     * @param invocation an invocation
-     * @return a sorted list of compute nodes
-     */
-    std::vector<std::shared_ptr<ServerlessComputeNode>> FCFSServerlessScheduler::sortComputeNodesForInvocation(
-        const ServerlessStateOfTheSystem* state, const std::shared_ptr<Invocation>& invocation) {
-        // Do nothing (FCFS order is original compute node order)
-        return state->getComputeNodes();
-    }
-
-
     /**
      * @brief Sort schedulable invocations, where the first invocations are considered
      *        first when making scheduling decisions
@@ -45,4 +30,18 @@ namespace wrench {
         // Do nothing (FCFS order is original invocation order)
         return invocations;
     }
+
+    /**
+     * @brief Given an invocation, sort compute nodes so that the first compute nodes
+     *        are considered first when making scheduling decisions for this invocation
+     * @param state the state of the system
+     * @param invocation an invocation
+     * @return a sorted list of compute nodes
+     */
+    std::vector<std::shared_ptr<ServerlessComputeNode>> FCFSServerlessScheduler::sortComputeNodesForInvocation(
+        const ServerlessStateOfTheSystem* state, const std::shared_ptr<Invocation>& invocation) {
+        // Do nothing (FCFS order is original compute node order)
+        return state->getComputeNodes();
+    }
+
 } // namespace wrench

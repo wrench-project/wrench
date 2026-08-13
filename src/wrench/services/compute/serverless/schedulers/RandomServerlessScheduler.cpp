@@ -14,25 +14,10 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<ServerlessComputeNode>> RandomServerlessScheduler::sortComputeNodes(
         const ServerlessStateOfTheSystem* state) {
-        std::vector<std::shared_ptr<ServerlessComputeNode>> shuffled(state->getComputeNodes());
-        std::shuffle(shuffled.begin(), shuffled.end(), _rng);
-        return shuffled;
-    }
-
-    /**
-     * @brief Sort compute nodes for an invocation, where the first compute nodes
-     *        are considered first when making scheduling decisions for this invocation
-     * @param state the state of the system
-     * @param invocation an invocation
-     * @return a sorted list of compute nodes
-     */
-    std::vector<std::shared_ptr<ServerlessComputeNode>> RandomServerlessScheduler::sortComputeNodesForInvocation(
-        const ServerlessStateOfTheSystem* state, const std::shared_ptr<Invocation>& invocation) {
         std::vector shuffled(state->getComputeNodes());
         std::shuffle(shuffled.begin(), shuffled.end(), _rng);
         return shuffled;
     }
-
 
     /**
      * @brief Sort schedulable invocations, where the first invocations are considered
@@ -44,6 +29,20 @@ namespace wrench {
     std::vector<std::shared_ptr<Invocation>> RandomServerlessScheduler::sortSchedulableInvocations(
         const ServerlessStateOfTheSystem* state, const std::vector<std::shared_ptr<Invocation>>& invocations) {
         std::vector shuffled(invocations);
+        std::shuffle(shuffled.begin(), shuffled.end(), _rng);
+        return shuffled;
+    }
+
+    /**
+     * @brief Given an invocation, sort compute nodes so that the first compute nodes
+     *        are considered first when making scheduling decisions for this invocation
+     * @param state the state of the system
+     * @param invocation an invocation
+     * @return a sorted list of compute nodes
+     */
+    std::vector<std::shared_ptr<ServerlessComputeNode>> RandomServerlessScheduler::sortComputeNodesForInvocation(
+        const ServerlessStateOfTheSystem* state, const std::shared_ptr<Invocation>& invocation) {
+        std::vector shuffled(state->getComputeNodes());
         std::shuffle(shuffled.begin(), shuffled.end(), _rng);
         return shuffled;
     }
