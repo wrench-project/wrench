@@ -33,7 +33,8 @@ WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless
 namespace wrench {
     unsigned long ServerlessComputeService::_sequence_number = 0;
 
-    const std::function lambda_noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {};
+    const std::function lambda_noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {
+    };
 
     /**
      * @brief Constructor
@@ -74,7 +75,8 @@ namespace wrench {
         _compute_node_ram = S4U_Simulation::getHostMemoryCapacity(first_hostname);
         try {
             _compute_node_disk_space = S4U_Simulation::getDiskCapacity(first_hostname, "/");
-        } catch (std::invalid_argument&) {
+        }
+        catch (std::invalid_argument&) {
             throw std::invalid_argument("Compute nodes for a serverless compute service must have a '/' mountpoint");
         }
         check_homogeneity(compute_nodes);
@@ -98,7 +100,6 @@ namespace wrench {
      * @param compute_nodes a list of compute node hostnames
      */
     void ServerlessComputeService::check_homogeneity(const std::vector<std::string>& compute_nodes) const {
-
         for (auto const& hostname : compute_nodes) {
             auto num_cores_available = S4U_Simulation::getHostNumCores(hostname);
             double speed = S4U_Simulation::getHostFlopRate(hostname);
@@ -333,32 +334,29 @@ namespace wrench {
 
         bool do_scheduling;
         while (processNextMessage(do_scheduling)) {
+            // Make invocations whose images have downloaded schedulable
+            admitInvocations();
+
             if (do_scheduling) {
-
-                // Make invocations whose images have downloaded schedulable
-                admitInvocations();
-
                 // Invoke the scheduler
                 auto decisions = invokeScheduler();
 
                 // Implement the scheduler's decisions, if possible. Note that
                 // some decision can be invalid, and that's ok. For instance, the scheduler
-                // could be simple and not sure any knowledge of the LRU behavior on compute node
+                // could be simple and not use any knowledge of the LRU behavior on compute node
                 // disk and RAM, and of which files are currently unevictable. The idea is that
                 // even a super naive scheduler can be used, even though most of its scheduling
-                // decisions are not feasible. It will just be invoked again later.
+                // decisions may not feasible at a given time. It will just be invoked again later.
 
-                // First, terminate containers
+                // First, terminate idle containers
                 terminateIdleContainers(decisions->container_terminations);
                 // Second, do invocations (before the image loads/copies to avoid LRU evictions)
                 dispatchInvocations(decisions->invocation_dispatches);
-                // Do the image loads (before image copies to avoid LRU evictions)
+                // Third, do the image loads (before image copies to avoid LRU evictions)
                 initiateImageLoads(decisions->image_loads_to_RAM);
-                // Do the image copies last
+                // Last, do the image copies
                 initiateImageCopies(decisions->image_copies_to_disk);
             }
-            // std::cerr << "## COMPUTE NODE AVAILABLE RAM: " << _state_of_the_system->_compute_nodes.at(0)->getFreeRAMSpace() << "\n";
-            // std::cerr << "## IDLE CONTAINERS: " << _state_of_the_system->_compute_nodes.at(0)->_idle_containers.size() << "\n";
         }
         return 0;
     }
@@ -467,15 +465,15 @@ namespace wrench {
      */
     void ServerlessComputeService::processFunctionRegistrationRequest(
         S4U_CommPort* answer_commport,
-                                                                      const std::shared_ptr<Function>& function,
-                                                                      double time_limit,
-                                                                      sg_size_t disk_space_limit_in_bytes,
-                                                                      sg_size_t ram_limit_in_bytes,
-                                                                      sg_size_t ingress_in_bytes,
-                                                                      sg_size_t egress_in_bytes) {
+        const std::shared_ptr<Function>& function,
+        double time_limit,
+        sg_size_t disk_space_limit_in_bytes,
+        sg_size_t ram_limit_in_bytes,
+        sg_size_t ingress_in_bytes,
+        sg_size_t egress_in_bytes) {
         // Check that function can ever run!
         {
-            sg_size_t needed_disk_space = function->getImageFile()->getSize() + disk_space_limit_in_bytes;
+            sg_size_t needed_disk_space = function->getImage()->getDiskFootprint() + disk_space_limit_in_bytes;
             sg_size_t needed_ram_space = function->getImage()->getRAMFootprint() + ram_limit_in_bytes;
 
             if (needed_disk_space > _compute_node_disk_space) {
@@ -526,11 +524,11 @@ namespace wrench {
      * @param input the input to the function
      * @param notify_commport the ExecutionController commport to notify
      */
-    void ServerlessComputeService::processFunctionInvocationRequest(S4U_CommPort* answer_commport,
-                                                                    const std::shared_ptr<RegisteredFunction>
-                                                                    & registered_function,
-                                                                    const std::shared_ptr<FunctionInput>& input,
-                                                                    S4U_CommPort* notify_commport) {
+    void ServerlessComputeService::processFunctionInvocationRequest(
+        S4U_CommPort* answer_commport,
+        const std::shared_ptr<RegisteredFunction>& registered_function,
+        const std::shared_ptr<FunctionInput>& input,
+        S4U_CommPort* notify_commport) {
         // If the function is not registered answer with some error
         if (_state_of_the_system->_registered_functions.find(registered_function) ==
             _state_of_the_system->_registered_functions.end()) {
@@ -650,7 +648,8 @@ namespace wrench {
      * @param container the container that has idle-timed out
      * @param idle_sequence the idle sequence number
      */
-    void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence) {
+    void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container,
+                                                               std::uint64_t idle_sequence) {
         // If this isn't a stale/no-longer-valid message, nevermind
         if (container->getIdleSequence() != idle_sequence) {
             return;
@@ -965,7 +964,11 @@ namespace wrench {
             const auto src_location = invocation->_registered_function->_function->getImage()->getLocation();
             const auto dst_location = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
                                                              src_location->getFile());
-            StorageService::copyFile(src_location, dst_location);
+            if (this->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS)) {
+                StorageService::copyFile(src_location, dst_location);
+            } else {
+                StorageService::createFileAtLocation(dst_location);
+            }
         };
         const std::function lambda_terminate = lambda_noop;
 
@@ -1006,7 +1009,6 @@ namespace wrench {
      * @return the scheduler's scheduling decisions
      */
     std::shared_ptr<ServerlessSchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
-        // Invoke the scheduler so that it manages images
         auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
                                               _state_of_the_system.get());
 #if 0
@@ -1114,7 +1116,6 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<Image>& image) {
-
         // Sanity check
         if (compute_node->isImageInRAM(image)) {
             throw std::runtime_error(

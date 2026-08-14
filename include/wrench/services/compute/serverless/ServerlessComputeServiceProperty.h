@@ -35,6 +35,10 @@ namespace wrench {
         /** @brief The buffer size used by all internal storage services.
          **/
         DECLARE_PROPERTY_NAME(STORAGE_SERVICES_BUFFER_SIZE);
+
+        /** @brief Whether the download of remote images should be simulated or not (if not, then zero time is assumed)
+         **/
+        DECLARE_PROPERTY_NAME(SIMULATE_REMOTE_IMAGE_DOWNLOADS);
     };
 
 }// namespace wrench

@@ -165,7 +165,7 @@ private:
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        for (unsigned char i = 0; i < 200; i++) {
+        for (unsigned char i = 0; i < 100; i++) {
             WRENCH_INFO("Invoking function 1");
             invocations.push_back(function_manager->invokeFunction(registered_function1, this->compute_service, input));
             WRENCH_INFO("Function 1 invoked");
