@@ -14,8 +14,7 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/failure_causes/OperationTimeout.h"
-#include "wrench/failure_causes/FunctionNotFound.h"
-#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -223,7 +222,7 @@ void ServerlessFailureTest::do_RemoteDownloadFailure_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(),
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0),
         {{wrench::ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "50MB"}}, {}));
 
     std::string user_host = "UserHost";

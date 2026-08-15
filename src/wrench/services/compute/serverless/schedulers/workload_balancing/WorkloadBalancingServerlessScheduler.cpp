@@ -2,7 +2,7 @@
  * WorkloadBalancingServerlessScheduler.cpp
  */
 
-#include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/workload_balancing/WorkloadBalancingServerlessScheduler.h"
 
 namespace wrench {
     /**
@@ -114,7 +114,7 @@ namespace wrench {
                     // First, see if there is an idle container we can re-use
                     auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
                     if (idling_container) {
-                        decisions->invocation_dispatches.push_back({inv, node.get(), idling_container});
+                        decisions->invocation_dispatches.push_back({inv, node, idling_container});
                         claimed_idle_containers.insert(idling_container);
                         available_cores[node]--;
                         scheduled++;
@@ -126,7 +126,7 @@ namespace wrench {
                     if ((num_available_cores > 0) and
                         (available_disk[node] >= inv->getRegisteredFunction()->getDiskSpaceLimit()) and
                         (available_ram[node] >= inv->getRegisteredFunction()->getRAMSpaceLimit())) {
-                        decisions->invocation_dispatches.push_back({inv, node.get(), nullptr});
+                        decisions->invocation_dispatches.push_back({inv, node, nullptr});
                         available_cores[node]--;
                         available_disk[node] -= inv->getRegisteredFunction()->getDiskSpaceLimit();
                         available_ram[node] -= inv->getRegisteredFunction()->getRAMSpaceLimit();
@@ -144,7 +144,7 @@ namespace wrench {
                             available_disk[node] += victim->getRegisteredFunction()->getDiskSpaceLimit();
                             available_ram[node] += victim->getRegisteredFunction()->getRAMSpaceLimit();
                         }
-                        decisions->invocation_dispatches.push_back({inv, node.get(), nullptr});
+                        decisions->invocation_dispatches.push_back({inv, node, nullptr});
                         available_cores[node]--;
                         available_disk[node] -= inv->getRegisteredFunction()->getDiskSpaceLimit();
                         available_ram[node] -= inv->getRegisteredFunction()->getRAMSpaceLimit();

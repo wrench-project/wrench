@@ -713,7 +713,7 @@ namespace wrench {
      * @return true on success, false on failure
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
-                                                      ServerlessComputeNode* target_compute_node,
+                                                      std::shared_ptr<ServerlessComputeNode> target_compute_node,
                                                       std::shared_ptr<Container> target_container) {
         // Check that things can work, which may not be the case because scheduling and LRU is complicated
         if (not target_compute_node->isInvocationFeasible(invocation, target_container)) {

@@ -16,9 +16,9 @@
 #include "../../../include/RuntimeAssert.h"
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
-#include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/FCFSServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/workload_balancing/WorkloadBalancingServerlessScheduler.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -247,7 +247,7 @@ private:
 TEST_F(ServerlessTimingTest, ImageReuse) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(0),
         std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
     };
     for (auto& scheduler : schedulers) {
@@ -489,7 +489,7 @@ private:
 TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(0),
         std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
     };
     for (auto& scheduler : schedulers) {
@@ -1641,7 +1641,7 @@ private:
 TEST_F(ServerlessTimingTest, TmpStorageClearing) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(0),
         // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
     };
     for (auto& scheduler : schedulers) {
@@ -1836,7 +1836,7 @@ private:
 TEST_F(ServerlessTimingTest, IdleContainerEviction) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(),
+        std::make_shared<wrench::RandomServerlessScheduler>(0),
         // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
     };
     for (auto& scheduler : schedulers) {

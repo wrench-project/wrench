@@ -39,7 +39,7 @@ namespace wrench {
 
     struct DispatchInvocation {
         std::shared_ptr<Invocation> invocation;
-        ServerlessComputeNode* compute_node;
+        std::shared_ptr<ServerlessComputeNode> compute_node;
         std::shared_ptr<Container> container; // nullptr if none
     };
 
@@ -113,8 +113,8 @@ namespace wrench {
          *   is not clear-cut: the answer may be 0 but one can perhaps use the node because some memory
          *   content will be evicted due to the LRU behavior...
          *
-         *   As a result of the above, the scheduling decisions returned by this method may not all be
-         *   feasible, and the same invocations could be passed to the method over and over....
+         *   A scheduling decision is an intent, not a reservation. The serverless compute service checks
+         *   whether the decision can actually be executed when it processes it.
          *
          * @param schedulable_invocations A list of invocations whose images reside on the head node
          * @param state The current system state

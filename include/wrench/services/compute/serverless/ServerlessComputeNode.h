@@ -57,6 +57,7 @@ namespace wrench
         std::shared_ptr<Container> findIdleContainer(
             const RegisteredFunction *registered_function,
             const std::set<std::shared_ptr<Container>>& excluded_container) const;
+        [[nodiscard]] std::set<std::shared_ptr<Container>> getIdleContainers() const;
 
         bool findIdleContainersToTerminate(sg_size_t needed_free_ram_space, std::set<std::shared_ptr<Container>>& to_terminate);
 
@@ -90,9 +91,6 @@ namespace wrench
 
         std::set<std::shared_ptr<Container>> _busy_containers;
         std::set<std::shared_ptr<Container>> _idle_containers;
-
-        std::unordered_map<std::shared_ptr<Image>, std::shared_ptr<simgrid::fsmod::File>> _disk_image_pins;
-        std::unordered_map<std::shared_ptr<Image>, std::shared_ptr<simgrid::fsmod::File>> _ram_image_pins;
 
     };
 

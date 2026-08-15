@@ -91,6 +91,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Retrieve the set of idle container
+     * @return A set of containers
+     */
+    std::set<std::shared_ptr<Container>> ServerlessComputeNode::getIdleContainers() const {
+        return _idle_containers;
+    }
+
+    /**
      * @brief Method to identify which idle containers to terminate to create at least some free RAM space. It
      *        returns the smallest set possible in terms of number of containers to terminate, trying to
      *        free up as little memory as possible (it's not optimal in this regard however, as finding

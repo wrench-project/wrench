@@ -37,9 +37,9 @@
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 #include "wrench/services/storage/proxy/StorageServiceProxy.h"
 #include "wrench/services/compute/serverless/ServerlessComputeService.h"
-#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/FCFSServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/workload_balancing/WorkloadBalancingServerlessScheduler.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 
 // Simulation Output Analysis

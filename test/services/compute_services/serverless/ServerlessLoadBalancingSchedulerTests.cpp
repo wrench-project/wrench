@@ -13,7 +13,7 @@
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
-#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
 
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
@@ -30,7 +30,7 @@ public:
     void do_Basic_test();
 
 protected:
-    ~ServerlessLoadBalancingSchedulerTest() {
+    ~ServerlessLoadBalancingSchedulerTest() override {
         wrench::Simulation::removeAllFiles();
     }
 
@@ -208,7 +208,7 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes,  std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(

@@ -15,7 +15,7 @@
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/failure_causes/OperationTimeout.h"
 #include "wrench/failure_causes/FunctionNotFound.h"
-#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -286,37 +286,37 @@ void ServerlessBasicTest::do_SanityTest_test() {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongMountPoint"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongSpeed"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongCores"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongRAM"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongDiskSpace"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
     }
 
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
         auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-            "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+            "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
 
         std::string user_host = "UserHost";
         auto wms = simulation->add(
@@ -371,7 +371,7 @@ private:
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
         wrench::StorageService::createFileAtLocation(image_location);
 
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
@@ -424,7 +424,7 @@ void ServerlessBasicTest::do_FunctionRegistrationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -572,7 +572,7 @@ void ServerlessBasicTest::do_FunctionInvocationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -697,7 +697,7 @@ void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -828,10 +828,10 @@ void ServerlessBasicTest::do_FunctionErrorTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
 
     auto other_serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-       "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(), {}, {}));
+       "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
 
 
     std::string user_host = "UserHost";
