@@ -25,9 +25,9 @@
 #include <wrench.h>
 
 #include "ServerlessExampleExecutionController.h"
-#include "wrench/services/compute/serverless/schedulers/RandomServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/FCFSServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/WorkloadBalancingServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy/FCFSServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/workload_balancing/WorkloadBalancingServerlessScheduler.h"
 
 namespace sg4 = simgrid::s4u;
 
