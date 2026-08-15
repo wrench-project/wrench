@@ -2,6 +2,8 @@
 #define WRENCH_GREEDYSCHEDULINGSTATE_H
 
 #include <map>
+#include <set>
+#include <memory>
 #include <unordered_set>
 #include <simgrid/forward.h>
 

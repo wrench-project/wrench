@@ -25,7 +25,6 @@ namespace wrench {
         // Determine the set of relevant images
         std::set<std::shared_ptr<Image>> relevant_images;
         for (auto const &inv: schedulable_invocations) {
-            std::cerr << "** SCHEDULING STATE: RELEVANT IMAGE: " << inv->getRegisteredFunction()->getImage()->getName() << "\n";
             relevant_images.insert(inv->getRegisteredFunction()->getImage());
         }
 
@@ -39,11 +38,9 @@ namespace wrench {
             idle_containers[node] = {};
 
             for (const auto &image: relevant_images) {
-                std::cerr << "IS IMAGE ON DISK : " << image->getName() << "  " << node->isImageOnDisk(image) << "\n";
                 if (node->isImageOnDisk(image)) {
                     images_on_disk.at(node).insert(image);
                 }
-                std::cerr << "IS IMAGE IN RAM : " << image->getName() << "  " << node->isImageInRAM(image) << "\n";
 
                 if (node->isImageInRAM(image)) {
                     images_in_ram.at(node).insert(image);

@@ -187,7 +187,9 @@ private:
             double remote_download = 5.4; // estimated (bottleneck = wide area)
             double copy_to_compute_node = 1; // estimated (bottleneck = disk)
             double local_image_read = 1; // estimated (bottleneck = disk)
-            double compute = this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD) + 5; // estimate (bottleneck = sleep)
+            double compute = this->compute_service->getPropertyValueAsDouble(
+                wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD) + 5;
+            // estimate (bottleneck = sleep)
             double expected_elapsed = remote_download + copy_to_compute_node + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
@@ -220,8 +222,9 @@ private:
         {
             auto function2 = wrench::FunctionManager::createFunction("Function2", lambda, image);
             auto input2 = std::make_shared<MyFunctionInput>(1, 2);
-            auto registered_function2 = function_manager->registerFunction(function, this->compute_service, 10, 2000 * MB,
-                                                                          8000 * MB, 10 * MB, 1 * MB);
+            auto registered_function2 = function_manager->registerFunction(
+                function, this->compute_service, 10, 2000 * MB,
+                8000 * MB, 10 * MB, 1 * MB);
             auto now = wrench::Simulation::getCurrentSimulatedDate();
             auto invocation = function_manager->invokeFunction(registered_function2, this->compute_service, input2);
             function_manager->wait_one(invocation);
@@ -229,7 +232,9 @@ private:
             double remote_download = 0; // cached
             double local_copy = 0; // ALREADY ON DISK!
             double local_image_read = 0; // ALREADY IN RAM!
-            double compute = this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD) + 5; // estimate (bottleneck = sleep)
+            double compute = this->compute_service->getPropertyValueAsDouble(
+                wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD) + 5;
+            // estimate (bottleneck = sleep)
             double expected_elapsed = remote_download + local_copy + local_image_read + compute;
 
             if (fabs(elapsed - expected_elapsed) > 0.05) {
@@ -273,9 +278,9 @@ void ServerlessTimingTest::do_ImageReuse_test(const std::shared_ptr<wrench::Serv
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", "/", compute_nodes, scheduler,
         {
-                {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "10.0"},
-                {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "1000.0"}
-            }, {}));
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "10.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "1000.0"}
+        }, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -474,11 +479,14 @@ private:
 
         // Checks
         if (invocation_1->getFunctionEndDate() >= invocation_2->getDispatchDate()) {
-           throw std::runtime_error("Invocation #2 should have been dispatched before Invocation #1 finished");
+            throw std::runtime_error("Invocation #2 should have been dispatched before Invocation #1 finished");
         }
-        if (std::abs(invocation_1->getFunctionEndDate() + 61.0 * GB / (100 * MB) -  invocation_2->getDispatchDate()) > EPSILON) {
-            throw std::runtime_error("Invocation #2 dispatch date should roughly be Invocation #1's end date + time to load image to RAM: " +
-                std::to_string(invocation_1->getFunctionEndDate() + 61.0 * GB / (100 * MB)) + " vs. " + std::to_string(invocation_2->getDispatchDate()));
+        if (std::abs(invocation_1->getFunctionEndDate() + 61.0 * GB / (100 * MB) - invocation_2->getDispatchDate()) >
+            EPSILON) {
+            throw std::runtime_error(
+                "Invocation #2 dispatch date should roughly be Invocation #1's end date + time to load image to RAM: " +
+                std::to_string(invocation_1->getFunctionEndDate() + 61.0 * GB / (100 * MB)) + " vs. " + std::to_string(
+                    invocation_2->getDispatchDate()));
         }
 
 
@@ -937,23 +945,34 @@ private:
         function_manager->wait_one(inv2);
 
         // Sleep more than the idle timeout
-        wrench::Simulation::sleep( 10 +
-            compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT));
+        wrench::Simulation::sleep(10 +
+            compute_service->getPropertyValueAsDouble(
+                wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT));
 
         // Place another invocation and wait for it
         auto inv3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv3);
 
-        if (std::abs((inv1->getFunctionStartDate() - inv1->getDispatchDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation #1 times: " +  std::to_string(inv1->getDispatchDate()) + " " + std::to_string(inv1->getFunctionStartDate()));
+        if (std::abs(
+            (inv1->getFunctionStartDate() - inv1->getDispatchDate()) - compute_service->getPropertyValueAsDouble(
+                wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
+            throw std::runtime_error(
+                "Unexpected invocation #1 times: " + std::to_string(inv1->getDispatchDate()) + " " + std::to_string(
+                    inv1->getFunctionStartDate()));
         }
 
         if (std::abs(inv2->getFunctionStartDate() - inv2->getDispatchDate()) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation #2 times: " +  std::to_string(inv2->getDispatchDate()) + " " + std::to_string(inv2->getFunctionStartDate()));
+            throw std::runtime_error(
+                "Unexpected invocation #2 times: " + std::to_string(inv2->getDispatchDate()) + " " + std::to_string(
+                    inv2->getFunctionStartDate()));
         }
 
-        if (std::abs((inv3->getFunctionStartDate() - inv3->getDispatchDate()) - compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
-            throw std::runtime_error("Unexpected invocation #3 times: " +  std::to_string(inv3->getDispatchDate()) + " " + std::to_string(inv3->getFunctionStartDate()));
+        if (std::abs(
+            (inv3->getFunctionStartDate() - inv3->getDispatchDate()) - compute_service->getPropertyValueAsDouble(
+                wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) > EPSILON) {
+            throw std::runtime_error(
+                "Unexpected invocation #3 times: " + std::to_string(inv3->getDispatchDate()) + " " + std::to_string(
+                    inv3->getFunctionStartDate()));
         }
 
         return 0;
@@ -1014,10 +1033,10 @@ void ServerlessTimingTest::do_HotStart_test(
 class ServerlessSimpleImageEvictionFromDiskController : public wrench::ExecutionController {
 public:
     ServerlessSimpleImageEvictionFromDiskController(ServerlessTimingTest* test,
-                                 const std::string& hostname,
-                                 const std::shared_ptr<wrench::ServerlessComputeService>
-                                 & compute_service,
-                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -1065,8 +1084,6 @@ private:
         // Keep track of time for invocation when image is on disk at compute node
         auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getSubmitDate();
 
-        std::cerr << "\n\nAT THIS POINT WE HAVE DONE TWO INVOK OF F1: " << inv1_elapsed << "  " << inv2_elapsed << "\n\n\n";
-
         // Register that function with ANOTHER 50GB image file that takes %50 of the node disk space
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
@@ -1081,8 +1098,9 @@ private:
         // Place an invocation to function 2 and wait for it
         auto inv3 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
         function_manager->wait_one(inv3);
+        auto inv3_elapsed = inv3->getFunctionEndDate() - inv3->getSubmitDate();
 
-        // At this point image_1 should have been kicked out of the node disk
+        // At this point image_1 should have been kicked out of the node disk (and the node RAM!)
         // Place an invocation to function 1 and wait for it
         auto inv4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_one(inv4);
@@ -1090,14 +1108,32 @@ private:
         auto inv4_elapsed = inv4->getFunctionEndDate() - inv4->getSubmitDate();
 
         // std::cerr << "INV1: " << inv1->getSubmitDate() << " --> " << inv1->getFunctionEndDate() << std::endl;
-        // std::cerr << "INV2: " << inv2->getSubmitDate() << " --> " << inv2->getFunctionEndDate() <<  "(" << inv2->getFunctionEndDate() - inv2->getSubmitDate() << ")" << std::endl;
-        // std::cerr << "INV3: " << inv3->getSubmitDate() << " --> " << inv3->getFunctionEndDate() <<  "(" << inv3->getFunctionEndDate() - inv3->getSubmitDate() << ")" << std::endl;
-        // std::cerr << "INV4: " << inv4->getSubmitDate() << " --> " << inv4->getFunctionEndDate() <<  "(" << inv4->getFunctionEndDate() - inv4->getSubmitDate() << ")" << std::endl;
+        // std::cerr << "INV2: " << inv2->getSubmitDate() << " --> " << inv2->getFunctionEndDate() << "(" << inv2->
+        //     getFunctionEndDate() - inv2->getSubmitDate() << ")" << std::endl;
+        // std::cerr << "INV3: " << inv3->getSubmitDate() << " --> " << inv3->getFunctionEndDate() << "(" << inv3->
+        //     getFunctionEndDate() - inv3->getSubmitDate() << ")" << std::endl;
+        // std::cerr << "INV4: " << inv4->getSubmitDate() << " --> " << inv4->getFunctionEndDate() << "(" << inv4->
+        //     getFunctionEndDate() - inv4->getSubmitDate() << ")" << std::endl;
 
-        if ((std::abs((inv2_elapsed + 50 * GB / (100 * MB)) - inv4_elapsed) > EPSILON)){
-            throw std::runtime_error("Unexpected elapsed times: inv2: " + std::to_string(inv2_elapsed) + " inv4: " + std::to_string(inv4_elapsed));
+        double expected_inv1_elapsed = (50.0 * GB) / (100.0 * MB) + (50.0 * GB) / (100.0 * MB) + 10;
+        double expected_inv2_elapsed = 10;
+        double expected_inv3_elapsed = (50.0 * GB) / (100.0 * MB) + (50.0 * GB) / (100.0 * MB) + 10;
+        double expected_inv4_elapsed = (50.0 * GB) / (100.0 * MB) + (50.0 * GB) / (100.0 * MB) + 10;
+
+        if (std::abs(inv1_elapsed - expected_inv1_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected inv1 elapsed: " + std::to_string(inv1_elapsed) + " as opposed to " + std::to_string(expected_inv1_elapsed));
         }
-        return 0;
+        if (std::abs(inv2_elapsed - expected_inv2_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected inv2 elapsed: " + std::to_string(inv2_elapsed) + " as opposed to " + std::to_string(expected_inv2_elapsed));
+        }
+        if (std::abs(inv3_elapsed - expected_inv3_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected inv3 elapsed: " + std::to_string(inv3_elapsed) + " as opposed to " + std::to_string(expected_inv3_elapsed));
+        }
+        if (std::abs(inv4_elapsed - expected_inv4_elapsed) > EPSILON) {
+            throw std::runtime_error("Unexpected inv4 elapsed: " + std::to_string(inv4_elapsed) + " as opposed to " + std::to_string(expected_inv4_elapsed));
+        }
+
+            return 0;
     }
 };
 
@@ -1114,10 +1150,10 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
 
 void ServerlessTimingTest::do_SimpleImageEvictionFromDisk_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1132,7 +1168,8 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromDisk_test(
         "ServerlessHeadNode", "/", compute_nodes, scheduler,
         {
             {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0.0"},
-            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0.00"}
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0.00"},
+            {wrench::ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "false"},
         },
         {}));
 
@@ -1155,10 +1192,10 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromDisk_test(
 class ServerlessSimpleImageEvictionFromRAMController : public wrench::ExecutionController {
 public:
     ServerlessSimpleImageEvictionFromRAMController(ServerlessTimingTest* test,
-                                 const std::string& hostname,
-                                 const std::shared_ptr<wrench::ServerlessComputeService>
-                                 & compute_service,
-                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                   const std::string& hostname,
+                                                   const std::shared_ptr<wrench::ServerlessComputeService>
+                                                   & compute_service,
+                                                   const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -1242,10 +1279,12 @@ private:
         // std::cerr << "INV6: " << inv6_elapsed << std::endl;
 
         if (std::abs(inv3_elapsed - inv6_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected times: inv3: " + std::to_string(inv3_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
+            throw std::runtime_error(
+                "Unexpected times: inv3: " + std::to_string(inv3_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
         }
         if (std::abs((inv4_elapsed + (50 * GB / (100 * MB))) - inv6_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected times: inv4: " + std::to_string(inv4_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
+            throw std::runtime_error(
+                "Unexpected times: inv4: " + std::to_string(inv4_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
         }
         return 0;
     }
@@ -1304,10 +1343,10 @@ void ServerlessTimingTest::do_SimpleImageEvictionFromRAM_test(
 class ServerlessTwoIdleContainersController : public wrench::ExecutionController {
 public:
     ServerlessTwoIdleContainersController(ServerlessTimingTest* test,
-                                 const std::string& hostname,
-                                 const std::shared_ptr<wrench::ServerlessComputeService>
-                                 & compute_service,
-                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                          const std::string& hostname,
+                                          const std::shared_ptr<wrench::ServerlessComputeService>
+                                          & compute_service,
+                                          const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -1366,7 +1405,7 @@ private:
         function_manager->wait_one(inv6);
         auto inv5_elapsed = inv5->getFunctionEndDate() - inv5->getSubmitDate();
         auto inv6_elapsed = inv6->getFunctionEndDate() - inv6->getSubmitDate();
-        
+
         // std::cerr << "INV1: " << inv1_elapsed << std::endl;
         // std::cerr << "INV2: " << inv2_elapsed << std::endl;
         // std::cerr << "INV3: " << inv3_elapsed << std::endl;
@@ -1375,20 +1414,28 @@ private:
         // std::cerr << "INV6: " << inv6_elapsed << std::endl;
 
         if (std::abs(inv1_elapsed - inv2_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed times: inv1: " + std::to_string(inv1_elapsed) + "   inv2: " + std::to_string(inv2_elapsed));
+            throw std::runtime_error(
+                "Unexpected elapsed times: inv1: " + std::to_string(inv1_elapsed) + "   inv2: " + std::to_string(
+                    inv2_elapsed));
         }
         if (std::abs(inv3_elapsed - inv4_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed times: inv1: " + std::to_string(inv3_elapsed) + "   inv2: " + std::to_string(inv4_elapsed));
+            throw std::runtime_error(
+                "Unexpected elapsed times: inv1: " + std::to_string(inv3_elapsed) + "   inv2: " + std::to_string(
+                    inv4_elapsed));
         }
         if (std::abs(inv5_elapsed - inv6_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed times: inv1: " + std::to_string(inv5_elapsed) + "   inv2: " + std::to_string(inv6_elapsed));
+            throw std::runtime_error(
+                "Unexpected elapsed times: inv1: " + std::to_string(inv5_elapsed) + "   inv2: " + std::to_string(
+                    inv6_elapsed));
         }
 
         if (std::abs(inv3_elapsed - 10.0) > EPSILON) {
             throw std::runtime_error("Unexpected elapsed time: inv3: " + std::to_string(inv3_elapsed));
         }
 
-        if (std::abs(inv5_elapsed - (10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD))) > EPSILON) {
+        if (std::abs(
+            inv5_elapsed - (10.0 + this->compute_service->getPropertyValueAsDouble(
+                wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD))) > EPSILON) {
             throw std::runtime_error("Unexpected elapsed time: inv5: " + std::to_string(inv5_elapsed));
         }
 
@@ -1451,10 +1498,10 @@ void ServerlessTimingTest::do_TwoIdleContainers_test(
 class ServerlessOneIdleContainerTwoInvocationsController : public wrench::ExecutionController {
 public:
     ServerlessOneIdleContainerTwoInvocationsController(ServerlessTimingTest* test,
-                                 const std::string& hostname,
-                                 const std::shared_ptr<wrench::ServerlessComputeService>
-                                 & compute_service,
-                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                       const std::string& hostname,
+                                                       const std::shared_ptr<wrench::ServerlessComputeService>
+                                                       & compute_service,
+                                                       const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -1504,7 +1551,6 @@ private:
         auto inv3_elapsed = inv3->getFunctionEndDate() - inv3->getSubmitDate();
 
 
-
         // std::cerr << "INV1: " << inv1_elapsed << std::endl;
         // std::cerr << "INV2: " << inv2_elapsed << std::endl;
         // std::cerr << "INV3: " << inv3_elapsed << std::endl;
@@ -1513,10 +1559,16 @@ private:
         // std::cerr << "INV6: " << inv6_elapsed << std::endl;
 
         if (std::abs(inv2->getDispatchDate() - inv3->getDispatchDate()) > EPSILON) {
-            throw std::runtime_error("Unexpected dispatch times: inv2: " + std::to_string(inv2->getDispatchDate()) + "   inv3: " + std::to_string(inv3->getDispatchDate()));
+            throw std::runtime_error(
+                "Unexpected dispatch times: inv2: " + std::to_string(inv2->getDispatchDate()) + "   inv3: " +
+                std::to_string(inv3->getDispatchDate()));
         }
-        if (std::abs((inv2_elapsed + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) - (inv3_elapsed)) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed times: inv2: " + std::to_string(inv2_elapsed) + "   inv3: dispatch: " + std::to_string(inv3_elapsed));
+        if (std::abs(
+            (inv2_elapsed + this->compute_service->getPropertyValueAsDouble(
+                wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD)) - (inv3_elapsed)) > EPSILON) {
+            throw std::runtime_error(
+                "Unexpected elapsed times: inv2: " + std::to_string(inv2_elapsed) + "   inv3: dispatch: " +
+                std::to_string(inv3_elapsed));
         }
 
 
@@ -1579,10 +1631,10 @@ void ServerlessTimingTest::do_OneIdleContainerTwoInvocations_test(
 class ServerlessTmpStorageClearingController : public wrench::ExecutionController {
 public:
     ServerlessTmpStorageClearingController(ServerlessTimingTest* test,
-                                 const std::string& hostname,
-                                 const std::shared_ptr<wrench::ServerlessComputeService>
-                                 & compute_service,
-                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                           const std::string& hostname,
+                                           const std::shared_ptr<wrench::ServerlessComputeService>
+                                           & compute_service,
+                                           const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -1603,10 +1655,13 @@ private:
             wrench::FunctionOutput> {
             auto free_storage_space_begin = service->getTotalFreeSpace();
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            wrench::StorageService::createFileAtLocation(wrench::FileLocation::LOCATION(service, wrench::Simulation::addTmpFile(1 * GB)));
+            wrench::StorageService::createFileAtLocation(
+                wrench::FileLocation::LOCATION(service, wrench::Simulation::addTmpFile(1 * GB)));
             wrench::Simulation::sleep(10);
             auto free_storage_space_end = service->getTotalFreeSpace();
-            return std::make_shared<MyFunctionOutput>("FREE SPACE: " + std::to_string(free_storage_space_begin) +" " + std::to_string(free_storage_space_end));
+            return std::make_shared<MyFunctionOutput>(
+                "FREE SPACE: " + std::to_string(free_storage_space_begin) + " " +
+                std::to_string(free_storage_space_end));
         };
 
         // Register that function with a 32GB image file that takes %50 of the node disk space
@@ -1633,7 +1688,9 @@ private:
         auto inv2_output = std::dynamic_pointer_cast<MyFunctionOutput>(inv2->getOutput());
 
         if (inv1_output->toString() != inv2_output->toString()) {
-            throw std::runtime_error("Both invocations should produce the same output, instead: " +  inv1_output->toString() + " != " + inv2_output->toString());
+            throw std::runtime_error(
+                "Both invocations should produce the same output, instead: " + inv1_output->toString() + " != " +
+                inv2_output->toString());
         }
 
         return 0;
@@ -1694,10 +1751,10 @@ void ServerlessTimingTest::do_TmpStorageClearing_test(
 class ServerlessIdleContainerEvictionController : public wrench::ExecutionController {
 public:
     ServerlessIdleContainerEvictionController(ServerlessTimingTest* test,
-                                 const std::string& hostname,
-                                 const std::shared_ptr<wrench::ServerlessComputeService>
-                                 & compute_service,
-                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                              const std::string& hostname,
+                                              const std::shared_ptr<wrench::ServerlessComputeService>
+                                              & compute_service,
+                                              const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -1758,7 +1815,6 @@ private:
         function_manager->wait_all({inv1_1, inv1_2, inv1_3, inv2_1});
 
         // Now, both images are in RAM, and we have 3 idle containers for function_1 and 1 idle container for function_2: RAM is full
-        std::cerr << "\n\n*** AT THIS POINT MEMORY SHOULD BE FULL WITH 3 IDLE CONTAINERS FOR F1 AND 1 IDLE CONTAINER FOR F2 ***\n\n\n";
 
         // Place one invocation to function_1 to re-use one of the idle containers for function_1
         auto inv1_4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
@@ -1776,7 +1832,7 @@ private:
         auto inv1_5 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         auto inv1_6 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         function_manager->wait_all({inv1_5, inv1_6});
-        
+
 
         auto inv1_1_elapsed = inv1_1->getFunctionEndDate() - inv1_1->getSubmitDate();
         auto inv1_2_elapsed = inv1_2->getFunctionEndDate() - inv1_2->getSubmitDate();
@@ -1802,33 +1858,48 @@ private:
 
         double inv1_4_elapsed_expected = 10.0;
         double inv1_5_elapsed_expected = 10.0;
-        double inv1_6_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
+        double inv1_6_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(
+            wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
         double inv2_2_elapsed_expected = 10.0;
-        double inv2_3_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
-        double inv2_4_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
+        double inv2_3_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(
+            wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
+        double inv2_4_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(
+            wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
 
         if (std::abs(inv1_4_elapsed - inv1_4_elapsed_expected) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed time inv1_4: " + std::to_string(inv1_4_elapsed) + " instead of " +std::to_string(inv1_4_elapsed_expected));
+            throw std::runtime_error(
+                "Unexpected elapsed time inv1_4: " + std::to_string(inv1_4_elapsed) + " instead of " + std::to_string(
+                    inv1_4_elapsed_expected));
         }
 
         if (std::abs(inv1_5_elapsed - inv1_5_elapsed_expected) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed time inv1_5: " + std::to_string(inv1_5_elapsed) + " instead of " +std::to_string(inv1_5_elapsed_expected));
+            throw std::runtime_error(
+                "Unexpected elapsed time inv1_5: " + std::to_string(inv1_5_elapsed) + " instead of " + std::to_string(
+                    inv1_5_elapsed_expected));
         }
 
         if (std::abs(inv1_6_elapsed - inv1_6_elapsed_expected) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed time inv1_6: " + std::to_string(inv1_6_elapsed) + " instead of " +std::to_string(inv1_6_elapsed_expected));
+            throw std::runtime_error(
+                "Unexpected elapsed time inv1_6: " + std::to_string(inv1_6_elapsed) + " instead of " + std::to_string(
+                    inv1_6_elapsed_expected));
         }
 
         if (std::abs(inv2_2_elapsed - inv2_2_elapsed_expected) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed time inv2_2: " + std::to_string(inv2_2_elapsed) + " instead of " +std::to_string(inv2_2_elapsed_expected));
+            throw std::runtime_error(
+                "Unexpected elapsed time inv2_2: " + std::to_string(inv2_2_elapsed) + " instead of " + std::to_string(
+                    inv2_2_elapsed_expected));
         }
 
         if (std::abs(inv2_3_elapsed - inv2_3_elapsed_expected) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed time inv2_3: " + std::to_string(inv2_3_elapsed) + " instead of " +std::to_string(inv2_3_elapsed_expected));
+            throw std::runtime_error(
+                "Unexpected elapsed time inv2_3: " + std::to_string(inv2_3_elapsed) + " instead of " + std::to_string(
+                    inv2_3_elapsed_expected));
         }
 
         if (std::abs(inv2_4_elapsed - inv2_4_elapsed_expected) > EPSILON) {
-            throw std::runtime_error("Unexpected elapsed time inv2_4: " + std::to_string(inv2_4_elapsed) + " instead of " +std::to_string(inv2_4_elapsed_expected));
+            throw std::runtime_error(
+                "Unexpected elapsed time inv2_4: " + std::to_string(inv2_4_elapsed) + " instead of " + std::to_string(
+                    inv2_4_elapsed_expected));
         }
 
 
@@ -1849,10 +1920,10 @@ TEST_F(ServerlessTimingTest, IdleContainerEviction) {
 
 void ServerlessTimingTest::do_IdleContainerEviction_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1890,10 +1961,12 @@ void ServerlessTimingTest::do_IdleContainerEviction_test(
 class ServerlessImageDownloadSimulationController : public wrench::ExecutionController {
 public:
     ServerlessImageDownloadSimulationController(ServerlessTimingTest* test,
-                                 const std::string& hostname,
-                                 const std::shared_ptr<wrench::ServerlessComputeService> & compute_service,
-                                 const std::shared_ptr<wrench::ServerlessComputeService> & other_compute_service,
-                                 const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                const std::string& hostname,
+                                                const std::shared_ptr<wrench::ServerlessComputeService>&
+                                                compute_service,
+                                                const std::shared_ptr<wrench::ServerlessComputeService>&
+                                                other_compute_service,
+                                                const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -1954,7 +2027,9 @@ private:
         auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getSubmitDate();
 
         if (std::abs(inv1_elapsed - inv2_elapsed) < 30.0 * GB / (20 * MB)) {
-            throw std::runtime_error("Unexpected elapsed times: inv1=" + std::to_string(inv1_elapsed) + " inv2=" + std::to_string(inv2_elapsed));
+            throw std::runtime_error(
+                "Unexpected elapsed times: inv1=" + std::to_string(inv1_elapsed) + " inv2=" + std::to_string(
+                    inv2_elapsed));
         }
 
 
@@ -2009,7 +2084,8 @@ void ServerlessTimingTest::do_ImageDownloadSimulation_test(
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessImageDownloadSimulationController(this, user_host, serverless_provider, other_serverless_provider, storage_service));
+        new ServerlessImageDownloadSimulationController(this, user_host, serverless_provider, other_serverless_provider,
+                                                        storage_service));
 
     simulation->launch();
 

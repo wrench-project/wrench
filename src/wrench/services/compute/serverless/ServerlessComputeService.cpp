@@ -334,19 +334,25 @@ namespace wrench {
 
         bool do_scheduling;
         while (processNextMessage(do_scheduling)) {
-            // Make invocations whose images have downloaded schedulable
-            std::cerr << "ADMITTING INVOCATIONS\n";
-            admitInvocations();
-            for (auto const &inv : this->_state_of_the_system->_schedulable_invocations) {
-                std::cerr << "ONE INVOCATION IS SCHEDULABLE\n";
-                std::cerr << "DOES THE COMPUTE NODE HAVE IT IN RAM: " << (*this->_state_of_the_system->_compute_nodes.begin())->isImageInRAM(inv->getRegisteredFunction()->getImage()) << "\n";
-                std::cerr << "DOES THE COMPUTE NODE HAVE IT ON DISK: " << (*this->_state_of_the_system->_compute_nodes.begin())->isImageOnDisk(inv->getRegisteredFunction()->getImage()) << "\n";
+
+            // At each compute node, if an image is in RAM but not on Disk, due to what we did in the previous
+            // scheduling decisions, remove it from RAM (to be realistic).
+            // This is a hack, but, as of now, there is no way to "tie" two files together. And
+            // the LRU behavior is outside of wrench's control (in fsmod), and not observable/callbackable.
+            for (auto const &node : _state_of_the_system->_compute_nodes) {
+                for (auto const &rf : _state_of_the_system->_registered_functions) {
+                    auto image = rf->getImage();
+                    if (node->isImageInRAM(image) and (not node->isImageOnDisk(image))) {
+                        StorageService::removeFileAtLocation(FileLocation::LOCATION(node->_memory, image->getRAMFile()));
+                    }
+                }
             }
 
+            // Make invocations whose images have downloaded schedulable
+            admitInvocations();
 
             if (do_scheduling) {
                 // Invoke the scheduler
-                std::cerr << "INKOVING SCHEDULER\n";
                 auto decisions = invokeScheduler();
 
                 // Implement the scheduler's decisions, if possible. Note that
@@ -624,8 +630,6 @@ namespace wrench {
         double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
-            std::cerr << "IS MY IMAGE STILL IN RAM " << compute_node->isImageInRAM(container->getRegisteredFunction()->getImage()) << "\n";
-            std::cerr << "IS MY IMAGE STILL ON DISK " << compute_node->isImageOnDisk(container->getRegisteredFunction()->getImage()) << "\n";
         }
         else {
             // Start the timeout alarm
@@ -651,8 +655,6 @@ namespace wrench {
                 failure_cause, this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
 
-        std::cerr << "WTF: IS MY IMAGE STILL IN RAM " << compute_node->isImageInRAM(container->getRegisteredFunction()->getImage()) << "\n";
-        std::cerr << "WTF: IS MY IMAGE STILL ON DISK " << compute_node->isImageOnDisk(container->getRegisteredFunction()->getImage()) << "\n";
     }
 
     /**
@@ -911,12 +913,10 @@ namespace wrench {
             auto invocation = _state_of_the_system->_new_invocations.front();
             const auto image = invocation->_registered_function->_function->getImage();
             // WRENCH_INFO("Admitting an invocation...");
-            std::cerr << "Admitting an invocation for uimage " << image->getName() << "\n";
 
             // If the image file is already downloaded, make the invocation schedulable immediately
             if (_state_of_the_system->_head_storage_service->hasFile(image->getFile())) {
                 _state_of_the_system->_new_invocations.pop();
-                std::cerr << "IT IS SCHEDULABLE!\n";
                 _state_of_the_system->_schedulable_invocations.emplace_back(invocation); // Insert at the end
                 continue;
             }
@@ -1134,8 +1134,9 @@ namespace wrench {
                 image->getRAMFile());
 
             // This below is a "hack" to implement the "read only the RAM portion of the on-disk image",
-            // for which StorageService implementations don't provide an API
-            // Create and open a tmp file to "reserve" space while the reading occurs
+            // for which StorageService implementations don't provide an API to
+            // create and open a tmp file to "reserve" space while the reading occurs. AND,
+            // this also correctly simulates that the disk bandwidth is the bottleneck.
             auto tmp_file = Simulation::addTmpFile(image->getRAMFootprint());
             auto tmp_file_location = wrench::FileLocation::LOCATION(compute_node->_memory, tmp_file);
             std::shared_ptr<simgrid::fsmod::File> open_tmp_file;
