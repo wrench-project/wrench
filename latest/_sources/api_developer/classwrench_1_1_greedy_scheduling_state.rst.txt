@@ -1,0 +1,8 @@
+.. _GreedySchedulingState:
+wrench::GreedySchedulingState
+*****************************
+
+.. doxygenclass:: wrench::GreedySchedulingState
+   :project: developer
+   :members:
+

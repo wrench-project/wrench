@@ -220,6 +220,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_not_found.html">wrench::FunctionNotFound</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_functionality_not_available.html">wrench::FunctionalityNotAvailable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_greedy_scheduling_state.html">wrench::GreedySchedulingState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_greedy_serverless_scheduler.html">wrench::GreedyServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service.html">wrench::HTCondorCentralManagerService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service_message.html">wrench::HTCondorCentralManagerServiceMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service_message_payload.html">wrench::HTCondorCentralManagerServiceMessagePayload</a></li>
@@ -394,7 +396,6 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_terminal_output.html">wrench::TerminalOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_timer_event.html">wrench::TimerEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_trace_file_loader.html">wrench::TraceFileLoader</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_two_pass_serverless_scheduler.html">wrench::TwoPassServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser.html">wrench::UnitParser</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_unit_parser_1_1unit__scale.html">wrench::UnitParser::unit_scale</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_virtualized_cluster_compute_service.html">wrench::VirtualizedClusterComputeService</a></li>
@@ -458,7 +459,7 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench19ServerlessSchedulerE">
 <span id="_CPPv3N6wrench19ServerlessSchedulerE"></span><span id="_CPPv2N6wrench19ServerlessSchedulerE"></span><span id="wrench::ServerlessScheduler"></span><span class="target" id="classwrench_1_1_serverless_scheduler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessScheduler</span></span></span><a class="headerlink" href="#_CPPv4N6wrench19ServerlessSchedulerE" title="Link to this definition"></a><br /></dt>
 <dd><p>Abstract base class for scheduling in a serverless compute service. </p>
-<p>Subclassed by <a class="reference internal" href="../api_user/classwrench_1_1_two_pass_serverless_scheduler.html#classwrench_1_1_two_pass_serverless_scheduler"><span class="std std-ref">wrench::TwoPassServerlessScheduler</span></a>, <a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html#classwrench_1_1_workload_balancing_serverless_scheduler"><span class="std std-ref">wrench::WorkloadBalancingServerlessScheduler</span></a></p>
+<p>Subclassed by <a class="reference internal" href="../api_user/classwrench_1_1_greedy_serverless_scheduler.html#classwrench_1_1_greedy_serverless_scheduler"><span class="std std-ref">wrench::GreedyServerlessScheduler</span></a>, <a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html#classwrench_1_1_workload_balancing_serverless_scheduler"><span class="std std-ref">wrench::WorkloadBalancingServerlessScheduler</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -473,7 +474,7 @@
 </ul>
 </p>
 <p>Note that the disk and RAM at each compute host is managed using LRU, and so the scheduler doesn’t have full control (which would likely be intractable anyway). But that means that when asking from the system state questions like “how much RAM is available at that node?” is not clear-cut: the answer may be 0 but one can perhaps use the node because some memory content will be evicted due to the LRU behavior…</p>
-<p>As a result of the above, the scheduling decisions returned by this method may not all be feasible, and the same invocations could be passed to the method over and over….</p>
+<p>A scheduling decision is an intent, not a reservation. The serverless compute service checks whether the decision can actually be executed when it processes it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

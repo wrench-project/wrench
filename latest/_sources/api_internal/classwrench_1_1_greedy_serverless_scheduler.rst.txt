@@ -1,0 +1,8 @@
+.. _GreedyServerlessScheduler:
+wrench::GreedyServerlessScheduler
+*********************************
+
+.. doxygenclass:: wrench::GreedyServerlessScheduler
+   :project: internal
+   :members:
+
