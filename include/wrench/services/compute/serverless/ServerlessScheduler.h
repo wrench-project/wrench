@@ -18,14 +18,9 @@
 #include <string>
 
 namespace wrench {
-
     /***********************/
     /** \cond INTERNAL    **/
     /***********************/
-
-    struct TerminateContainer {
-        std::shared_ptr<Container> container;
-    };
 
     struct CopyImage {
         std::shared_ptr<Image> image;
@@ -45,33 +40,25 @@ namespace wrench {
 
     /**
      * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
-     *        - Which idle containers should be terminated right now
      *        - Which images should be copied from the head node to compute nodes' disks, initiated right now
      *        - Which images should be loaded into compute node's RAMs, initiated right now
      *        - Which invocations should be dispatched right now
      */
     struct ServerlessSchedulingDecisions {
-        /** @brief The list of idle containers to terminate */
-        std::vector<TerminateContainer> container_terminations;
-	    /** @brief The list of image copies to storage at compute nodes */
+        /** @brief The list of image copies to storage at compute nodes */
         std::vector<CopyImage> image_copies_to_disk;
-	    /** @brief The list of image loads in RAM at compute nodes */
+        /** @brief The list of image loads in RAM at compute nodes */
         std::vector<LoadImage> image_loads_to_RAM;
-	    /** @brief The list of function invocations at compute nodes */
+        /** @brief The list of function invocations at compute nodes */
         std::vector<DispatchInvocation> invocation_dispatches;
 
         void print() {
-            if (container_terminations.empty() and image_copies_to_disk.empty() and image_loads_to_RAM.empty() and invocation_dispatches.empty()) {
+            if (image_copies_to_disk.empty() and image_loads_to_RAM.empty() and
+                invocation_dispatches.empty()) {
                 return;
             }
 
             std::cerr << "** SCHEDULING DECISIONS **" << std::endl;
-            if (not container_terminations.empty()) {
-                for (const auto& [container] : container_terminations) {
-                    std::cerr << "  Container termination: " << container->getRegisteredFunction()->getImage()->getName() <<
-                        "(" <<container->getComputeNode()->hostname << ")" << std::endl;
-                }
-            }
             if (not image_copies_to_disk.empty()) {
                 for (const auto& [image, node] : image_copies_to_disk) {
                     std::cerr << "  Image copy: " << image->getName() << " at " << node->hostname << std::endl;
@@ -84,11 +71,12 @@ namespace wrench {
             }
             if (not invocation_dispatches.empty()) {
                 for (const auto& [invocation, node, container] : invocation_dispatches) {
-                    std::cerr << "  Invocation dispatch: for " << invocation->getRegisteredFunction()->getImage()->getName() <<
-                        " at " << node->hostname << " (" << (container ? "on an idle container" : "on a new container") << ")" << std::endl;
+                    std::cerr << "  Invocation dispatch: for " << invocation->getRegisteredFunction()->getImage()->
+                                                                              getName() <<
+                        " at " << node->hostname << " (" << (container ? "on an idle container" : "on a new container")
+                        << ")" << std::endl;
                 }
             }
-
         }
     };
 
@@ -125,8 +113,13 @@ namespace wrench {
             const ServerlessStateOfTheSystem* state
         ) = 0;
 
-
+    protected:
+        bool findIdleContainersToTerminate(std::vector<std::shared_ptr<Container>> idle_containers,
+                                           sg_size_t current_free_ram_space,
+                                           sg_size_t needed_free_ram_space,
+                                           std::set<std::shared_ptr<Container>>& to_terminate);
     };
+
     /***********************/
     /** \endcond          **/
     /***********************/

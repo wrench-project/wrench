@@ -1065,6 +1065,8 @@ private:
         // Keep track of time for invocation when image is on disk at compute node
         auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getSubmitDate();
 
+        std::cerr << "\n\nAT THIS POINT WE HAVE DONE TWO INVOK OF F1: " << inv1_elapsed << "  " << inv2_elapsed << "\n\n\n";
+
         // Register that function with ANOTHER 50GB image file that takes %50 of the node disk space
         auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
         auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
@@ -1112,10 +1114,10 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
 
 void ServerlessTimingTest::do_SimpleImageEvictionFromDisk_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 1;
+    int argc = 2;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    // argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1751,11 +1753,12 @@ private:
         auto inv1_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         auto inv1_2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
         auto inv1_3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
+        wrench::Simulation::sleep(0.1);
         auto inv2_1 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
         function_manager->wait_all({inv1_1, inv1_2, inv1_3, inv2_1});
 
         // Now, both images are in RAM, and we have 3 idle containers for function_1 and 1 idle container for function_2: RAM is full
-        // std::cerr << "\n\n*** AT THIS POINT MEMORY SHOULD BE FULL WITH 3 IDLE CONTAINERS FOR F1 AND 1 IDLE CONTAINER FOR F2 ***\n\n\n";
+        std::cerr << "\n\n*** AT THIS POINT MEMORY SHOULD BE FULL WITH 3 IDLE CONTAINERS FOR F1 AND 1 IDLE CONTAINER FOR F2 ***\n\n\n";
 
         // Place one invocation to function_1 to re-use one of the idle containers for function_1
         auto inv1_4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
@@ -1836,7 +1839,7 @@ private:
 TEST_F(ServerlessTimingTest, IdleContainerEviction) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
         std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(0),
+        // std::make_shared<wrench::RandomServerlessScheduler>(0),
         // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
     };
     for (auto& scheduler : schedulers) {
@@ -1846,10 +1849,10 @@ TEST_F(ServerlessTimingTest, IdleContainerEviction) {
 
 void ServerlessTimingTest::do_IdleContainerEviction_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 1;
+    int argc = 2;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    // argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);

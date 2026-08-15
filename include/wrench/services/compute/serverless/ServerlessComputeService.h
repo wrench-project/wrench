@@ -130,7 +130,6 @@ namespace wrench {
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
-        void terminateIdleContainers(const std::vector<TerminateContainer>& decisions);
         void dispatchInvocations(const std::vector<DispatchInvocation>& decisions);
         void initiateImageLoads(const std::vector<LoadImage>& decisions);
         void initiateImageCopies(const std::vector<CopyImage>& decisions);
@@ -148,7 +147,7 @@ namespace wrench {
         void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<Image>& image);
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
-            std::shared_ptr<ServerlessComputeNode> target_compute_node,
+            const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
             std::shared_ptr<Container> target_container);
 
         unsigned long _compute_node_num_cores;

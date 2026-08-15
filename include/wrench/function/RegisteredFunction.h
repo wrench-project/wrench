@@ -49,7 +49,8 @@ namespace wrench {
 
         [[nodiscard]] std::shared_ptr<Image> getImage() const;
         [[nodiscard]] std::shared_ptr<DataFile> getImageFile() const;
-        std::shared_ptr<Function> getFunction();
+        [[nodiscard]] std::shared_ptr<Function> getFunction() const;
+        [[nodiscard]] std::string getName() const;
         [[nodiscard]] double getTimeLimit() const;
         [[nodiscard]] sg_size_t getDiskSpaceLimit() const;
         [[nodiscard]] sg_size_t getRAMSpaceLimit() const;

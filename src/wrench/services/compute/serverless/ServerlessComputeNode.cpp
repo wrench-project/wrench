@@ -15,18 +15,23 @@
 
 #include <wrench/logging/TerminalOutput.h>
 
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/failure_causes/NotEnoughResources.h"
+
 WRENCH_LOG_CATEGORY(wrench_core_serverless_compute_node, "Log category for Serverless Compute Node");
 
 namespace wrench {
-
     /**
     *  @brief Constructor
     *  @param h: hostname
     *  @param num_cores: number of cores
     *  @param service: the ServerlessComputeService that owns this compute node
     */
-    ServerlessComputeNode::ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService *service) :
-                hostname(std::move(h)), _serverless_compute_service(service), _total_cores(num_cores), _available_cores(num_cores) {}
+    ServerlessComputeNode::ServerlessComputeNode(std::string h, unsigned int num_cores,
+                                                 ServerlessComputeService* service) :
+        hostname(std::move(h)), _serverless_compute_service(service), _total_cores(num_cores),
+        _available_cores(num_cores) {
+    }
 
 
     /**
@@ -67,6 +72,8 @@ namespace wrench {
             throw std::runtime_error("Trying to shutdown a container that's not in the idle list?");
         }
         _idle_containers.erase(container);
+        WRENCH_INFO("Shutting down an idle container for function [%s]",
+                    container->getRegisteredFunction()->getName().c_str());
         container->shutdown();
     }
 
@@ -79,7 +86,7 @@ namespace wrench {
     std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(
         const RegisteredFunction* registered_function,
         const std::set<std::shared_ptr<Container>>& excluded_container) const {
-        for (auto const &idle_container : _idle_containers) {
+        for (auto const& idle_container : _idle_containers) {
             if (excluded_container.find(idle_container) != excluded_container.end()) {
                 continue;
             }
@@ -99,65 +106,50 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to identify which idle containers to terminate to create at least some free RAM space. It
-     *        returns the smallest set possible in terms of number of containers to terminate, trying to
-     *        free up as little memory as possible (it's not optimal in this regard however, as finding
-     *        the smallest set with the smallest sum is NP-hard, and would require dynamic programming, etc.)
-     * @param needed_free_ram_space The RAM space needed in bytes
-     * @param to_terminate The set of containers to terminate
-     * @return a set of idle containers that could be terminated to reach free space
-     */
-    bool ServerlessComputeNode::findIdleContainersToTerminate(sg_size_t needed_free_ram_space,
-                                                              std::set<std::shared_ptr<Container>>& to_terminate) {
-        // Perhaps nothing needs to be done
-        if (needed_free_ram_space <= getFreeRAMSpace()) {
-            return true;
-        }
-
-        // Compute the space to free_up
-        auto space_to_free_up = needed_free_ram_space - getFreeRAMSpace();
-
-        // Compute a list of the containers, sorted by increasing RAM footprint
-        std::vector<std::shared_ptr<Container>> sorted_containers;
-        sorted_containers.reserve(_idle_containers.size());
-        for (auto const &container : _idle_containers) {
-            sorted_containers.push_back(container);
-        }
-        std::sort(sorted_containers.begin(), sorted_containers.end(),
-            [](const std::shared_ptr<Container>& a, const std::shared_ptr<Container>& b) {
-                return a->getRegisteredFunction()->getRAMSpaceLimit() < b->getRegisteredFunction()->getRAMSpaceLimit();
-        });
-
-        // TODO: Use dynamic programming to return the optimal set? (smallest cardinal, and smallest sum) - LIKELY OVERKILL
-        sg_size_t space_freed_up = 0;
-        while (space_freed_up < space_to_free_up) {
-            if (sorted_containers.empty()) {
-                to_terminate.clear();
-                return false;
-            }
-            // Find the smallest container that gets us there, and if non, pick the largest container
-            auto victim = sorted_containers.end();
-            for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
-                if ((*it)->getRegisteredFunction()->getRAMSpaceLimit() >= space_to_free_up) {
-                    victim = it;
-                    break;
-                }
-            }
-            to_terminate.insert(*victim);
-            space_freed_up += (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
-            sorted_containers.erase(victim);
-        }
-        return true;
-    }
-
-    /**
-     * @brief Spawn a container
+     * @brief Spawn a container (and try to kill idle containers if it helps)
      * @param registered_function a registered function
      */
-    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const RegisteredFunction *registered_function) {
+    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const RegisteredFunction* registered_function) {
         // Create a container object
-        auto container = std::shared_ptr<Container>(new Container(registered_function, this, _serverless_compute_service, Container::State::BUSY));
-        container->spawn();
+        std::cerr << "TRYING TO SPAN A CONTAINER\n";
+        auto container = std::shared_ptr<Container>(
+            new Container(registered_function, this, _serverless_compute_service, Container::State::BUSY));
+        try {
+            container->spawn();
+        } catch (ExecutionException& e) {
+            if (not std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
+                throw;
+            }
+            std::cerr << "OOPS, NOT ENOUGH RESOURCES\n";
+            // Try to terminate idle containers
+            std::cerr << "TRYING TO FIND VICTIMS..\n";
+            std::cerr << "  NEEDED / FREE RAM: " << registered_function->getRAMSpaceLimit() << "/" << this->getFreeRAMSpace() << "\n";
+            std::cerr << "  NEEDED / FREE DISK: " << registered_function->getDiskSpaceLimit() << "/" << this->getFreeDiskSpace() << "\n";
+            std::set<std::shared_ptr<Container>> victims;
+            auto success = this->findIdleContainersToTerminate(
+                registered_function->getRAMSpaceLimit(),
+                registered_function->getDiskSpaceLimit(),
+                victims);
+            std::cerr << "FOUND VICTIMS? " << success << "  " << victims.size() << " VICTIMS FOUND!\n";
+            if (not success) {
+                throw;
+            } else {
+                std::cerr << "SHUTTING DOWN VICTIM CONTAINERS\n";
+                for (auto const& victim : victims) {
+                    this->shutdownContainer(victim);
+                }
+            }
+            // Attempt again!
+            try {
+                std::cerr << "ATTEMPTING TO SPAWN THE CONTAINER AGAIN!\n";
+                std::cerr << "  NEEDED / FREE RAM: " << registered_function->getRAMSpaceLimit() << "/" << this->getFreeRAMSpace() << "\n";
+                std::cerr << "  NEEDED / FREE DISK: " << registered_function->getDiskSpaceLimit() << "/" << this->getFreeDiskSpace() << "\n";
+
+                container->spawn();
+            } catch (ExecutionException&) {
+                throw;
+            }
+        }
         _busy_containers.insert(container);
         return container;
     }
@@ -223,7 +215,6 @@ namespace wrench {
     bool ServerlessComputeNode::isInvocationFeasible(
         const std::shared_ptr<Invocation>& invocation,
         const std::shared_ptr<Container>& target_container) const {
-
         // Sanity checks
         if (invocation->isDispatched()) {
             throw std::runtime_error(
@@ -266,7 +257,85 @@ namespace wrench {
             return false;
         }
 
+        // Is there enough space
+
         return true;
     }
 
+    /**
+     * @brief Method to identify which idle containers to terminate to create at least some free RAM space. It
+     *        returns the smallest set possible in terms of number of containers to terminate, trying to
+     *        free up as little memory as possible (it's not optimal in this regard however, as finding
+     *        the smallest set with the smallest sum is NP-hard, and would require dynamic programming, etc.)
+     *        This is a really a super-generic method that is implementing an algorithm, and it's not Container-specific
+     * @param needed_free_ram_space The RAM space needed in bytes
+     * @param needed_free_disk_space The Disk space needed in bytes
+     * @param to_terminate The set of containers to terminate (reference, will be updated)
+     * @return a set of idle containers that could be terminated to reach free space
+     */
+    bool ServerlessComputeNode::findIdleContainersToTerminate(sg_size_t needed_free_ram_space,
+                                                              sg_size_t needed_free_disk_space,
+                                                              std::set<std::shared_ptr<Container>>& to_terminate)
+    const {
+
+        // Perhaps nothing needs to be done
+        if ((needed_free_ram_space <= this->getFreeRAMSpace()) and (needed_free_disk_space <= this->
+            getFreeDiskSpace())) {
+            to_terminate.clear();
+            return true;
+        }
+
+        auto ram_space_to_free_up = (needed_free_ram_space <= this->getFreeRAMSpace() ? 0 : needed_free_ram_space - this->getFreeRAMSpace());
+        auto disk_space_to_free_up = (needed_free_disk_space <= this->getFreeDiskSpace() ? 0 : needed_free_disk_space - this->getFreeDiskSpace());
+
+        std::cerr << "FINDING VICTIMS: RAM  needed:" << ram_space_to_free_up << "  free: " << this->getFreeRAMSpace() << "\n";
+        std::cerr << "FINDING VICTIMS: DISK needed:" << disk_space_to_free_up << "  free: " << this->getFreeDiskSpace() << "\n";
+        // Compute a sorted list of the containers
+        std::vector<std::shared_ptr<Container>> sorted_containers;
+        sorted_containers.reserve(_idle_containers.size());
+        for (auto const& container : _idle_containers) {
+            sorted_containers.push_back(container);
+        }
+        std::sort(sorted_containers.begin(), sorted_containers.end(),
+                  [ram_space_to_free_up, disk_space_to_free_up](const std::shared_ptr<Container>& a, const std::shared_ptr<Container>& b) {
+                      if (disk_space_to_free_up == 0) {
+                          return a->getRegisteredFunction()->getRAMSpaceLimit() < b->getRegisteredFunction()->getRAMSpaceLimit();
+                      }
+                      if (ram_space_to_free_up == 0) {
+                          return a->getRegisteredFunction()->getDiskSpaceLimit() < b->getRegisteredFunction()->getDiskSpaceLimit();
+                      }
+                      // Use the sum as a (crappy?) heuristic
+                      return a->getRegisteredFunction()->getDiskSpaceLimit() + a->getRegisteredFunction()->getRAMSpaceLimit() <
+                             b->getRegisteredFunction()->getDiskSpaceLimit() + b->getRegisteredFunction()->getRAMSpaceLimit();
+                  });
+
+        // TODO: Use dynamic programming to return some optimal set? (smallest cardinal, and smallest sum, NP-hard, but likely only weakly,
+        // TODO: but not easy due to the two dimensions...Like some knapscak) - LIKELY OVERKILL
+        sg_size_t ram_space_freed_up = 0;
+        sg_size_t disk_space_freed_up = 0;
+        while (true) {
+            if (sorted_containers.empty()) {
+                to_terminate.clear();
+                return false;
+            }
+            // Find the smallest container that gets us there, and if none, pick the largest container
+            auto victim = sorted_containers.end();
+            for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
+                if ((*it)->getRegisteredFunction()->getRAMSpaceLimit() >= ram_space_to_free_up and
+                    (*it)->getRegisteredFunction()->getDiskSpaceLimit() >= disk_space_to_free_up) {
+                    victim = it;
+                    break;
+                }
+            }
+            to_terminate.insert(*victim);
+            ram_space_freed_up += (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
+            disk_space_freed_up += (*victim)->getRegisteredFunction()->getDiskSpaceLimit();
+            sorted_containers.erase(victim);
+
+            if ((ram_space_freed_up >= ram_space_to_free_up) and (disk_space_freed_up >= disk_space_to_free_up)) {
+                break;
+            }
+        }
+        return true;
+    }
 } // namespace wrench

@@ -52,8 +52,16 @@ namespace wrench {
      * @brief Get the registered function's actual function implementation
      * @return A function
      */
-    std::shared_ptr<Function> RegisteredFunction::getFunction() {
+    std::shared_ptr<Function> RegisteredFunction::getFunction() const {
         return _function;
+    }
+
+    /**
+     * @brief Get the registered function's name
+     * @return A name
+     */
+    std::string RegisteredFunction::getName() const {
+        return _function->getName();
     }
 
     /**

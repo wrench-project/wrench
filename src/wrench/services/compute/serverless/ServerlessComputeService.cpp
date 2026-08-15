@@ -335,26 +335,33 @@ namespace wrench {
         bool do_scheduling;
         while (processNextMessage(do_scheduling)) {
             // Make invocations whose images have downloaded schedulable
+            std::cerr << "ADMITTING INVOCATIONS\n";
             admitInvocations();
+            for (auto const &inv : this->_state_of_the_system->_schedulable_invocations) {
+                std::cerr << "ONE INVOCATION IS SCHEDULABLE\n";
+                std::cerr << "DOES THE COMPUTE NODE HAVE IT IN RAM: " << (*this->_state_of_the_system->_compute_nodes.begin())->isImageInRAM(inv->getRegisteredFunction()->getImage()) << "\n";
+                std::cerr << "DOES THE COMPUTE NODE HAVE IT ON DISK: " << (*this->_state_of_the_system->_compute_nodes.begin())->isImageOnDisk(inv->getRegisteredFunction()->getImage()) << "\n";
+            }
+
 
             if (do_scheduling) {
                 // Invoke the scheduler
+                std::cerr << "INKOVING SCHEDULER\n";
                 auto decisions = invokeScheduler();
 
                 // Implement the scheduler's decisions, if possible. Note that
                 // some decision can be invalid, and that's ok. For instance, the scheduler
-                // could be simple and not use any knowledge of the LRU behavior on compute node
+                // is likely not accounting for LRU behavior on compute node
                 // disk and RAM, and of which files are currently unevictable. The idea is that
                 // even a super naive scheduler can be used, even though most of its scheduling
                 // decisions may not feasible at a given time. It will just be invoked again later.
+                // It is unlikely that a crazy-sophisticated scheduling will mode/capture everything.
 
-                // First, terminate idle containers
-                terminateIdleContainers(decisions->container_terminations);
-                // Second, do invocations (before the image loads/copies to avoid LRU evictions)
+                // First, do invocations (before the image loads/copies to avoid LRU evictions)
                 dispatchInvocations(decisions->invocation_dispatches);
-                // Third, do the image loads (before image copies to avoid LRU evictions)
+                // Second, do the image loads (before image copies to avoid LRU evictions)
                 initiateImageLoads(decisions->image_loads_to_RAM);
-                // Last, do the image copies
+                // Third, do the image copies
                 initiateImageCopies(decisions->image_copies_to_disk);
             }
         }
@@ -617,6 +624,8 @@ namespace wrench {
         double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
+            std::cerr << "IS MY IMAGE STILL IN RAM " << compute_node->isImageInRAM(container->getRegisteredFunction()->getImage()) << "\n";
+            std::cerr << "IS MY IMAGE STILL ON DISK " << compute_node->isImageOnDisk(container->getRegisteredFunction()->getImage()) << "\n";
         }
         else {
             // Start the timeout alarm
@@ -641,6 +650,9 @@ namespace wrench {
                 invocation,
                 failure_cause, this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+
+        std::cerr << "WTF: IS MY IMAGE STILL IN RAM " << compute_node->isImageInRAM(container->getRegisteredFunction()->getImage()) << "\n";
+        std::cerr << "WTF: IS MY IMAGE STILL ON DISK " << compute_node->isImageOnDisk(container->getRegisteredFunction()->getImage()) << "\n";
     }
 
     /**
@@ -656,22 +668,6 @@ namespace wrench {
         }
         // Shutdown the container
         container->getComputeNode()->shutdownContainer(container);
-    }
-
-    /**
-     * @brief Terminates idle containers if need be
-     * @param decisions scheduling decisions
-     */
-    void ServerlessComputeService::terminateIdleContainers(const std::vector<TerminateContainer>& decisions) {
-        for (const auto& [container] : decisions) {
-            if (container->isBusy()) {
-                throw std::runtime_error(
-                    "ServerlessComputeService::terminateIdleContainers(): container to terminate is not idle!");
-            }
-            // Shutdown the container
-            container->getComputeNode()->shutdownContainer(container);
-        }
-        // TODO: Should this method ensure that we do a second round of scheduling?
     }
 
     /**
@@ -713,9 +709,9 @@ namespace wrench {
      * @return true on success, false on failure
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
-                                                      std::shared_ptr<ServerlessComputeNode> target_compute_node,
+                                                      const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
                                                       std::shared_ptr<Container> target_container) {
-        // Check that things can work, which may not be the case because scheduling and LRU is complicated
+        // Check that things can work at all
         if (not target_compute_node->isInvocationFeasible(invocation, target_container)) {
             return false;
         }
@@ -723,7 +719,7 @@ namespace wrench {
         bool hot_start = target_container != nullptr;
 
         if (not hot_start) {
-            // Spawn the container
+            // Try to spawn a container
             try {
                 target_container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
             }
@@ -912,13 +908,15 @@ namespace wrench {
         // be revisited (e.g., creating a property that allows the user to pick one of several
         // strategies).
         while (!_state_of_the_system->_new_invocations.empty()) {
-            // WRENCH_INFO("Admitting an invocation...");
             auto invocation = _state_of_the_system->_new_invocations.front();
             const auto image = invocation->_registered_function->_function->getImage();
+            // WRENCH_INFO("Admitting an invocation...");
+            std::cerr << "Admitting an invocation for uimage " << image->getName() << "\n";
 
             // If the image file is already downloaded, make the invocation schedulable immediately
             if (_state_of_the_system->_head_storage_service->hasFile(image->getFile())) {
                 _state_of_the_system->_new_invocations.pop();
+                std::cerr << "IT IS SCHEDULABLE!\n";
                 _state_of_the_system->_schedulable_invocations.emplace_back(invocation); // Insert at the end
                 continue;
             }
@@ -1011,7 +1009,7 @@ namespace wrench {
     std::shared_ptr<ServerlessSchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
         auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
                                               _state_of_the_system.get());
-#if 0
+#if 1
         decisions->print();
 #endif
         return decisions;

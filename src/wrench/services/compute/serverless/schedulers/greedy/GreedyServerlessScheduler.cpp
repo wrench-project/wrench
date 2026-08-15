@@ -30,7 +30,7 @@ namespace wrench {
         auto sorted_schedulable_invocations = this->sortSchedulableInvocations(
             scheduling_state, schedulable_invocations);
 
-        // Go through the invocations and pick target hosts
+        // Go through the invocations and pick target compute node
         for (const auto& inv : sorted_schedulable_invocations) {
             // Get the image for this invocation
             auto image = inv->getRegisteredFunction()->getImage();
@@ -40,6 +40,7 @@ namespace wrench {
             if (!target_node) {
                 continue;
             }
+
 
             /** Translate the decision into actionable items **/
 
@@ -60,9 +61,9 @@ namespace wrench {
             }
             if (scheduled) continue;
 
-            // Can we start a new container to run the function because the image is in RAM?
+            // Can we start a new container to run the function because the image is in RAM
             if ((scheduling_state->cores_available.at(target_node) > 0)  and
-                (scheduling_state->images_in_ram.at(target_node).find(image) != scheduling_state->images_in_ram.at(target_node).end())) {
+                (scheduling_state->images_in_ram.at(target_node).count(image))) {
                     // Encode the decision
                     decisions->invocation_dispatches.push_back({inv, target_node, nullptr});
                     // Update the scheduling state
@@ -71,12 +72,12 @@ namespace wrench {
             }
 
             // If the image on its way to RAM, we'll schedule again later
-            if (scheduling_state->images_on_their_way_to_ram.at(target_node).find(image) != scheduling_state->images_on_their_way_to_ram.at(target_node).end()) {
+            if (scheduling_state->images_on_their_way_to_ram.at(target_node).count(image)) {
                 continue;
             }
 
             // If the image is on disk initiate an image load, that will maybe work (if we're lucky with RAM space and LRU)
-            if (scheduling_state->images_on_disk.at(target_node).find(image) != scheduling_state->images_on_disk.at(target_node).end()) {
+            if (scheduling_state->images_on_disk.at(target_node).count(image)) {
                 decisions->image_loads_to_RAM.push_back({image, target_node});
                 // Update the scheduling state
                 scheduling_state->images_on_their_way_to_ram.at(target_node).insert(image);
@@ -84,12 +85,13 @@ namespace wrench {
             }
 
             // If the image is on its way to disk, we'll schedule again later
-            if (scheduling_state->images_on_their_way_to_disk.at(target_node).find(image) != scheduling_state->images_on_their_way_to_disk.at(target_node).end()) {
+            if (scheduling_state->images_on_their_way_to_disk.at(target_node).count(image)) {
                 continue;
             }
 
             // Schedule an image copy, that will maybe work (if we're lucky with disk space and LRU)
             decisions->image_copies_to_disk.push_back({image, target_node});
+            scheduling_state->images_on_their_way_to_disk.at(target_node).insert(image);
 
         }
         return decisions;

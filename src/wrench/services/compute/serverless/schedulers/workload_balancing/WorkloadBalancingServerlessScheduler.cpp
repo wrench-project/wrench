@@ -133,24 +133,6 @@ namespace wrench {
                         scheduled++;
                         continue;
                     }
-
-                    // Then, see if we can terminate idling containers for other images to free up space
-                    std::set<std::shared_ptr<Container>> to_terminate;
-                    bool possible = node->findIdleContainersToTerminate(inv->getRegisteredFunction()->getRAMSpaceLimit(), to_terminate);
-                    if (possible) {
-                        for (const auto& victim : to_terminate) {
-                            decisions->container_terminations.push_back({victim});
-                            available_cores[node]++;
-                            available_disk[node] += victim->getRegisteredFunction()->getDiskSpaceLimit();
-                            available_ram[node] += victim->getRegisteredFunction()->getRAMSpaceLimit();
-                        }
-                        decisions->invocation_dispatches.push_back({inv, node, nullptr});
-                        available_cores[node]--;
-                        available_disk[node] -= inv->getRegisteredFunction()->getDiskSpaceLimit();
-                        available_ram[node] -= inv->getRegisteredFunction()->getRAMSpaceLimit();
-                        scheduled++;
-                        continue;
-                    }
                 }
             }
         }

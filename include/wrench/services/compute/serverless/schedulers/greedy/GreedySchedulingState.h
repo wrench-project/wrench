@@ -27,8 +27,6 @@ namespace wrench {
         std::vector<std::shared_ptr<ServerlessComputeNode>> compute_nodes;
 
         std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> cores_available;
-        // std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ram_available;
-        // std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> disk_available;
 
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> idle_containers;
 

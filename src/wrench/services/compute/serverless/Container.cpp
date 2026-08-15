@@ -58,13 +58,15 @@ namespace wrench {
 
 
     /**
-     * @brief Method to spawn a container
+     * @brief Method to spawn a container. It will try to terminate idle containers to
+     *        make the new container fit!
      */
     void Container::spawn() {
         // WRENCH_INFO("Spawning a new container for an invocation of function %s",
         //             _registered_function->getFunction()->getName().c_str());
 
         /** This method's implementation is overly paranoid exception-wise, but it's likely a good thing **/
+
 
         // Open the image disk file (do this first to pin it to RAM - would
         // be weird if, due to LRU, the container itself kicked out the image!)
@@ -96,6 +98,7 @@ namespace wrench {
             throw ExecutionException(std::make_shared<FatalFailure>("Can't open image in RAM"));
         }
 
+        std::cerr << "   NEW CONTAINER DISK SPACE?\n";
         // Reserve disk space on the compute node's storage service
         try {
             _tmp_file_location = FileLocation::LOCATION(
@@ -203,6 +206,7 @@ namespace wrench {
      * @brief Helper method to release the disk and memory resource of the container
      */
     void Container::freeDiskAndMemoryResources() {
+        std::cerr << "IN FREE DISK AND MEMORY RESOURCES\n";
         // Clearing disk space
         try {
             if (_tmp_storage_service and (_tmp_storage_service->getState() == Service::State::UP)) {
@@ -223,6 +227,7 @@ namespace wrench {
         try {
             if (_tmp_file_location) {
                 if (StorageService::hasFileAtLocation(_tmp_file_location)) {
+                    std::cerr << "REMOVING A FILE ON DISK\n";
                     StorageService::removeFileAtLocation(_tmp_file_location);
                 }
             }
@@ -242,6 +247,7 @@ namespace wrench {
         try {
             if (_tmp_ram_file_location) {
                 if (StorageService::hasFileAtLocation(_tmp_ram_file_location)) {
+                    std::cerr << "REMOVING A FILE IN RAM\n";
                     StorageService::removeFileAtLocation(_tmp_ram_file_location);
                 }
             }
