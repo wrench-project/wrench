@@ -108,7 +108,7 @@ public:
 
 class MyFunctionOutput : public wrench::FunctionOutput {
 public:
-    MyFunctionOutput(const std::string& msg) : msg_(msg) {
+    explicit MyFunctionOutput(const std::string& msg) : msg_(msg) {
     }
     std::string msg_;
 };
@@ -147,7 +147,7 @@ private:
         auto source_code = wrench::Simulation::addFile("source_code", 10 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
-        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
 
 
         auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
@@ -208,7 +208,7 @@ void ServerlessLoadBalancingSchedulerTest::do_Basic_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes,  std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,  std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(

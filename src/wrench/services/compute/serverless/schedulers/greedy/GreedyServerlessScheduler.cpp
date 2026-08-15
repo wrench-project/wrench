@@ -72,12 +72,14 @@ namespace wrench {
             }
 
             // If the image on its way to RAM, we'll schedule again later
-            if (scheduling_state->images_on_their_way_to_ram.at(target_node).count(image)) {
+            if (not scheduling_state->images_in_ram.at(target_node).count(image) and
+                scheduling_state->images_on_their_way_to_ram.at(target_node).count(image)) {
                 continue;
             }
 
             // If the image is on disk initiate an image load, that will maybe work (if we're lucky with RAM space and LRU)
-            if (scheduling_state->images_on_disk.at(target_node).count(image)) {
+            if (scheduling_state->images_on_disk.at(target_node).count(image) and
+                not scheduling_state->images_in_ram.at(target_node).count(image)) {
                 decisions->image_loads_to_RAM.push_back({image, target_node});
                 // Update the scheduling state
                 scheduling_state->images_on_their_way_to_ram.at(target_node).insert(image);
@@ -85,13 +87,16 @@ namespace wrench {
             }
 
             // If the image is on its way to disk, we'll schedule again later
-            if (scheduling_state->images_on_their_way_to_disk.at(target_node).count(image)) {
+            if (not scheduling_state->images_on_disk.at(target_node).count(image) and
+                scheduling_state->images_on_their_way_to_disk.at(target_node).count(image)) {
                 continue;
             }
 
             // Schedule an image copy, that will maybe work (if we're lucky with disk space and LRU)
-            decisions->image_copies_to_disk.push_back({image, target_node});
-            scheduling_state->images_on_their_way_to_disk.at(target_node).insert(image);
+            if (not scheduling_state->images_on_disk.at(target_node).count(image)) {
+                decisions->image_copies_to_disk.push_back({image, target_node});
+                scheduling_state->images_on_their_way_to_disk.at(target_node).insert(image);
+            }
 
         }
         return decisions;

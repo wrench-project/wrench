@@ -59,7 +59,6 @@ namespace wrench {
                     !state->isImageBeingLoadedAtNode(node, image) &&
                     !state->isImageInRAMAtNode(node, image)) {
                     decisions->image_loads_to_RAM.push_back(LoadImage{image, node});
-
                 }
             }
         }
