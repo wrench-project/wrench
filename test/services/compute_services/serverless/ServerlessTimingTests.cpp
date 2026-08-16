@@ -45,7 +45,8 @@ public:
     void do_TwoIdleContainers_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_OneIdleContainerTwoInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_TmpStorageClearing_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
-    void do_IdleContainerEviction_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_IdleContainerEviction_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler,
+        const std::string& idle_container_eviction_policy);
     void do_ImageDownloadSimulation_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
 
 protected:
@@ -1878,16 +1879,18 @@ TEST_F(ServerlessTimingTest, IdleContainerEviction) {
         // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
     };
     for (auto& scheduler : schedulers) {
-        DO_TEST_WITH_FORK_ONE_ARG(do_IdleContainerEviction_test, scheduler);
+        DO_TEST_WITH_FORK_TWO_ARGS(do_IdleContainerEviction_test, scheduler, "RAM");
+        DO_TEST_WITH_FORK_TWO_ARGS(do_IdleContainerEviction_test, scheduler, "LRU");
     }
 }
 
 void ServerlessTimingTest::do_IdleContainerEviction_test(
-    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 2;
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler,
+    const std::string& idle_container_eviction_policy) {
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -1903,8 +1906,7 @@ void ServerlessTimingTest::do_IdleContainerEviction_test(
         {
             {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},
             {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"},
-            // {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "RAM"},
-            {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "LRU"}
+            {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, idle_container_eviction_policy}
         },
         {}));
 
