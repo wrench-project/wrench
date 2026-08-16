@@ -54,6 +54,7 @@ namespace wrench {
      */
     void Container::makeBusy() {
         _state = State::BUSY;
+        _idle_date = DBL_MAX;
         _idle_sequence += 1;
     }
 
