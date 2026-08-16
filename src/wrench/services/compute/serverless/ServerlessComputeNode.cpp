@@ -14,6 +14,7 @@
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/compute/serverless/ServerlessComputeService.h>
 
 #include "wrench/exceptions/ExecutionException.h"
 #include "wrench/failure_causes/NotEnoughResources.h"
@@ -129,6 +130,11 @@ namespace wrench {
                 throw;
             } else {
                 for (auto const& victim : victims) {
+                    WRENCH_INFO("Evicting an idle container [%s, idle for %.2lf seconds, %llu bytes in RAM, %llu bytes on disk",
+                        victim->getRegisteredFunction()->getName().c_str(),
+                        S4U_Simulation::getClock() - victim->getIdleDate(),
+                        victim->getRegisteredFunction()->getRAMSpaceLimit(),
+                        victim->getRegisteredFunction()->getDiskSpaceLimit());
                     this->shutdownContainer(victim);
                 }
             }
@@ -266,34 +272,62 @@ namespace wrench {
                                                               sg_size_t needed_free_disk_space,
                                                               std::set<std::shared_ptr<Container>>& to_terminate)
     const {
+        // Compute numbers of bytes to be freed up
+        auto ram_space_to_free_up = (needed_free_ram_space <= this->getFreeRAMSpace()
+                                         ? 0
+                                         : needed_free_ram_space - this->getFreeRAMSpace());
+        auto disk_space_to_free_up = (needed_free_disk_space <= this->getFreeDiskSpace()
+                                          ? 0
+                                          : needed_free_disk_space - this->getFreeDiskSpace());
 
-        // Perhaps nothing needs to be done
-        if ((needed_free_ram_space <= this->getFreeRAMSpace()) and (needed_free_disk_space <= this->
-            getFreeDiskSpace())) {
-            to_terminate.clear();
+        // If nothing to be done, return
+        if (ram_space_to_free_up == 0 and disk_space_to_free_up == 0) {
             return true;
         }
 
-        auto ram_space_to_free_up = (needed_free_ram_space <= this->getFreeRAMSpace() ? 0 : needed_free_ram_space - this->getFreeRAMSpace());
-        auto disk_space_to_free_up = (needed_free_disk_space <= this->getFreeDiskSpace() ? 0 : needed_free_disk_space - this->getFreeDiskSpace());
+        auto policy = _serverless_compute_service->getPropertyValueAsString(
+            ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY);
+        bool success;
+        if (policy == "LRU") {
+            return this->pickVictimContainersLRU(ram_space_to_free_up, disk_space_to_free_up, to_terminate);
+        } else if (policy == "RAM") {
+            return this->pickVictimContainersRAM(ram_space_to_free_up, disk_space_to_free_up, to_terminate);
+        }
+        throw std::invalid_argument("ServerlessComputeNode::findIdleContainersToTerminate():"
+            " invalid idle container eviction policy '" + policy + "'");
+    }
 
-        // Compute a sorted list of the containers
+    /**
+     * @brief Pick victim idle containers to terminate using the RAM policy
+     * @param to_terminate The set of containers to terminate (reference, will be updated)
+     * @param ram_space_to_free_up The number of bytes to free up in RAM
+     * @param disk_space_to_free_up The number of bytes to free up in disk
+     * @return
+     */
+    bool ServerlessComputeNode::pickVictimContainersRAM(
+        sg_size_t ram_space_to_free_up,
+        sg_size_t disk_space_to_free_up,
+        std::set<std::shared_ptr<Container>>& to_terminate) const {
+        // Compute a to-sort list of the containers
         std::vector<std::shared_ptr<Container>> sorted_containers;
         sorted_containers.reserve(_idle_containers.size());
         for (auto const& container : _idle_containers) {
             sorted_containers.push_back(container);
         }
+
+        // Sort the list
         std::sort(sorted_containers.begin(), sorted_containers.end(),
-                  [ram_space_to_free_up, disk_space_to_free_up](const std::shared_ptr<Container>& a, const std::shared_ptr<Container>& b) {
-                      if (disk_space_to_free_up == 0) {
-                          return a->getRegisteredFunction()->getRAMSpaceLimit() < b->getRegisteredFunction()->getRAMSpaceLimit();
-                      }
+                  [ram_space_to_free_up](const std::shared_ptr<Container>& a,
+                                                                const std::shared_ptr<Container>& b) {
+                      // If RAM doesn't matter, sort based on disk
                       if (ram_space_to_free_up == 0) {
-                          return a->getRegisteredFunction()->getDiskSpaceLimit() < b->getRegisteredFunction()->getDiskSpaceLimit();
+                          return a->getRegisteredFunction()->getDiskSpaceLimit() <
+                              b->getRegisteredFunction()->getDiskSpaceLimit();
                       }
-                      // Use the sum as a (crappy?) heuristic
-                      return a->getRegisteredFunction()->getDiskSpaceLimit() + a->getRegisteredFunction()->getRAMSpaceLimit() <
-                             b->getRegisteredFunction()->getDiskSpaceLimit() + b->getRegisteredFunction()->getRAMSpaceLimit();
+
+                      // Otherwise sort based on RAM (which should be the limiting factor)
+                      return a->getRegisteredFunction()->getRAMSpaceLimit() <
+                          b->getRegisteredFunction()->getRAMSpaceLimit();
                   });
 
         // TODO: Use dynamic programming to return some optimal set? (smallest cardinal, and smallest sum, NP-hard, but likely only weakly,
@@ -324,5 +358,48 @@ namespace wrench {
             }
         }
         return true;
+    }
+
+    /**
+    * @brief Pick victim idle containers to terminate using the LRU policy
+    * @param ram_space_to_free_up The number of bytes to free up in RAM
+    * @param disk_space_to_free_up The number of bytes to free up in disk
+    * @param to_terminate The set of containers to terminate (reference, will be updated)
+    * @return
+    */
+    bool ServerlessComputeNode::pickVictimContainersLRU(
+        sg_size_t ram_space_to_free_up,
+        sg_size_t disk_space_to_free_up,
+        std::set<std::shared_ptr<Container>>& to_terminate) const {
+        // Compute a to-sort list of the containers
+        std::vector<std::shared_ptr<Container>> sorted_containers;
+        sorted_containers.reserve(_idle_containers.size());
+        for (auto const& container : _idle_containers) {
+            sorted_containers.push_back(container);
+        }
+
+        // Sort the list
+        std::sort(sorted_containers.begin(), sorted_containers.end(),
+                  [](
+                  const std::shared_ptr<Container>& a, const std::shared_ptr<Container>& b) {
+                      double a_time_since_idle = S4U_Simulation::getClock() - a->getIdleDate();
+                      double b_time_since_idle = S4U_Simulation::getClock() - b->getIdleDate();
+                      return a_time_since_idle > b_time_since_idle;
+                  });
+
+        // Go through the list
+        sg_size_t ram_space_freed_up = 0;
+        sg_size_t disk_space_freed_up = 0;
+        for (auto const& container : sorted_containers) {
+            to_terminate.insert(container);
+            ram_space_freed_up += container->getRegisteredFunction()->getRAMSpaceLimit();
+            disk_space_freed_up += container->getRegisteredFunction()->getDiskSpaceLimit();
+            if ((ram_space_freed_up >= ram_space_to_free_up) and (disk_space_freed_up >= disk_space_to_free_up)) {
+                return true;
+            }
+        }
+        to_terminate.clear();
+        return false;
+
     }
 } // namespace wrench

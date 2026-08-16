@@ -31,6 +31,7 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0"},
+            {ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "LRU"},
             {ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "0"},
             {ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "true"}
         };

@@ -39,6 +39,7 @@ namespace wrench {
         [[nodiscard]] bool isBusy() const { return _state == State::BUSY; }
         // [[nodiscard]] double getIdleTime() const;
         [[nodiscard]] unsigned long getIdleSequence() const {return _idle_sequence; }
+        [[nodiscard]] double getIdleDate() const {return _idle_date; }
         [[nodiscard]] const RegisteredFunction *getRegisteredFunction() const { return _registered_function; }
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const { return _tmp_storage_service; }
         [[nodiscard]] ServerlessComputeNode* getComputeNode() const {return const_cast<ServerlessComputeNode*>(_compute_node); }
@@ -76,6 +77,7 @@ namespace wrench {
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
 
         unsigned long _idle_sequence = 0;
+        double _idle_date = DBL_MAX;
 
         /***********************/
         /** \endcond          **/

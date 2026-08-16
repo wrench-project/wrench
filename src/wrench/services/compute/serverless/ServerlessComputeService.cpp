@@ -110,7 +110,7 @@ namespace wrench {
             try {
                 disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
             }
-            catch (std::invalid_argument& e) {
+            catch (std::invalid_argument&) {
                 throw std::invalid_argument(
                     "Compute nodes for a serverless compute service must have a '/' mountpoint");
             }

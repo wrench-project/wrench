@@ -1813,6 +1813,7 @@ private:
         wrench::Simulation::sleep(0.1);
         auto inv2_1 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
         function_manager->wait_all({inv1_1, inv1_2, inv1_3, inv2_1});
+        wrench::Simulation::sleep(100);
 
         // Now, both images are in RAM, and we have 3 idle containers for function_1 and 1 idle container for function_2: RAM is full
 
@@ -1827,6 +1828,7 @@ private:
         auto inv2_4 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
 
         function_manager->wait_all({inv1_4, inv2_2, inv2_3, inv2_4});
+        wrench::Simulation::sleep(100);
 
         // For good measure, re-submit two invocations to function_1, and one of them should pay the startup_overhead
         auto inv1_5 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
@@ -1938,7 +1940,9 @@ void ServerlessTimingTest::do_IdleContainerEviction_test(
         "ServerlessHeadNode", "/", compute_nodes, scheduler,
         {
             {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},
-            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"}
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"},
+            {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "RAM"}
+            // {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "LRU"}
         },
         {}));
 

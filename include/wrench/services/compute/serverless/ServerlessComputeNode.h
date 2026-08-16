@@ -73,8 +73,8 @@ namespace wrench {
         const std::string hostname;
 
         bool findIdleContainersToTerminate(sg_size_t needed_free_ram_space,
-                                         sg_size_t needed_free_disk_space,
-                                         std::set<std::shared_ptr<Container>>& to_terminate) const;
+                                           sg_size_t needed_free_disk_space,
+                                           std::set<std::shared_ptr<Container>>& to_terminate) const;
 
     private:
         ServerlessComputeService* _serverless_compute_service;
@@ -92,7 +92,12 @@ namespace wrench {
         std::set<std::shared_ptr<Container>> _busy_containers;
         std::set<std::shared_ptr<Container>> _idle_containers;
 
-
+        bool pickVictimContainersRAM(sg_size_t ram_space_to_free_up,
+                                     sg_size_t disk_space_to_free_up,
+                                     std::set<std::shared_ptr<Container>>& to_terminate) const;
+        bool pickVictimContainersLRU(sg_size_t ram_space_to_free_up,
+                                     sg_size_t disk_space_to_free_up,
+                                     std::set<std::shared_ptr<Container>>& to_terminate) const;
     };
 
     /***********************/

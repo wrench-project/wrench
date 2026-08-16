@@ -46,6 +46,7 @@ namespace wrench {
      */
     void Container::makeIdle() {
         _state = State::IDLE;
+        _idle_date = S4U_Simulation::getClock();
     }
 
     /**
@@ -188,6 +189,7 @@ namespace wrench {
      */
     void Container::shutdown() {
         _idle_sequence += 1; // to invalidate any future timeouts
+        _idle_date = DBL_MAX;
         this->freeDiskAndMemoryResources();
     }
 
