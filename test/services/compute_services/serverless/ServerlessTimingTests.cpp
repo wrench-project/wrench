@@ -1121,19 +1121,27 @@ private:
         double expected_inv4_elapsed = (50.0 * GB) / (100.0 * MB) + (50.0 * GB) / (100.0 * MB) + 10;
 
         if (std::abs(inv1_elapsed - expected_inv1_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected inv1 elapsed: " + std::to_string(inv1_elapsed) + " as opposed to " + std::to_string(expected_inv1_elapsed));
+            throw std::runtime_error(
+                "Unexpected inv1 elapsed: " + std::to_string(inv1_elapsed) + " as opposed to " + std::to_string(
+                    expected_inv1_elapsed));
         }
         if (std::abs(inv2_elapsed - expected_inv2_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected inv2 elapsed: " + std::to_string(inv2_elapsed) + " as opposed to " + std::to_string(expected_inv2_elapsed));
+            throw std::runtime_error(
+                "Unexpected inv2 elapsed: " + std::to_string(inv2_elapsed) + " as opposed to " + std::to_string(
+                    expected_inv2_elapsed));
         }
         if (std::abs(inv3_elapsed - expected_inv3_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected inv3 elapsed: " + std::to_string(inv3_elapsed) + " as opposed to " + std::to_string(expected_inv3_elapsed));
+            throw std::runtime_error(
+                "Unexpected inv3 elapsed: " + std::to_string(inv3_elapsed) + " as opposed to " + std::to_string(
+                    expected_inv3_elapsed));
         }
         if (std::abs(inv4_elapsed - expected_inv4_elapsed) > EPSILON) {
-            throw std::runtime_error("Unexpected inv4 elapsed: " + std::to_string(inv4_elapsed) + " as opposed to " + std::to_string(expected_inv4_elapsed));
+            throw std::runtime_error(
+                "Unexpected inv4 elapsed: " + std::to_string(inv4_elapsed) + " as opposed to " + std::to_string(
+                    expected_inv4_elapsed));
         }
 
-            return 0;
+        return 0;
     }
 };
 
@@ -1769,141 +1777,92 @@ private:
     int main() override {
         auto function_manager = this->createFunctionManager();
 
-
-        // Create a function
-        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
-                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+        // Create a function lambda that sleeps 100 seconds
+        double sleep_time = 100.0;
+        std::function lambda = [sleep_time](const std::shared_ptr<wrench::FunctionInput>& input,
+                                            const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
             wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            wrench::Simulation::sleep(10);
+            wrench::Simulation::sleep(sleep_time);
             return std::make_shared<MyFunctionOutput>("output");
         };
 
-        // Compute node has 64GB of RAM
+        // Compute node has 64GB of RAM, create a 33GB image
+        auto image_file = wrench::Simulation::addFile("image_file", 33 * GB);
+        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        wrench::StorageService::createFileAtLocation(image_location);
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
 
-        // Register a function_1 with a 30GB image file, and a 1GB container RAM space
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 30 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
-
-        auto function_1 = wrench::FunctionManager::createFunction("Function_1", lambda, image_1);
-        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        // 1 GB Container RAM SPACE
-        auto registered_function_1 = function_manager->registerFunction(function_1, this->compute_service, 100,
-                                                                        1 * GB, 1 * GB, 10 * MB, 1 * MB);
-
-        // Register a function_2 with a 30GB image file, and a 1GB container RAM space
-        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 30 * GB);
-        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
-        wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
-
-        auto function_2 = wrench::FunctionManager::createFunction("Function_2", lambda, image_2);
-        auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
-        // 1 GB Container RAM SPACE
-        auto registered_function_2 = function_manager->registerFunction(function_2, this->compute_service, 100,
-                                                                        1 * GB, 1 * GB, 10 * MB, 1 * MB);
-
-
-        // Place three invocations to function_1 and one invocation to function_2
-        auto inv1_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
-        auto inv1_2 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
-        auto inv1_3 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
-        wrench::Simulation::sleep(0.1);
-        auto inv2_1 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
-        function_manager->wait_all({inv1_1, inv1_2, inv1_3, inv2_1});
-        wrench::Simulation::sleep(100);
-
-        // Now, both images are in RAM, and we have 3 idle containers for function_1 and 1 idle container for function_2: RAM is full
-
-        // Place one invocation to function_1 to re-use one of the idle containers for function_1
-        auto inv1_4 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
-        // Place three invocations to function_2, which should:
-        //   1) reuse one idle container;
-        //   2) kick out 2 idle containers (for function_1);
-        //   3) start two new containers (for function_2)
-        auto inv2_2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
-        auto inv2_3 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
-        auto inv2_4 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
-
-        function_manager->wait_all({inv1_4, inv2_2, inv2_3, inv2_4});
-        wrench::Simulation::sleep(100);
-
-        // For good measure, re-submit two invocations to function_1, and one of them should pay the startup_overhead
-        auto inv1_5 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
-        auto inv1_6 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
-        function_manager->wait_all({inv1_5, inv1_6});
-
-
-        auto inv1_1_elapsed = inv1_1->getFunctionEndDate() - inv1_1->getSubmitDate();
-        auto inv1_2_elapsed = inv1_2->getFunctionEndDate() - inv1_2->getSubmitDate();
-        auto inv1_3_elapsed = inv1_3->getFunctionEndDate() - inv1_3->getSubmitDate();
-        auto inv1_4_elapsed = inv1_4->getFunctionEndDate() - inv1_4->getSubmitDate();
-        auto inv1_5_elapsed = inv1_5->getFunctionEndDate() - inv1_5->getSubmitDate();
-        auto inv1_6_elapsed = inv1_6->getFunctionEndDate() - inv1_6->getSubmitDate();
-        auto inv2_1_elapsed = inv2_1->getFunctionEndDate() - inv2_1->getSubmitDate();
-        auto inv2_2_elapsed = inv2_2->getFunctionEndDate() - inv2_2->getSubmitDate();
-        auto inv2_3_elapsed = inv2_3->getFunctionEndDate() - inv2_3->getSubmitDate();
-        auto inv2_4_elapsed = inv2_4->getFunctionEndDate() - inv2_4->getSubmitDate();
-
-        // std::cerr << "INV1_1: " << inv1_1_elapsed << std::endl;
-        // std::cerr << "INV1_2: " << inv1_2_elapsed << std::endl;
-        // std::cerr << "INV1_3: " << inv1_3_elapsed << std::endl;
-        // std::cerr << "INV1_4: " << inv1_4_elapsed << std::endl;
-        // std::cerr << "INV1_5: " << inv1_5_elapsed << std::endl;
-        // std::cerr << "INV1_6: " << inv1_6_elapsed << std::endl;
-        // std::cerr << "INV2_1: " << inv2_1_elapsed << std::endl;
-        // std::cerr << "INV2_2: " << inv2_2_elapsed << std::endl;
-        // std::cerr << "INV2_3: " << inv2_3_elapsed << std::endl;
-        // std::cerr << "INV2_4: " << inv2_4_elapsed << std::endl;
-
-        double inv1_4_elapsed_expected = 10.0;
-        double inv1_5_elapsed_expected = 10.0;
-        double inv1_6_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(
-            wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
-        double inv2_2_elapsed_expected = 10.0;
-        double inv2_3_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(
-            wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
-        double inv2_4_elapsed_expected = 10.0 + this->compute_service->getPropertyValueAsDouble(
-            wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD);
-
-        if (std::abs(inv1_4_elapsed - inv1_4_elapsed_expected) > EPSILON) {
-            throw std::runtime_error(
-                "Unexpected elapsed time inv1_4: " + std::to_string(inv1_4_elapsed) + " instead of " + std::to_string(
-                    inv1_4_elapsed_expected));
+        // Create 10 functions with these RAM sizes, which will fill up the remaining 31GB of RAM
+        auto function = wrench::FunctionManager::createFunction("function_code", lambda, image);
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+        std::vector<sg_size_t> function_RAM_sizes = {1, 1, 1, 1, 2, 3, 4, 5, 6, 7};
+        std::vector<std::shared_ptr<wrench::RegisteredFunction>> registered_functions;
+        registered_functions.reserve(function_RAM_sizes.size());
+        for (auto ram_size : function_RAM_sizes) {
+            registered_functions.push_back(function_manager->registerFunction(
+                function, this->compute_service, 100,
+                1 * GB, ram_size * GB, 10 * MB, 1 * MB));
         }
 
-        if (std::abs(inv1_5_elapsed - inv1_5_elapsed_expected) > EPSILON) {
-            throw std::runtime_error(
-                "Unexpected elapsed time inv1_5: " + std::to_string(inv1_5_elapsed) + " instead of " + std::to_string(
-                    inv1_5_elapsed_expected));
+        // Fill up memory by invoking these 10 functions, each once
+        std::vector<std::shared_ptr<wrench::Invocation>> invocations;
+        for (auto const& rf : registered_functions) {
+            invocations.push_back(function_manager->invokeFunction(rf, this->compute_service, input));
+            wrench::Simulation::sleep(1);
+        }
+        function_manager->wait_all(invocations);
+
+        std::cerr << "\n\n** AT THIS POINT MEMORY SHOULD BE FULL, AND WE PLACE ONE MORE INVOCATIONS **\n\n";
+
+        // At this point, place one invocation for yet another function that needs 11 GB of RAM
+        {
+            auto rf = function_manager->registerFunction(
+                function, this->compute_service, 100,
+                1 * GB, 11 * GB, 10 * MB, 1 * MB);
+            auto inv = function_manager->invokeFunction(rf, this->compute_service, input);
+            function_manager->wait_one(inv);
         }
 
-        if (std::abs(inv1_6_elapsed - inv1_6_elapsed_expected) > EPSILON) {
-            throw std::runtime_error(
-                "Unexpected elapsed time inv1_6: " + std::to_string(inv1_6_elapsed) + " instead of " + std::to_string(
-                    inv1_6_elapsed_expected));
+        std::cerr << "\n\n** THAT ONE INVOCATION WAS PLACED **\n\n";
+
+
+        // At this point, depending on the idle container eviction policy, different containers should have been evicted,
+        std::set<int> indices_of_functions_that_should_have_been_evicted;
+        if (this->compute_service->getPropertyValueAsString(
+            wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY) == "RAM") {
+            indices_of_functions_that_should_have_been_evicted = {6, 9};
+        } else if (this->compute_service->getPropertyValueAsString(
+            wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY) == "LRU") {
+            indices_of_functions_that_should_have_been_evicted = {0, 1, 2, 3, 4, 5, 6};
         }
 
-        if (std::abs(inv2_2_elapsed - inv2_2_elapsed_expected) > EPSILON) {
-            throw std::runtime_error(
-                "Unexpected elapsed time inv2_2: " + std::to_string(inv2_2_elapsed) + " instead of " + std::to_string(
-                    inv2_2_elapsed_expected));
+        // Double-check that containers that should not have been evicted haven't
+        for (auto idx : indices_of_functions_that_should_have_been_evicted) {
+            auto inv = function_manager->invokeFunction(registered_functions.at(idx), this->compute_service, input);
+            function_manager->wait_one(inv);
+            auto elapsed = inv->getFunctionEndDate() - inv->getDispatchDate();
+            if (std::abs(elapsed - sleep_time) > EPSILON) {
+                throw std::runtime_error(
+                    "Container for registered function index " + std::to_string(idx) + " should not have been evicted");
+            }
         }
 
-        if (std::abs(inv2_3_elapsed - inv2_3_elapsed_expected) > EPSILON) {
-            throw std::runtime_error(
-                "Unexpected elapsed time inv2_3: " + std::to_string(inv2_3_elapsed) + " instead of " + std::to_string(
-                    inv2_3_elapsed_expected));
+        // Double-check that other containers HAVE been evicted
+        for (int idx = 0; idx < 10; idx++) {
+            if (indices_of_functions_that_should_have_been_evicted.count(idx) > 0) {
+                continue;
+            }
+            auto inv = function_manager->invokeFunction(registered_functions.at(idx), this->compute_service, input);
+            function_manager->wait_one(inv);
+            auto elapsed = inv->getFunctionEndDate() - inv->getDispatchDate();
+            if (std::abs(
+                elapsed - (sleep_time + this->compute_service->getPropertyValueAsDouble(
+                    wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD))) > EPSILON) {
+                throw std::runtime_error(
+                    "Container for registered function index " + std::to_string(idx) + " should have been evicted");
+            }
         }
-
-        if (std::abs(inv2_4_elapsed - inv2_4_elapsed_expected) > EPSILON) {
-            throw std::runtime_error(
-                "Unexpected elapsed time inv2_4: " + std::to_string(inv2_4_elapsed) + " instead of " + std::to_string(
-                    inv2_4_elapsed_expected));
-        }
-
 
         return 0;
     }
@@ -1922,10 +1881,10 @@ TEST_F(ServerlessTimingTest, IdleContainerEviction) {
 
 void ServerlessTimingTest::do_IdleContainerEviction_test(
     const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
-    int argc = 1;
+    int argc = 2;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    // argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
