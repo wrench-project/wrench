@@ -332,28 +332,36 @@ namespace wrench {
 
         // TODO: Use dynamic programming to return some optimal set? (smallest cardinal, and smallest sum, NP-hard, but likely only weakly,
         // TODO: but not easy due to the two dimensions...Like some knapscak) - LIKELY OVERKILL
-        sg_size_t ram_space_freed_up = 0;
-        sg_size_t disk_space_freed_up = 0;
+        // sg_size_t ram_space_freed_up = 0;
+        // sg_size_t disk_space_freed_up = 0;
+        std::cerr << "LOOPING TO FIND VICTIMS IN THE RAM POLICY\n";
         while (true) {
+            std::cerr << "IN LOOP: TO FREE UP " << ram_space_to_free_up << "\n";
             if (sorted_containers.empty()) {
                 to_terminate.clear();
                 return false;
             }
             // Find the smallest container that gets us there, and if none, pick the largest container
-            auto victim = sorted_containers.end();
+            std::cerr << "Find the smallest container that gets us there, and if none, pick the largest container\n";
+            auto victim = sorted_containers.end()-1;
             for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
+                std::cerr << "  LOOKING AT A CONTAINER WITH RAM " << (*it)->getRegisteredFunction()->getRAMSpaceLimit() << " (TO FREE UP: " << ram_space_to_free_up << ")\n";
                 if ((*it)->getRegisteredFunction()->getRAMSpaceLimit() >= ram_space_to_free_up and
                     (*it)->getRegisteredFunction()->getDiskSpaceLimit() >= disk_space_to_free_up) {
                     victim = it;
                     break;
                 }
             }
+            std::cerr << "  CONTAINER FOUND: " << (*victim)->getRegisteredFunction()->getRAMSpaceLimit() << "\n";
+
             to_terminate.insert(*victim);
-            ram_space_freed_up += (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
-            disk_space_freed_up += (*victim)->getRegisteredFunction()->getDiskSpaceLimit();
+            auto victim_ram_space = (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
+            auto victim_disk_space = (*victim)->getRegisteredFunction()->getDiskSpaceLimit();
+            ram_space_to_free_up = (victim_ram_space > ram_space_to_free_up ? 0 : ram_space_to_free_up - victim_ram_space);
+            disk_space_to_free_up = (victim_disk_space > disk_space_to_free_up ? 0 : disk_space_to_free_up - victim_disk_space);
             sorted_containers.erase(victim);
 
-            if ((ram_space_freed_up >= ram_space_to_free_up) and (disk_space_freed_up >= disk_space_to_free_up)) {
+            if ((ram_space_to_free_up == 0) and (disk_space_to_free_up == 0)) {
                 break;
             }
         }

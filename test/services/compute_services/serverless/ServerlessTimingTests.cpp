@@ -1802,7 +1802,7 @@ private:
         for (auto ram_size : function_RAM_sizes) {
             registered_functions.push_back(function_manager->registerFunction(
                 function, this->compute_service, 100,
-                1 * GB, ram_size * GB, 10 * MB, 1 * MB));
+                1 * MB, ram_size * GB, 10 * MB, 1 * MB));
         }
 
         // Fill up memory by invoking these 10 functions, each once
@@ -1813,18 +1813,16 @@ private:
         }
         function_manager->wait_all(invocations);
 
-        std::cerr << "\n\n** AT THIS POINT MEMORY SHOULD BE FULL, AND WE PLACE ONE MORE INVOCATIONS **\n\n";
+        // std::cerr << "\n\n** AT THIS POINT MEMORY SHOULD BE FULL, AND WE PLACE ONE MORE INVOCATIONS **\n\n";
 
         // At this point, place one invocation for yet another function that needs 11 GB of RAM
         {
             auto rf = function_manager->registerFunction(
                 function, this->compute_service, 100,
-                1 * GB, 11 * GB, 10 * MB, 1 * MB);
+                1 * MB, 11 * GB, 10 * MB, 1 * MB);
             auto inv = function_manager->invokeFunction(rf, this->compute_service, input);
             function_manager->wait_one(inv);
         }
-
-        std::cerr << "\n\n** THAT ONE INVOCATION WAS PLACED **\n\n";
 
 
         // At this point, depending on the idle container eviction policy, different containers should have been evicted,
@@ -1838,7 +1836,11 @@ private:
         }
 
         // Double-check that containers that should not have been evicted haven't
-        for (auto idx : indices_of_functions_that_should_have_been_evicted) {
+        // std::cerr << " ** CHECKING NON-EVICTED CONTAINERS\n";
+        for (int idx = 0; idx < 10; idx++) {
+            if (indices_of_functions_that_should_have_been_evicted.count(idx) > 0) {
+                continue;
+            }
             auto inv = function_manager->invokeFunction(registered_functions.at(idx), this->compute_service, input);
             function_manager->wait_one(inv);
             auto elapsed = inv->getFunctionEndDate() - inv->getDispatchDate();
@@ -1847,12 +1849,13 @@ private:
                     "Container for registered function index " + std::to_string(idx) + " should not have been evicted");
             }
         }
-
         // Double-check that other containers HAVE been evicted
+        // std::cerr << " ** CHECKING EVICTED CONTAINERS\n";
         for (int idx = 0; idx < 10; idx++) {
-            if (indices_of_functions_that_should_have_been_evicted.count(idx) > 0) {
+            if (indices_of_functions_that_should_have_been_evicted.count(idx) == 0) {
                 continue;
             }
+
             auto inv = function_manager->invokeFunction(registered_functions.at(idx), this->compute_service, input);
             function_manager->wait_one(inv);
             auto elapsed = inv->getFunctionEndDate() - inv->getDispatchDate();
@@ -1900,8 +1903,8 @@ void ServerlessTimingTest::do_IdleContainerEviction_test(
         {
             {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},
             {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"},
-            {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "RAM"}
-            // {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "LRU"}
+            // {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "RAM"},
+            {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "LRU"}
         },
         {}));
 
