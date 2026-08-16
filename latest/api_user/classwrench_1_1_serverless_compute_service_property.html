@@ -105,6 +105,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServicePropertyE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessComputeServiceProperty</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty30IDLE_CONTAINER_EVICTION_POLICYE"><code class="docutils literal notranslate"><span class="pre">IDLE_CONTAINER_EVICTION_POLICY</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty31SIMULATE_REMOTE_IMAGE_DOWNLOADSE"><code class="docutils literal notranslate"><span class="pre">SIMULATE_REMOTE_IMAGE_DOWNLOADS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE"><code class="docutils literal notranslate"><span class="pre">STORAGE_SERVICES_BUFFER_SIZE</span></code></a></li>
 </ul>
@@ -217,6 +218,17 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"></span><span id="wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a37d489688aadebff1b97c5ac819f584a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></span></span><br /></dt>
 <dd><p>The overhead to start a container after the image has been loaded into RAM (default value: “0”, default unit: seconds): Examples: “5”, “5s”, “5000ms”, etc. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty30IDLE_CONTAINER_EVICTION_POLICYE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty30IDLE_CONTAINER_EVICTION_POLICYE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty30IDLE_CONTAINER_EVICTION_POLICYE"></span><span id="wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a634e3907d3af0dbb796c3e01bcb4dc0b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IDLE_CONTAINER_EVICTION_POLICY</span></span></span><br /></dt>
+<dd><p>The policy used to evict idle containers if space is needed at a compute node. Possible values: </p>
+<p><ul class="simple">
+<li><p>LRU: evict containers that have been idle the longest (default)</p></li>
+<li><p>RAM: evict as few containers as possible, prioritizing ones with the smallest RAM footprints </p></li>
+</ul>
+</p>
 </dd></dl>
 
 <dl class="cpp var">
