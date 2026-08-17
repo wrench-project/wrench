@@ -135,10 +135,12 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Invocation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench10InvocationE"><code class="docutils literal notranslate"><span class="pre">wrench::Invocation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation14getComputeNodeEv"><code class="docutils literal notranslate"><span class="pre">getComputeNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation15getDispatchDateEv"><code class="docutils literal notranslate"><span class="pre">getDispatchDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation15getFailureCauseEv"><code class="docutils literal notranslate"><span class="pre">getFailureCause()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation18getFunctionEndDateEv"><code class="docutils literal notranslate"><span class="pre">getFunctionEndDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation20getFunctionStartDateEv"><code class="docutils literal notranslate"><span class="pre">getFunctionStartDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation5getIdEv"><code class="docutils literal notranslate"><span class="pre">getId()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation9getOutputEv"><code class="docutils literal notranslate"><span class="pre">getOutput()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation21getRegisteredFunctionEv"><code class="docutils literal notranslate"><span class="pre">getRegisteredFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation13getSubmitDateEv"><code class="docutils literal notranslate"><span class="pre">getSubmitDate()</span></code></a></li>
@@ -283,6 +285,17 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation14getComputeNodeEv">
+<span id="_CPPv3NK6wrench10Invocation14getComputeNodeEv"></span><span id="_CPPv2NK6wrench10Invocation14getComputeNodeEv"></span><span id="wrench::Invocation::getComputeNodeC"></span><span class="target" id="classwrench_1_1_invocation_1aff4e3115bb37099992a405cf0dc7b4a7"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getComputeNode</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10Invocation14getComputeNodeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the hostname of the compute node on which the invocation was executed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a hostname (or “n/a” if not available) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation15getDispatchDateEv">
 <span id="_CPPv3NK6wrench10Invocation15getDispatchDateEv"></span><span id="_CPPv2NK6wrench10Invocation15getDispatchDateEv"></span><span id="wrench::Invocation::getDispatchDateC"></span><span class="target" id="classwrench_1_1_invocation_1a620ba7c7adebe332ed1da76cdf6b737e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDispatchDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10Invocation15getDispatchDateEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Get the invocation’s dispatch date. </p>
@@ -322,6 +335,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A simulated date (or -1.0 if not started) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation5getIdEv">
+<span id="_CPPv3NK6wrench10Invocation5getIdEv"></span><span id="_CPPv2NK6wrench10Invocation5getIdEv"></span><span id="wrench::Invocation::getIdC"></span><span class="target" id="classwrench_1_1_invocation_1ab9fd774d163de2035771f9e75a87a4d2"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getId</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10Invocation5getIdEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the invocations (unique) Id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a numerical Id </p>
 </dd>
 </dl>
 </dd></dl>

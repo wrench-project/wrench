@@ -310,6 +310,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty30IDLE_CONTAINER_EVICTION_POLICYE"><code class="docutils literal notranslate"><span class="pre">IDLE_CONTAINER_EVICTION_POLICY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">INVOCATION_PROCESSING_OVERHEAD</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty31SIMULATE_REMOTE_IMAGE_DOWNLOADSE"><code class="docutils literal notranslate"><span class="pre">SIMULATE_REMOTE_IMAGE_DOWNLOADS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE"><code class="docutils literal notranslate"><span class="pre">STORAGE_SERVICES_BUFFER_SIZE</span></code></a></li>
 </ul>
@@ -489,9 +490,15 @@
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"></span><span id="wrench::ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a367772508821a4a1bc1f1539a773c37b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INVOCATION_PROCESSING_OVERHEAD</span></span></span><br /></dt>
+<dd><p>The overhead for the compute service to process an incoming request (default value: “0”, default unit: seconds): Examples: “5”, “5s”, “5000ms”, etc. </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty31SIMULATE_REMOTE_IMAGE_DOWNLOADSE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty31SIMULATE_REMOTE_IMAGE_DOWNLOADSE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty31SIMULATE_REMOTE_IMAGE_DOWNLOADSE"></span><span id="wrench::ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1ac64d9ed1d8dfd0b586830b33320e719d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SIMULATE_REMOTE_IMAGE_DOWNLOADS</span></span></span><br /></dt>
-<dd><p>Whether the download of remote images should be simulated or not (if not, then zero time is assumed) </p>
+<dd><p>Whether the download of remote images should be simulated or not (if not, then zero time is assumed). Setting this to false can create strange re-ordering of initial requests at time zero (because so much happens exactly at time zero), which likely doesn’t matter a lot, but be warned. It’s likely better to simulate remote image downloads and just make the remove bandwidth very high when wanted to essentially ignore remote downloads. </p>
 </dd></dl>
 
 <dl class="cpp var">
