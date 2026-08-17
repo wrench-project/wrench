@@ -209,8 +209,6 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager.html">wrench::FunctionManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_completed_message.html">wrench::FunctionManagerFunctionCompletedMessage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_failed_message.html">wrench::FunctionManagerFunctionFailedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_answer_message.html">wrench::FunctionManagerFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_request_message.html">wrench::FunctionManagerFunctionInvocationRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_message.html">wrench::FunctionManagerMessage</a></li>
@@ -296,9 +294,15 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode21ServerlessComputeNodeENSt6stringEjP24ServerlessComputeService"><code class="docutils literal notranslate"><span class="pre">ServerlessComputeNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode17findIdleContainerEPK18RegisteredFunctionRKNSt3setINSt10shared_ptrI9ContainerEEEE"><code class="docutils literal notranslate"><span class="pre">findIdleContainer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode29findIdleContainersToTerminateE9sg_size_t9sg_size_tRNSt3setINSt10shared_ptrI9ContainerEEEE"><code class="docutils literal notranslate"><span class="pre">findIdleContainersToTerminate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode14getDiskStorageEv"><code class="docutils literal notranslate"><span class="pre">getDiskStorage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode16getFreeDiskSpaceEv"><code class="docutils literal notranslate"><span class="pre">getFreeDiskSpace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode15getFreeRAMSpaceEv"><code class="docutils literal notranslate"><span class="pre">getFreeRAMSpace()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode17getIdleContainersEv"><code class="docutils literal notranslate"><span class="pre">getIdleContainers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingCopiedEv"><code class="docutils literal notranslate"><span class="pre">getImagesBeingCopied()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode20getImagesBeingLoadedEv"><code class="docutils literal notranslate"><span class="pre">getImagesBeingLoaded()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode16getMemoryStorageEv"><code class="docutils literal notranslate"><span class="pre">getMemoryStorage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode11getNumCoresEv"><code class="docutils literal notranslate"><span class="pre">getNumCores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode15getNumIdleCoresEv"><code class="docutils literal notranslate"><span class="pre">getNumIdleCores()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingCopiedERKNSt10shared_ptrI5ImageEE"><code class="docutils literal notranslate"><span class="pre">isImageBeingCopied()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageBeingLoadedERKNSt10shared_ptrI5ImageEE"><code class="docutils literal notranslate"><span class="pre">isImageBeingLoaded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode12isImageInRAMERKNSt10shared_ptrI5ImageEE"><code class="docutils literal notranslate"><span class="pre">isImageInRAM()</span></code></a></li>
@@ -308,6 +312,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode17makeContainerIdleERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">makeContainerIdle()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode17shutdownContainerERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">shutdownContainer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode14spawnContainerEPK18RegisteredFunction"><code class="docutils literal notranslate"><span class="pre">spawnContainer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode8hostnameE"><code class="docutils literal notranslate"><span class="pre">hostname</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -526,6 +531,39 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode14getDiskStorageEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode14getDiskStorageEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode14getDiskStorageEv"></span><span id="wrench::ServerlessComputeNode::getDiskStorageC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a49ae48a8d57e7f77dcdf82c8cbc64646"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_simple_storage_service.html#_CPPv4N6wrench20SimpleStorageServiceE" title="wrench::SimpleStorageService"><span class="n"><span class="pre">SimpleStorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDiskStorage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode14getDiskStorageEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the compute node’s disk storage. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A storage service </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode16getFreeDiskSpaceEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode16getFreeDiskSpaceEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode16getFreeDiskSpaceEv"></span><span id="wrench::ServerlessComputeNode::getFreeDiskSpaceC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1ae1f14b9dd77590b1b83b09b333c6cda7"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFreeDiskSpace</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode16getFreeDiskSpaceEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the compute node’s free disk space. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of bytes </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode15getFreeRAMSpaceEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode15getFreeRAMSpaceEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode15getFreeRAMSpaceEv"></span><span id="wrench::ServerlessComputeNode::getFreeRAMSpaceC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1adfadc697fc3f64e2fb3a1f4d4fbf42ce"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFreeRAMSpace</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode15getFreeRAMSpaceEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the compute node’s free RAM space. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of bytes </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode17getIdleContainersEv">
 <span id="_CPPv3NK6wrench21ServerlessComputeNode17getIdleContainersEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode17getIdleContainersEv"></span><span id="wrench::ServerlessComputeNode::getIdleContainersC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a0e241483dd4d976b8cda017647041a61"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_container.html#_CPPv4N6wrench9ContainerE" title="wrench::Container"><span class="n"><span class="pre">Container</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getIdleContainers</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode17getIdleContainersEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Retrieve the set of idle container. </p>
@@ -554,6 +592,39 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A set of images </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode16getMemoryStorageEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode16getMemoryStorageEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode16getMemoryStorageEv"></span><span id="wrench::ServerlessComputeNode::getMemoryStorageC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a8a10aa706011121c4a4e2e5f81e10acf"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_simple_storage_service.html#_CPPv4N6wrench20SimpleStorageServiceE" title="wrench::SimpleStorageService"><span class="n"><span class="pre">SimpleStorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMemoryStorage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode16getMemoryStorageEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the compute node’s RAM storage. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A storage service </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode11getNumCoresEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode11getNumCoresEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode11getNumCoresEv"></span><span id="wrench::ServerlessComputeNode::getNumCoresC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1aec5d00e4e3c69a915fa74061ce3555c7"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumCores</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode11getNumCoresEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the compute node’s number of cores. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of cores </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode15getNumIdleCoresEv">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode15getNumIdleCoresEv"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode15getNumIdleCoresEv"></span><span id="wrench::ServerlessComputeNode::getNumIdleCoresC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1ab1a2239f7d1bf37f87e4616dfc8b7a51"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumIdleCores</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode15getNumIdleCoresEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the compute node’s number of idle cores. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a number of cores </p>
 </dd>
 </dl>
 </dd></dl>
@@ -672,7 +743,19 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>registered_function</strong> – a registered function </p>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A container </p>
+</dd>
 </dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench21ServerlessComputeNode8hostnameE">
+<span id="_CPPv3N6wrench21ServerlessComputeNode8hostnameE"></span><span id="_CPPv2N6wrench21ServerlessComputeNode8hostnameE"></span><span id="wrench::ServerlessComputeNode::hostname__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1a08d010ec7f576e3ff5982748cc017ec7"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hostname</span></span></span><a class="headerlink" href="#_CPPv4N6wrench21ServerlessComputeNode8hostnameE" title="Link to this definition"></a><br /></dt>
+<dd><p>The hostname of the compute node. </p>
 </dd></dl>
 
 </div>

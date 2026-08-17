@@ -209,13 +209,16 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager.html">wrench::FunctionManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_completed_message.html">wrench::FunctionManagerFunctionCompletedMessage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_failed_message.html">wrench::FunctionManagerFunctionFailedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_answer_message.html">wrench::FunctionManagerFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_request_message.html">wrench::FunctionManagerFunctionInvocationRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_message.html">wrench::FunctionManagerMessage</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::FunctionManagerWaitAllMessage</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessageE"><code class="docutils literal notranslate"><span class="pre">wrench::FunctionManagerWaitAllMessage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessageE"><code class="docutils literal notranslate"><span class="pre">wrench::FunctionManagerWaitAllMessage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessage29FunctionManagerWaitAllMessageEP12S4U_CommPortNSt6vectorINSt10shared_ptrI10InvocationEEEE"><code class="docutils literal notranslate"><span class="pre">FunctionManagerWaitAllMessage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessage15answer_commportE"><code class="docutils literal notranslate"><span class="pre">answer_commport</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessage11invocationsE"><code class="docutils literal notranslate"><span class="pre">invocations</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_wait_one_message.html">wrench::FunctionManagerWaitOneMessage</a></li>
@@ -455,7 +458,40 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench29FunctionManagerWaitAllMessageE">
 <span id="_CPPv3N6wrench29FunctionManagerWaitAllMessageE"></span><span id="_CPPv2N6wrench29FunctionManagerWaitAllMessageE"></span><span id="wrench::FunctionManagerWaitAllMessage"></span><span class="target" id="classwrench_1_1_function_manager_wait_all_message"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionManagerWaitAllMessage</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_function_manager_message.html#_CPPv4N6wrench22FunctionManagerMessageE" title="wrench::FunctionManagerMessage"><span class="n"><span class="pre">FunctionManagerMessage</span></span></a><a class="headerlink" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessageE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
+<dd><p>A message sent by the function manager when multiple waited-upon invocation completes. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench29FunctionManagerWaitAllMessage29FunctionManagerWaitAllMessageEP12S4U_CommPortNSt6vectorINSt10shared_ptrI10InvocationEEEE">
+<span id="_CPPv3N6wrench29FunctionManagerWaitAllMessage29FunctionManagerWaitAllMessageEP12S4U_CommPortNSt6vectorINSt10shared_ptrI10InvocationEEEE"></span><span id="_CPPv2N6wrench29FunctionManagerWaitAllMessage29FunctionManagerWaitAllMessageEP12S4U_CommPortNSt6vectorINSt10shared_ptrI10InvocationEEEE"></span><span id="wrench::FunctionManagerWaitAllMessage::FunctionManagerWaitAllMessage__S4U_CommPortP.std::vector:std::shared_ptr:Invocation::"></span><span class="target" id="classwrench_1_1_function_manager_wait_all_message_1aad6338cc744cd249b1f86872f1bf09c8"></span><span class="sig-name descname"><span class="n"><span class="pre">FunctionManagerWaitAllMessage</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">answer_commport</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">invocations</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessage29FunctionManagerWaitAllMessageEP12S4U_CommPortNSt6vectorINSt10shared_ptrI10InvocationEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>answer_commport</strong> – he commport to notify </p></li>
+<li><p><strong>invocations</strong> – the invocations that finished </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench29FunctionManagerWaitAllMessage15answer_commportE">
+<span id="_CPPv3N6wrench29FunctionManagerWaitAllMessage15answer_commportE"></span><span id="_CPPv2N6wrench29FunctionManagerWaitAllMessage15answer_commportE"></span><span id="wrench::FunctionManagerWaitAllMessage::answer_commport__S4U_CommPortP"></span><span class="target" id="classwrench_1_1_function_manager_wait_all_message_1ae4a7b4ca5452f842615d3d96cdc63361"></span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">answer_commport</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessage15answer_commportE" title="Link to this definition"></a><br /></dt>
+<dd><p>The commport to notify. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench29FunctionManagerWaitAllMessage11invocationsE">
+<span id="_CPPv3N6wrench29FunctionManagerWaitAllMessage11invocationsE"></span><span id="_CPPv2N6wrench29FunctionManagerWaitAllMessage11invocationsE"></span><span id="wrench::FunctionManagerWaitAllMessage::invocations__std::vector:std::shared_ptr:Invocation::"></span><span class="target" id="classwrench_1_1_function_manager_wait_all_message_1a297c3cdd4e810381154b68b574f2df5c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">invocations</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29FunctionManagerWaitAllMessage11invocationsE" title="Link to this definition"></a><br /></dt>
+<dd><p>The invocations. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
 
 </section>
 

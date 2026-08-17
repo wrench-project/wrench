@@ -21,7 +21,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="wrench::FunctionManagerFunctionCompletedMessage" href="classwrench_1_1_function_manager_function_completed_message.html" />
+    <link rel="next" title="wrench::FunctionManagerFunctionInvocationAnswerMessage" href="classwrench_1_1_function_manager_function_invocation_answer_message.html" />
     <link rel="prev" title="wrench::FunctionInput" href="classwrench_1_1_function_input.html" /> 
 </head>
 
@@ -224,8 +224,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_completed_message.html">wrench::FunctionManagerFunctionCompletedMessage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_failed_message.html">wrench::FunctionManagerFunctionFailedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_answer_message.html">wrench::FunctionManagerFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_request_message.html">wrench::FunctionManagerFunctionInvocationRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_message.html">wrench::FunctionManagerMessage</a></li>
@@ -489,7 +487,7 @@
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>std::shared_ptr&lt;Invocation&gt; an <a class="reference internal" href="classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> object created by the <a class="reference internal" href="../api_user/classwrench_1_1_serverless_compute_service.html#classwrench_1_1_serverless_compute_service"><span class="std std-ref">ServerlessComputeService</span></a></p>
+<dd class="field-even"><p>std::shared_ptr&lt;Invocation&gt; an <a class="reference internal" href="../api_user/classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> object created by the <a class="reference internal" href="../api_user/classwrench_1_1_serverless_compute_service.html#classwrench_1_1_serverless_compute_service"><span class="std std-ref">ServerlessComputeService</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -552,6 +550,11 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench15FunctionManager8wait_allERKNSt6vectorINSt10shared_ptrI10InvocationEEEE">
 <span id="_CPPv3N6wrench15FunctionManager8wait_allERKNSt6vectorINSt10shared_ptrI10InvocationEEEE"></span><span id="_CPPv2N6wrench15FunctionManager8wait_allERKNSt6vectorINSt10shared_ptrI10InvocationEEEE"></span><span id="wrench::FunctionManager::wait_all__std::vector:std::shared_ptr:Invocation::CR"></span><span class="target" id="classwrench_1_1_function_manager_1a8090c452be93d5a73bf2aa1e89e7aa78"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">wait_all</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">invocations</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Waits for a list of invocations to finish. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>invocations</strong> – the invocations to wait for </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
@@ -571,7 +574,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench15FunctionManager14createFunctionERKNSt6stringERKNSt8functionIFNSt10shared_ptrI14FunctionOutputEERKNSt10shared_ptrI13FunctionInputEERKNSt10shared_ptrI14StorageServiceEEEEERKNSt10shared_ptrI5ImageEE">
 <span id="_CPPv3N6wrench15FunctionManager14createFunctionERKNSt6stringERKNSt8functionIFNSt10shared_ptrI14FunctionOutputEERKNSt10shared_ptrI13FunctionInputEERKNSt10shared_ptrI14StorageServiceEEEEERKNSt10shared_ptrI5ImageEE"></span><span id="_CPPv2N6wrench15FunctionManager14createFunctionERKNSt6stringERKNSt8functionIFNSt10shared_ptrI14FunctionOutputEERKNSt10shared_ptrI13FunctionInputEERKNSt10shared_ptrI14StorageServiceEEEEERKNSt10shared_ptrI5ImageEE"></span><span class="target" id="classwrench_1_1_function_manager_1ab538c436edff646319859a7699bbb786"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function.html#_CPPv4N6wrench8FunctionE" title="wrench::Function"><span class="n"><span class="pre">Function</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createFunction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function_output.html#_CPPv4N6wrench14FunctionOutputE" title="wrench::FunctionOutput"><span class="n"><span class="pre">FunctionOutput</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function_input.html#_CPPv4N6wrench13FunctionInputE" title="wrench::FunctionInput"><span class="n"><span class="pre">FunctionInput</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">lambda</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Creates a shared pointer to a <a class="reference internal" href="classwrench_1_1_function.html#classwrench_1_1_function"><span class="std std-ref">Function</span></a> object and returns it. </p>
+<dd><p>Creates a shared pointer to a <a class="reference internal" href="../api_user/classwrench_1_1_function.html#classwrench_1_1_function"><span class="std std-ref">Function</span></a> object and returns it. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -581,7 +584,7 @@
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>std::shared_ptr&lt;Function&gt; a shared pointer to the <a class="reference internal" href="classwrench_1_1_function.html#classwrench_1_1_function"><span class="std std-ref">Function</span></a> object created </p>
+<dd class="field-even"><p>std::shared_ptr&lt;Function&gt; a shared pointer to the <a class="reference internal" href="../api_user/classwrench_1_1_function.html#classwrench_1_1_function"><span class="std std-ref">Function</span></a> object created </p>
 </dd>
 </dl>
 </dd></dl>
@@ -613,7 +616,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="classwrench_1_1_function_input.html" class="btn btn-neutral float-left" title="wrench::FunctionInput" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="classwrench_1_1_function_manager_function_completed_message.html" class="btn btn-neutral float-right" title="wrench::FunctionManagerFunctionCompletedMessage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="classwrench_1_1_function_manager_function_invocation_answer_message.html" class="btn btn-neutral float-right" title="wrench::FunctionManagerFunctionInvocationAnswerMessage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

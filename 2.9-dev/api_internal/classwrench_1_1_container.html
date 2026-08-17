@@ -145,7 +145,15 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_constant_efficiency_parallel_model.html">wrench::ConstantEfficiencyParallelModel</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Container</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench9ContainerE"><code class="docutils literal notranslate"><span class="pre">wrench::Container</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench9Container5StateE"><code class="docutils literal notranslate"><span class="pre">State</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench9Container19clearPrivateStorageEv"><code class="docutils literal notranslate"><span class="pre">clearPrivateStorage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container14getComputeNodeEv"><code class="docutils literal notranslate"><span class="pre">getComputeNode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container11getIdleDateEv"><code class="docutils literal notranslate"><span class="pre">getIdleDate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container15getIdleSequenceEv"><code class="docutils literal notranslate"><span class="pre">getIdleSequence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container24getPrivateStorageServiceEv"><code class="docutils literal notranslate"><span class="pre">getPrivateStorageService()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container21getRegisteredFunctionEv"><code class="docutils literal notranslate"><span class="pre">getRegisteredFunction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container6isBusyEv"><code class="docutils literal notranslate"><span class="pre">isBusy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container6isIdleEv"><code class="docutils literal notranslate"><span class="pre">isIdle()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -215,8 +223,6 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager.html">wrench::FunctionManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_completed_message.html">wrench::FunctionManagerFunctionCompletedMessage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_failed_message.html">wrench::FunctionManagerFunctionFailedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_answer_message.html">wrench::FunctionManagerFunctionInvocationAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_function_invocation_request_message.html">wrench::FunctionManagerFunctionInvocationRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_manager_message.html">wrench::FunctionManagerMessage</a></li>
@@ -460,11 +466,108 @@
 <span id="_CPPv3N6wrench9ContainerE"></span><span id="_CPPv2N6wrench9ContainerE"></span><span id="wrench::Container"></span><span class="target" id="classwrench_1_1_container"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Container</span></span></span><a class="headerlink" href="#_CPPv4N6wrench9ContainerE" title="Link to this definition"></a><br /></dt>
 <dd><p>Represents a container in a serverless platform. </p>
 <div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench9Container5StateE">
+<span id="_CPPv3N6wrench9Container5StateE"></span><span id="_CPPv2N6wrench9Container5StateE"></span><span class="target" id="classwrench_1_1_container_1a490d1bf0b02e8a6df4aed07ab4439ece"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">State</span></span></span><a class="headerlink" href="#_CPPv4N6wrench9Container5StateE" title="Link to this definition"></a><br /></dt>
+<dd><p>Enum to describe a container’s state. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench9Container5State4BUSYE">
+<span id="_CPPv3N6wrench9Container5State4BUSYE"></span><span id="_CPPv2N6wrench9Container5State4BUSYE"></span><span class="target" id="classwrench_1_1_container_1a490d1bf0b02e8a6df4aed07ab4439ecea802706a9238e2928077f97736854bad4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BUSY</span></span></span><a class="headerlink" href="#_CPPv4N6wrench9Container5State4BUSYE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench9Container5State4IDLEE">
+<span id="_CPPv3N6wrench9Container5State4IDLEE"></span><span id="_CPPv2N6wrench9Container5State4IDLEE"></span><span class="target" id="classwrench_1_1_container_1a490d1bf0b02e8a6df4aed07ab4439eceaa5daf7f2ebbba4975d61dab1c40188c7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IDLE</span></span></span><a class="headerlink" href="#_CPPv4N6wrench9Container5State4IDLEE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench9Container19clearPrivateStorageEv">
 <span id="_CPPv3N6wrench9Container19clearPrivateStorageEv"></span><span id="_CPPv2N6wrench9Container19clearPrivateStorageEv"></span><span id="wrench::Container::clearPrivateStorage"></span><span class="target" id="classwrench_1_1_container_1a6a299c223018498cb70027386f1ee182"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clearPrivateStorage</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench9Container19clearPrivateStorageEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Clear the private storage’s content. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container14getComputeNodeEv">
+<span id="_CPPv3NK6wrench9Container14getComputeNodeEv"></span><span id="_CPPv2NK6wrench9Container14getComputeNodeEv"></span><span id="wrench::Container::getComputeNodeC"></span><span class="target" id="classwrench_1_1_container_1aee2ee59d7b34c101ee62cb4f610fbcbb"></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getComputeNode</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container14getComputeNodeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the compute node on which this container is running. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a compute node </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container11getIdleDateEv">
+<span id="_CPPv3NK6wrench9Container11getIdleDateEv"></span><span id="_CPPv2NK6wrench9Container11getIdleDateEv"></span><span id="wrench::Container::getIdleDateC"></span><span class="target" id="classwrench_1_1_container_1af4be48d4e82808597edee07bc172edff"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getIdleDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container11getIdleDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the container’s idle date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a date </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container15getIdleSequenceEv">
+<span id="_CPPv3NK6wrench9Container15getIdleSequenceEv"></span><span id="_CPPv2NK6wrench9Container15getIdleSequenceEv"></span><span id="wrench::Container::getIdleSequenceC"></span><span class="target" id="classwrench_1_1_container_1a6855123049fa74dc7b64766f3ba878d4"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getIdleSequence</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container15getIdleSequenceEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the container’s idle sequence. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the sequence number </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container24getPrivateStorageServiceEv">
+<span id="_CPPv3NK6wrench9Container24getPrivateStorageServiceEv"></span><span id="_CPPv2NK6wrench9Container24getPrivateStorageServiceEv"></span><span id="wrench::Container::getPrivateStorageServiceC"></span><span class="target" id="classwrench_1_1_container_1ad78b1e03b79e22bb98d9d40234e2ce03"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_storage_service.html#_CPPv4N6wrench14StorageServiceE" title="wrench::StorageService"><span class="n"><span class="pre">StorageService</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPrivateStorageService</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container24getPrivateStorageServiceEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the container’s private storage service. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a storage service </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container21getRegisteredFunctionEv">
+<span id="_CPPv3NK6wrench9Container21getRegisteredFunctionEv"></span><span id="_CPPv2NK6wrench9Container21getRegisteredFunctionEv"></span><span id="wrench::Container::getRegisteredFunctionC"></span><span class="target" id="classwrench_1_1_container_1a011beafd8543b65d1e5f49c881ce065d"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api_developer/classwrench_1_1_registered_function.html#_CPPv4N6wrench18RegisteredFunctionE" title="wrench::RegisteredFunction"><span class="n"><span class="pre">RegisteredFunction</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getRegisteredFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container21getRegisteredFunctionEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the container’s registered function. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a registered function </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container6isBusyEv">
+<span id="_CPPv3NK6wrench9Container6isBusyEv"></span><span id="_CPPv2NK6wrench9Container6isBusyEv"></span><span id="wrench::Container::isBusyC"></span><span class="target" id="classwrench_1_1_container_1a85649494d05aed0d0e6c098baa4f5163"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isBusy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container6isBusyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine whether the container is busy or not. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if busy, false otherwise </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container6isIdleEv">
+<span id="_CPPv3NK6wrench9Container6isIdleEv"></span><span id="_CPPv2NK6wrench9Container6isIdleEv"></span><span id="wrench::Container::isIdleC"></span><span class="target" id="classwrench_1_1_container_1a80cbeb8ed4ac258920233cf06a2d12a5"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isIdle</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container6isIdleEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine whether the container is idle or not. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if idle, false otherwise </p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
