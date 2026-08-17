@@ -48,6 +48,7 @@ public:
     void do_IdleContainerEviction_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler,
         const std::string& idle_container_eviction_policy);
     void do_ImageDownloadSimulation_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
+    void do_TwoHostFCFSTiming_test();
 
 protected:
     ~ServerlessTimingTest() override {
@@ -84,6 +85,13 @@ protected:
                 <prop id="mount" value="/"/>
             </disk>
         </host>
+        <host id="ServerlessComputeNode2" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="200GB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
         <host id="ServerlessComputeNodeSmallDisk" speed="50Gf" core="10">
             <prop id="ram" value="64000GB" />
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
@@ -99,8 +107,10 @@ protected:
         <!-- Network routes -->
         <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="wide_area"/></route>
         <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
+        <route src="UserHost" dst="ServerlessComputeNode2"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
         <route src="UserHost" dst="ServerlessComputeNodeSmallDisk"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
         <route src="ServerlessHeadNode" dst="ServerlessComputeNode1">  <link_ctn id="local_area"/></route>
+        <route src="ServerlessHeadNode" dst="ServerlessComputeNode2">  <link_ctn id="local_area"/></route>
         <route src="ServerlessHeadNode" dst="ServerlessComputeNodeSmallDisk">  <link_ctn id="local_area"/></route>
 
     </zone>
@@ -132,7 +142,7 @@ public:
     explicit MyFunctionOutput(std::string msg) : msg_(std::move(msg)) {
     }
 
-    std::string toString() const { return msg_; }
+    [[nodiscard]] std::string toString() const { return msg_; }
 
     std::string msg_;
 };
@@ -1291,7 +1301,7 @@ private:
             throw std::runtime_error(
                 "Unexpected times: inv3: " + std::to_string(inv3_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
         }
-        if (std::abs((inv4_elapsed + (50 * GB / (100 * MB))) - inv6_elapsed) > EPSILON) {
+        if (std::abs((inv4_elapsed + (50.0 * GB / (100 * MB))) - inv6_elapsed) > EPSILON) {
             throw std::runtime_error(
                 "Unexpected times: inv4: " + std::to_string(inv4_elapsed) + "   inv6: " + std::to_string(inv6_elapsed));
         }
@@ -2053,6 +2063,164 @@ void ServerlessTimingTest::do_ImageDownloadSimulation_test(
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessImageDownloadSimulationController(this, user_host, serverless_provider, other_serverless_provider,
+                                                        storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+
+/**********************************************************************/
+/**  TWO-HOST TIMING TEST                                            **/
+/**********************************************************************/
+
+class ServerlessTwoHostTimingController : public wrench::ExecutionController {
+public:
+    ServerlessTwoHostTimingController(ServerlessTimingTest* test,
+                                                const std::string& hostname,
+                                                const std::shared_ptr<wrench::ServerlessComputeService>&
+                                                compute_service,
+                                                const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessTimingTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::ServerlessComputeService> other_compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Create a function that sleeps 10
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(10);
+            return std::make_shared<MyFunctionOutput>("output");
+        };
+
+        // Register a function_1 with a 10GB image file, and a 1GB container RAM space
+        auto image_file = wrench::Simulation::addFile("image_file", 10 * GB);
+        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
+        wrench::StorageService::createFileAtLocation(image_location);
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+
+        auto function = wrench::FunctionManager::createFunction("Function", lambda, image);
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+        // 1 GB Container RAM SPACE
+        auto registered_function = function_manager->registerFunction(function, this->compute_service, 100,
+                                                                        1 * GB, 1 * GB, 10 * MB, 1 * MB);
+
+
+        // Place some invocations
+        int num_invocations = 34;
+        std::vector<std::shared_ptr<wrench::Invocation>> invocations;
+        invocations.reserve(num_invocations);
+        for (int i=0; i < num_invocations; i++) {
+            invocations.push_back(function_manager->invokeFunction(registered_function, this->compute_service, input));
+        }
+
+        // Wait for them all
+        function_manager->wait_all(invocations);
+
+        // for (int i=0; i < num_invocations; i++)  {
+        //     std::cerr << "INV" << i << " (ID=" << std::to_string(invocations.at(i)->getId()) +" : ";
+        //     std::cerr << "submit: " << invocations.at(i)->getSubmitDate() << "  ";
+        //     std::cerr << "dispatch: " << invocations.at(i)->getDispatchDate() << "  ";
+        //     std::cerr << "fstart: " << invocations.at(i)->getFunctionStartDate() << "  ";
+        //     std::cerr << "fend: " << invocations.at(i)->getFunctionEndDate() << "  ";
+        //     std::cerr << "elapsed: " << (invocations.at(i)->getFunctionEndDate() - invocations.at(i)->getSubmitDate()) << "  ";
+        //     std::cerr << "host: " << (invocations.at(i)->getComputeNode()) << std::endl;
+        // }
+
+        // Check that the host ordering make sense
+        for (auto const &inv : invocations) {
+            auto hostname = inv->getComputeNode();
+            if (inv->getId() <= 9) {
+                if (hostname != "ServerlessComputeNode1") {
+                    throw std::runtime_error("Unexpected compute node " + hostname + " for invocation #" + std::to_string(inv->getId()));
+                }
+            }
+            if (inv->getId() >= 10 and inv->getId() <= 19) {
+                if (hostname != "ServerlessComputeNode2") {
+                    throw std::runtime_error("Unexpected compute node " + hostname + " for invocation #" + std::to_string(inv->getId()));
+                }
+            }
+            if (inv->getId() >= 20 and inv->getId() <= 29) {
+                if (hostname != "ServerlessComputeNode1") {
+                    throw std::runtime_error("Unexpected compute node " + hostname + " for invocation #" + std::to_string(inv->getId()));
+                }
+            }
+            if (inv->getId() >= 30) {
+                if (hostname != "ServerlessComputeNode2") {
+                    throw std::runtime_error("Unexpected compute node " + hostname + " for invocation #" + std::to_string(inv->getId()));
+                }
+            }
+        }
+
+        // Check that dispatch of the last batch is the same as the end time of the first batch
+        auto batch_end_date = invocations.at(0)->getFunctionEndDate();
+        for (int i = 1; i < 10; i++) {
+            if (invocations.at(i)->getFunctionEndDate() != batch_end_date) {
+                throw std::runtime_error("Unexpected end date " + std::to_string(invocations.at(i)->getFunctionEndDate()) + " for invocation #" + std::to_string(invocations.at(i)->getId()));
+            }
+        }
+        for (int i = 20; i < 30; i++) {
+            if (invocations.at(i)->getFunctionStartDate() != batch_end_date) {
+                throw std::runtime_error("Unexpected start date " + std::to_string(invocations.at(i)->getFunctionStartDate()) + " for invocation #" + std::to_string(invocations.at(i)->getId()));
+            }
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessTimingTest, TwoHostFCFSTiming) {
+    DO_TEST_WITH_FORK(do_TwoHostFCFSTiming_test);
+}
+
+void ServerlessTimingTest::do_TwoHostFCFSTiming_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "0"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes,
+        // std::make_shared<wrench::RandomServerlessScheduler>(0),
+        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        {
+            {wrench::ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "1.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"},
+            {wrench::ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "false"}
+        },
+        {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessTwoHostTimingController(this, user_host, serverless_provider,
                                                         storage_service));
 
     simulation->launch();

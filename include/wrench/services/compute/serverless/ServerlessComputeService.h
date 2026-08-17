@@ -29,6 +29,7 @@ namespace wrench {
     class ServerlessComputeService : public ComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+            {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0"},
             {ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "LRU"},

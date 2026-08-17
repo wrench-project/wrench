@@ -9,6 +9,8 @@
 
 #include "wrench/function/Invocation.h"
 #include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/compute/serverless/Container.h"
+#include "wrench/services/compute/serverless/ServerlessComputeNode.h"
 
 WRENCH_LOG_CATEGORY(Invocation, "Log category for Serverless invocations");
 
@@ -28,6 +30,9 @@ namespace wrench {
                                                             _dispatched(false),
                                                             _success(false),
                                                             _notify_commport(notify_commport) {
+        static unsigned long long id_sequence_number = 0;
+        _id = id_sequence_number;
+        id_sequence_number++;
         // WRENCH_INFO("Invocation created for function %s", _registered_function->getFunction()->getName().c_str());
     }
 
@@ -72,6 +77,26 @@ namespace wrench {
     */
     double Invocation::getFunctionEndDate() const {
         return _function_end_date;
+    }
+
+    /**
+     * @brief Get the invocations (unique) Id
+     * @return a numerical Id
+     */
+    unsigned long long Invocation::getId() const {
+        return _id;
+    }
+
+    /**
+     * @brief Get the hostname of the compute node on which the invocation was executed
+     * @return a hostname (or "n/a" if not available)
+     */
+    std::string Invocation::getComputeNode() const {
+        if (_container) {
+            return _container->getComputeNode()->hostname;
+        } else {
+            return "n/a";
+        }
     }
 
     /**

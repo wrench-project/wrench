@@ -348,10 +348,10 @@ namespace wrench {
                 }
             }
 
-            // Make invocations whose images have downloaded schedulable
+            // Admit invocations whose images have or are being downloaded
             admitInvocations();
 
-            if (do_scheduling) {
+            if (do_scheduling and not _state_of_the_system->_schedulable_invocations.empty()) {
                 // Invoke the scheduler
                 auto decisions = invokeScheduler();
 
@@ -369,6 +369,8 @@ namespace wrench {
                 initiateImageLoads(decisions->image_loads_to_RAM);
                 // Third, do the image copies
                 initiateImageCopies(decisions->image_copies_to_disk);
+
+                do_scheduling = false;
             }
         }
         return 0;
@@ -397,7 +399,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (const auto ss_msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // TODO: Die...
@@ -542,6 +544,10 @@ namespace wrench {
         const std::shared_ptr<RegisteredFunction>& registered_function,
         const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
+
+        // Apply the overhead
+        S4U_Simulation::sleep(this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
+
         // If the function is not registered answer with some error
         if (_state_of_the_system->_registered_functions.find(registered_function) ==
             _state_of_the_system->_registered_functions.end()) {
@@ -552,10 +558,18 @@ namespace wrench {
             answer_commport->dputMessage(answerMessage);
         }
         else {
-            // Put the invocation in the "new invocations" list
+            // Put the invocation in the right list
             auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
             invocation->_submit_date = Simulation::getCurrentSimulatedDate();
-            _state_of_the_system->_new_invocations.push(invocation);
+
+            if (_state_of_the_system->_head_storage_service->hasFile(registered_function->getImageFile())) {
+                _state_of_the_system->_schedulable_invocations.push_back(invocation);
+            } else if (_state_of_the_system->_being_downloaded_images.count(registered_function->getImage())) {
+                _state_of_the_system->_admitted_invocations[registered_function->getImage()].push(invocation);
+            } else {
+                _state_of_the_system->_new_invocations.push(invocation);
+            }
+
             auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 true, invocation, nullptr, this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
@@ -912,18 +926,11 @@ namespace wrench {
         while (!_state_of_the_system->_new_invocations.empty()) {
             auto invocation = _state_of_the_system->_new_invocations.front();
             const auto image = invocation->_registered_function->_function->getImage();
-            // WRENCH_INFO("Admitting an invocation...");
-
-            // If the image file is already downloaded, make the invocation schedulable immediately
-            if (_state_of_the_system->_head_storage_service->hasFile(image->getFile())) {
-                _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_schedulable_invocations.emplace_back(invocation); // Insert at the end
-                continue;
-            }
+            WRENCH_INFO("Admitting invocation %llu...", invocation->getId());
 
             // If the image file is being downloaded, make the invocation admitted
-            if (_state_of_the_system->_being_downloaded_images.find(image) != _state_of_the_system->
-                                                                              _being_downloaded_images.end()) {
+            if (_state_of_the_system->_head_storage_service->hasFile(image->getFile()) or
+                _state_of_the_system->_being_downloaded_images.count(image) > 0) {
                 _state_of_the_system->_new_invocations.pop();
                 _state_of_the_system->_admitted_invocations[image].push(invocation);
                 continue;

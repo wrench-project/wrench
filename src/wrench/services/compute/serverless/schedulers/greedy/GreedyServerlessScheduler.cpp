@@ -41,7 +41,6 @@ namespace wrench {
                 continue;
             }
 
-
             /** Translate the decision into actionable items **/
 
             // Can we use an idle container to run the function?
@@ -74,6 +73,7 @@ namespace wrench {
             // If the image on its way to RAM, we'll schedule again later
             if (not scheduling_state->images_in_ram.at(target_node).count(image) and
                 scheduling_state->images_on_their_way_to_ram.at(target_node).count(image)) {
+                scheduling_state->cores_available.at(target_node) -= 1;
                 continue;
             }
 
@@ -83,12 +83,14 @@ namespace wrench {
                 decisions->image_loads_to_RAM.push_back({image, target_node});
                 // Update the scheduling state
                 scheduling_state->images_on_their_way_to_ram.at(target_node).insert(image);
+                scheduling_state->cores_available.at(target_node) -= 1;
                 continue;
             }
 
             // If the image is on its way to disk, we'll schedule again later
             if (not scheduling_state->images_on_disk.at(target_node).count(image) and
                 scheduling_state->images_on_their_way_to_disk.at(target_node).count(image)) {
+                scheduling_state->cores_available.at(target_node) -= 1;
                 continue;
             }
 
@@ -96,6 +98,7 @@ namespace wrench {
             if (not scheduling_state->images_on_disk.at(target_node).count(image)) {
                 decisions->image_copies_to_disk.push_back({image, target_node});
                 scheduling_state->images_on_their_way_to_disk.at(target_node).insert(image);
+                scheduling_state->cores_available.at(target_node) -= 1;
             }
 
         }

@@ -23,6 +23,11 @@ namespace wrench {
     class ServerlessComputeServiceProperty : public ComputeServiceProperty {
 
     public:
+        /** @brief The overhead for the compute service to process an incoming request (default value: "0", default unit: seconds):
+         *         Examples: "5", "5s", "5000ms", etc.
+         **/
+        DECLARE_PROPERTY_NAME(INVOCATION_PROCESSING_OVERHEAD);
+
         /** @brief The overhead to start a container after the image has been loaded into RAM (default value: "0", default unit: seconds):
          *         Examples: "5", "5s", "5000ms", etc.
          **/
@@ -42,7 +47,10 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(STORAGE_SERVICES_BUFFER_SIZE);
 
-        /** @brief Whether the download of remote images should be simulated or not (if not, then zero time is assumed)
+        /** @brief Whether the download of remote images should be simulated or not (if not, then zero time is assumed).
+         *  Setting this to false can create strange re-ordering of initial requests at time zero (because so much happens
+         *  exactly at time zero), which likely doesn't matter a lot, but be warned. It's likely better to simulate remote image
+         *  downloads and just make the remove bandwidth very high when wanted to essentially ignore remote downloads.
          **/
         DECLARE_PROPERTY_NAME(SIMULATE_REMOTE_IMAGE_DOWNLOADS);
 

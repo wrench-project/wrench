@@ -34,7 +34,7 @@ namespace wrench {
     Container::Container(const RegisteredFunction* registered_function,
                          const ServerlessComputeNode* compute_node,
                          const ServerlessComputeService* serverless_compute_service,
-                         State initial_state) {
+                         const State initial_state) {
         _registered_function = registered_function;
         _compute_node = compute_node;
         _serverless_compute_service = serverless_compute_service;

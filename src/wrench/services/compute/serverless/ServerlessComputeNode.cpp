@@ -28,7 +28,7 @@ namespace wrench {
     *  @param num_cores: number of cores
     *  @param service: the ServerlessComputeService that owns this compute node
     */
-    ServerlessComputeNode::ServerlessComputeNode(std::string h, unsigned int num_cores,
+    ServerlessComputeNode::ServerlessComputeNode(std::string h, const unsigned int num_cores,
                                                  ServerlessComputeService* service) :
         hostname(std::move(h)), _serverless_compute_service(service), _total_cores(num_cores),
         _available_cores(num_cores) {
@@ -268,8 +268,8 @@ namespace wrench {
      * @param to_terminate The set of containers to terminate (reference, will be updated)
      * @return a set of idle containers that could be terminated to reach free space
      */
-    bool ServerlessComputeNode::findIdleContainersToTerminate(sg_size_t needed_free_ram_space,
-                                                              sg_size_t needed_free_disk_space,
+    bool ServerlessComputeNode::findIdleContainersToTerminate(const sg_size_t needed_free_ram_space,
+                                                              const sg_size_t needed_free_disk_space,
                                                               std::set<std::shared_ptr<Container>>& to_terminate)
     const {
         // Compute numbers of bytes to be freed up
@@ -332,27 +332,20 @@ namespace wrench {
 
         // TODO: Use dynamic programming to return some optimal set? (smallest cardinal, and smallest sum, NP-hard, but likely only weakly,
         // TODO: but not easy due to the two dimensions...Like some knapscak) - LIKELY OVERKILL
-        // sg_size_t ram_space_freed_up = 0;
-        // sg_size_t disk_space_freed_up = 0;
-        std::cerr << "LOOPING TO FIND VICTIMS IN THE RAM POLICY\n";
         while (true) {
-            std::cerr << "IN LOOP: TO FREE UP " << ram_space_to_free_up << "\n";
             if (sorted_containers.empty()) {
                 to_terminate.clear();
                 return false;
             }
             // Find the smallest container that gets us there, and if none, pick the largest container
-            std::cerr << "Find the smallest container that gets us there, and if none, pick the largest container\n";
             auto victim = sorted_containers.end()-1;
             for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
-                std::cerr << "  LOOKING AT A CONTAINER WITH RAM " << (*it)->getRegisteredFunction()->getRAMSpaceLimit() << " (TO FREE UP: " << ram_space_to_free_up << ")\n";
                 if ((*it)->getRegisteredFunction()->getRAMSpaceLimit() >= ram_space_to_free_up and
                     (*it)->getRegisteredFunction()->getDiskSpaceLimit() >= disk_space_to_free_up) {
                     victim = it;
                     break;
                 }
             }
-            std::cerr << "  CONTAINER FOUND: " << (*victim)->getRegisteredFunction()->getRAMSpaceLimit() << "\n";
 
             to_terminate.insert(*victim);
             auto victim_ram_space = (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
@@ -376,8 +369,8 @@ namespace wrench {
     * @return
     */
     bool ServerlessComputeNode::pickVictimContainersLRU(
-        sg_size_t ram_space_to_free_up,
-        sg_size_t disk_space_to_free_up,
+        const sg_size_t ram_space_to_free_up,
+        const sg_size_t disk_space_to_free_up,
         std::set<std::shared_ptr<Container>>& to_terminate) const {
         // Compute a to-sort list of the containers
         std::vector<std::shared_ptr<Container>> sorted_containers;

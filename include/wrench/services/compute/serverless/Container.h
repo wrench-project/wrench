@@ -12,6 +12,7 @@
 #define CONTAINER_H
 
 #include <memory>
+#include <cfloat>
 #include <fsmod/File.hpp>
 #include <wrench/function/RegisteredFunction.h>
 

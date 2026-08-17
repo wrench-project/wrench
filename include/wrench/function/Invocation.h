@@ -12,6 +12,7 @@
 #define INVOCATION_H
 
 #include <memory>
+#include <string>
 
 namespace wrench {
     class S4U_CommPort;
@@ -43,6 +44,8 @@ namespace wrench {
         [[nodiscard]] double getDispatchDate() const;
         [[nodiscard]] double getFunctionStartDate() const;
         [[nodiscard]] double getFunctionEndDate() const;
+        [[nodiscard]] unsigned long long getId() const;
+        [[nodiscard]] std::string getComputeNode() const;
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -68,6 +71,8 @@ namespace wrench {
         double _dispatch_date = -1.0;
         double _function_start_date = -1.0;
         double _function_end_date = -1.0;
+
+        unsigned long long _id = 0;
 
         std::shared_ptr<ServerlessComputeNode> _compute_node;
         std::shared_ptr<Container> _container;
