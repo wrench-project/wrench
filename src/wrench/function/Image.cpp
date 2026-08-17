@@ -30,10 +30,34 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the image's name
+     * @return a name
+     */
+    std::string Image::getName() const {
+        return _name;
+    }
+
+    /**
+     * @brief Get the image's RAM footprint
+     * @return a number of bytes
+     */
+    sg_size_t Image::getRAMFootprint() const {
+        return _ram_footprint;
+    }
+
+    /**
      * @return The image's disk footprint
      */
     sg_size_t Image::getDiskFootprint() const {
         return _location->getFile()->getSize();
+    }
+
+    /**
+     * @brief Get the image's file location
+     * @return a location
+     */
+    std::shared_ptr<FileLocation> Image::getLocation() const {
+        return _location;
     }
 
     /**

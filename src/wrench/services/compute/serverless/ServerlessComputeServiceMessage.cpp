@@ -138,18 +138,49 @@ namespace wrench
         sg_size_t payload)
         : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
+    /**
+     * @brief Constructor
+     * @param action The action that did the download
+     * @param image The image that was downloaded
+     * @param payload The message size in bytes
+     */
     ServerlessComputeServiceDownloadCompleteMessage::ServerlessComputeServiceDownloadCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)) {}
 
+    /**
+     * @brief Constructor
+     * @param action The action that did the download
+     * @param invocation The invocation that completed
+     * @param payload The message size in bytes
+     */
     ServerlessComputeServiceInvocationExecutionCompleteMessage::ServerlessComputeServiceInvocationExecutionCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<Invocation> invocation, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _invocation(std::move(invocation)) {}
 
+    /**
+     * @brief Constructor
+     * @param action The action that did the copy
+     * @param image The image that was copied
+     * @param compute_node The compute node to which the image was copied
+     * @param payload The message size in bytes
+     */
     ServerlessComputeServiceNodeCopyCompleteMessage::ServerlessComputeServiceNodeCopyCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)), _compute_node(std::move(compute_node)) {}
 
+    /**
+     * @brief Constructor
+     * @param action The action that did the loading
+     * @param image The image that was loaded into RAM
+     * @param compute_node The compuate node at which the image was loaded into RAM
+     * @param payload The message size in bytes
+     */
     ServerlessComputeServiceNodeLoadCompleteMessage::ServerlessComputeServiceNodeLoadCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)), _compute_node(std::move(compute_node)) {}
 
+    /**
+     * @brief Constructor
+     * @param container The container
+     * @param idle_sequence The idle sequence number
+     */
     ServerlessComputeServiceContainerIdleTimeoutMessage::ServerlessComputeServiceContainerIdleTimeoutMessage(
         std::shared_ptr<Container> container, std::uint64_t idle_sequence) : ServerlessComputeServiceMessage(0), _container(std::move(container)), _idle_sequence(idle_sequence) {}
 

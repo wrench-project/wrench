@@ -79,7 +79,7 @@ namespace wrench {
         S4U_CommPort *answer_commport;
         /** @brief The function to invoke */
         std::shared_ptr<RegisteredFunction> registered_function;
-        /** @brief   */
+        /** @brief  The function input */
         std::shared_ptr<FunctionInput> function_input;
         /** @brief The commport_name to send notifications to */
         S4U_CommPort *notify_commport;

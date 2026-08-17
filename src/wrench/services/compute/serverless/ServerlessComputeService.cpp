@@ -33,6 +33,9 @@ WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless
 namespace wrench {
     unsigned long ServerlessComputeService::_sequence_number = 0;
 
+    /**
+     * @brief A no-op lambda
+     */
     const std::function lambda_noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {
     };
 

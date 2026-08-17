@@ -46,38 +46,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent by the FunctionManager to notify some submitter that a Function has completed
-     */
-    class FunctionManagerFunctionCompletedMessage : public FunctionManagerMessage {
-    public:
-        FunctionManagerFunctionCompletedMessage(std::shared_ptr<Function> function, 
-                                                std::shared_ptr<ServerlessComputeService> sl_compute_service);
-
-        /** @brief The function that is invoked */
-        std::shared_ptr<Function> function;
-        /** @brief The ServerlessComputeService on which the function ran */
-        std::shared_ptr<ServerlessComputeService> sl_compute_service;
-    };
-
-    /**
-     * @brief A message sent by the FunctionManager to notify some submitter that a Function has failed
-     */
-    class FunctionManagerFunctionFailedMessage : public FunctionManagerMessage {
-    public:
-        FunctionManagerFunctionFailedMessage(std::shared_ptr<Function> function,
-                                             std::shared_ptr<ServerlessComputeService> sl_compute_service,
-                                             std::shared_ptr<FailureCause> cause);
-
-        /** @brief The function that is invoked */
-        std::shared_ptr<Function> function;
-        /** @brief The ServerlessComputeService on which the function ran */
-        std::shared_ptr<ServerlessComputeService> sl_compute_service;
-        /** @brief The cause of the failure */
-        std::shared_ptr<FailureCause> cause;
-    };
-
-    /**
-     * @brief 
+     * @brief A message sent by the function manager when one waited-upon invocation completes
      * 
      */
     class FunctionManagerWaitOneMessage : public FunctionManagerMessage {
@@ -85,12 +54,14 @@ namespace wrench {
         FunctionManagerWaitOneMessage(S4U_CommPort *answer_commport, 
                                       std::shared_ptr<Invocation> invocation);
 
+	/** @brief The commport to notify */
         S4U_CommPort *answer_commport;
+	/** @brief The invocation */
         std::shared_ptr<Invocation> invocation;
     };
 
     /**
-     * @brief 
+     * @brief A message sent by the function manager when multiple waited-upon invocation completes
      * 
      */
     class FunctionManagerWaitAllMessage : public FunctionManagerMessage {
@@ -98,7 +69,9 @@ namespace wrench {
         FunctionManagerWaitAllMessage(S4U_CommPort *answer_commport,
                                       std::vector<std::shared_ptr<Invocation>> invocations);
 
+	/** @brief The commport to notify */
         S4U_CommPort *answer_commport;
+	/** @brief The invocations */
         std::vector<std::shared_ptr<Invocation>> invocations;
     };
 

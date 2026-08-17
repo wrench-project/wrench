@@ -46,10 +46,10 @@ namespace wrench {
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
 
-        [[nodiscard]] unsigned int getNumCores() const { return _total_cores; }
-        [[nodiscard]] unsigned int getNumIdleCores() const { return _available_cores; }
-        [[nodiscard]] sg_size_t getFreeDiskSpace() const { return _disk->getTotalFreeSpaceZeroTime(); }
-        [[nodiscard]] sg_size_t getFreeRAMSpace() const { return _memory->getTotalFreeSpaceZeroTime(); }
+        [[nodiscard]] unsigned int getNumCores() const;
+        [[nodiscard]] unsigned int getNumIdleCores() const;
+        [[nodiscard]] sg_size_t getFreeDiskSpace() const;
+        [[nodiscard]] sg_size_t getFreeRAMSpace() const;
 
         std::shared_ptr<Container> findIdleContainer(
             const RegisteredFunction* registered_function,
@@ -67,9 +67,10 @@ namespace wrench {
         [[nodiscard]] bool isInvocationFeasible(const std::shared_ptr<Invocation>& invocation,
                                                 const std::shared_ptr<Container>& target_container) const;
 
-        [[nodiscard]] std::shared_ptr<SimpleStorageService> getDiskStorage() const { return _disk; }
-        [[nodiscard]] std::shared_ptr<SimpleStorageService> getMemoryStorage() const { return _memory; }
+        [[nodiscard]] std::shared_ptr<SimpleStorageService> getDiskStorage() const;
+        [[nodiscard]] std::shared_ptr<SimpleStorageService> getMemoryStorage() const;
 
+	/** @brief The hostname of the compute node */
         const std::string hostname;
 
         bool findIdleContainersToTerminate(sg_size_t needed_free_ram_space,

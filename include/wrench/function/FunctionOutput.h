@@ -12,10 +12,6 @@
  
  namespace wrench {
 
-     /***********************/
-     /** \cond DEVELOPER    */
-     /***********************/
-
     /**
     * @brief Represents a completely abstract FunctionOutput object
     */
@@ -25,10 +21,6 @@
         virtual ~FunctionOutput() = default;
     };
 
-     /***********************/
-     /** \endcond           */
-     /***********************/
-     
  } // namespace wrench
  
  #endif // WRENCH_FUNCTIONOUTPUT_H

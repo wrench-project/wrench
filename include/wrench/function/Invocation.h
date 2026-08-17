@@ -23,9 +23,6 @@ namespace wrench {
     class ServerlessComputeNode;
     class Container;
 
-    /***********************/
-    /** \cond DEVELOPER   **/
-    /***********************/
 
     /**
      * @class Invocation
@@ -80,10 +77,6 @@ namespace wrench {
         /***********************/
         /** \endcond          **/
         /***********************/
-
-    /***********************/
-    /** \endcond          **/
-    /***********************/
 
     };
 }

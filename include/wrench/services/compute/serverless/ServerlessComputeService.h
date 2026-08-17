@@ -77,6 +77,7 @@ namespace wrench {
     /** \cond INTERNAL    **/
     /***********************/
 
+	/** @brief A unique sequence counter */
         static unsigned long _sequence_number;
 
     protected:

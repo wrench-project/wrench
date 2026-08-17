@@ -185,6 +185,7 @@ namespace wrench {
     /**
      * @brief Waits for a list of invocations to finish
      *
+     * @param invocations the invocations to wait for
      */
     void FunctionManager::wait_all(const std::vector<std::shared_ptr<Invocation>>& invocations) {
         // WRENCH_INFO("FunctionManager::wait_all(): Waiting for list of invocations to finish");

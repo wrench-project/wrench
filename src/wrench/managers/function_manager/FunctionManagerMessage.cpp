@@ -25,28 +25,11 @@ namespace wrench {
     FunctionManagerWakeupMessage::FunctionManagerWakeupMessage() : FunctionManagerMessage() {
     }
 
-//     /**
-//      * @brief Constructor
-//      * @param function: the function that is invoked
-//      * @param sl_compute_service: the ServerlessComputeService on which it ran
-//      */
-//     FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(std::shared_ptr<Function> function,
-//                                                                                      std::shared_ptr<ServerlessComputeService> sl_compute_service)
-//                                                                                      : FunctionManagerMessage() {
-// #ifdef WRENCH_INTERNAL_EXCEPTIONS
-//         if ((function == nullptr) || (sl_compute_service == nullptr)) {
-//             throw std::invalid_argument("FunctionManagerFunctionCompletedMessage::FunctionManagerFunctionCompletedMessage(): Invalid arguments");
-//         }
-// #endif
-//         this->function = std::move(function);
-//         this->sl_compute_service = std::move(sl_compute_service);
-//     }
-
     /**
-     * @brief Construct a new Function Manager Wait One Message:: Function Manager Wait One Message object
+     * @brief Constructor
      * 
-     * @param answer_commport 
-     * @param invocation 
+     * @param answer_commport the commport to notify
+     * @param invocation the invocation that finished
      */
     FunctionManagerWaitOneMessage::FunctionManagerWaitOneMessage(S4U_CommPort *answer_commport,
                                                                  std::shared_ptr<Invocation> invocation) 
@@ -55,6 +38,11 @@ namespace wrench {
         this->invocation = std::move(invocation);
     }
 
+    /**
+     * @brief Constructor
+     * @param answer_commport he commport to notify
+     * @param invocations the invocations that finished
+     */
     FunctionManagerWaitAllMessage::FunctionManagerWaitAllMessage(S4U_CommPort *answer_commport,
                                                                  std::vector<std::shared_ptr<Invocation>> invocations) 
                                                                  : FunctionManagerMessage() {

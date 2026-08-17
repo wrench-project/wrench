@@ -21,7 +21,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param function: the function to be invoked
+     * @param registered_function: the (registered) function to be invoked
      */
     FunctionNotFound::FunctionNotFound(std::shared_ptr<RegisteredFunction> registered_function) {
         _registered_function = std::move(registered_function);

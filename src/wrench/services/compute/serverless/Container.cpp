@@ -42,6 +42,62 @@ namespace wrench {
     }
 
     /**
+     * @brief Determine whether the container is idle or not
+     * @return true if idle, false otherwise
+     */
+    bool Container::isIdle() const {
+        return _state == State::IDLE;
+    }
+
+    /**
+     * @brief Determine whether the container is busy or not
+     * @return true if busy, false otherwise
+     */
+    bool Container::isBusy() const {
+        return _state == State::BUSY;
+    }
+
+    /**
+     * @brief Get the container's idle sequence
+     * @return the sequence number
+     */
+    unsigned long Container::getIdleSequence() const {
+        return _idle_sequence;
+    }
+
+    /**
+      * @brief Get the container's idle date
+      * @return a date
+      */
+    double Container::getIdleDate() const {
+        return _idle_date;
+    }
+
+    /**
+      * @brief Get the container's registered function
+      * @return a registered function
+      */
+    const RegisteredFunction* Container::getRegisteredFunction() const {
+        return _registered_function;
+    }
+
+    /**
+      * @brief Get the container's private storage service
+      * @return a storage service
+      */
+    std::shared_ptr<StorageService> Container::getPrivateStorageService() const {
+        return _tmp_storage_service;
+    }
+
+    /**
+      * @brief Get the compute node on which this container is running
+      * @return a compute node
+      */
+    ServerlessComputeNode* Container::getComputeNode() const {
+        return const_cast<ServerlessComputeNode*>(_compute_node);
+    }
+
+    /**
      * @brief Make the container idle
      */
     void Container::makeIdle() {
@@ -76,8 +132,7 @@ namespace wrench {
         try {
             _opened_image_disk_file = compute_disk_ss->openFile(
                 FileLocation::LOCATION(compute_disk_ss, _registered_function->getImageFile()));
-        }
-        catch (ExecutionException&) {
+        } catch (ExecutionException&) {
             this->freeDiskAndMemoryResources();
             throw;
         } catch (simgrid::Exception&) {
@@ -91,8 +146,7 @@ namespace wrench {
         try {
             _opened_image_ram_file = compute_ram_ss->openFile(
                 FileLocation::LOCATION(compute_ram_ss, _registered_function->getImage()->getRAMFile()));
-        }
-        catch (ExecutionException& e) {
+        } catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             throw;
         } catch (simgrid::Exception& e) {
@@ -108,8 +162,7 @@ namespace wrench {
                     _registered_function->getDiskSpaceLimit()));
             StorageService::createFileAtLocation(_tmp_file_location);
             _opened_tmp_file = _compute_node->getDiskStorage()->openFile(_tmp_file_location);
-        }
-        catch (ExecutionException& e) {
+        } catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             auto cause = std::dynamic_pointer_cast<StorageServiceNotEnoughSpace>(e.getCause());
             if (cause) {
@@ -134,8 +187,7 @@ namespace wrench {
             fs = simgrid::fsmod::FileSystem::create(
                 "fs" + std::to_string(ServerlessComputeService::_sequence_number));
             fs->mount_partition("/", ods, _registered_function->getDiskSpaceLimit());
-        }
-        catch (simgrid::Exception& e) {
+        } catch (simgrid::Exception& e) {
             this->freeDiskAndMemoryResources();
             throw ExecutionException(std::make_shared<NotEnoughResources>(e.what()));
         } catch (ExecutionException& e) {
@@ -157,8 +209,7 @@ namespace wrench {
             _tmp_storage_service->setSimulation(_serverless_compute_service->getSimulation());
             _tmp_storage_service->setNetworkTimeoutValue(_serverless_compute_service->getNetworkTimeoutValue());
             _tmp_storage_service->start(_tmp_storage_service, true, false);
-        }
-        catch (ExecutionException& e) {
+        } catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             throw;
         }
@@ -170,8 +221,7 @@ namespace wrench {
             StorageService::createFileAtLocation(file_location);
             _tmp_ram_file_location = file_location;
             _opened_tmp_ram_file = compute_ram_ss->openFile(_tmp_ram_file_location);
-        }
-        catch (ExecutionException& e) {
+        } catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             auto cause = std::dynamic_pointer_cast<StorageServiceNotEnoughSpace>(e.getCause());
             if (cause) {
@@ -213,16 +263,14 @@ namespace wrench {
             if (_tmp_storage_service and (_tmp_storage_service->getState() == Service::State::UP)) {
                 _tmp_storage_service->stop();
             }
-        }
-        catch (ExecutionException& ignore) {
+        } catch (ExecutionException& ignore) {
         }
 
         try {
             if (_opened_tmp_file) {
                 _opened_tmp_file->close();
             }
-        }
-        catch (simgrid::Exception& ignore) {
+        } catch (simgrid::Exception& ignore) {
         }
 
         try {
@@ -231,8 +279,7 @@ namespace wrench {
                     StorageService::removeFileAtLocation(_tmp_file_location);
                 }
             }
-        }
-        catch (ExecutionException& ignore) {
+        } catch (ExecutionException& ignore) {
         }
 
         // Clearing RAM space
@@ -240,8 +287,7 @@ namespace wrench {
             if (_opened_tmp_ram_file) {
                 _opened_tmp_ram_file->close();
             }
-        }
-        catch (simgrid::Exception& ignore) {
+        } catch (simgrid::Exception& ignore) {
         }
 
         try {
@@ -250,8 +296,7 @@ namespace wrench {
                     StorageService::removeFileAtLocation(_tmp_ram_file_location);
                 }
             }
-        }
-        catch (ExecutionException& ignore) {
+        } catch (ExecutionException& ignore) {
         }
 
         // Close the image disk file
@@ -259,8 +304,7 @@ namespace wrench {
             if (_opened_image_disk_file) {
                 _opened_image_disk_file->close();
             }
-        }
-        catch (simgrid::Exception& ignore) {
+        } catch (simgrid::Exception& ignore) {
         }
 
         // Close the image ram file
@@ -268,8 +312,7 @@ namespace wrench {
             if (_opened_image_ram_file) {
                 _opened_image_ram_file->close();
             }
-        }
-        catch (simgrid::Exception& ignore) {
+        } catch (simgrid::Exception& ignore) {
         }
 
         // Reset all pointers, just to be safe

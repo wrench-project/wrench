@@ -36,6 +36,7 @@ namespace wrench {
     public:
         /**
 	 * @brief Returns a message type name as a string
+	 * @return a message type name
 	 */
         template<class TMessageType>
         std::string get_type_name() {

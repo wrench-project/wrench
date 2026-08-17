@@ -12,10 +12,6 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
-
     /**
      * @brief Represents a completely abstract FunctionInput object
      */
@@ -27,10 +23,6 @@ namespace wrench {
         virtual ~FunctionInput() = default;
     };
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
-    
 } // namespace wrench
 
 #endif // WRENCH_FUNCTIONINPUT_H

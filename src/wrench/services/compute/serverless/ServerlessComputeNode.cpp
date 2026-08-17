@@ -79,6 +79,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the compute node's disk storage
+     * @return A storage service
+     */
+    std::shared_ptr<SimpleStorageService> ServerlessComputeNode::getDiskStorage() const {
+        return _disk;
+    }
+
+    /**
+     * @brief Get the compute node's RAM storage
+     * @return A storage service
+     */
+    std::shared_ptr<SimpleStorageService> ServerlessComputeNode::getMemoryStorage() const {
+        return _memory;
+    }
+
+    /**
      * @brief Method to see if there is an appropriate idle container
      * @param registered_function the target function
      * @param excluded_container set containers to ignore
@@ -109,6 +125,7 @@ namespace wrench {
     /**
      * @brief Spawn a container (and try to kill idle containers if it helps)
      * @param registered_function a registered function
+     * @return A container
      */
     std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const RegisteredFunction* registered_function) {
         // Create a container object
@@ -130,7 +147,8 @@ namespace wrench {
                 throw;
             } else {
                 for (auto const& victim : victims) {
-                    WRENCH_INFO("Evicting an idle container [%s, idle for %.2lf seconds, %llu bytes in RAM, %llu bytes on disk",
+                    WRENCH_INFO(
+                        "Evicting an idle container [%s, idle for %.2lf seconds, %llu bytes in RAM, %llu bytes on disk",
                         victim->getRegisteredFunction()->getName().c_str(),
                         S4U_Simulation::getClock() - victim->getIdleDate(),
                         victim->getRegisteredFunction()->getRAMSpaceLimit(),
@@ -147,6 +165,38 @@ namespace wrench {
         }
         _busy_containers.insert(container);
         return container;
+    }
+
+    /**
+     * @brief Get the compute node's number of cores
+     * @return a number of cores
+     */
+    unsigned int ServerlessComputeNode::getNumCores() const {
+        return _total_cores;
+    }
+
+    /**
+     * @brief Get the compute node's number of idle cores
+     * @return a number of cores
+     */
+    unsigned int ServerlessComputeNode::getNumIdleCores() const {
+        return _available_cores;
+    }
+
+    /**
+     * @brief Get the compute node's free disk space
+     * @return a number of bytes
+     */
+    sg_size_t ServerlessComputeNode::getFreeDiskSpace() const {
+        return _disk->getTotalFreeSpaceZeroTime();
+    }
+
+    /**
+     * @brief Get the compute node's free RAM space
+     * @return a number of bytes
+     */
+    sg_size_t ServerlessComputeNode::getFreeRAMSpace() const {
+        return _memory->getTotalFreeSpaceZeroTime();
     }
 
     /**
@@ -318,7 +368,7 @@ namespace wrench {
         // Sort the list
         std::sort(sorted_containers.begin(), sorted_containers.end(),
                   [ram_space_to_free_up](const std::shared_ptr<Container>& a,
-                                                                const std::shared_ptr<Container>& b) {
+                                         const std::shared_ptr<Container>& b) {
                       // If RAM doesn't matter, sort based on disk
                       if (ram_space_to_free_up == 0) {
                           return a->getRegisteredFunction()->getDiskSpaceLimit() <
@@ -338,7 +388,7 @@ namespace wrench {
                 return false;
             }
             // Find the smallest container that gets us there, and if none, pick the largest container
-            auto victim = sorted_containers.end()-1;
+            auto victim = sorted_containers.end() - 1;
             for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
                 if ((*it)->getRegisteredFunction()->getRAMSpaceLimit() >= ram_space_to_free_up and
                     (*it)->getRegisteredFunction()->getDiskSpaceLimit() >= disk_space_to_free_up) {
@@ -350,8 +400,12 @@ namespace wrench {
             to_terminate.insert(*victim);
             auto victim_ram_space = (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
             auto victim_disk_space = (*victim)->getRegisteredFunction()->getDiskSpaceLimit();
-            ram_space_to_free_up = (victim_ram_space > ram_space_to_free_up ? 0 : ram_space_to_free_up - victim_ram_space);
-            disk_space_to_free_up = (victim_disk_space > disk_space_to_free_up ? 0 : disk_space_to_free_up - victim_disk_space);
+            ram_space_to_free_up = (victim_ram_space > ram_space_to_free_up
+                                        ? 0
+                                        : ram_space_to_free_up - victim_ram_space);
+            disk_space_to_free_up = (victim_disk_space > disk_space_to_free_up
+                                         ? 0
+                                         : disk_space_to_free_up - victim_disk_space);
             sorted_containers.erase(victim);
 
             if ((ram_space_to_free_up == 0) and (disk_space_to_free_up == 0)) {
@@ -401,6 +455,5 @@ namespace wrench {
         }
         to_terminate.clear();
         return false;
-
     }
 } // namespace wrench

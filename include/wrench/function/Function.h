@@ -24,10 +24,6 @@ namespace wrench {
     class FileLocation;
     class DataFile;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
-
     /**
      * @brief A class that implements the notion of a function that
      *        can be invoked at a serverless compute service
@@ -61,10 +57,6 @@ namespace wrench {
         std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput> &, const std::shared_ptr<StorageService> &)> _lambda; // the function logic
         std::shared_ptr<Image> _image;
     };
-
-    /***********************/
-    /** \endcond           */
-    /***********************/
 
 } // namespace wrench
 

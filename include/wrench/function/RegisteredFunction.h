@@ -23,10 +23,6 @@ namespace wrench {
     class FileLocation;
     class DataFile;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
-
     /**
      * @brief Represents a serverless function, encapsulating its metadata and behavior.
      */
@@ -67,10 +63,6 @@ namespace wrench {
         sg_size_t _egress; // the egress data limit for the function
     };
     
-    /***********************/
-    /** \endcond           */
-    /***********************/
-
 } // namespace wrench
 
 #endif // WRENCH_REGISTEREDFUNCTION_H

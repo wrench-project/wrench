@@ -21,7 +21,6 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param job: the job that was killed
     */
     JobKilled::JobKilled() {
     }

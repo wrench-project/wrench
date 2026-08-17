@@ -22,20 +22,50 @@ namespace wrench {
     /** \cond INTERNAL    **/
     /***********************/
 
+    /**
+     * @brief A structure to encode an image-copy scheduling decision
+     */
     struct CopyImage {
+        /**
+         * @brief The image to copy
+         */
         std::shared_ptr<Image> image;
+        /**
+         * @brief The compute node to copy the image to
+         */
         std::shared_ptr<ServerlessComputeNode> compute_node;
     };
 
+    /**
+     * @brief A structure to encode an image-load scheduling decision
+     */
     struct LoadImage {
+        /**
+         * @brief The image to load
+         */
         std::shared_ptr<Image> image;
+        /**
+         * @brief The compute node to load the image at
+         */
         std::shared_ptr<ServerlessComputeNode> compute_node;
     };
 
+    /**
+     * @brief A structure to encode an image-dispatch scheduling decision
+     */
     struct DispatchInvocation {
+        /**
+         * @brief The invocation to dispatch
+         */
         std::shared_ptr<Invocation> invocation;
+        /**
+         * @brief The compute node where to dispatch
+         */
         std::shared_ptr<ServerlessComputeNode> compute_node;
-        std::shared_ptr<Container> container; // nullptr if none
+        /**
+         * @brief The container to use (nullptr if new container is to be started)
+         */
+        std::shared_ptr<Container> container;
     };
 
     /**
@@ -52,6 +82,9 @@ namespace wrench {
         /** @brief The list of function invocations at compute nodes */
         std::vector<DispatchInvocation> invocation_dispatches;
 
+	/**
+	 * @brief Method to print scheduling decisions
+	 */
         void print() {
             if (image_copies_to_disk.empty() and image_loads_to_RAM.empty() and
                 invocation_dispatches.empty()) {
@@ -113,11 +146,6 @@ namespace wrench {
             const ServerlessStateOfTheSystem* state
         ) = 0;
 
-    protected:
-        bool findIdleContainersToTerminate(std::vector<std::shared_ptr<Container>> idle_containers,
-                                           sg_size_t current_free_ram_space,
-                                           sg_size_t needed_free_ram_space,
-                                           std::set<std::shared_ptr<Container>>& to_terminate);
     };
 
     /***********************/

@@ -32,18 +32,21 @@ namespace wrench {
     class Container {
 
     public:
+	/**
+	 * @brief Enum to describe a container's state
+	 */
         enum class State {
             BUSY,
             IDLE,
         };
-        [[nodiscard]] bool isIdle() const { return _state == State::IDLE; }
-        [[nodiscard]] bool isBusy() const { return _state == State::BUSY; }
-        // [[nodiscard]] double getIdleTime() const;
-        [[nodiscard]] unsigned long getIdleSequence() const {return _idle_sequence; }
-        [[nodiscard]] double getIdleDate() const {return _idle_date; }
-        [[nodiscard]] const RegisteredFunction *getRegisteredFunction() const { return _registered_function; }
-        [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const { return _tmp_storage_service; }
-        [[nodiscard]] ServerlessComputeNode* getComputeNode() const {return const_cast<ServerlessComputeNode*>(_compute_node); }
+
+        [[nodiscard]] bool isIdle() const;
+        [[nodiscard]] bool isBusy() const;
+        [[nodiscard]] unsigned long getIdleSequence() const;
+        [[nodiscard]] double getIdleDate() const;
+        [[nodiscard]] const RegisteredFunction *getRegisteredFunction() const;
+        [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const;
+        [[nodiscard]] ServerlessComputeNode* getComputeNode() const;
 
         void clearPrivateStorage();
 

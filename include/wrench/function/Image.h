@@ -27,10 +27,10 @@ namespace wrench {
      */
     class Image {
     public:
-        [[nodiscard]] std::string getName() const { return _name; }
-        [[nodiscard]] sg_size_t getRAMFootprint() const { return _ram_footprint; }
+        [[nodiscard]] std::string getName() const;
+        [[nodiscard]] sg_size_t getRAMFootprint() const;
         [[nodiscard]] sg_size_t getDiskFootprint() const;
-        [[nodiscard]] std::shared_ptr<FileLocation> getLocation() const { return _location; }
+        [[nodiscard]] std::shared_ptr<FileLocation> getLocation() const;
         [[nodiscard]] std::shared_ptr<DataFile> getFile() const;
 
     private:
@@ -43,7 +43,7 @@ namespace wrench {
 
         Image(const std::string& name,
               const std::shared_ptr<FileLocation>& location,
-              sg_size_t ram_foot_print);
+              sg_size_t ram_footprint);
 
         [[nodiscard]] std::shared_ptr<DataFile> getRAMFile() const;
 

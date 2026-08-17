@@ -86,7 +86,9 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-    /* Helper class */
+    /**
+     * @brief A helper class that implements an action executor, but with a timeout
+     */
     class ActionExecutorActorWithTimeout : public ActionExecutor {
     public:
         ActionExecutorActorWithTimeout(const std::string& hostname,

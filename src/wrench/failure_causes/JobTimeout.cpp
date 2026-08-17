@@ -20,8 +20,6 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    *
-    * @param job: the job that has timed out
     */
     JobTimeout::JobTimeout() {
     }
