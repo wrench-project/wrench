@@ -92,11 +92,10 @@ namespace wrench {
      * @return a hostname (or "n/a" if not available)
      */
     std::string Invocation::getComputeNode() const {
-        if (_container) {
-            return _container->getComputeNode()->hostname;
-        } else {
+        if (not _container) {
             return "n/a";
         }
+        return _container->getComputeNode()->hostname;
     }
 
     /**

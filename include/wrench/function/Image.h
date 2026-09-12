@@ -41,7 +41,7 @@ namespace wrench {
         friend class ServerlessComputeNode;
         friend class ServerlessComputeService;
 
-        Image(const std::string& name,
+        Image(std::string  name,
               const std::shared_ptr<FileLocation>& location,
               sg_size_t ram_footprint);
 

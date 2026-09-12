@@ -8,6 +8,8 @@
  */
 
 #include "wrench/function/Image.h"
+
+#include <utility>
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 #include "wrench/simulation/Simulation.h"
@@ -23,9 +25,9 @@ namespace wrench {
      * @param location The location of the image (i.e., on some remote/authoritative repo)
      * @param ram_footprint The memory occupied by the resident, reusable portion of that image, in bytes
      */
-    Image::Image(const std::string& name,
+    Image::Image(std::string  name,
                  const std::shared_ptr<FileLocation>& location,
-                 const sg_size_t ram_footprint) : _name(name), _location(location), _ram_footprint(ram_footprint) {
+                 const sg_size_t ram_footprint) : _name(std::move(name)), _location(location), _ram_footprint(ram_footprint) {
         _ram_file = Simulation::addFile(location->getFile()->getID() + "_RAM", _ram_footprint);
     }
 

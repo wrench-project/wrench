@@ -99,7 +99,7 @@ namespace wrench {
         S4U_CommPort *creator_commport;
 
         // FunctionManager internal data structures
-        std::set<std::shared_ptr<RegisteredFunction>> _registered_functions; // do we store these here or in the Serverless Compute Service?
+        // std::set<std::shared_ptr<RegisteredFunction>> _registered_functions; // do we store these here or in the Serverless Compute Service?
         std::queue<std::shared_ptr<RegisteredFunction>> _functions_to_invoke;
         std::set<std::shared_ptr<Invocation>> _pending_invocations; // do we really need this?
         std::set<std::shared_ptr<Invocation>> _finished_invocations;

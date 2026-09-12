@@ -53,7 +53,7 @@ namespace wrench {
      */
     void FunctionManager::kill() {
         this->killActor();
-        _registered_functions.clear();
+        // _registered_functions.clear();
         while (!_functions_to_invoke.empty()) {
             _functions_to_invoke.pop();
         }
