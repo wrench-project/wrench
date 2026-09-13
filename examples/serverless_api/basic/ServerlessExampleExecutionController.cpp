@@ -94,9 +94,8 @@ namespace wrench {
         auto image_file_location = FileLocation::LOCATION(storage_service, image_file);
         StorageService::createFileAtLocation(image_file_location);
 
-        // Create the function object
+        // Create the function's image object
         auto image = wrench::FunctionManager::createImage("my_image", image_file_location, image_file->getSize());
-        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image);
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 
@@ -108,7 +107,7 @@ namespace wrench {
         sg_size_t egress_in_bytes = 40 * MB;
 
         // Register the function to the serverless compute service, via the function manager
-        auto registered_function = function_manager->registerFunction(function, compute_service,
+        auto registered_function = function_manager->registerFunction("my_function", function_code, image, compute_service,
                                                                       time_limit,
                                                                       disk_space_limit_in_bytes,
                                                                       RAM_limit_in_bytes,

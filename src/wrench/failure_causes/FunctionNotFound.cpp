@@ -32,7 +32,7 @@ namespace wrench {
      * @return the message
      */
     std::string FunctionNotFound::toString() {
-        return "The function (" + _registered_function->getFunction()->getName() + ") was not found";
+        return "The function (" + _registered_function->getName() + ") was not found";
     }
 
 } // namespace wrench

@@ -78,8 +78,7 @@ namespace wrench {
         _compute_node_ram = S4U_Simulation::getHostMemoryCapacity(first_hostname);
         try {
             _compute_node_disk_space = S4U_Simulation::getDiskCapacity(first_hostname, "/");
-        }
-        catch (std::invalid_argument&) {
+        } catch (std::invalid_argument&) {
             throw std::invalid_argument("Compute nodes for a serverless compute service must have a '/' mountpoint");
         }
         check_homogeneity(compute_nodes);
@@ -112,8 +111,7 @@ namespace wrench {
             // sg_size_t disk_write_bandwidth;
             try {
                 disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
-            }
-            catch (std::invalid_argument&) {
+            } catch (std::invalid_argument&) {
                 throw std::invalid_argument(
                     "Compute nodes for a serverless compute service must have a '/' mountpoint");
             }
@@ -207,40 +205,35 @@ namespace wrench {
             std::map<std::string, double> num_hosts;
             num_hosts.insert(std::make_pair(this->getName(), _state_of_the_system->_compute_nodes.size()));
             return num_hosts;
-        }
-        else if (key == "num_cores") {
+        } else if (key == "num_cores") {
             // Num cores per host
             std::map<std::string, double> num_cores;
             for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
                 num_cores[compute_node->hostname] = static_cast<double>(compute_node->_total_cores);
             }
             return num_cores;
-        }
-        else if (key == "num_idle_cores") {
+        } else if (key == "num_idle_cores") {
             // Num idle cores per host
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 num_idle_cores[compute_node->hostname] = static_cast<double>(compute_node->_available_cores);
             }
             return num_idle_cores;
-        }
-        else if (key == "flop_rates") {
+        } else if (key == "flop_rates") {
             // Flop rate per host
             std::map<std::string, double> flop_rates;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 flop_rates[compute_node->hostname] = S4U_Simulation::getHostFlopRate(compute_node->hostname);
             }
             return flop_rates;
-        }
-        else if (key == "ram_capacities") {
+        } else if (key == "ram_capacities") {
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
             }
             return ram_capacities;
-        }
-        else if (key == "ram_availabilities") {
+        } else if (key == "ram_availabilities") {
             // RAM availability per host
             std::map<std::string, double> ram_availability;
             for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
@@ -248,8 +241,7 @@ namespace wrench {
                     getTotalFreeSpaceZeroTime());
             }
             return ram_availability;
-        }
-        else {
+        } else {
             throw std::runtime_error("ServerlessComputeService::getResourceInformation(): unknown key");
         }
     }
@@ -257,7 +249,9 @@ namespace wrench {
     /**
      * @brief Register a function in the serverless compute service
      *
-     * @param function the function to register
+     * @param name the function's name
+     * @param code the function's code
+     * @param image the function's image
      * @param time_limit_in_seconds the time limit for execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
      * @param RAM_limit_in_bytes the RAM limit for the function
@@ -267,14 +261,22 @@ namespace wrench {
      * @throw ExecutionException if the function registration fails
      */
     std::shared_ptr<RegisteredFunction> ServerlessComputeService::registerFunction(
-        const std::shared_ptr<Function>& function, const double time_limit_in_seconds,
-        const sg_size_t disk_space_limit_in_bytes, const sg_size_t RAM_limit_in_bytes,
-        const sg_size_t ingress_in_bytes, const sg_size_t egress_in_bytes) const {
+        const std::string& name,
+        const std::function<std::shared_ptr<FunctionOutput>(
+            const std::shared_ptr<FunctionInput>&,
+            const std::shared_ptr<StorageService>&)>& code,
+        const std::shared_ptr<Image>& image,
+        const double time_limit_in_seconds,
+        const sg_size_t disk_space_limit_in_bytes,
+        const sg_size_t RAM_limit_in_bytes,
+        const sg_size_t ingress_in_bytes,
+        const sg_size_t egress_in_bytes) const {
         const auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         _commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
-                answer_commport, function, time_limit_in_seconds, disk_space_limit_in_bytes, RAM_limit_in_bytes,
+                answer_commport, name, code, image, time_limit_in_seconds, disk_space_limit_in_bytes,
+                RAM_limit_in_bytes,
                 ingress_in_bytes, egress_in_bytes,
                 this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_REQUEST_MESSAGE_PAYLOAD)));
@@ -337,16 +339,16 @@ namespace wrench {
 
         bool do_scheduling;
         while (processNextMessage(do_scheduling)) {
-
             // At each compute node, if an image is in RAM but not on Disk, due to what we did in the previous
             // scheduling decisions, remove it from RAM (to be realistic).
             // This is a hack, but, as of now, there is no way to "tie" two files together. And
             // the LRU behavior is outside of wrench's control (in fsmod), and not observable/callbackable.
-            for (auto const &node : _state_of_the_system->_compute_nodes) {
-                for (auto const &rf : _state_of_the_system->_registered_functions) {
+            for (auto const& node : _state_of_the_system->_compute_nodes) {
+                for (auto const& rf : _state_of_the_system->_registered_functions) {
                     auto image = rf->getImage();
                     if (node->isImageInRAM(image) and (not node->isImageOnDisk(image))) {
-                        StorageService::removeFileAtLocation(FileLocation::LOCATION(node->_memory, image->getRAMFile()));
+                        StorageService::removeFileAtLocation(
+                            FileLocation::LOCATION(node->_memory, image->getRAMFile()));
                     }
                 }
             }
@@ -396,8 +398,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
         try {
             message = _commport->getMessage();
-        }
-        catch (ExecutionException&) {
+        } catch (ExecutionException&) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;
         }
@@ -407,65 +408,56 @@ namespace wrench {
         if (const auto ss_msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // TODO: Die...
             return false;
-        }
-        else if (const auto scsfrr_msg = std::dynamic_pointer_cast<
+        } else if (const auto scsfrr_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
             processFunctionRegistrationRequest(
-                scsfrr_msg->answer_commport, scsfrr_msg->function, scsfrr_msg->time_limit_in_seconds,
+                scsfrr_msg->answer_commport, scsfrr_msg->name, scsfrr_msg->code, scsfrr_msg->image,
+                scsfrr_msg->time_limit_in_seconds,
                 scsfrr_msg->disk_space_limit_in_bytes, scsfrr_msg->ram_limit_in_bytes,
                 scsfrr_msg->ingress_in_bytes, scsfrr_msg->egress_in_bytes);
             return true;
-        }
-        else if (const auto scsfir_msg = std::dynamic_pointer_cast<
+        } else if (const auto scsfir_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionInvocationRequestMessage>(message)) {
             processFunctionInvocationRequest(scsfir_msg->answer_commport, scsfir_msg->registered_function,
                                              scsfir_msg->function_input, scsfir_msg->notify_commport);
             return true;
-        }
-        else if (const auto scsdc_msg = std::dynamic_pointer_cast<
+        } else if (const auto scsdc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceDownloadCompleteMessage>(message)) {
             processImageDownloadCompletion(scsdc_msg->_action, scsdc_msg->_image);
             return true;
-        }
-        else if (const auto scsiec_msg = std::dynamic_pointer_cast<
+        } else if (const auto scsiec_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             processInvocationCompletion(scsiec_msg->_invocation, scsiec_msg->_action);
             return true;
-        }
-        else if (const auto scsncc_msg = std::dynamic_pointer_cast<
+        } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
             scsncc_msg->_compute_node->_images_being_copied.erase(scsncc_msg->_image);
             if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("An image copy has failed (due to disk pressure) for image [%s]... oh well",
                             scsncc_msg->_image->getName().c_str());
                 do_scheduling = false;
-            }
-            else {
+            } else {
                 WRENCH_INFO("Image [%s] was stored on disk at [%s]",
                             scsncc_msg->_image->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
             }
             return true;
-        }
-        else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
+        } else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
             scsnlc_msg->_compute_node->_images_being_loaded.erase(scsnlc_msg->_image);
             if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("A memory load has failed (due to memory pressure) for image [%s]... oh well",
                             scsnlc_msg->_image->getName().c_str());
                 do_scheduling = false;
-            }
-            else {
+            } else {
                 WRENCH_INFO("Image [%s] was loaded in RAM at [%s]",
                             scsnlc_msg->_image->getName().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
             }
             return true;
-        }
-        else if (const auto sclcit_msg = std::dynamic_pointer_cast<
+        } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerIdleTimeoutMessage>(message)) {
             processContainerIdleTimeout(sclcit_msg->_container, sclcit_msg->_idle_sequence);
             return true;
-        }
-        else {
+        } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
@@ -474,7 +466,9 @@ namespace wrench {
      * @brief Processes a "function registration request" message
      *
      * @param answer_commport the FunctionManager commport to answer to
-     * @param function the function to register
+     * @param name the name of the function to register
+     * @param code the function's code
+     * @param image the function's image
      * @param time_limit the time limit for execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
      * @param ram_limit_in_bytes the RAM limit for the function
@@ -483,7 +477,11 @@ namespace wrench {
      */
     void ServerlessComputeService::processFunctionRegistrationRequest(
         S4U_CommPort* answer_commport,
-        const std::shared_ptr<Function>& function,
+        const std::string& name,
+        const std::function<std::shared_ptr<FunctionOutput>(
+            const std::shared_ptr<FunctionInput>&,
+            const std::shared_ptr<StorageService>&)>& code,
+        const std::shared_ptr<Image>& image,
         double time_limit,
         sg_size_t disk_space_limit_in_bytes,
         sg_size_t ram_limit_in_bytes,
@@ -491,8 +489,8 @@ namespace wrench {
         sg_size_t egress_in_bytes) {
         // Check that function can ever run!
         {
-            sg_size_t needed_disk_space = function->getImage()->getDiskFootprint() + disk_space_limit_in_bytes;
-            sg_size_t needed_ram_space = function->getImage()->getRAMFootprint() + ram_limit_in_bytes;
+            sg_size_t needed_disk_space = image->getDiskFootprint() + disk_space_limit_in_bytes;
+            sg_size_t needed_ram_space = image->getRAMFootprint() + ram_limit_in_bytes;
 
             if (needed_disk_space > _compute_node_disk_space) {
                 const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
@@ -519,7 +517,9 @@ namespace wrench {
 
         // At this point, we can register the function
         auto registered_function = std::make_shared<RegisteredFunction>(
-            function,
+            name,
+            code,
+            image,
             time_limit,
             disk_space_limit_in_bytes,
             ram_limit_in_bytes,
@@ -547,9 +547,9 @@ namespace wrench {
         const std::shared_ptr<RegisteredFunction>& registered_function,
         const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
-
         // Apply the overhead
-        S4U_Simulation::sleep(this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
+        S4U_Simulation::sleep(
+            this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
 
         // If the function is not registered answer with some error
         if (_state_of_the_system->_registered_functions.find(registered_function) ==
@@ -559,8 +559,7 @@ namespace wrench {
                 false, nullptr, std::make_shared<FunctionNotFound>(registered_function), this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answerMessage);
-        }
-        else {
+        } else {
             // Put the invocation in the right list
             auto invocation = std::make_shared<Invocation>(registered_function, input, notify_commport);
             invocation->_submit_date = Simulation::getCurrentSimulatedDate();
@@ -632,7 +631,7 @@ namespace wrench {
                                                                const std::shared_ptr<Action>& action) {
         std::shared_ptr<FailureCause> failure_cause = action->getFailureCause();
         WRENCH_INFO("A function invocation for function %s has finished [%s]",
-                    invocation->getRegisteredFunction()->getFunction()->getName().c_str(),
+                    invocation->getRegisteredFunction()->getName().c_str(),
                     (failure_cause ? "FAILURE" : "SUCCESS"));
 
         auto compute_node = invocation->_compute_node;
@@ -647,8 +646,7 @@ namespace wrench {
         double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
-        }
-        else {
+        } else {
             // Start the timeout alarm
             std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
                 this->simulation_,
@@ -671,7 +669,6 @@ namespace wrench {
                 invocation,
                 failure_cause, this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-
     }
 
     /**
@@ -741,10 +738,9 @@ namespace wrench {
             // Try to spawn a container
             try {
                 target_container = target_compute_node->spawnContainer(invocation->getRegisteredFunction().get());
-            }
-            catch (ExecutionException& e) {
+            } catch (ExecutionException& e) {
                 WRENCH_INFO("Couldn't spawn a container for an invocation for function %s: %s",
-                            invocation->_registered_function->_function->getName().c_str(),
+                            invocation->_registered_function->getName().c_str(),
                             e.getCause()->toString().c_str());
                 return false;
             }
@@ -773,15 +769,14 @@ namespace wrench {
 
         const std::function lambda_execute = [invocation](
             const std::shared_ptr<ActionExecutor>& action_executor) {
-            const auto function = invocation->_registered_function->_function;
 
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
             try {
-                invocation->_function_output = function->execute(invocation->_function_input,
+                invocation->_function_output = invocation->_registered_function->_code(invocation->_function_input,
                                                                  invocation->_container->getPrivateStorageService());
-            }
-            catch (ExecutionException& e) {
+
+            } catch (ExecutionException& e) {
                 invocation->_container->clearPrivateStorage();
                 invocation->_function_end_date = S4U_Simulation::getClock();
                 throw;
@@ -792,7 +787,7 @@ namespace wrench {
         // Create the action and create a corresponding action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "run_invocation_" + invocation->_registered_function->_function->getName(),
+                "run_invocation_" + invocation->_registered_function->getName(),
                 0, 0, lambda_execute, lambda_terminate));
 
         auto custom_message = new ServerlessComputeServiceInvocationExecutionCompleteMessage(
@@ -816,13 +811,12 @@ namespace wrench {
         action_executor->setSimulation(this->simulation_);
 
         WRENCH_INFO("Dispatched an invocation for function %s",
-                    invocation->getRegisteredFunction()->getFunction()->getName().c_str());
+                    invocation->getRegisteredFunction()->getName().c_str());
 
         // Start the action executor object
         try {
             action_executor->start(action_executor, true, false);
-        }
-        catch (ExecutionException&) {
+        } catch (ExecutionException&) {
             throw std::runtime_error(
                 "ServerlessComputeService::dispatchInvocation(): Action executor could not be started - internal error");
         }
@@ -928,7 +922,7 @@ namespace wrench {
         // strategies).
         while (!_state_of_the_system->_new_invocations.empty()) {
             auto invocation = _state_of_the_system->_new_invocations.front();
-            const auto image = invocation->_registered_function->_function->getImage();
+            const auto image = invocation->_registered_function->getImage();
             WRENCH_INFO("Admitting invocation %llu...", invocation->getId());
 
             // If the image file is being downloaded, make the invocation admitted
@@ -949,8 +943,7 @@ namespace wrench {
                 initiateImageDownloadFromRemote(invocation);
                 _state_of_the_system->_new_invocations.pop();
                 _state_of_the_system->_admitted_invocations[image].push(invocation);
-            }
-            else {
+            } else {
                 throw std::runtime_error("ServerlessComputeService::admitInvocations(): "
                     "An invocation cannot be admitted because there is not enough space on the head storage to download its (remote) image. "
                     "Currently, no mechanism is implemented to manage the head storage (just make it bigger).");
@@ -969,7 +962,7 @@ namespace wrench {
         const std::function lambda_execute = [invocation, this
             ](const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the lambda execute!!");
-            const auto src_location = invocation->_registered_function->_function->getImage()->getLocation();
+            const auto src_location = invocation->_registered_function->getImage()->getLocation();
             const auto dst_location = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
                                                              src_location->getFile());
             if (this->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS)) {
@@ -982,13 +975,13 @@ namespace wrench {
 
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "download_image_" + invocation->_registered_function->_function->getImageFile()->getID(),
+                "download_image_" + invocation->_registered_function->getImageFile()->getID(),
                 0, 0, lambda_execute, lambda_terminate));
 
         // Spin up an ActionExecutor service, and have it send us back a custom message
         auto custom_message = new ServerlessComputeServiceDownloadCompleteMessage(
             action,
-            invocation->_registered_function->_function->getImage(), 0);
+            invocation->_registered_function->getImage(), 0);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             this->getHostname(),
@@ -1005,8 +998,7 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for downloading a remove image...");
         try {
             action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
-        }
-        catch (const std::exception&) {
+        } catch (const std::exception&) {
             throw std::runtime_error(
                 "ServerlessComputeService::initiateImageDownloadFromRemote(): Action executor could not be started - internal error");
         }
@@ -1104,8 +1096,7 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         try {
             action_executor->start(action_executor, true, false);
-        }
-        catch (const std::exception&) {
+        } catch (const std::exception&) {
             throw std::runtime_error(
                 "ServerlessComputeService::initiateImageCopyToComputeNode(): Action executor could not be started - internal error");
         }
@@ -1162,8 +1153,7 @@ namespace wrench {
                 Simulation::removeFile(tmp_file);
                 // Create the RAM file in its place
                 compute_node->_memory->createFile(image->getRAMFile());
-            }
-            catch (ExecutionException&) {
+            } catch (ExecutionException&) {
                 // Remove/close the tmp file if failed
                 if (open_tmp_file) {
                     open_tmp_file->close();
@@ -1204,8 +1194,7 @@ namespace wrench {
         // WRENCH_INFO("Starting an action executor for copying image...");
         try {
             action_executor->start(action_executor, true, false);
-        }
-        catch (const std::exception&) {
+        } catch (const std::exception&) {
             throw std::runtime_error(
                 "ServerlessComputeService::initiateImageLoadAtComputeNode(): Action executor could not be started - internal error");
         }

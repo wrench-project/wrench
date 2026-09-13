@@ -65,9 +65,8 @@ namespace wrench {
             return std::make_shared<FunctionOutput>();
         };
 
-        // Create a function object
-	auto image = wrench::FunctionManager::createImage("my_image", image_file_location, image_file->getSize() / 2);
-        auto function = wrench::FunctionManager::createFunction("my_function", function_code, image);
+        // Create the function's image
+	    auto image = wrench::FunctionManager::createImage("my_image", image_file_location, image_file->getSize() / 2);
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 
@@ -79,7 +78,7 @@ namespace wrench {
         sg_size_t egress_in_bytes = 40 * MB;
 
         // Register the function to the serverless compute service, via the function manager
-        auto registered_function = function_manager->registerFunction(function, serverless_compute_service,
+        auto registered_function = function_manager->registerFunction("my_function", function_code, image, serverless_compute_service,
                                                                       time_limit,
                                                                       disk_space_limit_in_bytes,
                                                                       RAM_limit_in_bytes,

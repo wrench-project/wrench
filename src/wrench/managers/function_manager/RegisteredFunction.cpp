@@ -16,20 +16,26 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param function The function to be registered.
+     * @param name The function's name.
+     * @param code the function's code.
+     * @param image the function's image.
      * @param time_limit_in_seconds The time limit for the function execution.
      * @param disk_space_limit_in_bytes The disk space limit for the function.
      * @param RAM_limit_in_bytes The RAM limit for the function.
      * @param ingress_in_bytes The ingress data limit for the function.
      * @param egress_in_bytes The egress data limit for the function.
      */
-    RegisteredFunction::RegisteredFunction(const std::shared_ptr<Function>& function,
-                                           double time_limit_in_seconds, 
+    RegisteredFunction::RegisteredFunction(const std::string& name,
+            const std::function<std::shared_ptr<FunctionOutput>(
+                const std::shared_ptr<FunctionInput>&,
+                const std::shared_ptr<StorageService>&)>& code,
+                const std::shared_ptr<Image>& image,
+                                           double time_limit_in_seconds,
                                            sg_size_t disk_space_limit_in_bytes, 
                                            sg_size_t RAM_limit_in_bytes,
                                            sg_size_t ingress_in_bytes, 
                                            sg_size_t egress_in_bytes)
-        : _function(function), _time_limit(time_limit_in_seconds), _disk_space(disk_space_limit_in_bytes), 
+        : _name(name), _code(code), _image(image), _time_limit(time_limit_in_seconds), _disk_space(disk_space_limit_in_bytes),
         _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
 
     /**
@@ -37,7 +43,7 @@ namespace wrench {
      * @return A file
      */
     std::shared_ptr<Image> RegisteredFunction::getImage() const {
-        return _function->getImage();
+        return _image;
     }
 
     /**
@@ -45,15 +51,7 @@ namespace wrench {
      * @return A file
      */
     std::shared_ptr<DataFile> RegisteredFunction::getImageFile() const {
-        return _function->getImage()->getFile();
-    }
-
-    /**
-     * @brief Get the registered function's actual function implementation
-     * @return A function
-     */
-    std::shared_ptr<Function> RegisteredFunction::getFunction() const {
-        return _function;
+        return _image->getFile();
     }
 
     /**
@@ -61,7 +59,7 @@ namespace wrench {
      * @return A name
      */
     std::string RegisteredFunction::getName() const {
-        return _function->getName();
+        return _name;
     }
 
     /**

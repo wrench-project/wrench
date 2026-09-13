@@ -16,12 +16,14 @@
 #include <simgrid/forward.h>
 
 namespace wrench {
-
     class ServerlessComputeService;
     class Function;
     class Image;
     class FileLocation;
     class DataFile;
+    class FunctionInput;
+    class FunctionOutput;
+    class StorageService;
 
     /**
      * @brief Represents a serverless function, encapsulating its metadata and behavior.
@@ -32,12 +34,17 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        RegisteredFunction(const std::shared_ptr<Function>& function,
-                           double time_limit_in_seconds, 
-                           sg_size_t disk_space_limit_in_bytes, 
-                           sg_size_t RAM_limit_in_bytes,
-                           sg_size_t ingress_in_bytes, 
-                           sg_size_t egress_in_bytes);
+        RegisteredFunction(
+            const std::string& name,
+            const std::function<std::shared_ptr<FunctionOutput>(
+                const std::shared_ptr<FunctionInput>&,
+                const std::shared_ptr<StorageService>&)>& code,
+            const std::shared_ptr<Image>& image,
+            double time_limit_in_seconds,
+            sg_size_t disk_space_limit_in_bytes,
+            sg_size_t RAM_limit_in_bytes,
+            sg_size_t ingress_in_bytes,
+            sg_size_t egress_in_bytes);
 
         /***********************/
         /** \endcond           */
@@ -45,7 +52,6 @@ namespace wrench {
 
         [[nodiscard]] std::shared_ptr<Image> getImage() const;
         [[nodiscard]] std::shared_ptr<DataFile> getImageFile() const;
-        [[nodiscard]] std::shared_ptr<Function> getFunction() const;
         [[nodiscard]] std::string getName() const;
         [[nodiscard]] double getTimeLimit() const;
         [[nodiscard]] sg_size_t getDiskSpaceLimit() const;
@@ -54,15 +60,21 @@ namespace wrench {
     private:
         friend class FunctionManager;
         friend class ServerlessComputeService;
-        
-        std::shared_ptr<Function> _function; // the function to be registered
+
+        // the name of the function
+        std::string _name;
+        // the function's logic
+        std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput>&,
+                                                      const std::shared_ptr<StorageService>&)> _code;
+        // the function's image
+        std::shared_ptr<Image> _image;
+
         double _time_limit; // the time limit for the function execution
         sg_size_t _disk_space; // the disk space limit for the function
         sg_size_t _ram_limit; // the RAM limit for the function
         sg_size_t _ingress; // the ingress data limit for the function
         sg_size_t _egress; // the egress data limit for the function
     };
-    
 } // namespace wrench
 
 #endif // WRENCH_REGISTEREDFUNCTION_H

@@ -243,9 +243,8 @@ private:
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         auto image = function_manager->createImage("image", image_location, image_file->getSize());
         wrench::StorageService::createFileAtLocation(image_location);
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
         try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
+            function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
                                                1 * MB);
             throw std::runtime_error("Function registration should have failed due to RAM space");
         }
@@ -253,7 +252,7 @@ private:
         }
 
         try {
-            function_manager->registerFunction(function1, this->compute_service, 10, 20000 * GB, 8000 * MB, 10 * MB,
+            function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 20000 * GB, 8000 * MB, 10 * MB,
                                                1 * MB);
             throw std::runtime_error("Function registration should have failed due to disk space");
         }
@@ -374,25 +373,10 @@ private:
         auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
         wrench::StorageService::createFileAtLocation(image_location);
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
+        function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
-        // Trying to create a function with the same name
-        try {
-            auto function_duplicate = wrench::FunctionManager::createFunction("Function 1", lambda, image);
-            throw std::runtime_error("Redundant function creation should have failed");
-        }
-        catch (const std::exception& expected) {
-        }
-
-        function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
-
-        auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image);
-
-        auto registered_function2 = function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB,
+        auto registered_function2 = function_manager->registerFunction("Function 2", lambda, image, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
-        if (registered_function2->getFunction() != function2) {
-            throw std::runtime_error("Registered function should be function2");
-        }
         if (registered_function2->getImage() != image) {
             throw std::runtime_error("Registered function image should be image location");
         }
@@ -476,11 +460,9 @@ private:
         auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
 
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
-
         // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
+        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -489,9 +471,6 @@ private:
 
 
             auto registered_function = invocation->getRegisteredFunction();
-            if (invocation->getRegisteredFunction()->getFunction() != function1) {
-                throw std::runtime_error("Invocation's associated function should be function1");
-            }
             if (invocation->getRegisteredFunction()->getTimeLimit() != 10.00) {
                 throw std::runtime_error("Invocation's associated time limit should be 10.0");
             }
@@ -623,12 +602,10 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
-        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
-
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
+        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         auto dsl = registered_function1->getDiskSpaceLimit(); // coverage
@@ -762,11 +739,9 @@ private:
                 MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
-
         // Registering a function with one of the two compute services
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB,
+        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation to a function that's not registered to a service

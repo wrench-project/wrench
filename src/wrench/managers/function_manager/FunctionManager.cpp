@@ -76,32 +76,35 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<Image> FunctionManager::createImage(const std::string& name,
-                                                           const std::shared_ptr<FileLocation>& location, sg_size_t ram_foot_print) {
+                                                        const std::shared_ptr<FileLocation>& location,
+                                                        sg_size_t ram_foot_print) {
         return std::shared_ptr<Image>(new Image(name, location, ram_foot_print));
     }
 
 
-    /**
-     * @brief Creates a shared pointer to a Function object and returns it
-     *
-     * @param name the name of the function
-     * @param lambda the code of the function
-     * @param image the image for the function
-     * @return std::shared_ptr<Function> a shared pointer to the Function object created
-     */
-    std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
-                                                              const std::function<std::shared_ptr<FunctionOutput>(
-                                                              const std::shared_ptr<FunctionInput>&,
-                                                              const std::shared_ptr<StorageService>&)>& lambda,
-                                                              const std::shared_ptr<Image>& image) {
-        // Create the notion of a function
-        return std::make_shared<Function>(name, lambda, image);
-    }
+    // /**
+    //  * @brief Creates a shared pointer to a Function object and returns it
+    //  *
+    //  * @param name the name of the function
+    //  * @param lambda the code of the function
+    //  * @param image the image for the function
+    //  * @return std::shared_ptr<Function> a shared pointer to the Function object created
+    //  */
+    // std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
+    //                                                           const std::function<std::shared_ptr<FunctionOutput>(
+    //                                                           const std::shared_ptr<FunctionInput>&,
+    //                                                           const std::shared_ptr<StorageService>&)>& lambda,
+    //                                                           const std::shared_ptr<Image>& image) {
+    //     // Create the notion of a function
+    //     return std::make_shared<Function>(name, lambda, image);
+    // }
 
     /**
      * @brief Registers a function with the ServerlessComputeService
      *
-     * @param function the function to register
+     * @param name the function's name
+     * @param code the function's code
+     * @param image the function's image
      * @param sl_compute_service the ServerlessComputeService to register the function on
      * @param time_limit_in_seconds the time limit for the function execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
@@ -111,19 +114,22 @@ namespace wrench {
      * @return true if the function was registered successfully
      * @throw ExecutionException if the function registration fails
      */
-    std::shared_ptr<RegisteredFunction> FunctionManager::registerFunction(const std::shared_ptr<Function>& function,
-                                                                          const std::shared_ptr<
-                                                                              ServerlessComputeService>&
-                                                                          sl_compute_service,
-                                                                          double time_limit_in_seconds,
-                                                                          sg_size_t disk_space_limit_in_bytes,
-                                                                          sg_size_t RAM_limit_in_bytes,
-                                                                          sg_size_t ingress_in_bytes,
-                                                                          sg_size_t egress_in_bytes) {
-        WRENCH_INFO("Function [%s] registered with compute service [%s]", function->getName().c_str(),
-                    sl_compute_service->getName().c_str());
-        // Logic to register the function with the serverless compute service
-        return sl_compute_service->registerFunction(function, time_limit_in_seconds, disk_space_limit_in_bytes,
+    std::shared_ptr<RegisteredFunction> FunctionManager::registerFunction(
+        const std::string& name,
+        const std::function<std::shared_ptr<
+            FunctionOutput>(
+            const std::shared_ptr<FunctionInput>&,
+            const std::shared_ptr<StorageService>&)>& code,
+        const std::shared_ptr<Image>& image,
+        const std::shared_ptr<
+            ServerlessComputeService>&
+        sl_compute_service,
+        double time_limit_in_seconds,
+        sg_size_t disk_space_limit_in_bytes,
+        sg_size_t RAM_limit_in_bytes,
+        sg_size_t ingress_in_bytes,
+        sg_size_t egress_in_bytes) {
+        return sl_compute_service->registerFunction(name, code, image, time_limit_in_seconds, disk_space_limit_in_bytes,
                                                     RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
     }
 
@@ -237,8 +243,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
         try {
             message = this->_commport->getMessage();
-        }
-        catch (ExecutionException& e) {
+        } catch (ExecutionException& e) {
             WRENCH_INFO(
                 "Got a network error while getting some message... ignoring");
             return true;
@@ -250,11 +255,9 @@ namespace wrench {
         if (std::dynamic_pointer_cast<FunctionManagerWakeupMessage>(message)) {
             // wake up!!
             return true;
-        }
-        else if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        } else if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             return false;
-        }
-        else if (auto scsfic_msg = std::dynamic_pointer_cast<
+        } else if (auto scsfic_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionInvocationCompleteMessage>(message)) {
             processFunctionInvocationComplete(scsfic_msg->invocation, scsfic_msg->success, scsfic_msg->failure_cause);
             return true;
@@ -266,12 +269,10 @@ namespace wrench {
         else if (auto wait_one_msg = std::dynamic_pointer_cast<FunctionManagerWaitOneMessage>(message)) {
             processWaitOne(wait_one_msg->invocation, wait_one_msg->answer_commport);
             return true;
-        }
-        else if (auto wait_many_msg = std::dynamic_pointer_cast<FunctionManagerWaitAllMessage>(message)) {
+        } else if (auto wait_many_msg = std::dynamic_pointer_cast<FunctionManagerWaitAllMessage>(message)) {
             processWaitAll(wait_many_msg->invocations, wait_many_msg->answer_commport);
             return true;
-        }
-        else {
+        } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
@@ -338,8 +339,7 @@ namespace wrench {
                     it->second->putMessage(new FunctionManagerWakeupMessage());
                 }
                 it = _invocations_being_waited_for.erase(it);
-            }
-            else {
+            } else {
                 ++it;
             }
         }

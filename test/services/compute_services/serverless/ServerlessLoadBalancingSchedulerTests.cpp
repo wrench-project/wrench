@@ -150,16 +150,12 @@ private:
         auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
 
 
-        auto function1 = wrench::FunctionManager::createFunction("Function 1", lambda, image);
-
         WRENCH_INFO("Registering function 1");
-        auto registered_function1 = function_manager->registerFunction(function1, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 1 registered");
 
-        auto function2 = wrench::FunctionManager::createFunction("Function 2", lambda, image);
-
         WRENCH_INFO("Registering function 2");
-        auto registered_function2 = function_manager->registerFunction(function2, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        auto registered_function2 = function_manager->registerFunction("Function 2", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
         WRENCH_INFO("Function 2 registered");
 
         std::vector<std::shared_ptr<wrench::Invocation>> invocations;

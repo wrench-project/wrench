@@ -16,6 +16,7 @@
 #include "wrench/function/Function.h"
 
 namespace wrench {
+    class Image;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -34,12 +35,27 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionRegisterRequestMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionRegisterRequestMessage(S4U_CommPort *answer_commport, std::shared_ptr<Function> function, double time_limit, sg_size_t disk_space_limit_in_bytes, sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes, sg_size_t egress_in_bytes, sg_size_t payload);
+        ServerlessComputeServiceFunctionRegisterRequestMessage(S4U_CommPort* answer_commport,
+                                                               const std::string& name,
+                                                               const std::function<std::shared_ptr<FunctionOutput>(
+                                                                   const std::shared_ptr<FunctionInput>&,
+                                                                   const std::shared_ptr<StorageService>&)>& code,
+                                                               const std::shared_ptr<Image>& image,
+                                                               double time_limit,
+                                                               sg_size_t disk_space_limit_in_bytes,
+                                                               sg_size_t ram_limit_in_bytes, sg_size_t ingress_in_bytes,
+                                                               sg_size_t egress_in_bytes, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
-        S4U_CommPort *answer_commport;
-        /** @brief The function to register */
-        std::shared_ptr<Function> function;
+        S4U_CommPort* answer_commport;
+        /** @brief The name of the function to register */
+        std::string name;
+        /** @brief The function's code **/
+        std::function<std::shared_ptr<FunctionOutput>(
+            const std::shared_ptr<FunctionInput>&,
+            const std::shared_ptr<StorageService>&)> code;
+        /** @brief The function's image **/
+        std::shared_ptr<Image> image;
         /** @brief The time limit for execution */
         double time_limit_in_seconds;
         /** @brief Disk space limit for the function in bytes */
@@ -50,7 +66,6 @@ namespace wrench {
         sg_size_t ingress_in_bytes;
         /** @brief Egress data limit in bytes */
         sg_size_t egress_in_bytes;
-
     };
 
     /**
@@ -58,7 +73,10 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionRegisterAnswerMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success, std::shared_ptr<RegisteredFunction> registered_function, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+        ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success,
+                                                              std::shared_ptr<RegisteredFunction> registered_function,
+                                                              std::shared_ptr<FailureCause> failure_cause,
+                                                              sg_size_t payload);
 
         /** @brief Whether the registration was successful */
         bool success;
@@ -73,16 +91,20 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionInvocationRequestMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort *answer_commport, const std::shared_ptr<RegisteredFunction>& registered_function, const std::shared_ptr<FunctionInput>& function_input, S4U_CommPort *notify_commport, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort* answer_commport,
+                                                                 const std::shared_ptr<RegisteredFunction>&
+                                                                 registered_function,
+                                                                 const std::shared_ptr<FunctionInput>& function_input,
+                                                                 S4U_CommPort* notify_commport, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
-        S4U_CommPort *answer_commport;
+        S4U_CommPort* answer_commport;
         /** @brief The function to invoke */
         std::shared_ptr<RegisteredFunction> registered_function;
         /** @brief  The function input */
         std::shared_ptr<FunctionInput> function_input;
         /** @brief The commport_name to send notifications to */
-        S4U_CommPort *notify_commport;
+        S4U_CommPort* notify_commport;
     };
 
     /**
@@ -90,7 +112,9 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionInvocationAnswerMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationAnswerMessage(bool success, std::shared_ptr<Invocation> invocation, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationAnswerMessage(bool success, std::shared_ptr<Invocation> invocation,
+                                                                std::shared_ptr<FailureCause> failure_cause,
+                                                                sg_size_t payload);
 
         /** @brief Whether the invocation will be completed or not at some point in the future*/
         bool success;
@@ -105,7 +129,9 @@ namespace wrench {
      */
     class ServerlessComputeServiceFunctionInvocationCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceFunctionInvocationCompleteMessage(bool success, std::shared_ptr<Invocation> invocation, std::shared_ptr<FailureCause> failure_cause, sg_size_t payload);
+        ServerlessComputeServiceFunctionInvocationCompleteMessage(bool success, std::shared_ptr<Invocation> invocation,
+                                                                  std::shared_ptr<FailureCause> failure_cause,
+                                                                  sg_size_t payload);
 
         /** @brief Whether the invocation was successful */
         bool success;
@@ -120,7 +146,8 @@ namespace wrench {
      */
     class ServerlessComputeServiceDownloadCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceDownloadCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, sg_size_t payload);
+        ServerlessComputeServiceDownloadCompleteMessage(std::shared_ptr<CustomAction> action,
+                                                        std::shared_ptr<Image> image, sg_size_t payload);
 
         /** @brief The action that did the download */
         std::shared_ptr<CustomAction> _action;
@@ -133,7 +160,9 @@ namespace wrench {
      */
     class ServerlessComputeServiceInvocationExecutionCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceInvocationExecutionCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<Invocation> invocation, sg_size_t payload);
+        ServerlessComputeServiceInvocationExecutionCompleteMessage(std::shared_ptr<CustomAction> action,
+                                                                   std::shared_ptr<Invocation> invocation,
+                                                                   sg_size_t payload);
 
         /** @brief The action that did the download */
         std::shared_ptr<CustomAction> _action;
@@ -146,7 +175,10 @@ namespace wrench {
      */
     class ServerlessComputeServiceNodeCopyCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceNodeCopyCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload);
+        ServerlessComputeServiceNodeCopyCompleteMessage(std::shared_ptr<CustomAction> action,
+                                                        std::shared_ptr<Image> image,
+                                                        std::shared_ptr<ServerlessComputeNode> compute_node,
+                                                        sg_size_t payload);
         /** @brief The action that did the copy */
         std::shared_ptr<CustomAction> _action;
         /** @brief The image that was copied */
@@ -160,7 +192,10 @@ namespace wrench {
      */
     class ServerlessComputeServiceNodeLoadCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceNodeLoadCompleteMessage(std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload);
+        ServerlessComputeServiceNodeLoadCompleteMessage(std::shared_ptr<CustomAction> action,
+                                                        std::shared_ptr<Image> image,
+                                                        std::shared_ptr<ServerlessComputeNode> compute_node,
+                                                        sg_size_t payload);
         /** @brief The action that did the copy */
         std::shared_ptr<CustomAction> _action;
         /** @brief The image that was loaded */
@@ -174,7 +209,8 @@ namespace wrench {
     */
     class ServerlessComputeServiceContainerIdleTimeoutMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceContainerIdleTimeoutMessage(std::shared_ptr<Container> container, std::uint64_t idle_sequence);
+        ServerlessComputeServiceContainerIdleTimeoutMessage(std::shared_ptr<Container> container,
+                                                            std::uint64_t idle_sequence);
         /** @brief The container that idle-timed out */
         std::shared_ptr<Container> _container;
         /** @brief The container's idle sequence */
@@ -184,9 +220,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-
 }
-
 
 
 #endif //SERVERLESSCOMPUTESERVICEMESSAGE_H

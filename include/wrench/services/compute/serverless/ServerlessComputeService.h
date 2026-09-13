@@ -73,11 +73,12 @@ namespace wrench {
         bool supportsPilotJobs() override;
         bool supportsFunctions() override;
 
-    /***********************/
-    /** \cond INTERNAL    **/
-    /***********************/
 
-	/** @brief A unique sequence counter */
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
+        /** @brief A unique sequence counter */
         static unsigned long _sequence_number;
 
     protected:
@@ -87,7 +88,11 @@ namespace wrench {
                                                    const std::shared_ptr<FunctionInput>& input,
                                                    S4U_CommPort* notify_commport) const;
 
-        std::shared_ptr<RegisteredFunction> registerFunction(const std::shared_ptr<Function>& function,
+        std::shared_ptr<RegisteredFunction> registerFunction(const std::string& name,
+                                                             const std::function<std::shared_ptr<FunctionOutput>(
+                                                                 const std::shared_ptr<FunctionInput>&,
+                                                                 const std::shared_ptr<StorageService>&)>& code,
+                                                             const std::shared_ptr<Image>& image,
                                                              double time_limit_in_seconds,
                                                              sg_size_t disk_space_limit_in_bytes,
                                                              sg_size_t RAM_limit_in_bytes,
@@ -95,7 +100,6 @@ namespace wrench {
                                                              sg_size_t egress_in_bytes) const;
 
     private:
-
         std::shared_ptr<ServerlessScheduler> _scheduler;
         std::shared_ptr<ServerlessStateOfTheSystem> _state_of_the_system;
 
@@ -112,7 +116,11 @@ namespace wrench {
         override;
 
         void processFunctionRegistrationRequest(S4U_CommPort* answer_commport,
-                                                const std::shared_ptr<Function>& function,
+                                                const std::string& name,
+                                                const std::function<std::shared_ptr<FunctionOutput>(
+                                                    const std::shared_ptr<FunctionInput>&,
+                                                    const std::shared_ptr<StorageService>&)>& code,
+                                                const std::shared_ptr<Image>& image,
                                                 double time_limit,
                                                 sg_size_t disk_space_limit_in_bytes,
                                                 sg_size_t ram_limit_in_bytes,
@@ -127,7 +135,8 @@ namespace wrench {
         void processImageDownloadCompletion(const std::shared_ptr<Action>& action,
                                             const std::shared_ptr<Image>& image);
 
-        void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation, const std::shared_ptr<Action>& action);
+        void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation,
+                                         const std::shared_ptr<Action>& action);
 
         void processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence);
 
@@ -146,12 +155,14 @@ namespace wrench {
         void startComputeNodeServices();
 
         void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
-        void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<Image>& image);
-        void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node, const std::shared_ptr<Image>& image);
+        void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
+                                            const std::shared_ptr<Image>& image);
+        void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
+                                            const std::shared_ptr<Image>& image);
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
-            const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
-            std::shared_ptr<Container> target_container);
+                                const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
+                                std::shared_ptr<Container> target_container);
 
         unsigned long _compute_node_num_cores;
         double _compute_node_core_speed;

@@ -19,7 +19,6 @@
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
-
     class Image;
     class Function;
     class FunctionInput;
@@ -44,25 +43,25 @@ namespace wrench {
         void kill();
 
         static std::shared_ptr<Image> createImage(const std::string& name,
-                                                     const std::shared_ptr<FileLocation>& location,
-                                                     sg_size_t ram_foot_print);
+                                                  const std::shared_ptr<FileLocation>& location,
+                                                  sg_size_t ram_foot_print);
 
-        static std::shared_ptr<Function> createFunction(const std::string& name,
-                                                        const std::function<std::shared_ptr<FunctionOutput>(const std::shared_ptr<FunctionInput>&,
-                                                        const std::shared_ptr<StorageService>&)>& lambda,
-                                                        const std::shared_ptr<Image>& image);
+        std::shared_ptr<RegisteredFunction> registerFunction(const std::string& name,
+                                                             const std::function<std::shared_ptr<FunctionOutput>(
+                                                                 const std::shared_ptr<FunctionInput>&,
+                                                                 const std::shared_ptr<StorageService>&)>& code,
+                                                             const std::shared_ptr<Image>& image,
+                                                             const std::shared_ptr<ServerlessComputeService>&
+                                                             compute_service,
+                                                             double time_limit_in_seconds,
+                                                             sg_size_t disk_space_limit_in_bytes,
+                                                             sg_size_t RAM_limit_in_bytes,
+                                                             sg_size_t ingress_in_bytes,
+                                                             sg_size_t egress_in_bytes);
 
-        std::shared_ptr<RegisteredFunction> registerFunction(const std::shared_ptr<Function>& function,
-                              const std::shared_ptr<ServerlessComputeService>& compute_service,
-                              double time_limit_in_seconds,
-                              sg_size_t disk_space_limit_in_bytes,
-                              sg_size_t RAM_limit_in_bytes,
-                              sg_size_t ingress_in_bytes,
-                              sg_size_t egress_in_bytes);
-
-        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction> &registered_function,
-                                                    const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
-                                                    const std::shared_ptr<FunctionInput>& function_input);
+        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction>& registered_function,
+                                                   const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
+                                                   const std::shared_ptr<FunctionInput>& function_input);
 
         bool isDone(const std::shared_ptr<Invocation>& invocation);
         void wait_one(const std::shared_ptr<Invocation>& invocation);
@@ -77,7 +76,7 @@ namespace wrench {
     protected:
         friend class ExecutionController;
 
-        explicit FunctionManager(const std::string& hostname, S4U_CommPort *creator_commport);
+        explicit FunctionManager(const std::string& hostname, S4U_CommPort* creator_commport);
 
         /***********************/
         /** \endcond           */
@@ -88,7 +87,8 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processFunctionInvocationComplete(const std::shared_ptr<Invocation>& invocation, bool success, const std::shared_ptr<FailureCause>& failure_cause);
+        void processFunctionInvocationComplete(const std::shared_ptr<Invocation>& invocation, bool success,
+                                               const std::shared_ptr<FailureCause>& failure_cause);
 
         void processWaitOne(const std::shared_ptr<Invocation>& invocation, S4U_CommPort* answer_commport);
 
@@ -96,20 +96,20 @@ namespace wrench {
 
         void processInvocationsBeingWaitedFor();
 
-        S4U_CommPort *creator_commport;
+        S4U_CommPort* creator_commport;
 
         // FunctionManager internal data structures
         // std::set<std::shared_ptr<RegisteredFunction>> _registered_functions; // do we store these here or in the Serverless Compute Service?
         std::queue<std::shared_ptr<RegisteredFunction>> _functions_to_invoke;
         std::set<std::shared_ptr<Invocation>> _pending_invocations; // do we really need this?
         std::set<std::shared_ptr<Invocation>> _finished_invocations;
-        std::vector<std::pair<std::shared_ptr<Invocation>, S4U_CommPort*>> _invocations_being_waited_for; // should it be S4U_CommPort or a pointer to one?
+        std::vector<std::pair<std::shared_ptr<Invocation>, S4U_CommPort*>> _invocations_being_waited_for;
+        // should it be S4U_CommPort or a pointer to one?
     };
 
     /***********************/
     /** \endcond            */
     /***********************/
-
 } // namespace wrench
 
 #endif // WRENCH_FUNCTIONMANAGER_H

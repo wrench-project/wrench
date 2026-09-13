@@ -28,7 +28,9 @@ namespace wrench
      * @brief Constructor
      *
      * @param answer_commport: commport to which the answer message should be sent
-     * @param function: the function to register
+     * @param name: the name of the function to register
+     * @param code: the function's code
+     * @param image: the function's image
      * @param time_limit: time limit for execution
      * @param disk_space_limit_in_bytes: disk space limit for the function
      * @param ram_limit_in_bytes: RAM limit for the function
@@ -38,7 +40,11 @@ namespace wrench
      */
     ServerlessComputeServiceFunctionRegisterRequestMessage::ServerlessComputeServiceFunctionRegisterRequestMessage(
         S4U_CommPort *answer_commport,
-        std::shared_ptr<Function> function,
+        const std::string& name,
+                const std::function<std::shared_ptr<FunctionOutput>(
+                    const std::shared_ptr<FunctionInput>&,
+                    const std::shared_ptr<StorageService>&)>& code,
+                const std::shared_ptr<Image>& image,
         const double time_limit,
         const sg_size_t disk_space_limit_in_bytes,
         const sg_size_t ram_limit_in_bytes,
@@ -55,7 +61,9 @@ namespace wrench
         }
 #endif
         this->answer_commport = answer_commport;
-        this->function = std::move(function);
+        this->name = name;
+        this->code = code;
+        this->image = image;
         this->time_limit_in_seconds = time_limit;
         this->disk_space_limit_in_bytes = disk_space_limit_in_bytes;
         this->ram_limit_in_bytes = ram_limit_in_bytes;
