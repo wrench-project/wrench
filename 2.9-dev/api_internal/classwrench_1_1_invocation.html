@@ -239,15 +239,15 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Invocation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench10InvocationE"><code class="docutils literal notranslate"><span class="pre">wrench::Invocation</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI18RegisteredFunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort"><code class="docutils literal notranslate"><span class="pre">Invocation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI8FunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort"><code class="docutils literal notranslate"><span class="pre">Invocation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation14getComputeNodeEv"><code class="docutils literal notranslate"><span class="pre">getComputeNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation15getDispatchDateEv"><code class="docutils literal notranslate"><span class="pre">getDispatchDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation15getFailureCauseEv"><code class="docutils literal notranslate"><span class="pre">getFailureCause()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation11getFunctionEv"><code class="docutils literal notranslate"><span class="pre">getFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation18getFunctionEndDateEv"><code class="docutils literal notranslate"><span class="pre">getFunctionEndDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation20getFunctionStartDateEv"><code class="docutils literal notranslate"><span class="pre">getFunctionStartDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation5getIdEv"><code class="docutils literal notranslate"><span class="pre">getId()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation9getOutputEv"><code class="docutils literal notranslate"><span class="pre">getOutput()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation21getRegisteredFunctionEv"><code class="docutils literal notranslate"><span class="pre">getRegisteredFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation13getSubmitDateEv"><code class="docutils literal notranslate"><span class="pre">getSubmitDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation12hasSucceededEv"><code class="docutils literal notranslate"><span class="pre">hasSucceeded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation12isDispatchedEv"><code class="docutils literal notranslate"><span class="pre">isDispatched()</span></code></a></li>
@@ -298,7 +298,6 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pointer_util.html">wrench::PointerUtil</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_proxy_location.html">wrench::ProxyLocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_registered_function.html">wrench::RegisteredFunction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html">wrench::S4U_CommPort</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon.html">wrench::S4U_Daemon</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon_1_1_life_saver.html">wrench::S4U_Daemon::LifeSaver</a></li>
@@ -468,17 +467,17 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10InvocationE">
 <span id="_CPPv3N6wrench10InvocationE"></span><span id="_CPPv2N6wrench10InvocationE"></span><span id="wrench::Invocation"></span><span class="target" id="classwrench_1_1_invocation"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Invocation</span></span></span><br /></dt>
-<dd><p>Represents an invocation of a registered function. </p>
+<dd><p>Represents an invocation of a function. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI18RegisteredFunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort">
-<span id="_CPPv3N6wrench10Invocation10InvocationERKNSt10shared_ptrI18RegisteredFunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort"></span><span id="_CPPv2N6wrench10Invocation10InvocationERKNSt10shared_ptrI18RegisteredFunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort"></span><span id="wrench::Invocation::Invocation__std::shared_ptr:RegisteredFunction:CR.std::shared_ptr:FunctionInput:CR.S4U_CommPortP"></span><span class="target" id="classwrench_1_1_invocation_1a8911e60e64f0d46905599307d0aa5169"></span><span class="sig-name descname"><span class="n"><span class="pre">Invocation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_registered_function.html#_CPPv4N6wrench18RegisteredFunctionE" title="wrench::RegisteredFunction"><span class="n"><span class="pre">RegisteredFunction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">registered_function</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function_input.html#_CPPv4N6wrench13FunctionInputE" title="wrench::FunctionInput"><span class="n"><span class="pre">FunctionInput</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">function_input</span></span>, <a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">notify_commport</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI18RegisteredFunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI8FunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort">
+<span id="_CPPv3N6wrench10Invocation10InvocationERKNSt10shared_ptrI8FunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort"></span><span id="_CPPv2N6wrench10Invocation10InvocationERKNSt10shared_ptrI8FunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort"></span><span id="wrench::Invocation::Invocation__std::shared_ptr:Function:CR.std::shared_ptr:FunctionInput:CR.S4U_CommPortP"></span><span class="target" id="classwrench_1_1_invocation_1a21559e159b1d27350495a06fa15e8410"></span><span class="sig-name descname"><span class="n"><span class="pre">Invocation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function.html#_CPPv4N6wrench8FunctionE" title="wrench::Function"><span class="n"><span class="pre">Function</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">function</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function_input.html#_CPPv4N6wrench13FunctionInputE" title="wrench::FunctionInput"><span class="n"><span class="pre">FunctionInput</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">function_input</span></span>, <a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">notify_commport</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10Invocation10InvocationERKNSt10shared_ptrI8FunctionEERKNSt10shared_ptrI13FunctionInputEEP12S4U_CommPort" title="Link to this definition"></a><br /></dt>
 <dd><p>Constructor. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>registered_function</strong> – The registered function to be invoked </p></li>
+<li><p><strong>function</strong> – The function to be invoked </p></li>
 <li><p><strong>function_input</strong> – The input for the function </p></li>
 <li><p><strong>notify_commport</strong> – The commport to notify upon completion/failure </p></li>
 </ul>
@@ -515,6 +514,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A failure cause </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation11getFunctionEv">
+<span id="_CPPv3NK6wrench10Invocation11getFunctionEv"></span><span id="_CPPv2NK6wrench10Invocation11getFunctionEv"></span><span id="wrench::Invocation::getFunctionC"></span><span class="target" id="classwrench_1_1_invocation_1a642b305c997fa47cb73d819bc2cdfcce"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function.html#_CPPv4N6wrench8FunctionE" title="wrench::Function"><span class="n"><span class="pre">Function</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Gets the function for this invocation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A function </p>
 </dd>
 </dl>
 </dd></dl>
@@ -559,17 +569,6 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A shared pointer to the function output. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation21getRegisteredFunctionEv">
-<span id="_CPPv3NK6wrench10Invocation21getRegisteredFunctionEv"></span><span id="_CPPv2NK6wrench10Invocation21getRegisteredFunctionEv"></span><span id="wrench::Invocation::getRegisteredFunctionC"></span><span class="target" id="classwrench_1_1_invocation_1a89589e42a23599a3bbbf32c137111944"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_registered_function.html#_CPPv4N6wrench18RegisteredFunctionE" title="wrench::RegisteredFunction"><span class="n"><span class="pre">RegisteredFunction</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getRegisteredFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><p>Gets the registered function for this invocation. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A registered function </p>
 </dd>
 </dl>
 </dd></dl>
