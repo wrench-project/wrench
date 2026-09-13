@@ -32,6 +32,7 @@ public:
     void do_SanityTest_test();
     void do_FunctionRegistrationTest_test();
     void do_FunctionInvocationTest_test();
+    void do_PreRegisteredFunctionInvocationTest_test();
     void do_FunctionTimeoutTest_test();
     void do_FunctionErrorTest_test();
 
@@ -241,7 +242,7 @@ private:
 
         auto image_file = wrench::Simulation::addFile("image_file", 100 * GB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        auto image = function_manager->createImage("image", image_location, image_file->getSize());
+        auto image = wrench::FunctionManager::createImage("image", image_location, image_file->getSize());
         wrench::StorageService::createFileAtLocation(image_location);
         try {
             function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
@@ -457,7 +458,7 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
-        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
 
 
         // Registering a function
@@ -556,6 +557,112 @@ void ServerlessBasicTest::do_FunctionInvocationTest_test() {
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessBasicTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**  PREREGISTERED FUNCTION INVOCATION TEST                          **/
+/**********************************************************************/
+
+class ServerlessBasicTestPreregisteredFunctionInvocationController : public wrench::ExecutionController {
+public:
+    ServerlessBasicTestPreregisteredFunctionInvocationController(ServerlessBasicTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::Function> & function,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->function = function;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessBasicTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::Function> function;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+        auto invocation = function_manager->invokeFunction(this->function, this->compute_service, input);
+
+        wrench::Simulation::sleep(1);
+
+        if (invocation->isDone()) {
+            throw std::runtime_error("Invocation should not be done yet");
+        }
+
+        function_manager->wait_one(invocation);
+
+        if (!invocation->isDone()) {
+            throw std::runtime_error("Invocation should be done by now");
+        }
+        if (!invocation->hasSucceeded()) {
+            throw std::runtime_error("Invocation should have succeeded");
+        }
+        if (invocation->getFailureCause()) {
+            throw std::runtime_error("There should be no failure cause");
+        }
+
+        auto output = std::dynamic_pointer_cast<MyFunctionOutput>(invocation->getOutput());
+        if (output->msg_ != "DONE") {
+            throw std::runtime_error("Invocation output should be string \"DONE\"");
+        }
+        return 0;
+    }
+};
+
+TEST_F(ServerlessBasicTest, PreRegisteredFunctionInvocation) {
+    DO_TEST_WITH_FORK(do_PreRegisteredFunctionInvocationTest_test);
+}
+
+void ServerlessBasicTest::do_PreRegisteredFunctionInvocationTest_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+
+    std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+        auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+        wrench::Simulation::sleep(5);
+        return std::make_shared<MyFunctionOutput>("DONE");
+    };
+
+    auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
+    auto image_location = wrench::FileLocation::LOCATION(storage_service, image_file);
+    wrench::StorageService::createFileAtLocation(image_location);
+    auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+
+    // Registering a function
+    auto function = serverless_provider->addRegisteredFunction(
+        "Function 1", lambda, image, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessBasicTestPreregisteredFunctionInvocationController(this, user_host, serverless_provider, function, storage_service));
 
     simulation->launch();
 
@@ -724,7 +831,7 @@ private:
         auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
         auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
         wrench::StorageService::createFileAtLocation(image_location);
-        auto image = function_manager->createImage("my_image", image_location, image_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
 
         // Create a function code
         std::function lambda = [this](const std::shared_ptr<wrench::FunctionInput>& input,

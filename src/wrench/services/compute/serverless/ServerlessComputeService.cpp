@@ -22,6 +22,7 @@
 #include <utility>
 
 #include "wrench/action/CustomAction.h"
+#include "wrench/failure_causes/NotEnoughResources.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
@@ -463,6 +464,62 @@ namespace wrench {
     }
 
     /**
+    * @brief Method to add (outside the simulation, in zero time) a new registered function
+    *        to a serverless compute service. Typically used before the simulation launch.
+    *
+    * @param name the name of the function to register
+    * @param code the function's code
+    * @param image the function's image
+    * @param time_limit the time limit for execution
+    * @param disk_space_limit_in_bytes the disk space limit for the function
+    * @param ram_limit_in_bytes the RAM limit for the function
+    * @param ingress_in_bytes the ingress data limit
+    * @param egress_in_bytes the egress data limit
+    * @return The Function object that was registered
+    */
+    std::shared_ptr<Function> ServerlessComputeService::addRegisteredFunction(
+        const std::string& name,
+        const std::function<std::shared_ptr<FunctionOutput>(
+            const std::shared_ptr<FunctionInput>&,
+            const std::shared_ptr<StorageService>&)>& code,
+        const std::shared_ptr<Image>& image,
+        double time_limit,
+        sg_size_t disk_space_limit_in_bytes,
+        sg_size_t ram_limit_in_bytes,
+        sg_size_t ingress_in_bytes,
+        sg_size_t egress_in_bytes) {
+        // Check that function can ever run!
+        sg_size_t needed_disk_space = image->getDiskFootprint() + disk_space_limit_in_bytes;
+        sg_size_t needed_ram_space = image->getRAMFootprint() + ram_limit_in_bytes;
+
+        if (needed_disk_space > _compute_node_disk_space) {
+            throw ExecutionException(
+                std::make_shared<NotEnoughResources>(
+                    "Function cannot be registered because no compute node has sufficient disk space to execute it"));
+        }
+
+        if (needed_ram_space > _compute_node_ram) {
+            throw ExecutionException(std::make_shared<NotEnoughResources>(
+                "Function cannot be registered because no compute node has sufficient RAM space to execute it"));
+        }
+
+        // At this point, we can create a function object
+        auto function = std::make_shared<Function>(
+            name,
+            code,
+            image,
+            time_limit,
+            disk_space_limit_in_bytes,
+            ram_limit_in_bytes,
+            ingress_in_bytes,
+            egress_in_bytes);
+        // Add it to the set of registered function
+        _state_of_the_system->_functions.insert(function);
+
+        return function;
+    }
+
+    /**
      * @brief Processes a "function registration request" message
      *
      * @param answer_commport the FunctionManager commport to answer to
@@ -487,49 +544,22 @@ namespace wrench {
         sg_size_t ram_limit_in_bytes,
         sg_size_t ingress_in_bytes,
         sg_size_t egress_in_bytes) {
-        // Check that function can ever run!
-        {
-            sg_size_t needed_disk_space = image->getDiskFootprint() + disk_space_limit_in_bytes;
-            sg_size_t needed_ram_space = image->getRAMFootprint() + ram_limit_in_bytes;
-
-            if (needed_disk_space > _compute_node_disk_space) {
-                const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-                    false, nullptr,
-                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                                                 "Function cannot be registered because no compute node has sufficient disk space to execute it"),
-                    this->getMessagePayloadValue(
-                        ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
-                answer_commport->dputMessage(answerMessage);
-                return;
-            }
-
-            if (needed_ram_space > _compute_node_ram) {
-                const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-                    false, nullptr,
-                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                                                 "Function cannot be registered because no compute node has sufficient RAM space to execute it"),
-                    this->getMessagePayloadValue(
-                        ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
-                answer_commport->dputMessage(answerMessage);
-                return;
-            }
+        std::shared_ptr<Function> new_function;
+        try {
+            new_function = this->addRegisteredFunction(name, code, image, time_limit, disk_space_limit_in_bytes,
+                                                       ram_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
+        } catch (ExecutionException& e) {
+            const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
+                false, nullptr,
+                e.getCause(),
+                this->getMessagePayloadValue(
+                    ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
+            answer_commport->dputMessage(answerMessage);
         }
 
-        // At this point, we can register the function
-        auto function = std::make_shared<Function>(
-            name,
-            code,
-            image,
-            time_limit,
-            disk_space_limit_in_bytes,
-            ram_limit_in_bytes,
-            ingress_in_bytes,
-            egress_in_bytes);
-
-        _state_of_the_system->_functions.insert(function);
-
+        // At this point, the function has been registered, so we can reply
         const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
-            true, function, nullptr, this->getMessagePayloadValue(
+            true, new_function, nullptr, this->getMessagePayloadValue(
                 ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
         answer_commport->dputMessage(answerMessage);
     }
@@ -769,13 +799,12 @@ namespace wrench {
 
         const std::function lambda_execute = [invocation](
             const std::shared_ptr<ActionExecutor>& action_executor) {
-
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
             try {
                 invocation->_function_output = invocation->_function->_code(invocation->_function_input,
-                                                                 invocation->_container->getPrivateStorageService());
-
+                                                                            invocation->_container->
+                                                                            getPrivateStorageService());
             } catch (ExecutionException& e) {
                 invocation->_container->clearPrivateStorage();
                 invocation->_function_end_date = S4U_Simulation::getClock();

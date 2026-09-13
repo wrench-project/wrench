@@ -12,7 +12,6 @@
 
 #include <wrench/function/Function.h>
 #include <wrench/managers/function_manager/FunctionManager.h>
-#include <wrench/function/Function.h>
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 #include "wrench/function/Invocation.h"
 #include "wrench/services/compute/ComputeService.h"
@@ -73,6 +72,18 @@ namespace wrench {
         bool supportsPilotJobs() override;
         bool supportsFunctions() override;
 
+        std::shared_ptr<Function> addRegisteredFunction(
+            const std::string& name,
+            const std::function<std::shared_ptr<FunctionOutput>(
+                const std::shared_ptr<FunctionInput>&,
+                const std::shared_ptr<StorageService>&)>& code,
+            const std::shared_ptr<Image>& image,
+            double time_limit_in_seconds,
+            sg_size_t disk_space_limit_in_bytes,
+            sg_size_t RAM_limit_in_bytes,
+            sg_size_t ingress_in_bytes,
+            sg_size_t egress_in_bytes);
+
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -89,15 +100,15 @@ namespace wrench {
                                                    S4U_CommPort* notify_commport) const;
 
         std::shared_ptr<Function> registerFunction(const std::string& name,
-                                                             const std::function<std::shared_ptr<FunctionOutput>(
-                                                                 const std::shared_ptr<FunctionInput>&,
-                                                                 const std::shared_ptr<StorageService>&)>& code,
-                                                             const std::shared_ptr<Image>& image,
-                                                             double time_limit_in_seconds,
-                                                             sg_size_t disk_space_limit_in_bytes,
-                                                             sg_size_t RAM_limit_in_bytes,
-                                                             sg_size_t ingress_in_bytes,
-                                                             sg_size_t egress_in_bytes) const;
+                                                   const std::function<std::shared_ptr<FunctionOutput>(
+                                                       const std::shared_ptr<FunctionInput>&,
+                                                       const std::shared_ptr<StorageService>&)>& code,
+                                                   const std::shared_ptr<Image>& image,
+                                                   double time_limit_in_seconds,
+                                                   sg_size_t disk_space_limit_in_bytes,
+                                                   sg_size_t RAM_limit_in_bytes,
+                                                   sg_size_t ingress_in_bytes,
+                                                   sg_size_t egress_in_bytes) const;
 
     private:
         std::shared_ptr<ServerlessScheduler> _scheduler;
