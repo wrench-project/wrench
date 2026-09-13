@@ -82,23 +82,6 @@ namespace wrench {
     }
 
 
-    // /**
-    //  * @brief Creates a shared pointer to a Function object and returns it
-    //  *
-    //  * @param name the name of the function
-    //  * @param lambda the code of the function
-    //  * @param image the image for the function
-    //  * @return std::shared_ptr<Function> a shared pointer to the Function object created
-    //  */
-    // std::shared_ptr<Function> FunctionManager::createFunction(const std::string& name,
-    //                                                           const std::function<std::shared_ptr<FunctionOutput>(
-    //                                                           const std::shared_ptr<FunctionInput>&,
-    //                                                           const std::shared_ptr<StorageService>&)>& lambda,
-    //                                                           const std::shared_ptr<Image>& image) {
-    //     // Create the notion of a function
-    //     return std::make_shared<Function>(name, lambda, image);
-    // }
-
     /**
      * @brief Registers a function with the ServerlessComputeService
      *
