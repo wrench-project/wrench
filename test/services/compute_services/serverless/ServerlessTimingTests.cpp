@@ -1790,7 +1790,7 @@ private:
         // Create 10 functions with these RAM sizes, which will fill up the remaining 31GB of RAM
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         std::vector<sg_size_t> function_RAM_sizes = {1, 1, 1, 1, 2, 3, 4, 5, 6, 7};
-        std::vector<std::shared_ptr<wrench::RegisteredFunction>> registered_functions;
+        std::vector<std::shared_ptr<wrench::Function>> registered_functions;
         registered_functions.reserve(function_RAM_sizes.size());
         for (auto ram_size : function_RAM_sizes) {
             registered_functions.push_back(function_manager->registerFunction(

@@ -33,7 +33,7 @@ namespace wrench {
         // Go through the invocations and pick target compute node
         for (const auto& inv : sorted_schedulable_invocations) {
             // Get the image for this invocation
-            auto image = inv->getRegisteredFunction()->getImage();
+            auto image = inv->getFunction()->getImage();
 
             // Pick a target compute node
             auto target_node = this->pickComputeNode(scheduling_state, inv);
@@ -47,7 +47,7 @@ namespace wrench {
             bool scheduled = false;
             if (scheduling_state->cores_available.at(target_node) > 0) {
                 for (auto const& idle_container : scheduling_state->idle_containers.at(target_node)) {
-                    if (idle_container->getRegisteredFunction() == inv->getRegisteredFunction().get()) {
+                    if (idle_container->getFunction() == inv->getFunction().get()) {
                         // Encode the decision
                         decisions->invocation_dispatches.push_back({inv, target_node, idle_container});
                         // Update the scheduling state

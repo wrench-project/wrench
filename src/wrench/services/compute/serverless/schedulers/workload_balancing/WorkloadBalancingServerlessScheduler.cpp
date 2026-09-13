@@ -38,7 +38,7 @@ namespace wrench {
         createAllocationPlan(state);
 
         for (const auto& [node, function_allocation] : allocation_plan) {
-            std::set<std::shared_ptr<RegisteredFunction>> required_functions;
+            std::set<std::shared_ptr<Function>> required_functions;
 
             // figure out which functions we need here
             for (const auto& [function , core_count] : function_allocation) {
@@ -80,9 +80,9 @@ namespace wrench {
         auto available_ram = state->getAvailableRAMSpace();
 
         // Group invocations by function name
-        std::unordered_map<std::shared_ptr<RegisteredFunction>, std::vector<std::shared_ptr<Invocation>>> invocations_by_function;
+        std::unordered_map<std::shared_ptr<Function>, std::vector<std::shared_ptr<Invocation>>> invocations_by_function;
         for (const auto& inv : schedulable_invocations) {
-            invocations_by_function[inv->getRegisteredFunction()].push_back(inv);
+            invocations_by_function[inv->getFunction()].push_back(inv);
         }
 
         std::set<std::shared_ptr<Container>> claimed_idle_containers;
@@ -105,13 +105,13 @@ namespace wrench {
                     invocations.pop_back();
 
                     // Make sure the image is on this node
-                    auto image = inv->getRegisteredFunction()->getImage();
+                    auto image = inv->getFunction()->getImage();
                     if (not state->isImageInRAMAtNode(node, image)) {
                         continue;
                     }
 
                     // First, see if there is an idle container we can re-use
-                    auto idling_container = node->findIdleContainer(inv->getRegisteredFunction().get(), claimed_idle_containers);
+                    auto idling_container = node->findIdleContainer(inv->getFunction().get(), claimed_idle_containers);
                     if (idling_container) {
                         decisions->invocation_dispatches.push_back({inv, node, idling_container});
                         claimed_idle_containers.insert(idling_container);
@@ -123,12 +123,12 @@ namespace wrench {
                     // Then, see if there is a core on which we can start a new container, given the current RAM / Disk space
                     auto num_available_cores = available_cores[node];
                     if ((num_available_cores > 0) and
-                        (available_disk[node] >= inv->getRegisteredFunction()->getDiskSpaceLimit()) and
-                        (available_ram[node] >= inv->getRegisteredFunction()->getRAMSpaceLimit())) {
+                        (available_disk[node] >= inv->getFunction()->getDiskSpaceLimit()) and
+                        (available_ram[node] >= inv->getFunction()->getRAMSpaceLimit())) {
                         decisions->invocation_dispatches.push_back({inv, node, nullptr});
                         available_cores[node]--;
-                        available_disk[node] -= inv->getRegisteredFunction()->getDiskSpaceLimit();
-                        available_ram[node] -= inv->getRegisteredFunction()->getRAMSpaceLimit();
+                        available_disk[node] -= inv->getFunction()->getDiskSpaceLimit();
+                        available_ram[node] -= inv->getFunction()->getRAMSpaceLimit();
                         scheduled++;
                         continue;
                     }
@@ -151,13 +151,13 @@ namespace wrench {
         // Process each invocation
         for (const auto& inv : invocations) {
             // Get time limit (we use this as runtime)
-            const double time_limit = inv->getRegisteredFunction()->getTimeLimit();
+            const double time_limit = inv->getFunction()->getTimeLimit();
 
             // Add to total workload
-            function_workloads[inv->getRegisteredFunction()] += time_limit;
+            function_workloads[inv->getFunction()] += time_limit;
 
             // Increment count
-            function_pending_count[inv->getRegisteredFunction()]++;
+            function_pending_count[inv->getFunction()]++;
         }
     }
 
@@ -191,7 +191,7 @@ namespace wrench {
         }
 
         // Allocate cores proportionally to workload
-        std::vector<std::pair<std::shared_ptr<RegisteredFunction>, unsigned>> function_core_allocation;
+        std::vector<std::pair<std::shared_ptr<Function>, unsigned>> function_core_allocation;
 
         for (const auto& [function_name, workload] : function_workloads) {
             const double proportion = workload / total_workload;

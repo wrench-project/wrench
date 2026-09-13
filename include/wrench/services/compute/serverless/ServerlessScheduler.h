@@ -104,7 +104,7 @@ namespace wrench {
             }
             if (not invocation_dispatches.empty()) {
                 for (const auto& [invocation, node, container] : invocation_dispatches) {
-                    std::cerr << "  Invocation dispatch: for " << invocation->getRegisteredFunction()->getImage()->
+                    std::cerr << "  Invocation dispatch: for " << invocation->getFunction()->getImage()->
                                                                               getName() <<
                         " at " << node->hostname << " (" << (container ? "on an idle container" : "on a new container")
                         << ")" << std::endl;

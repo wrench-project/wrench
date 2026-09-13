@@ -30,7 +30,7 @@ namespace wrench {
     std::shared_ptr<ServerlessComputeNode> FCFSServerlessScheduler::pickComputeNode(
         const std::shared_ptr<GreedySchedulingState>& scheduling_state,
         const std::shared_ptr<Invocation>& invocation) {
-        auto needed_image = invocation->getRegisteredFunction()->getImage();
+        auto needed_image = invocation->getFunction()->getImage();
 
         /* Go through the compute node in multiple passes, each time lowering "standards" */
 
@@ -40,7 +40,7 @@ namespace wrench {
                 continue;
             }
             for (auto const& idle_container : scheduling_state->idle_containers.at(node)) {
-                if (idle_container->getRegisteredFunction() == invocation->getRegisteredFunction().get()) {
+                if (idle_container->getFunction() == invocation->getFunction().get()) {
                     return node;
                 }
             }

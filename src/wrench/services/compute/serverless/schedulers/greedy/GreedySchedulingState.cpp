@@ -1,6 +1,6 @@
 #include <wrench/services/compute/serverless/schedulers/greedy/GreedySchedulingState.h>
 #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
-#include <wrench/function/RegisteredFunction.h>
+#include <wrench/function/Function.h>
 #include <wrench/logging/TerminalOutput.h>
 
 #include "wrench/function/Image.h"
@@ -25,7 +25,7 @@ namespace wrench {
         // Determine the set of relevant images
         std::set<std::shared_ptr<Image>> relevant_images;
         for (auto const &inv: schedulable_invocations) {
-            relevant_images.insert(inv->getRegisteredFunction()->getImage());
+            relevant_images.insert(inv->getFunction()->getImage());
         }
 
 
@@ -52,7 +52,7 @@ namespace wrench {
                     images_on_their_way_to_ram.at(node).insert(image);
                 }
                 for (auto const &container : node->getIdleContainers()) {
-                    auto container_image = container->getRegisteredFunction()->getImage();
+                    auto container_image = container->getFunction()->getImage();
                     if (relevant_images.count(container_image)) {
                         idle_containers.at(node).insert(container);
                     }

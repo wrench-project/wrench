@@ -35,7 +35,7 @@ namespace wrench {
 
     private:
         friend class FunctionManager;
-        friend class RegisteredFunction;
+        friend class Function;
         friend class Function;
         friend class Container;
         friend class ServerlessComputeNode;

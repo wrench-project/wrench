@@ -23,7 +23,7 @@ namespace simgrid::fsmod {
 
 namespace wrench {
     class ServerlessComputeService;
-    class RegisteredFunction;
+    class Function;
     class SimpleStorageService;
     class Image;
     class Invocation;
@@ -40,7 +40,7 @@ namespace wrench {
     public:
         ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService* service);
 
-        std::shared_ptr<Container> spawnContainer(const RegisteredFunction* registered_function);
+        std::shared_ptr<Container> spawnContainer(const Function* function);
         void makeContainerIdle(const std::shared_ptr<Container>& container);
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
@@ -52,7 +52,7 @@ namespace wrench {
         [[nodiscard]] sg_size_t getFreeRAMSpace() const;
 
         std::shared_ptr<Container> findIdleContainer(
-            const RegisteredFunction* registered_function,
+            const Function* function,
             const std::set<std::shared_ptr<Container>>& excluded_container) const;
         [[nodiscard]] std::set<std::shared_ptr<Container>> getIdleContainers() const;
 

@@ -74,7 +74,7 @@ namespace wrench {
         }
         _idle_containers.erase(container);
         WRENCH_INFO("Shutting down an idle container for function [%s]",
-                    container->getRegisteredFunction()->getName().c_str());
+                    container->getFunction()->getName().c_str());
         container->shutdown();
     }
 
@@ -96,18 +96,18 @@ namespace wrench {
 
     /**
      * @brief Method to see if there is an appropriate idle container
-     * @param registered_function the target function
+     * @param function the target function
      * @param excluded_container set containers to ignore
      * @return A container, if found, or nullptr
      */
     std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(
-        const RegisteredFunction* registered_function,
+        const Function* function,
         const std::set<std::shared_ptr<Container>>& excluded_container) const {
         for (auto const& idle_container : _idle_containers) {
             if (excluded_container.find(idle_container) != excluded_container.end()) {
                 continue;
             }
-            if (idle_container->getRegisteredFunction() == registered_function) {
+            if (idle_container->getFunction() == function) {
                 return idle_container;
             }
         }
@@ -124,13 +124,13 @@ namespace wrench {
 
     /**
      * @brief Spawn a container (and try to kill idle containers if it helps)
-     * @param registered_function a registered function
+     * @param function a function
      * @return A container
      */
-    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const RegisteredFunction* registered_function) {
+    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function) {
         // Create a container object
         auto container = std::shared_ptr<Container>(
-            new Container(registered_function, this, _serverless_compute_service, Container::State::BUSY));
+            new Container(function, this, _serverless_compute_service, Container::State::BUSY));
         try {
             container->spawn();
         } catch (ExecutionException& e) {
@@ -140,8 +140,8 @@ namespace wrench {
             // Try to terminate idle containers
             std::set<std::shared_ptr<Container>> victims;
             auto success = this->findIdleContainersToTerminate(
-                registered_function->getRAMSpaceLimit(),
-                registered_function->getDiskSpaceLimit(),
+                function->getRAMSpaceLimit(),
+                function->getDiskSpaceLimit(),
                 victims);
             if (not success) {
                 throw;
@@ -149,10 +149,10 @@ namespace wrench {
                 for (auto const& victim : victims) {
                     WRENCH_INFO(
                         "Evicting an idle container [%s, idle for %.2lf seconds, %llu bytes in RAM, %llu bytes on disk",
-                        victim->getRegisteredFunction()->getName().c_str(),
+                        victim->getFunction()->getName().c_str(),
                         S4U_Simulation::getClock() - victim->getIdleDate(),
-                        victim->getRegisteredFunction()->getRAMSpaceLimit(),
-                        victim->getRegisteredFunction()->getDiskSpaceLimit());
+                        victim->getFunction()->getRAMSpaceLimit(),
+                        victim->getFunction()->getDiskSpaceLimit());
                     this->shutdownContainer(victim);
                 }
             }
@@ -266,7 +266,7 @@ namespace wrench {
                 "ServerlessComputeNode::isInvocationFeasible(): The invocation has already been dispatched!");
         }
         if (target_container) {
-            if (invocation->getRegisteredFunction().get() != target_container->getRegisteredFunction()) {
+            if (invocation->getFunction().get() != target_container->getFunction()) {
                 throw std::runtime_error(
                     "ServerlessComputeNode::isInvocationFeasible(): The container isn't for the right function!");
             }
@@ -287,7 +287,7 @@ namespace wrench {
         }
 
         // The image is on disk?
-        auto image = invocation->getRegisteredFunction()->getImage();
+        auto image = invocation->getFunction()->getImage();
 
         if (not this->isImageOnDisk(image)) {
             WRENCH_INFO("Scheduled invocation cannot be started because image %s is not on disk at node %s",
@@ -371,13 +371,13 @@ namespace wrench {
                                          const std::shared_ptr<Container>& b) {
                       // If RAM doesn't matter, sort based on disk
                       if (ram_space_to_free_up == 0) {
-                          return a->getRegisteredFunction()->getDiskSpaceLimit() <
-                              b->getRegisteredFunction()->getDiskSpaceLimit();
+                          return a->getFunction()->getDiskSpaceLimit() <
+                              b->getFunction()->getDiskSpaceLimit();
                       }
 
                       // Otherwise sort based on RAM (which should be the limiting factor)
-                      return a->getRegisteredFunction()->getRAMSpaceLimit() <
-                          b->getRegisteredFunction()->getRAMSpaceLimit();
+                      return a->getFunction()->getRAMSpaceLimit() <
+                          b->getFunction()->getRAMSpaceLimit();
                   });
 
         // TODO: Use dynamic programming to return some optimal set? (smallest cardinal, and smallest sum, NP-hard, but likely only weakly,
@@ -390,16 +390,16 @@ namespace wrench {
             // Find the smallest container that gets us there, and if none, pick the largest container
             auto victim = sorted_containers.end() - 1;
             for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
-                if ((*it)->getRegisteredFunction()->getRAMSpaceLimit() >= ram_space_to_free_up and
-                    (*it)->getRegisteredFunction()->getDiskSpaceLimit() >= disk_space_to_free_up) {
+                if ((*it)->getFunction()->getRAMSpaceLimit() >= ram_space_to_free_up and
+                    (*it)->getFunction()->getDiskSpaceLimit() >= disk_space_to_free_up) {
                     victim = it;
                     break;
                 }
             }
 
             to_terminate.insert(*victim);
-            auto victim_ram_space = (*victim)->getRegisteredFunction()->getRAMSpaceLimit();
-            auto victim_disk_space = (*victim)->getRegisteredFunction()->getDiskSpaceLimit();
+            auto victim_ram_space = (*victim)->getFunction()->getRAMSpaceLimit();
+            auto victim_disk_space = (*victim)->getFunction()->getDiskSpaceLimit();
             ram_space_to_free_up = (victim_ram_space > ram_space_to_free_up
                                         ? 0
                                         : ram_space_to_free_up - victim_ram_space);
@@ -447,8 +447,8 @@ namespace wrench {
         sg_size_t disk_space_freed_up = 0;
         for (auto const& container : sorted_containers) {
             to_terminate.insert(container);
-            ram_space_freed_up += container->getRegisteredFunction()->getRAMSpaceLimit();
-            disk_space_freed_up += container->getRegisteredFunction()->getDiskSpaceLimit();
+            ram_space_freed_up += container->getFunction()->getRAMSpaceLimit();
+            disk_space_freed_up += container->getFunction()->getDiskSpaceLimit();
             if ((ram_space_freed_up >= ram_space_to_free_up) and (disk_space_freed_up >= disk_space_to_free_up)) {
                 return true;
             }

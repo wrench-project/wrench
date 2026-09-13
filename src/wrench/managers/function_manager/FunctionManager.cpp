@@ -53,7 +53,7 @@ namespace wrench {
      */
     void FunctionManager::kill() {
         this->killActor();
-        // _registered_functions.clear();
+        // _functions.clear();
         while (!_functions_to_invoke.empty()) {
             _functions_to_invoke.pop();
         }
@@ -114,7 +114,7 @@ namespace wrench {
      * @return true if the function was registered successfully
      * @throw ExecutionException if the function registration fails
      */
-    std::shared_ptr<RegisteredFunction> FunctionManager::registerFunction(
+    std::shared_ptr<Function> FunctionManager::registerFunction(
         const std::string& name,
         const std::function<std::shared_ptr<
             FunctionOutput>(
@@ -136,18 +136,18 @@ namespace wrench {
     /**
      * @brief Invokes a function on a ServerlessComputeService
      *
-     * @param registered_function the (registered) function to invoke
+     * @param _function the function to invoke
      * @param sl_compute_service the ServerlessComputeService to invoke the function on
      * @param function_input the input (object) to the function
      * @return std::shared_ptr<Invocation> an Invocation object created by the ServerlessComputeService
      */
     std::shared_ptr<Invocation> FunctionManager::invokeFunction(
-        const std::shared_ptr<RegisteredFunction>& registered_function,
+        const std::shared_ptr<Function>& _function,
         const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
         const std::shared_ptr<FunctionInput>& function_input) {
-        // WRENCH_INFO("Function [%s] invoked with compute service [%s]", registered_function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
+        // WRENCH_INFO("Function [%s] invoked with compute service [%s]", _function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the commport to notify
-        return sl_compute_service->invokeFunction(registered_function, function_input, this->_commport);
+        return sl_compute_service->invokeFunction(_function, function_input, this->_commport);
     }
 
     /**

@@ -75,43 +75,43 @@ namespace wrench
      * @brief Constructor
      *
      * @param success: whether the registration was successful or not
-     * @param registered_function: the registered function (or nullptr on failure)
+     * @param function: the (registered) function (or nullptr on failure)
      * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionRegisterAnswerMessage::ServerlessComputeServiceFunctionRegisterAnswerMessage(
         bool success,
-        std::shared_ptr<RegisteredFunction> registered_function,
+        std::shared_ptr<Function> function,
         std::shared_ptr<FailureCause> failure_cause,
         sg_size_t payload)
-        : ServerlessComputeServiceMessage(payload), success(success), registered_function(std::move(registered_function)), failure_cause(std::move(failure_cause)) {}
+        : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor
      *
      * @param answer_commport: commport to which the answer message should be sent
-     * @param registered_function: the (registered) function to invoke
+     * @param function: the (registered) function to invoke
      * @param function_input: input arguments passed to the function
      * @param notify_commport: commport to notify
      * @param payload: message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationRequestMessage::ServerlessComputeServiceFunctionInvocationRequestMessage(
         S4U_CommPort *answer_commport,
-        const std::shared_ptr<RegisteredFunction>& registered_function,
+        const std::shared_ptr<Function>& function,
         const std::shared_ptr<FunctionInput>& function_input,
         S4U_CommPort *notify_commport,
         sg_size_t payload)
         : ServerlessComputeServiceMessage(payload)
     {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_commport == nullptr) || (registered_function == nullptr) || (notify_commport == nullptr))
+        if ((answer_commport == nullptr) || (function == nullptr) || (notify_commport == nullptr))
         {
             throw std::invalid_argument(
                 "ServerlessComputeServiceFunctionRegisterRequestMessage::ServerlessComputeServiceFunctionRegisterRequestMessage(): Invalid arguments");
         }
 #endif
         this->answer_commport = answer_commport;
-        this->registered_function = registered_function;
+        this->function = function;
         this->function_input = function_input;
         this->notify_commport = notify_commport;
     }

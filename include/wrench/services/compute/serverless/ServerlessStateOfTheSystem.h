@@ -55,8 +55,8 @@ namespace wrench
 
         explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts, ServerlessComputeService *service);
 
-        // set of Registered functions
-        std::set<std::shared_ptr<RegisteredFunction>> _registered_functions;
+        // set of (registered)) functions
+        std::set<std::shared_ptr<Function>> _functions;
 
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _new_invocations;

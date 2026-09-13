@@ -470,11 +470,11 @@ private:
             auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
 
 
-            auto registered_function = invocation->getRegisteredFunction();
-            if (invocation->getRegisteredFunction()->getTimeLimit() != 10.00) {
+            auto registered_function = invocation->getFunction();
+            if (invocation->getFunction()->getTimeLimit() != 10.00) {
                 throw std::runtime_error("Invocation's associated time limit should be 10.0");
             }
-            if (invocation->getRegisteredFunction()->getImage() != image) {
+            if (invocation->getFunction()->getImage() != image) {
                 throw std::runtime_error("Invocation's associated image should be the image location");
             }
 

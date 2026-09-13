@@ -23,7 +23,7 @@ namespace wrench {
     class Function;
     class FunctionInput;
     class FunctionOutput;
-    class RegisteredFunction;
+    class Function;
     class Invocation;
     class ServerlessComputeService;
     class StorageService;
@@ -46,7 +46,7 @@ namespace wrench {
                                                   const std::shared_ptr<FileLocation>& location,
                                                   sg_size_t ram_foot_print);
 
-        std::shared_ptr<RegisteredFunction> registerFunction(const std::string& name,
+        std::shared_ptr<Function> registerFunction(const std::string& name,
                                                              const std::function<std::shared_ptr<FunctionOutput>(
                                                                  const std::shared_ptr<FunctionInput>&,
                                                                  const std::shared_ptr<StorageService>&)>& code,
@@ -59,7 +59,7 @@ namespace wrench {
                                                              sg_size_t ingress_in_bytes,
                                                              sg_size_t egress_in_bytes);
 
-        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction>& registered_function,
+        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<Function>& function,
                                                    const std::shared_ptr<ServerlessComputeService>& sl_compute_service,
                                                    const std::shared_ptr<FunctionInput>& function_input);
 
@@ -99,8 +99,7 @@ namespace wrench {
         S4U_CommPort* creator_commport;
 
         // FunctionManager internal data structures
-        // std::set<std::shared_ptr<RegisteredFunction>> _registered_functions; // do we store these here or in the Serverless Compute Service?
-        std::queue<std::shared_ptr<RegisteredFunction>> _functions_to_invoke;
+        std::queue<std::shared_ptr<Function>> _functions_to_invoke;
         std::set<std::shared_ptr<Invocation>> _pending_invocations; // do we really need this?
         std::set<std::shared_ptr<Invocation>> _finished_invocations;
         std::vector<std::pair<std::shared_ptr<Invocation>, S4U_CommPort*>> _invocations_being_waited_for;

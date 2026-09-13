@@ -74,14 +74,14 @@ namespace wrench {
     class ServerlessComputeServiceFunctionRegisterAnswerMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceFunctionRegisterAnswerMessage(bool success,
-                                                              std::shared_ptr<RegisteredFunction> registered_function,
+                                                              std::shared_ptr<Function> function,
                                                               std::shared_ptr<FailureCause> failure_cause,
                                                               sg_size_t payload);
 
         /** @brief Whether the registration was successful */
         bool success;
         /** @brief The registered function on success or nullptr on failure */
-        std::shared_ptr<RegisteredFunction> registered_function;
+        std::shared_ptr<Function> function;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
     };
@@ -92,15 +92,15 @@ namespace wrench {
     class ServerlessComputeServiceFunctionInvocationRequestMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceFunctionInvocationRequestMessage(S4U_CommPort* answer_commport,
-                                                                 const std::shared_ptr<RegisteredFunction>&
-                                                                 registered_function,
+                                                                 const std::shared_ptr<Function>&
+                                                                 function,
                                                                  const std::shared_ptr<FunctionInput>& function_input,
                                                                  S4U_CommPort* notify_commport, sg_size_t payload);
 
         /** @brief The commport_name to answer to */
         S4U_CommPort* answer_commport;
         /** @brief The function to invoke */
-        std::shared_ptr<RegisteredFunction> registered_function;
+        std::shared_ptr<Function> function;
         /** @brief  The function input */
         std::shared_ptr<FunctionInput> function_input;
         /** @brief The commport_name to send notifications to */

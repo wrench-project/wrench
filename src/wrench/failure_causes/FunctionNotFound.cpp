@@ -9,7 +9,6 @@
 
 #include <wrench/failure_causes/FunctionNotFound.h>
 #include <wrench/function/Function.h>
-#include <wrench/function/RegisteredFunction.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/failure_causes/FailureCause.h>
 
@@ -21,10 +20,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param registered_function: the (registered) function to be invoked
+     * @param function: the function to be invoked
      */
-    FunctionNotFound::FunctionNotFound(std::shared_ptr<RegisteredFunction> registered_function) {
-        _registered_function = std::move(registered_function);
+    FunctionNotFound::FunctionNotFound(std::shared_ptr<Function> function) {
+        _function = std::move(function);
     }
 
     /** 
@@ -32,7 +31,7 @@ namespace wrench {
      * @return the message
      */
     std::string FunctionNotFound::toString() {
-        return "The function (" + _registered_function->getName() + ") was not found";
+        return "The function (" + _function->getName() + ") was not found";
     }
 
 } // namespace wrench

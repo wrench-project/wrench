@@ -9,7 +9,6 @@
 
 #include "wrench/function/Function.h"
 #include "wrench/function/Image.h"
-#include "wrench/function/RegisteredFunction.h"
 
 namespace wrench {
 
@@ -25,7 +24,7 @@ namespace wrench {
      * @param ingress_in_bytes The ingress data limit for the function.
      * @param egress_in_bytes The egress data limit for the function.
      */
-    RegisteredFunction::RegisteredFunction(const std::string& name,
+    Function::Function(const std::string& name,
             const std::function<std::shared_ptr<FunctionOutput>(
                 const std::shared_ptr<FunctionInput>&,
                 const std::shared_ptr<StorageService>&)>& code,
@@ -39,50 +38,50 @@ namespace wrench {
         _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
 
     /**
-     * @brief Get the registered function's image
+     * @brief Get the function's image
      * @return A file
      */
-    std::shared_ptr<Image> RegisteredFunction::getImage() const {
+    std::shared_ptr<Image> Function::getImage() const {
         return _image;
     }
 
     /**
-     * @brief Get the registered function's image file
+     * @brief Get the function's image file
      * @return A file
      */
-    std::shared_ptr<DataFile> RegisteredFunction::getImageFile() const {
+    std::shared_ptr<DataFile> Function::getImageFile() const {
         return _image->getFile();
     }
 
     /**
-     * @brief Get the registered function's name
+     * @brief Get the function's name
      * @return A name
      */
-    std::string RegisteredFunction::getName() const {
+    std::string Function::getName() const {
         return _name;
     }
 
     /**
-     * @brief Get the registered function's time limit
+     * @brief Get the function's time limit
      * @return A time limit in seconds
      */
-    double RegisteredFunction::getTimeLimit() const {
+    double Function::getTimeLimit() const {
         return _time_limit;
     }
 
     /**
-     * @brief Get the registered function's disk space limit
+     * @brief Get the function's disk space limit
      * @return A RAN limit in bytes
      */
-    sg_size_t RegisteredFunction::getDiskSpaceLimit() const {
+    sg_size_t Function::getDiskSpaceLimit() const {
         return _disk_space;
     }
 
     /**
-     * @brief Get the registered function's RAM limit
+     * @brief Get the function's RAM limit
      * @return A RAN limit in bytes
      */
-    sg_size_t RegisteredFunction::getRAMSpaceLimit() const {
+    sg_size_t Function::getRAMSpaceLimit() const {
         return _ram_limit;
     }
 

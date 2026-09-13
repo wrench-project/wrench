@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_REGISTEREDFUNCTION_H
-#define WRENCH_REGISTEREDFUNCTION_H
+#ifndef WRENCH_FUNCTION_H
+#define WRENCH_FUNCTION_H
 
 #include <string>
 #include <functional>
@@ -28,13 +28,13 @@ namespace wrench {
     /**
      * @brief Represents a serverless function, encapsulating its metadata and behavior.
      */
-    class RegisteredFunction {
+    class Function {
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
 
-        RegisteredFunction(
+        Function(
             const std::string& name,
             const std::function<std::shared_ptr<FunctionOutput>(
                 const std::shared_ptr<FunctionInput>&,
@@ -77,4 +77,4 @@ namespace wrench {
     };
 } // namespace wrench
 
-#endif // WRENCH_REGISTEREDFUNCTION_H
+#endif // WRENCH_FUNCTION_H

@@ -14,7 +14,7 @@
 #include <memory>
 #include <cfloat>
 #include <fsmod/File.hpp>
-#include <wrench/function/RegisteredFunction.h>
+#include <wrench/function/Function.h>
 
 namespace wrench {
     class ServerlessComputeNode;
@@ -44,7 +44,7 @@ namespace wrench {
         [[nodiscard]] bool isBusy() const;
         [[nodiscard]] unsigned long getIdleSequence() const;
         [[nodiscard]] double getIdleDate() const;
-        [[nodiscard]] const RegisteredFunction *getRegisteredFunction() const;
+        [[nodiscard]] const Function *getFunction() const;
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const;
         [[nodiscard]] ServerlessComputeNode* getComputeNode() const;
 
@@ -53,7 +53,7 @@ namespace wrench {
     private:
         friend class ServerlessComputeNode;
 
-        Container(const RegisteredFunction* registered_function,
+        Container(const Function* function,
                            const ServerlessComputeNode* compute_node,
                            const ServerlessComputeService* serverless_compute_service,
                            State initial_state);
@@ -65,7 +65,7 @@ namespace wrench {
 
         void freeDiskAndMemoryResources();
 
-        const RegisteredFunction* _registered_function;
+        const Function* _function;
         const ServerlessComputeNode *_compute_node;
         const ServerlessComputeService* _serverless_compute_service;
         State _state;

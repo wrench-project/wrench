@@ -12,7 +12,7 @@
 
 #include <wrench/function/Function.h>
 #include <wrench/managers/function_manager/FunctionManager.h>
-#include <wrench/function/RegisteredFunction.h>
+#include <wrench/function/Function.h>
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 #include "wrench/function/Invocation.h"
 #include "wrench/services/compute/ComputeService.h"
@@ -84,11 +84,11 @@ namespace wrench {
     protected:
         friend class FunctionManager;
 
-        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<RegisteredFunction>& registered_function,
+        std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<Function>& function,
                                                    const std::shared_ptr<FunctionInput>& input,
                                                    S4U_CommPort* notify_commport) const;
 
-        std::shared_ptr<RegisteredFunction> registerFunction(const std::string& name,
+        std::shared_ptr<Function> registerFunction(const std::string& name,
                                                              const std::function<std::shared_ptr<FunctionOutput>(
                                                                  const std::shared_ptr<FunctionInput>&,
                                                                  const std::shared_ptr<StorageService>&)>& code,
@@ -128,7 +128,7 @@ namespace wrench {
                                                 sg_size_t egress_in_bytes);
 
         void processFunctionInvocationRequest(S4U_CommPort* answer_commport,
-                                              const std::shared_ptr<RegisteredFunction>& registered_function,
+                                              const std::shared_ptr<Function>& function,
                                               const std::shared_ptr<FunctionInput>& input,
                                               S4U_CommPort* notify_commport);
 

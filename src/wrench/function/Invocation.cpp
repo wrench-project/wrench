@@ -18,13 +18,13 @@ WRENCH_LOG_CATEGORY(Invocation, "Log category for Serverless invocations");
 namespace wrench {
     /**
      * @brief Constructor
-     * @param registered_function The registered function to be invoked
+     * @param function The function to be invoked
      * @param function_input The input for the function
      * @param notify_commport The commport to notify upon completion/failure
      */
-    Invocation::Invocation(const std::shared_ptr<RegisteredFunction>& registered_function,
+    Invocation::Invocation(const std::shared_ptr<Function>& function,
                            const std::shared_ptr<FunctionInput>& function_input,
-                           S4U_CommPort* notify_commport) : _registered_function(registered_function),
+                           S4U_CommPort* notify_commport) : _function(function),
                                                             _function_input(function_input),
                                                             _done(false),
                                                             _dispatched(false),
@@ -33,7 +33,7 @@ namespace wrench {
         static unsigned long long id_sequence_number = 0;
         _id = id_sequence_number;
         id_sequence_number++;
-        // WRENCH_INFO("Invocation created for function %s", _registered_function->getFunction()->getName().c_str());
+        // WRENCH_INFO("Invocation created for function %s", _function->getFunction()->getName().c_str());
     }
 
     /**
@@ -126,11 +126,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Gets the registered function for this invocation
-     * @return A registered function
+     * @brief Gets the function for this invocation
+     * @return A function
      */
-    std::shared_ptr<RegisteredFunction> Invocation::getRegisteredFunction() const {
-        return _registered_function;
+    std::shared_ptr<Function> Invocation::getFunction() const {
+        return _function;
     }
 
     /**

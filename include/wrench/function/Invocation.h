@@ -17,7 +17,7 @@
 namespace wrench {
     class S4U_CommPort;
     class FailureCause;
-    class RegisteredFunction;
+    class Function;
     class FunctionInput;
     class FunctionOutput;
     class ServerlessComputeNode;
@@ -26,7 +26,7 @@ namespace wrench {
 
     /**
      * @class Invocation
-     * @brief Represents an invocation of a registered function.
+     * @brief Represents an invocation of a function.
      */
     class Invocation {
 
@@ -34,7 +34,7 @@ namespace wrench {
         [[nodiscard]] bool isDispatched() const;
         [[nodiscard]] bool isDone() const;
         [[nodiscard]] bool hasSucceeded() const;
-        [[nodiscard]] std::shared_ptr<RegisteredFunction> getRegisteredFunction() const;
+        [[nodiscard]] std::shared_ptr<Function> getFunction() const;
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
         [[nodiscard]] double getSubmitDate() const;
@@ -48,14 +48,14 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        Invocation(const std::shared_ptr<RegisteredFunction> &registered_function,
+        Invocation(const std::shared_ptr<Function> &function,
                    const std::shared_ptr<FunctionInput> &function_input,
                    S4U_CommPort* notify_commport);
     private:
         friend class FunctionManager;
         friend class ServerlessComputeService;
 
-        const std::shared_ptr<RegisteredFunction> _registered_function; // the registered function to be invoked
+        const std::shared_ptr<Function> _function; // the function to be invoked
         std::shared_ptr<FunctionInput> _function_input; // the input for the function
         bool _done; // whether the invocation is done
         bool _dispatched; // whether the invocation has been dispatched
