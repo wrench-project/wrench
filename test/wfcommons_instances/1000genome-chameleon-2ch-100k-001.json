@@ -2,7 +2,7 @@
     "name": "1000genome-20200401T035039Z-0",
     "description": "Trace generated with wrench-pegasus-parser.py from http://wrench-project.org",
     "createdAt": "2020-04-01T20:22:32.420180Z",
-    "schemaVersion": "1.5",
+    "schemaVersion": "1.6",
     "author": {
         "name": "rafsilva",
         "email": "support@wrench-project.org"

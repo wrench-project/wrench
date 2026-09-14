@@ -98,9 +98,9 @@ namespace wrench {
             throw std::invalid_argument(
                 "WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'schema_version' key");
         }
-        if (schema_version != "1.5") {
+        if (schema_version != "1.6") {
             throw std::invalid_argument(
-                "WfCommonsWorkflowParser::createWorkflowFromJson(): Only handles WfFormat schema version 1.5 "
+                "WfCommonsWorkflowParser::createWorkflowFromJson(): Only handles WfFormat schema version 1.6 "
                 "(use the script at https://github.com/wfcommons/WfFormat/tree/main/tools/ to update your workflow instances).");
         }
 
