@@ -2,6 +2,8 @@ WRENCH Release Notes
 ------
 ### wrench 2.9-dev
 
+  - Move from WfFormat 1.5 to WfFormat 1.6 for workflow instance imports
+  - Improvement and enhancement to the ServerlessComputeService implementation, with some API changes
   - Implemented of `reclaimHosts()` and `releaseHosts()` methods for batch compute services, by which one can make compute nodes temporarily (or permanently) unavailable at runtime at any time throughout the simulation.
   - Added the possibility to start execution controllers dynamically
 
