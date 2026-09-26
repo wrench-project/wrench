@@ -10,6 +10,8 @@
 #include "wrench/function/Image.h"
 
 #include <utility>
+
+#include "wrench/function/ImageLayer.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 #include "wrench/simulation/Simulation.h"
@@ -22,14 +24,29 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param name A name
-     * @param location The location of the image (i.e., on some remote/authoritative repo)
-     * @param ram_footprint The memory occupied by the resident, reusable portion of that image, in bytes
+     * @param layers The list of layers that comprise this image
      */
-    Image::Image(std::string  name,
-                 const std::shared_ptr<FileLocation>& location,
-                 const sg_size_t ram_footprint) : _name(std::move(name)), _location(location), _ram_footprint(ram_footprint) {
-        _ram_file = Simulation::addFile(location->getFile()->getID() + "_RAM", _ram_footprint);
+    Image::Image(std::string name,
+                 const std::set<std::shared_ptr<ImageLayer>>& layers) : _name(std::move(name)), _layers(layers) {
     }
+
+    /**
+     * @brief Constructor
+     * @param name A name
+     * @param parent_image A parent image
+     * @param layers The list of addition layers necessary for this image
+     */
+    Image::Image(std::string name,
+                const std::shared_ptr<Image> &parent_image,
+                const std::set<std::shared_ptr<ImageLayer>>& layers) : _name(std::move(name)) {
+        for (auto const &layer: parent_image->getLayers()) {
+            _layers.insert(layer);
+        }
+        for (auto const &layer: layers) {
+            _layers.insert(layer);
+        }
+    }
+
 
     /**
      * @brief Get the image's name
@@ -40,40 +57,36 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the image's layers
+     * @return a list of layers
+     */
+    const std::set<std::shared_ptr<ImageLayer>>& Image::getLayers() const {
+        return _layers;
+    }
+
+    /**
+     * @brief Get the image's disk footprint
+     * @return a number of bytes
+     */
+    sg_size_t Image::getDiskFootprint() const {
+        sg_size_t size = 0;
+        for (auto const &layer : _layers) {
+            size += layer->getDiskFootprint();
+        }
+        return size;
+    }
+
+    /**
      * @brief Get the image's RAM footprint
      * @return a number of bytes
      */
     sg_size_t Image::getRAMFootprint() const {
-        return _ram_footprint;
+        sg_size_t size = 0;
+        for (auto const &layer : _layers) {
+            size += layer->getRAMFootprint();
+        }
+        return size;
     }
 
-    /**
-     * @return The image's disk footprint
-     */
-    sg_size_t Image::getDiskFootprint() const {
-        return _location->getFile()->getSize();
-    }
-
-    /**
-     * @brief Get the image's file location
-     * @return a location
-     */
-    std::shared_ptr<FileLocation> Image::getLocation() const {
-        return _location;
-    }
-
-    /**
-     * @return The image file
-     */
-    std::shared_ptr<DataFile> Image::getFile() const {
-        return _location->getFile();
-    }
-
-    /**
-     * @return The image RAM space (as a file)
-     */
-    std::shared_ptr<DataFile> Image::getRAMFile() const {
-        return _ram_file;
-    }
 
 } // namespace wrench

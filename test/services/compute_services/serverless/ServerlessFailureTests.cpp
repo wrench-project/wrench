@@ -14,7 +14,12 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/failure_causes/OperationTimeout.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -159,11 +164,11 @@ private:
             return std::make_shared<MyFunctionOutput>("DONE");
         };
 
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
-
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
         // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
@@ -220,7 +225,11 @@ void ServerlessFailureTest::do_RemoteDownloadFailure_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0),
+        "ServerlessHeadNode", "/", compute_nodes,
+        std::make_shared<wrench::GreedyServerlessScheduler>(
+            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
+            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
+            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
         {{wrench::ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "50MB"}}, {}));
 
     std::string user_host = "UserHost";

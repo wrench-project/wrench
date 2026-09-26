@@ -90,12 +90,13 @@ namespace wrench {
         };
 
         // Create a 250MB image file on the storage service (e.g., the docker image for the function environment)
-        auto image_file = Simulation::addFile("image_file", 250 * MB);
-        auto image_file_location = FileLocation::LOCATION(storage_service, image_file);
-        StorageService::createFileAtLocation(image_file_location);
+        auto image_layer_file = Simulation::addFile("image_layer_file", 250 * MB);
+        auto image_layer_file_location = FileLocation::LOCATION(storage_service, image_layer_file);
+        StorageService::createFileAtLocation(image_layer_file_location);
 
-        // Create the function's image object
-        auto image = wrench::FunctionManager::createImage("my_image", image_file_location, image_file->getSize());
+        // Create the function's image layer and image object
+        auto image_layer = wrench::FunctionManager::createImageLayer("my_image_layer", image_layer_file_location, image_layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {image_layer});
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 

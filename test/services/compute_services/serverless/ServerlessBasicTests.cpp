@@ -15,7 +15,13 @@
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/failure_causes/OperationTimeout.h"
 #include "wrench/failure_causes/FunctionNotFound.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/RandomServerlessPlanSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -31,7 +37,7 @@ public:
 
     void do_SanityTest_test();
     void do_FunctionRegistrationTest_test();
-    void do_FunctionInvocationTest_test();
+    void do_FunctionInvocationTest_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_PreRegisteredFunctionInvocationTest_test();
     void do_FunctionTimeoutTest_test();
     void do_FunctionErrorTest_test();
@@ -240,10 +246,11 @@ private:
                 MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * GB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        auto image = wrench::FunctionManager::createImage("image", image_location, image_file->getSize());
-        wrench::StorageService::createFileAtLocation(image_location);
+        auto layer_file = wrench::Simulation::addFile("image_file", 100 * GB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        auto layer = wrench::FunctionManager::createImageLayer("layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("image", {layer});
+        wrench::StorageService::createFileAtLocation(layer_location);
         try {
             function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB,
                                                1 * MB);
@@ -286,37 +293,37 @@ void ServerlessBasicTest::do_SanityTest_test() {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongMountPoint"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongSpeed"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongCores"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongRAM"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongDiskSpace"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
     }
 
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
         auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-            "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+            "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
 
         std::string user_host = "UserHost";
         auto wms = simulation->add(
@@ -369,10 +376,11 @@ private:
                 MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
-        wrench::StorageService::createFileAtLocation(image_location);
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
+        wrench::StorageService::createFileAtLocation(layer_location);
 
         function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
@@ -409,7 +417,7 @@ void ServerlessBasicTest::do_FunctionRegistrationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -455,11 +463,11 @@ private:
             return std::make_shared<MyFunctionOutput>("DONE");
         };
 
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
-
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
         // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
@@ -533,10 +541,35 @@ private:
 };
 
 TEST_F(ServerlessBasicTest, FunctionInvocation) {
-    DO_TEST_WITH_FORK(do_FunctionInvocationTest_test);
+    std::vector<std::shared_ptr<wrench::ServerlessInvocationOrderingPolicy>> ordering_policies =
+        {std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
+        std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0)};
+    std::vector<std::shared_ptr<wrench::ServerlessEvictionPolicy>> eviction_policies =
+        {std::make_shared<wrench::LRUServerlessEvictionPolicy>(),
+        std::make_shared<wrench::FewestServerlessEvictionPolicy>()};
+    std::vector<std::shared_ptr<wrench::ServerlessPlanSelectionPolicy>> selection_policies =
+        {std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>(),
+        std::make_shared<wrench::RandomServerlessPlanSelectionPolicy>(0)};
+
+    std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
+    for (const auto& ordering_policy : ordering_policies) {
+        for (const auto& eviction_policy : eviction_policies) {
+            for (const auto& selection_policy : selection_policies) {
+                auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
+                    ordering_policy,
+                    eviction_policy,
+                    selection_policy);
+                schedulers.push_back(scheduler);
+            }
+        }
+    }
+
+    for (auto& scheduler : schedulers) {
+        DO_TEST_WITH_FORK_ONE_ARG(do_FunctionInvocationTest_test, scheduler);
+    }
 }
 
-void ServerlessBasicTest::do_FunctionInvocationTest_test() {
+void ServerlessBasicTest::do_FunctionInvocationTest_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
@@ -552,7 +585,7 @@ void ServerlessBasicTest::do_FunctionInvocationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, scheduler, {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -601,6 +634,8 @@ private:
             throw std::runtime_error("Invocation should not be done yet");
         }
 
+        function_manager->wait_all({}); // coverage
+
         function_manager->wait_one(invocation);
 
         if (!invocation->isDone()) {
@@ -641,7 +676,7 @@ void ServerlessBasicTest::do_PreRegisteredFunctionInvocationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
 
     std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
                                   const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
@@ -651,10 +686,11 @@ void ServerlessBasicTest::do_PreRegisteredFunctionInvocationTest_test() {
         return std::make_shared<MyFunctionOutput>("DONE");
     };
 
-    auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-    auto image_location = wrench::FileLocation::LOCATION(storage_service, image_file);
-    wrench::StorageService::createFileAtLocation(image_location);
-    auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+    auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+    auto layer_location = wrench::FileLocation::LOCATION(storage_service, layer_file);
+    wrench::StorageService::createFileAtLocation(layer_location);
+    auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+    auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
     // Registering a function
     auto function = serverless_provider->addRegisteredFunction(
@@ -706,10 +742,11 @@ private:
                 MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
         };
 
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB,
@@ -719,15 +756,15 @@ private:
         if (dsl != 2000 * MB) {
             throw std::runtime_error("Disk space limit must be 2000MB");
         }
-        if (registered_function1->getImageFile() != image_file) {
-            throw std::runtime_error("Image file must be the same as the image for the function");
+        if ((*(registered_function1->getImage()->getLayers().begin()))->getFile() != layer_file) {
+            throw std::runtime_error("Image layer file must be the same as the image layer for the function");
         }
 
         // Place an invocation
         {
             auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
 
-            function_manager->wait_one(invocation);
+            function_manager->wait_all({invocation});
 
             if (!invocation->isDone()) {
                 throw std::runtime_error("Invocation should be done by now");
@@ -781,7 +818,7 @@ void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -828,10 +865,12 @@ private:
         auto function_manager = this->createFunctionManager();
 
         // Create other files
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_image", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
+
 
         // Create a function code
         std::function lambda = [this](const std::shared_ptr<wrench::FunctionInput>& input,
@@ -910,10 +949,10 @@ void ServerlessBasicTest::do_FunctionErrorTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
 
     auto other_serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-       "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::RandomServerlessScheduler>(0), {}, {}));
+       "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
 
 
     std::string user_host = "UserHost";

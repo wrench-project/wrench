@@ -19,6 +19,7 @@
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
+    class ImageLayer;
     class Image;
     class Function;
     class FunctionInput;
@@ -42,22 +43,29 @@ namespace wrench {
 
         void kill();
 
+        static std::shared_ptr<ImageLayer> createImageLayer(const std::string& name,
+                                                            const std::shared_ptr<FileLocation>& location,
+                                                            sg_size_t ram_foot_print);
+
         static std::shared_ptr<Image> createImage(const std::string& name,
-                                                  const std::shared_ptr<FileLocation>& location,
-                                                  sg_size_t ram_foot_print);
+                                                  const std::set<std::shared_ptr<ImageLayer>>& layers);
+
+        static std::shared_ptr<Image> createImage(const std::string& name,
+                                                  const std::shared_ptr<Image>& parent_image,
+                                                  const std::set<std::shared_ptr<ImageLayer>>& additional_layers);
 
         std::shared_ptr<Function> registerFunction(const std::string& name,
-                                                             const std::function<std::shared_ptr<FunctionOutput>(
-                                                                 const std::shared_ptr<FunctionInput>&,
-                                                                 const std::shared_ptr<StorageService>&)>& code,
-                                                             const std::shared_ptr<Image>& image,
-                                                             const std::shared_ptr<ServerlessComputeService>&
-                                                             compute_service,
-                                                             double time_limit_in_seconds,
-                                                             sg_size_t disk_space_limit_in_bytes,
-                                                             sg_size_t RAM_limit_in_bytes,
-                                                             sg_size_t ingress_in_bytes,
-                                                             sg_size_t egress_in_bytes);
+                                                   const std::function<std::shared_ptr<FunctionOutput>(
+                                                       const std::shared_ptr<FunctionInput>&,
+                                                       const std::shared_ptr<StorageService>&)>& code,
+                                                   const std::shared_ptr<Image>& image,
+                                                   const std::shared_ptr<ServerlessComputeService>&
+                                                   compute_service,
+                                                   double time_limit_in_seconds,
+                                                   sg_size_t disk_space_limit_in_bytes,
+                                                   sg_size_t RAM_limit_in_bytes,
+                                                   sg_size_t ingress_in_bytes,
+                                                   sg_size_t egress_in_bytes);
 
         std::shared_ptr<Invocation> invokeFunction(const std::shared_ptr<Function>& function,
                                                    const std::shared_ptr<ServerlessComputeService>& sl_compute_service,

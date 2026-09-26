@@ -559,14 +559,28 @@ namespace wrench {
     }
 
     /**
-     * @brief A method to open a file, which really doesn't do anything besides making the
+     * @brief A method to open a file, which has the side effect of making the
      *        file unevictable, in case the storage service implements caching. Calling
      *        close() on the returned file will decrement the file's refcount, thus possibly
      *        making it evictable again.
      * @param location: the file's location
+     * @return an open file
      */
     std::shared_ptr<simgrid::fsmod::File> SimpleStorageService::openFile(const std::shared_ptr<FileLocation> &location) {
         return this->file_system->open(location->getFilePath(), "r");
+    }
+
+    /**
+     * @brief Retrieve the file's last access date
+     * @param location: the file's location
+     * @return a date
+     */
+    double SimpleStorageService::getLastAccessDate(
+        const std::shared_ptr<FileLocation>& location) const {
+        const auto fd = this->file_system->open(location->getFilePath(), "r");
+        const auto date = fd->stat()->last_access_date;
+        fd->close();
+        return date;
     }
 
     /**

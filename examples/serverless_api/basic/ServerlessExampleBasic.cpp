@@ -23,11 +23,12 @@
 
 #include <iostream>
 #include <wrench.h>
+#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h>
+#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h>
 
 #include "ServerlessExampleExecutionController.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/FCFSServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/workload_balancing/WorkloadBalancingServerlessScheduler.h"
 
 namespace sg4 = simgrid::s4u;
 
@@ -142,8 +143,11 @@ int main(int argc, char** argv) {
     unsigned int num_invocations = atoi(argv[1]);
     unsigned int num_compute_nodes = atoi(argv[2]);
 
-    /* Using the basic First Come First Serve (FCFS) scheduler */
-    auto scheduler = std::make_shared<wrench::FCFSServerlessScheduler>();
+    /* Using the built-in greedy scheduler with some policy options */
+    auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
+        std::make_unique<wrench::FCFSServerlessInvocationOrderingPolicy>(),
+        std::make_unique<wrench::LRUServerlessEvictionPolicy>(),
+        std::make_unique<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
 
     /* Create the simulated platform */
     PlatformCreator platform_creator(num_compute_nodes);

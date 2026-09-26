@@ -54,7 +54,7 @@ namespace wrench
         : ServerlessComputeServiceMessage(payload)
     {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((answer_commport == nullptr) || (function == nullptr))
+        if ((answer_commport == nullptr) || (image == nullptr))
         {
             throw std::invalid_argument(
                 "ServerlessComputeServiceFunctionRegisterRequestMessage::ServerlessComputeServiceFunctionRegisterRequestMessage(): Invalid arguments");
@@ -80,10 +80,10 @@ namespace wrench
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionRegisterAnswerMessage::ServerlessComputeServiceFunctionRegisterAnswerMessage(
-        bool success,
+        const bool success,
         std::shared_ptr<Function> function,
         std::shared_ptr<FailureCause> failure_cause,
-        sg_size_t payload)
+        const sg_size_t payload)
         : ServerlessComputeServiceMessage(payload), success(success), function(std::move(function)), failure_cause(std::move(failure_cause)) {}
 
     /**
@@ -100,7 +100,7 @@ namespace wrench
         const std::shared_ptr<Function>& function,
         const std::shared_ptr<FunctionInput>& function_input,
         S4U_CommPort *notify_commport,
-        sg_size_t payload)
+        const sg_size_t payload)
         : ServerlessComputeServiceMessage(payload)
     {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -125,10 +125,10 @@ namespace wrench
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationAnswerMessage::ServerlessComputeServiceFunctionInvocationAnswerMessage(
-        bool success,
+        const bool success,
         std::shared_ptr<Invocation> invocation,
         std::shared_ptr<FailureCause> failure_cause,
-        sg_size_t payload)
+        const sg_size_t payload)
         : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
     /**
@@ -140,20 +140,20 @@ namespace wrench
      * @param payload: the message size in bytes
      */
     ServerlessComputeServiceFunctionInvocationCompleteMessage::ServerlessComputeServiceFunctionInvocationCompleteMessage(
-        bool success,
+        const bool success,
         std::shared_ptr<Invocation> invocation,
         std::shared_ptr<FailureCause> failure_cause,
-        sg_size_t payload)
+        const sg_size_t payload)
         : ServerlessComputeServiceMessage(payload), success(success), invocation(std::move(invocation)), failure_cause(std::move(failure_cause)) {}
 
     /**
      * @brief Constructor
      * @param action The action that did the download
-     * @param image The image that was downloaded
+     * @param layer The image layer that was downloaded
      * @param payload The message size in bytes
      */
     ServerlessComputeServiceDownloadCompleteMessage::ServerlessComputeServiceDownloadCompleteMessage(
-        std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)) {}
+        std::shared_ptr<CustomAction> action, std::shared_ptr<ImageLayer> layer, const sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _layer(std::move(layer)) {}
 
     /**
      * @brief Constructor
@@ -162,27 +162,27 @@ namespace wrench
      * @param payload The message size in bytes
      */
     ServerlessComputeServiceInvocationExecutionCompleteMessage::ServerlessComputeServiceInvocationExecutionCompleteMessage(
-        std::shared_ptr<CustomAction> action, std::shared_ptr<Invocation> invocation, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _invocation(std::move(invocation)) {}
+        std::shared_ptr<CustomAction> action, std::shared_ptr<Invocation> invocation, const sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _invocation(std::move(invocation)) {}
 
     /**
      * @brief Constructor
      * @param action The action that did the copy
-     * @param image The image that was copied
-     * @param compute_node The compute node to which the image was copied
+     * @param layer The image layer that was copied
+     * @param compute_node The compute node to which the image layer was copied
      * @param payload The message size in bytes
      */
     ServerlessComputeServiceNodeCopyCompleteMessage::ServerlessComputeServiceNodeCopyCompleteMessage(
-        std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)), _compute_node(std::move(compute_node)) {}
+        std::shared_ptr<CustomAction> action, std::shared_ptr<ImageLayer> layer, std::shared_ptr<ServerlessComputeNode> compute_node, const sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _layer(std::move(layer)), _compute_node(std::move(compute_node)) {}
 
     /**
      * @brief Constructor
      * @param action The action that did the loading
-     * @param image The image that was loaded into RAM
-     * @param compute_node The compuate node at which the image was loaded into RAM
+     * @param layer The image layer that was loaded into RAM
+     * @param compute_node The compute node at which the image layer was loaded into RAM
      * @param payload The message size in bytes
      */
     ServerlessComputeServiceNodeLoadCompleteMessage::ServerlessComputeServiceNodeLoadCompleteMessage(
-        std::shared_ptr<CustomAction> action, std::shared_ptr<Image> image, std::shared_ptr<ServerlessComputeNode> compute_node, sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _image(std::move(image)), _compute_node(std::move(compute_node)) {}
+        std::shared_ptr<CustomAction> action, std::shared_ptr<ImageLayer> layer, std::shared_ptr<ServerlessComputeNode> compute_node, const sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)), _layer(std::move(layer)), _compute_node(std::move(compute_node)) {}
 
     /**
      * @brief Constructor
@@ -190,6 +190,6 @@ namespace wrench
      * @param idle_sequence The idle sequence number
      */
     ServerlessComputeServiceContainerIdleTimeoutMessage::ServerlessComputeServiceContainerIdleTimeoutMessage(
-        std::shared_ptr<Container> container, std::uint64_t idle_sequence) : ServerlessComputeServiceMessage(0), _container(std::move(container)), _idle_sequence(idle_sequence) {}
+        std::shared_ptr<Container> container, const std::uint64_t idle_sequence) : ServerlessComputeServiceMessage(0), _container(std::move(container)), _idle_sequence(idle_sequence) {}
 
 } // namespace wrench

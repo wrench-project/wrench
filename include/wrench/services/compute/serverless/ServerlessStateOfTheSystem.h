@@ -40,13 +40,16 @@ namespace wrench
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
-        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool isImageOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
-        [[nodiscard]] bool isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Image>& image) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
+        [[nodiscard]] bool isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>&layer) const;
+        std::set<std::shared_ptr<ImageLayer>> getImageLayersOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
 
-        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
-        [[nodiscard]] bool isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<Image> &image) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool isImageLayerInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
+        [[nodiscard]] bool isImageLayerBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
+        std::set<std::shared_ptr<ImageLayer>> getImageLayersInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
+
 
         ~ServerlessStateOfTheSystem() = default;
 
@@ -60,7 +63,7 @@ namespace wrench
 
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _new_invocations;
-        // queues of function invocations whose images are being downloaded
+        // queues of function invocations whose image layers are being downloaded
         std::map<std::shared_ptr<Image>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
         // queue of function invocations whose images have been downloaded
         std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
@@ -69,11 +72,17 @@ namespace wrench
 
         std::string _head_storage_service_mount_point;
         std::shared_ptr<StorageService> _head_storage_service;
-        std::set<std::shared_ptr<Image>> _being_downloaded_images;
+        std::set<std::shared_ptr<ImageLayer>> _being_downloaded_image_layers;
         sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shenanigans
 
         // list of compute nodes
         std::vector<std::shared_ptr<ServerlessComputeNode>> _compute_nodes;
+
+        // Layer tracking
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_in_ram;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_being_loaded_in_ram;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_disk;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_being_copied_to_disk;
 
         // The compute service this is for
         ServerlessComputeService *_serverless_compute_service;

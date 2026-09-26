@@ -89,6 +89,7 @@
 
 // Function
 #include "wrench/function/Image.h"
+#include "wrench/function/ImageLayer.h"
 #include "wrench/function/Function.h"
 #include "wrench/function/FunctionInput.h"
 #include "wrench/function/FunctionOutput.h"

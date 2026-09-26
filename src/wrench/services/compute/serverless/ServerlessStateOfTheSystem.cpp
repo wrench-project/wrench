@@ -33,6 +33,10 @@ namespace wrench {
             auto compute_node = std::make_shared<
                 ServerlessComputeNode>(hostname, num_cores, service);
             _compute_nodes.push_back(compute_node);
+            _image_layers_in_ram[compute_node] = {};
+            _image_layers_being_loaded_in_ram[compute_node] = {};
+            _image_layers_on_disk[compute_node] = {};
+            _image_layers_being_copied_to_disk[compute_node] = {};
         }
     }
 
@@ -88,76 +92,99 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the current images being copied to a node
+     * @brief Get the current image layers being copied to a node
      *
      * @param node the compute node
      * @return a set of image files
      */
-    std::set<std::shared_ptr<Image>> ServerlessStateOfTheSystem::getImagesBeingCopiedToNode(
+    std::set<std::shared_ptr<ImageLayer>> ServerlessStateOfTheSystem::getImageLayersBeingCopiedToNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
-        return node->getImagesBeingCopied();
+        return _image_layers_being_copied_to_disk.at(node);
     }
 
     /**
-     * @brief Determine whether an image is currently being copied to a node
+     * @brief Get the current image layers on disk at a node
      *
      * @param node the compute node
-     * @param image an image file
+     * @return a set of image files
+     */
+    std::set<std::shared_ptr<ImageLayer>> ServerlessStateOfTheSystem::getImageLayersOnDiskAtNode(
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return _image_layers_on_disk.at(node);
+    }
+
+    /**
+     * @brief Determine whether an image layer is currently being copied to a node
+     *
+     * @param node the compute node
+     * @param layer an image layer
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                              const std::shared_ptr<Image>& image) const {
-        return (node->isImageBeingCopied(image));
+    bool ServerlessStateOfTheSystem::isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                              const std::shared_ptr<ImageLayer>& layer) const {
+        return _image_layers_being_copied_to_disk.at(node).count(layer) != 0;
     }
 
     /**
-     * @brief Determine whether an image is currently on disk at a node
+     * @brief Determine whether an image layer is currently on disk at a node
      *
      * @param node the compute node
-     * @param image an image
+     * @param layer an image layer
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                   const std::shared_ptr<Image>& image) const {
-        return node->isImageOnDisk(image);
+    bool ServerlessStateOfTheSystem::isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                   const std::shared_ptr<ImageLayer>& layer) const {
+        return _image_layers_on_disk.at(node).count(layer) != 0;
     }
 
     /**
-     * @brief Get the current images being loaded into RAM at a node
+     * @brief Get the current image layers being loaded into RAM at a node
      *
      * @param node the compute node
-     * @return a set of images
+     * @return a set of image layers
      */
-    std::set<std::shared_ptr<Image>> ServerlessStateOfTheSystem::getImagesBeingLoadedAtNode(
+    std::set<std::shared_ptr<ImageLayer>> ServerlessStateOfTheSystem::getImageLayersBeingLoadedAtNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
-        return node->getImagesBeingLoaded();
+        return _image_layers_being_loaded_in_ram.at(node);
     }
 
     /**
      * @brief Determine whether an image is currently being loading into RAM at a node
      *
      * @param node the compute node
-     * @param image an image file
+     * @param layer an image layer
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                              const std::shared_ptr<Image>& image) const {
-        return node->isImageBeingLoaded(image);
+    bool ServerlessStateOfTheSystem::isImageLayerBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                              const std::shared_ptr<ImageLayer>& layer) const {
+        return _image_layers_being_loaded_in_ram.at(node).count(layer) != 0;
     }
 
     /**
-     * @brief Determine whether an image is currently in RAM at a node
+     * @brief Determine whether an image layer is currently in RAM at a node
      *
      * @param node the compute node
-     * @param image an image file
+     * @param layer an image layer
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                        const std::shared_ptr<Image>& image) const {
-        return node->isImageInRAM(image);
+    bool ServerlessStateOfTheSystem::isImageLayerInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                        const std::shared_ptr<ImageLayer>& layer) const {
+        return _image_layers_in_ram.at(node).count(layer) != 0;
     }
+
+    /**
+     * @brief Get the current image layers in RAM at a node
+     *
+     * @param node the compute node
+     * @return a set of image files
+     */
+    std::set<std::shared_ptr<ImageLayer>> ServerlessStateOfTheSystem::getImageLayersInRAMAtNode(
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return _image_layers_in_ram.at(node);
+    }
+
 } // namespace wrench

@@ -45,13 +45,13 @@ namespace wrench {
         return _image;
     }
 
-    /**
-     * @brief Get the function's image file
-     * @return A file
-     */
-    std::shared_ptr<DataFile> Function::getImageFile() const {
-        return _image->getFile();
-    }
+    // /**
+    //  * @brief Get the function's image file
+    //  * @return A file
+    //  */
+    // std::shared_ptr<DataFile> Function::getImageFile() const {
+    //     return _image->getFile();
+    // }
 
     /**
      * @brief Get the function's name

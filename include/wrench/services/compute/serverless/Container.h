@@ -40,6 +40,7 @@ namespace wrench {
             IDLE,
         };
 
+        [[nodiscard]] unsigned long getCreationId() const;
         [[nodiscard]] bool isIdle() const;
         [[nodiscard]] bool isBusy() const;
         [[nodiscard]] unsigned long getIdleSequence() const;
@@ -48,7 +49,7 @@ namespace wrench {
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const;
         [[nodiscard]] ServerlessComputeNode* getComputeNode() const;
 
-        void clearPrivateStorage();
+        void clearPrivateStorage() const;
 
     private:
         friend class ServerlessComputeNode;
@@ -74,12 +75,14 @@ namespace wrench {
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
         std::shared_ptr<StorageService> _tmp_storage_service;
 
-        std::shared_ptr<simgrid::fsmod::File> _opened_image_disk_file;
-        std::shared_ptr<simgrid::fsmod::File> _opened_image_ram_file;
+        std::set<std::shared_ptr<simgrid::fsmod::File>> _opened_image_layer_disk_files;
+        std::set<std::shared_ptr<simgrid::fsmod::File>> _opened_image_layer_ram_files;
 
         std::shared_ptr<FileLocation> _tmp_ram_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
 
+        static unsigned long _creation_id_counter;
+        unsigned long _creation_id; // to break ties
         unsigned long _idle_sequence = 0;
         double _idle_date = DBL_MAX;
 

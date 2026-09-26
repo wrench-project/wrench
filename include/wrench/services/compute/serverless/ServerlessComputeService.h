@@ -17,7 +17,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
-#include "wrench/services/compute/serverless/ServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/ServerlessScheduler.h"
 #include "wrench/services/compute/serverless/ServerlessStateOfTheSystem.h"
 
 namespace wrench {
@@ -31,7 +31,6 @@ namespace wrench {
             {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0"},
-            {ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, "LRU"},
             {ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "0"},
             {ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "true"}
         };
@@ -57,6 +56,32 @@ namespace wrench {
                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD,
                 S4U_CommPort::default_control_message_size
             },
+            {
+                ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,
+                S4U_CommPort::default_control_message_size
+            },
+            {
+                ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,
+                S4U_CommPort::default_control_message_size
+            },
+            {
+                ComputeServiceMessagePayload::
+                IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD,
+                S4U_CommPort::default_control_message_size
+            },
+            {
+                ComputeServiceMessagePayload::
+                IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD,
+                S4U_CommPort::default_control_message_size
+            },
+            {
+                ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,
+                S4U_CommPort::default_control_message_size
+            },
+            {
+                ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,
+                S4U_CommPort::default_control_message_size
+            },
         };
 
     public:
@@ -71,6 +96,8 @@ namespace wrench {
         bool supportsCompoundJobs() override;
         bool supportsPilotJobs() override;
         bool supportsFunctions() override;
+
+        std::shared_ptr<ServerlessScheduler> getScheduler() const;
 
         std::shared_ptr<Function> addRegisteredFunction(
             const std::string& name,
@@ -143,8 +170,8 @@ namespace wrench {
                                               const std::shared_ptr<FunctionInput>& input,
                                               S4U_CommPort* notify_commport);
 
-        void processImageDownloadCompletion(const std::shared_ptr<Action>& action,
-                                            const std::shared_ptr<Image>& image);
+        void processImageLayerDownloadCompletion(const std::shared_ptr<Action>& action,
+                                                 const std::shared_ptr<ImageLayer>& layer);
 
         void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation,
                                          const std::shared_ptr<Action>& action);
@@ -153,9 +180,15 @@ namespace wrench {
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
+        void terminateIdleContainers(const std::vector<TerminateIdleContainer>& decisions) const;
+        void evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const;
+        void evictLayersFromDisk(const std::vector<EvictLayerFromDisk>& decisions) const;
         void dispatchInvocations(const std::vector<DispatchInvocation>& decisions);
-        void initiateImageLoads(const std::vector<LoadImage>& decisions);
-        void initiateImageCopies(const std::vector<CopyImage>& decisions);
+        void initiateImageLayerLoads(const std::vector<LoadImageLayer>& decisions);
+        void initiateImageLayerCopies(const std::vector<CopyImageLayer>& decisions);
+
+        bool isInvocationSchedulable(const std::shared_ptr<Invocation>& invocation) const;
+        bool isInvocationAdmittable(const std::shared_ptr<Invocation>& invocation) const;
 
         bool processNextMessage(bool& do_scheduling);
 
@@ -165,15 +198,18 @@ namespace wrench {
         void startHeadStorageService();
         void startComputeNodeServices();
 
-        void initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation);
-        void initiateImageCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
-                                            const std::shared_ptr<Image>& image);
-        void initiateImageLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
-                                            const std::shared_ptr<Image>& image);
+        void initiateImageLayerDownloadFromRemote(const std::shared_ptr<ImageLayer>& layer);
+        void initiateImageLayerCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
+                                                 const std::shared_ptr<ImageLayer>& layer);
+        void initiateImageLayerLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
+                                                 const std::shared_ptr<ImageLayer>& layer);
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                 const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
                                 std::shared_ptr<Container> target_container);
+
+        void terminateAllServicesAndReleaseAllResources();
+
 
         unsigned long _compute_node_num_cores;
         double _compute_node_core_speed;

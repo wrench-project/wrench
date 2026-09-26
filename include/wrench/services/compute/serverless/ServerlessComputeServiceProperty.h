@@ -37,12 +37,6 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(CONTAINER_IDLE_TIMEOUT);
 
-        /** @brief The policy used to evict idle containers if space is needed at a compute node. Possible values:
-         *     - LRU: evict containers that have been idle the longest (default)
-         *     - RAM: evict as few containers as possible, prioritizing ones with the smallest RAM footprints
-         **/
-        DECLARE_PROPERTY_NAME(IDLE_CONTAINER_EVICTION_POLICY);
-
         /** @brief The buffer size used by all internal storage services.
          **/
         DECLARE_PROPERTY_NAME(STORAGE_SERVICES_BUFFER_SIZE);

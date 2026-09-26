@@ -89,7 +89,7 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        virtual double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path = "/") override;
+        double getFileLastWriteDate(const std::shared_ptr<DataFile> &file, const std::string &path = "/") override;
 
         bool hasFile(const std::shared_ptr<FileLocation> &location) override;
 
@@ -150,6 +150,7 @@ namespace wrench {
         }
 
         std::shared_ptr<simgrid::fsmod::File> openFile(const std::shared_ptr<FileLocation> &location);
+        double getLastAccessDate(const std::shared_ptr<FileLocation> &location) const;
 
         /***********************/
         /** \endcond          **/

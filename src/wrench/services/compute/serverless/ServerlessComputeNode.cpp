@@ -10,6 +10,7 @@
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
 #include <wrench/function/Invocation.h>
 #include <wrench/function/Image.h>
+#include <wrench/function/ImageLayer.h>
 #include <wrench/services/compute/serverless/Container.h>
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 
@@ -95,6 +96,45 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the last access date for an in-RAM layer
+     * @param layer The layer
+     * @return a date
+     */
+    double ServerlessComputeNode::getLayerLastAccessDateInRAM(const std::shared_ptr<ImageLayer>& layer) const {
+        if (not this->_memory->hasFile(layer->getRAMFile())) {
+            throw std::runtime_error("ServerlessComputeNode::getLayerLastAccessDateInRAM(): Layer " + layer->getName() + " is not in RAM");
+        }
+        return _memory->getLastAccessDate(FileLocation::LOCATION(_memory, layer->getRAMFile()));
+    }
+
+    /**
+     * @brief Get the last access date for an in-disk layer
+     * @param layer The layer
+     * @return a date
+     */
+    double ServerlessComputeNode::getLayerLastAccessDateOnDisk(const std::shared_ptr<ImageLayer>& layer) const {
+        if (not this->_disk->hasFile(layer->getFile())) {
+            throw std::runtime_error("ServerlessComputeNode::getLayerLastAccessDateOnDisk(): Layer " + layer->getName() + " is not on disk");
+        }
+        return _disk->getLastAccessDate(FileLocation::LOCATION(_disk, layer->getFile()));
+    }
+
+    /**
+     * @brief Method to kill all containers (brutally)
+     */
+    void ServerlessComputeNode::killAllContainers() {
+        // Idle containers
+        for (auto const &container : _idle_containers) {
+            container->shutdown();
+        }
+        // Busy containers
+        for (auto const &container : _busy_containers) {
+            container->makeIdle();
+            container->shutdown();
+        }
+    }
+
+    /**
      * @brief Method to see if there is an appropriate idle container
      * @param function the target function
      * @param excluded_container set containers to ignore
@@ -115,11 +155,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the set of idle container
+     * @brief Retrieve the set of idle containers
      * @return A set of containers
      */
-    std::set<std::shared_ptr<Container>> ServerlessComputeNode::getIdleContainers() const {
+    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getIdleContainers() {
         return _idle_containers;
+    }
+
+    /**
+     * @brief Retrieve the set of non-idle containers
+     * @return A set of containers
+     */
+    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getBusyContainers() {
+        return _busy_containers;
     }
 
     /**
@@ -134,34 +182,32 @@ namespace wrench {
         try {
             container->spawn();
         } catch (ExecutionException& e) {
-            if (not std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw;
-            }
-            // Try to terminate idle containers
-            std::set<std::shared_ptr<Container>> victims;
-            auto success = this->findIdleContainersToTerminate(
-                function->getRAMSpaceLimit(),
-                function->getDiskSpaceLimit(),
-                victims);
-            if (not success) {
-                throw;
-            } else {
-                for (auto const& victim : victims) {
-                    WRENCH_INFO(
-                        "Evicting an idle container [%s, idle for %.2lf seconds, %llu bytes in RAM, %llu bytes on disk",
-                        victim->getFunction()->getName().c_str(),
-                        S4U_Simulation::getClock() - victim->getIdleDate(),
-                        victim->getFunction()->getRAMSpaceLimit(),
-                        victim->getFunction()->getDiskSpaceLimit());
-                    this->shutdownContainer(victim);
-                }
-            }
-            // Attempt again!
-            try {
-                container->spawn();
-            } catch (ExecutionException&) {
-                throw;
-            }
+            throw;
+            // // Try to terminate idle containers
+            // std::set<std::shared_ptr<Container>> victims;
+            // auto success = this->findIdleContainersToTerminate(
+            //     function->getRAMSpaceLimit(),
+            //     function->getDiskSpaceLimit(),
+            //     victims);
+            // if (not success) {
+            //     throw;
+            // } else {
+            //     for (auto const& victim : victims) {
+            //         WRENCH_INFO(
+            //             "Evicting an idle container [%s, idle for %.2lf seconds, %llu bytes in RAM, %llu bytes on disk",
+            //             victim->getFunction()->getName().c_str(),
+            //             S4U_Simulation::getClock() - victim->getIdleDate(),
+            //             victim->getFunction()->getRAMSpaceLimit(),
+            //             victim->getFunction()->getDiskSpaceLimit());
+            //         this->shutdownContainer(victim);
+            //     }
+            // }
+            // // Attempt again!
+            // try {
+            //     container->spawn();
+            // } catch (ExecutionException&) {
+            //     throw;
+            // }
         }
         _busy_containers.insert(container);
         return container;
@@ -200,56 +246,23 @@ namespace wrench {
     }
 
     /**
-     * @brief Is an image in the process of being copied to (the disk of) the compute node?
-     * @param image an image file
-     * @return True if the image is being copied
-     */
-    bool ServerlessComputeNode::isImageBeingCopied(const std::shared_ptr<Image>& image) const {
-        return (_images_being_copied.find(image) != _images_being_copied.end());
-    }
-
-    /**
-     * @brief Get the set of images being copied to (the disk of) the compute node
-     * @return A set of images
-     */
-    std::set<std::shared_ptr<Image>> ServerlessComputeNode::getImagesBeingCopied() const {
-        return _images_being_copied;
-    }
-
-    /**
-     * @brief Is an image on disk?
-     * @param image an image
+     * @brief Is an image layer on disk?
+     * @param layer an image layer
      * @return True if the image is on disk
      */
-    bool ServerlessComputeNode::isImageOnDisk(const std::shared_ptr<Image>& image) const {
-        return (this->_disk->hasFile(image->getFile()));
+    bool ServerlessComputeNode::isImageLayerOnDisk(const std::shared_ptr<ImageLayer>& layer) const {
+        return this->_disk->hasFile(layer->getFile());
     }
 
     /**
-     * @brief Is an image in the process of being loaded to (the RAM of) the compute node?
-     * @param image an image file
-     * @return True if the image is being loaded
+     * @brief Is an image layer in RAM?
+     * @param layer an image layer
+     * @return True if the image layer is in RAM
      */
-    bool ServerlessComputeNode::isImageBeingLoaded(const std::shared_ptr<Image>& image) const {
-        return (_images_being_loaded.find(image) != _images_being_loaded.end());
+    bool ServerlessComputeNode::isImageLayerInRAM(const std::shared_ptr<ImageLayer>& layer) const {
+        return (this->_memory->hasFile(layer->getRAMFile()));
     }
 
-    /**
-     * @brief Get the set of images being loaded to (the RAM of) the compute node
-     * @return A set of images
-     */
-    std::set<std::shared_ptr<Image>> ServerlessComputeNode::getImagesBeingLoaded() const {
-        return _images_being_loaded;
-    }
-
-    /**
-     * @brief Is an image in RAM?
-     * @param image an image file
-     * @return True if the image is in RAM
-     */
-    bool ServerlessComputeNode::isImageInRAM(const std::shared_ptr<Image>& image) const {
-        return (this->_memory->hasFile(image->getRAMFile()));
-    }
 
     /**
      * @brief Helper method to ensure that an invocation can be dispatched
@@ -271,8 +284,8 @@ namespace wrench {
                     "ServerlessComputeNode::isInvocationFeasible(): The container isn't for the right function!");
             }
             if (_idle_containers.find(target_container) == _idle_containers.end()) {
-                throw std::runtime_error(
-                    "ServerlessComputeNode::isInvocationFeasible(): Internal error - The container does not belong to the compute host!");
+                // The container could have been evicted due to another invocation dispatch
+                return false;
             }
             if (not target_container->isIdle()) {
                 throw std::runtime_error(
@@ -286,19 +299,36 @@ namespace wrench {
             return false;
         }
 
-        // The image is on disk?
         auto image = invocation->getFunction()->getImage();
 
-        if (not this->isImageOnDisk(image)) {
-            WRENCH_INFO("Scheduled invocation cannot be started because image %s is not on disk at node %s",
-                        image->getName().c_str(), this->hostname.c_str());
+        // The image is on disk?
+        bool all_layers_on_disk = true;
+        for (auto const& layer : image->getLayers()) {
+            if (not this->_disk->hasFile(layer->getFile())) {
+                all_layers_on_disk = false;
+                break;
+            }
+        }
+
+        if (not all_layers_on_disk) {
+            WRENCH_INFO(
+                "Scheduled invocation cannot be started because not all layers for image %s are on disk at node %s",
+                image->getName().c_str(), this->hostname.c_str());
             return false;
         }
 
-        // Is image in RAM
-        if (not this->isImageInRAM(image)) {
-            WRENCH_INFO("Scheduled invocation cannot be started because image %s is not in RAM at node %s",
-                        image->getName().c_str(), this->hostname.c_str());
+        // Is the image in RAM
+        bool all_layers_in_ram = true;
+        for (auto const& layer : image->getLayers()) {
+            if (not this->_memory->hasFile(layer->getRAMFile())) {
+                all_layers_in_ram = false;
+                break;
+            }
+        }
+        if (not all_layers_in_ram) {
+            WRENCH_INFO(
+                "Scheduled invocation cannot be started because not all layers for image %s are in RAM at node %s",
+                image->getName().c_str(), this->hostname.c_str());
             return false;
         }
 
@@ -307,153 +337,4 @@ namespace wrench {
         return true;
     }
 
-    /**
-     * @brief Method to identify which idle containers to terminate to create at least some free RAM space. It
-     *        returns the smallest set possible in terms of number of containers to terminate, trying to
-     *        free up as little memory as possible (it's not optimal in this regard however, as finding
-     *        the smallest set with the smallest sum is NP-hard, and would require dynamic programming, etc.)
-     *        This is a really a super-generic method that is implementing an algorithm, and it's not Container-specific
-     * @param needed_free_ram_space The RAM space needed in bytes
-     * @param needed_free_disk_space The Disk space needed in bytes
-     * @param to_terminate The set of containers to terminate (reference, will be updated)
-     * @return a set of idle containers that could be terminated to reach free space
-     */
-    bool ServerlessComputeNode::findIdleContainersToTerminate(const sg_size_t needed_free_ram_space,
-                                                              const sg_size_t needed_free_disk_space,
-                                                              std::set<std::shared_ptr<Container>>& to_terminate)
-    const {
-        // Compute numbers of bytes to be freed up
-        auto ram_space_to_free_up = (needed_free_ram_space <= this->getFreeRAMSpace()
-                                         ? 0
-                                         : needed_free_ram_space - this->getFreeRAMSpace());
-        auto disk_space_to_free_up = (needed_free_disk_space <= this->getFreeDiskSpace()
-                                          ? 0
-                                          : needed_free_disk_space - this->getFreeDiskSpace());
-
-        // If nothing to be done, return
-        if (ram_space_to_free_up == 0 and disk_space_to_free_up == 0) {
-            return true;
-        }
-
-        auto policy = _serverless_compute_service->getPropertyValueAsString(
-            ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY);
-        bool success;
-        if (policy == "LRU") {
-            return this->pickVictimContainersLRU(ram_space_to_free_up, disk_space_to_free_up, to_terminate);
-        } else if (policy == "RAM") {
-            return this->pickVictimContainersRAM(ram_space_to_free_up, disk_space_to_free_up, to_terminate);
-        }
-        throw std::invalid_argument("ServerlessComputeNode::findIdleContainersToTerminate():"
-            " invalid idle container eviction policy '" + policy + "'");
-    }
-
-    /**
-     * @brief Pick victim idle containers to terminate using the RAM policy
-     * @param to_terminate The set of containers to terminate (reference, will be updated)
-     * @param ram_space_to_free_up The number of bytes to free up in RAM
-     * @param disk_space_to_free_up The number of bytes to free up in disk
-     * @return
-     */
-    bool ServerlessComputeNode::pickVictimContainersRAM(
-        sg_size_t ram_space_to_free_up,
-        sg_size_t disk_space_to_free_up,
-        std::set<std::shared_ptr<Container>>& to_terminate) const {
-        // Compute a to-sort list of the containers
-        std::vector<std::shared_ptr<Container>> sorted_containers;
-        sorted_containers.reserve(_idle_containers.size());
-        for (auto const& container : _idle_containers) {
-            sorted_containers.push_back(container);
-        }
-
-        // Sort the list
-        std::sort(sorted_containers.begin(), sorted_containers.end(),
-                  [ram_space_to_free_up](const std::shared_ptr<Container>& a,
-                                         const std::shared_ptr<Container>& b) {
-                      // If RAM doesn't matter, sort based on disk
-                      if (ram_space_to_free_up == 0) {
-                          return a->getFunction()->getDiskSpaceLimit() <
-                              b->getFunction()->getDiskSpaceLimit();
-                      }
-
-                      // Otherwise sort based on RAM (which should be the limiting factor)
-                      return a->getFunction()->getRAMSpaceLimit() <
-                          b->getFunction()->getRAMSpaceLimit();
-                  });
-
-        // TODO: Use dynamic programming to return some optimal set? (smallest cardinal, and smallest sum, NP-hard, but likely only weakly,
-        // TODO: but not easy due to the two dimensions...Like some knapscak) - LIKELY OVERKILL
-        while (true) {
-            if (sorted_containers.empty()) {
-                to_terminate.clear();
-                return false;
-            }
-            // Find the smallest container that gets us there, and if none, pick the largest container
-            auto victim = sorted_containers.end() - 1;
-            for (auto it = sorted_containers.begin(); it != sorted_containers.end(); ++it) {
-                if ((*it)->getFunction()->getRAMSpaceLimit() >= ram_space_to_free_up and
-                    (*it)->getFunction()->getDiskSpaceLimit() >= disk_space_to_free_up) {
-                    victim = it;
-                    break;
-                }
-            }
-
-            to_terminate.insert(*victim);
-            auto victim_ram_space = (*victim)->getFunction()->getRAMSpaceLimit();
-            auto victim_disk_space = (*victim)->getFunction()->getDiskSpaceLimit();
-            ram_space_to_free_up = (victim_ram_space > ram_space_to_free_up
-                                        ? 0
-                                        : ram_space_to_free_up - victim_ram_space);
-            disk_space_to_free_up = (victim_disk_space > disk_space_to_free_up
-                                         ? 0
-                                         : disk_space_to_free_up - victim_disk_space);
-            sorted_containers.erase(victim);
-
-            if ((ram_space_to_free_up == 0) and (disk_space_to_free_up == 0)) {
-                break;
-            }
-        }
-        return true;
-    }
-
-    /**
-    * @brief Pick victim idle containers to terminate using the LRU policy
-    * @param ram_space_to_free_up The number of bytes to free up in RAM
-    * @param disk_space_to_free_up The number of bytes to free up in disk
-    * @param to_terminate The set of containers to terminate (reference, will be updated)
-    * @return
-    */
-    bool ServerlessComputeNode::pickVictimContainersLRU(
-        const sg_size_t ram_space_to_free_up,
-        const sg_size_t disk_space_to_free_up,
-        std::set<std::shared_ptr<Container>>& to_terminate) const {
-        // Compute a to-sort list of the containers
-        std::vector<std::shared_ptr<Container>> sorted_containers;
-        sorted_containers.reserve(_idle_containers.size());
-        for (auto const& container : _idle_containers) {
-            sorted_containers.push_back(container);
-        }
-
-        // Sort the list
-        std::sort(sorted_containers.begin(), sorted_containers.end(),
-                  [](
-                  const std::shared_ptr<Container>& a, const std::shared_ptr<Container>& b) {
-                      double a_time_since_idle = S4U_Simulation::getClock() - a->getIdleDate();
-                      double b_time_since_idle = S4U_Simulation::getClock() - b->getIdleDate();
-                      return a_time_since_idle > b_time_since_idle;
-                  });
-
-        // Go through the list
-        sg_size_t ram_space_freed_up = 0;
-        sg_size_t disk_space_freed_up = 0;
-        for (auto const& container : sorted_containers) {
-            to_terminate.insert(container);
-            ram_space_freed_up += container->getFunction()->getRAMSpaceLimit();
-            disk_space_freed_up += container->getFunction()->getDiskSpaceLimit();
-            if ((ram_space_freed_up >= ram_space_to_free_up) and (disk_space_freed_up >= disk_space_to_free_up)) {
-                return true;
-            }
-        }
-        to_terminate.clear();
-        return false;
-    }
 } // namespace wrench

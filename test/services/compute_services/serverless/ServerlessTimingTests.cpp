@@ -16,9 +16,12 @@
 #include "../../../include/RuntimeAssert.h"
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/FCFSServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/workload_balancing/WorkloadBalancingServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -45,8 +48,7 @@ public:
     void do_TwoIdleContainers_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_OneIdleContainerTwoInvocations_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_TmpStorageClearing_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
-    void do_IdleContainerEviction_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler,
-        const std::string& idle_container_eviction_policy);
+    void do_IdleContainerEviction_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_ImageDownloadSimulation_test(const std::shared_ptr<wrench::ServerlessScheduler>& scheduler);
     void do_TwoHostFCFSTiming_test();
 
@@ -180,10 +182,11 @@ private:
             return std::make_shared<MyFunctionOutput>("Processed!");
         };
 
-        auto image_file = wrench::Simulation::addFile("image_file", 100 * MB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function = function_manager->registerFunction("Function", lambda, image, this->compute_service, 10, 2000 * MB,
                                                                       8000 * MB, 10 * MB, 1 * MB);
@@ -260,9 +263,10 @@ private:
 
 TEST_F(ServerlessTimingTest, ImageReuse) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(0),
-        std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_ImageReuse_test, scheduler);
@@ -338,10 +342,11 @@ private:
         };
 
         // Register that function with an image file
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 60 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
@@ -383,9 +388,10 @@ private:
 
 TEST_F(ServerlessTimingTest, CorePressure) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_CorePressure_test, scheduler);
@@ -455,24 +461,25 @@ private:
             return std::make_shared<MyFunctionOutput>("Processed!");
         };
 
-        // Register that function with an image file that will fill up RAM
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
-
-        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
+        // Register that function with an image that will fill up RAM
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 60 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
+        auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto invocation_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
 
         // Register another function with an image file that will not fit in RAM
-        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 61 * GB);
-        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
-        wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto layer_file_2 = wrench::Simulation::addFile("layer_file_2", 61 * GB);
+        auto layer_location_2 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_2);
+        wrench::StorageService::createFileAtLocation(layer_location_2);
+        auto layer_2 = wrench::FunctionManager::createImageLayer("my_layer_2", layer_location_2, layer_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
@@ -502,9 +509,10 @@ private:
 
 TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(0),
-        std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_RAMPressureDueToImages_test, scheduler);
@@ -576,10 +584,12 @@ private:
         };
 
         // Register that function with an image file
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 60 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
+
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
@@ -621,9 +631,10 @@ private:
 
 TEST_F(ServerlessTimingTest, RAMPressureDueToInvocations) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_RAMPressureDueToInvocations_test, scheduler);
@@ -695,10 +706,11 @@ private:
         };
 
         // Register that function with an image file that will fill up the disk
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 60 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -708,10 +720,11 @@ private:
         auto invocation_1 = function_manager->invokeFunction(registered_function_1, this->compute_service, input_1);
 
         // Register another function with an image file that will not fit on disk
-        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 61 * GB);
-        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
-        wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto layer_file_2 = wrench::Simulation::addFile("layer_file_2", 61 * GB);
+        auto layer_location_2 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_2);
+        wrench::StorageService::createFileAtLocation(layer_location_2);
+        auto layer_2 = wrench::FunctionManager::createImageLayer("my_layer_2", layer_location_2, layer_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
@@ -737,9 +750,10 @@ private:
 
 TEST_F(ServerlessTimingTest, DiskPressureDueToImages) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_DiskPressureDueToImages_test, scheduler);
@@ -811,10 +825,11 @@ private:
         };
 
         // Register that function with an image file that will fill up the disk
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 60 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_image_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -854,9 +869,10 @@ private:
 
 TEST_F(ServerlessTimingTest, DiskPressureDueToInvocations) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_DiskPressureDueToInvocations_test, scheduler);
@@ -928,10 +944,11 @@ private:
         };
 
         // Register that function with an image file that will fill up the disk
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 60 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 60 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -982,9 +999,10 @@ private:
 
 TEST_F(ServerlessTimingTest, HotStart) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_HotStart_test, scheduler);
@@ -1062,10 +1080,11 @@ private:
         };
 
         // Register that function with a 50GB image file that takes %50 of the node disk space
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 50 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -1085,10 +1104,11 @@ private:
         auto inv2_elapsed = inv2->getFunctionEndDate() - inv2->getSubmitDate();
 
         // Register that function with ANOTHER 50GB image file that takes %50 of the node disk space
-        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
-        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
-        wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto layer_file_2 = wrench::Simulation::addFile("layer_file_2", 50 * GB);
+        auto layer_location_2 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_2);
+        wrench::StorageService::createFileAtLocation(layer_location_2);
+        auto layer_2 = wrench::FunctionManager::createImageLayer("my_image_2", layer_location_2, layer_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
@@ -1146,9 +1166,10 @@ private:
 
 TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_SimpleImageEvictionFromDisk_test, scheduler);
@@ -1227,10 +1248,11 @@ private:
         };
 
         // Register that function with a 32GB image file that takes %50 of the node disk space
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 50 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -1243,10 +1265,11 @@ private:
         auto inv1_elapsed = inv1->getFunctionEndDate() - inv1->getSubmitDate();
 
         // Place an invocation to function 2 and wait for it
-        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 50 * GB);
-        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
-        wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto layer_file_2 = wrench::Simulation::addFile("layer_file_2", 50 * GB);
+        auto layer_location_2 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_2);
+        wrench::StorageService::createFileAtLocation(layer_location_2);
+        auto layer_2 = wrench::FunctionManager::createImageLayer("my_layer_2", layer_location_2, layer_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
@@ -1297,9 +1320,10 @@ private:
 
 TEST_F(ServerlessTimingTest, SimpleImageEvictionFromRAM) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_SimpleImageEvictionFromRAM_test, scheduler);
@@ -1376,10 +1400,11 @@ private:
         };
 
         // Register that function with a 32GB image file that takes %50 of the node disk space
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 50 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -1449,9 +1474,10 @@ private:
 
 TEST_F(ServerlessTimingTest, TwoIdleContainers) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_TwoIdleContainers_test, scheduler);
@@ -1530,10 +1556,11 @@ private:
         };
 
         // Register that function with a 32GB image file that takes %50 of the node disk space
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 50 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -1581,9 +1608,10 @@ private:
 
 TEST_F(ServerlessTimingTest, OneIdleContainerTwoInvocations) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_OneIdleContainerTwoInvocations_test, scheduler);
@@ -1668,10 +1696,11 @@ private:
         };
 
         // Register that function with a 32GB image file that takes %50 of the node disk space
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 50 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 50 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
@@ -1701,9 +1730,10 @@ private:
 
 TEST_F(ServerlessTimingTest, TmpStorageClearing) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        std::make_shared<wrench::RandomServerlessScheduler>(0),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_TmpStorageClearing_test, scheduler);
@@ -1771,6 +1801,9 @@ private:
     int main() override {
         auto function_manager = this->createFunctionManager();
 
+        auto scheduler = std::dynamic_pointer_cast<wrench::GreedyServerlessScheduler>(this->compute_service->getScheduler());
+        auto eviction_policy = scheduler->getEvictionPolicy();
+
         // Create a function lambda that sleeps 100 seconds
         double sleep_time = 100.0;
         std::function lambda = [sleep_time](const std::shared_ptr<wrench::FunctionInput>& input,
@@ -1782,10 +1815,11 @@ private:
         };
 
         // Compute node has 64GB of RAM, create a 33GB image
-        auto image_file = wrench::Simulation::addFile("image_file", 33 * GB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+        auto layer_file = wrench::Simulation::addFile("layer_file", 33 * GB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
         // Create 10 functions with these RAM sizes, which will fill up the remaining 31GB of RAM
         auto input = std::make_shared<MyFunctionInput>(1, 2);
@@ -1817,14 +1851,13 @@ private:
             function_manager->wait_one(inv);
         }
 
+        // std::cerr << "\n\n** AT THIS POINT SOME CONTAINERS SHOULD HAVE BEEN EVICTED **\n\n";
 
         // At this point, depending on the idle container eviction policy, different containers should have been evicted,
         std::set<int> indices_of_functions_that_should_have_been_evicted;
-        if (this->compute_service->getPropertyValueAsString(
-            wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY) == "RAM") {
+        if (dynamic_cast<wrench::FewestServerlessEvictionPolicy*>(eviction_policy)) {
             indices_of_functions_that_should_have_been_evicted = {6, 9};
-        } else if (this->compute_service->getPropertyValueAsString(
-            wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY) == "LRU") {
+        } else if (dynamic_cast<wrench::LRUServerlessEvictionPolicy*>(eviction_policy)) {
             indices_of_functions_that_should_have_been_evicted = {0, 1, 2, 3, 4, 5, 6};
         }
 
@@ -1839,7 +1872,8 @@ private:
             auto elapsed = inv->getFunctionEndDate() - inv->getDispatchDate();
             if (std::abs(elapsed - sleep_time) > EPSILON) {
                 throw std::runtime_error(
-                    "Container for registered function index " + std::to_string(idx) + " should not have been evicted");
+                    "Container for registered function index " + std::to_string(idx) +
+                    " (footprint = " + std::to_string(registered_functions.at(idx)->getRAMSpaceLimit() / 1000000000) + ") should not have been evicted");
             }
         }
         // Double-check that other containers HAVE been evicted
@@ -1866,19 +1900,16 @@ private:
 
 TEST_F(ServerlessTimingTest, IdleContainerEviction) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(0),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
-        DO_TEST_WITH_FORK_TWO_ARGS(do_IdleContainerEviction_test, scheduler, "RAM");
-        DO_TEST_WITH_FORK_TWO_ARGS(do_IdleContainerEviction_test, scheduler, "LRU");
+        DO_TEST_WITH_FORK_ONE_ARG(do_IdleContainerEviction_test, scheduler);
     }
 }
 
 void ServerlessTimingTest::do_IdleContainerEviction_test(
-    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler,
-    const std::string& idle_container_eviction_policy) {
+    const std::shared_ptr<wrench::ServerlessScheduler>& scheduler) {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
@@ -1897,8 +1928,7 @@ void ServerlessTimingTest::do_IdleContainerEviction_test(
         "ServerlessHeadNode", "/", compute_nodes, scheduler,
         {
             {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},
-            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"},
-            {wrench::ServerlessComputeServiceProperty::IDLE_CONTAINER_EVICTION_POLICY, idle_container_eviction_policy}
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "10000.0"}
         },
         {}));
 
@@ -1953,10 +1983,11 @@ private:
         };
 
         // Register a function_1 with a 30GB image file, and a 1GB container RAM space
-        auto image_file_1 = wrench::Simulation::addFile("image_file_1", 30 * GB);
-        auto image_location_1 = wrench::FileLocation::LOCATION(this->storage_service, image_file_1);
-        wrench::StorageService::createFileAtLocation(image_location_1);
-        auto image_1 = wrench::FunctionManager::createImage("my_image_1", image_location_1, image_file_1->getSize());
+        auto layer_file_1 = wrench::Simulation::addFile("layer_file_1", 30 * GB);
+        auto layer_location_1 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_1);
+        wrench::StorageService::createFileAtLocation(layer_location_1);
+        auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
+        auto image_1 = wrench::FunctionManager::createImage("my_image", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // 1 GB Container RAM SPACE
@@ -1964,10 +1995,11 @@ private:
                                                                         1 * GB, 1 * GB, 10 * MB, 1 * MB);
 
         // Register a function_2 with a 30GB image file, and a 1GB container RAM space
-        auto image_file_2 = wrench::Simulation::addFile("image_file_2", 30 * GB);
-        auto image_location_2 = wrench::FileLocation::LOCATION(this->storage_service, image_file_2);
-        wrench::StorageService::createFileAtLocation(image_location_2);
-        auto image_2 = wrench::FunctionManager::createImage("my_image_2", image_location_2, image_file_2->getSize());
+        auto layer_file_2 = wrench::Simulation::addFile("layer_file_2", 30 * GB);
+        auto layer_location_2 = wrench::FileLocation::LOCATION(this->storage_service, layer_file_2);
+        wrench::StorageService::createFileAtLocation(layer_location_2);
+        auto layer_2 = wrench::FunctionManager::createImageLayer("my_layer_2", layer_location_2, layer_file_2->getSize());
+        auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         // 1 GB Container RAM SPACE
@@ -1997,9 +2029,8 @@ private:
 
 TEST_F(ServerlessTimingTest, ImageDownloadSimulation) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers = {
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
-        // std::make_shared<wrench::RandomServerlessScheduler>(),
-        // std::make_shared<wrench::WorkloadBalancingServerlessScheduler>(),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
     };
     for (auto& scheduler : schedulers) {
         DO_TEST_WITH_FORK_ONE_ARG(do_ImageDownloadSimulation_test, scheduler);
@@ -2091,10 +2122,11 @@ private:
         };
 
         // Register a function_1 with a 10GB image file, and a 1GB container RAM space
-        auto image_file = wrench::Simulation::addFile("image_file", 10 * GB);
-        auto image_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_location);
-        auto image = wrench::FunctionManager::createImage("my_image", image_location, image_file->getSize());
+        auto layer_file = wrench::Simulation::addFile("layer_file", 10 * GB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         // 1 GB Container RAM SPACE
@@ -2112,9 +2144,21 @@ private:
 
         // Wait for them all
         function_manager->wait_all(invocations);
+        if (invocations.at(0)->getComputeNode() != "ServerlessComputeNode1") {
+            for (const auto& invocation : invocations) {
+                std::cerr
+                    << "id=" << invocation->getId()
+                    << " submit=" << invocation->getSubmitDate()
+                    << " dispatch=" << invocation->getDispatchDate()
+                    << " start=" << invocation->getFunctionStartDate()
+                    << " end=" << invocation->getFunctionEndDate()
+                    << " host=" << invocation->getComputeNode()
+                    << '\n';
+            }
+        }
 
         // for (int i=0; i < num_invocations; i++)  {
-        //     std::cerr << "INV" << i << " (ID=" << std::to_string(invocations.at(i)->getId()) +" : ";
+        //     std::cerr << "INV" << i << " (ID=" << std::to_string(invocations.at(i)->getId()) +": ";
         //     std::cerr << "submit: " << invocations.at(i)->getSubmitDate() << "  ";
         //     std::cerr << "dispatch: " << invocations.at(i)->getDispatchDate() << "  ";
         //     std::cerr << "fstart: " << invocations.at(i)->getFunctionStartDate() << "  ";
@@ -2187,8 +2231,8 @@ void ServerlessTimingTest::do_TwoHostFCFSTiming_test() {
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", "/", compute_nodes,
-        // std::make_shared<wrench::RandomServerlessScheduler>(0),
-        std::make_shared<wrench::FCFSServerlessScheduler>(),
+        // std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::LRUServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
         {
             {wrench::ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "1.0"},
             {wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "5.0"},

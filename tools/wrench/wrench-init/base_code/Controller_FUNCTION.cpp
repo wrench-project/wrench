@@ -50,10 +50,12 @@ namespace wrench {
         // Start a function manager
         auto function_manager = this->createFunctionManager();
 
-        /* Create a function image file on the storage at the user's host */
-        auto image_file = wrench::Simulation::addFile("image_file", 10 * GB);
-        auto image_file_location = wrench::FileLocation::LOCATION(this->storage_service, image_file);
-        wrench::StorageService::createFileAtLocation(image_file_location);
+        /* Create a function image layer file on the storage at the user's host */
+        auto layer_file = wrench::Simulation::addFile("layer_file", 10 * GB);
+        auto layer_file_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_file_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_file_location, layer_file->getSize() / 2);
+
 
         // Create the code for a function. This function computes a fixed amount of flops.
         //  It has absolutely generic Input and Output
@@ -66,7 +68,7 @@ namespace wrench {
         };
 
         // Create the function's image
-	    auto image = wrench::FunctionManager::createImage("my_image", image_file_location, image_file->getSize() / 2);
+	    auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
         WRENCH_INFO("Registering the function with the serverless compute service");
 

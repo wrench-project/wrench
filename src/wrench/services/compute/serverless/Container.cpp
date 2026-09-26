@@ -15,6 +15,8 @@
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 #include <wrench/simulation/Simulation.h>
+#include <wrench/function/Image.h>
+#include <wrench/function/ImageLayer.h>
 
 #include "wrench/failure_causes/FatalFailure.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -23,6 +25,9 @@ WRENCH_LOG_CATEGORY(Container, "Log category for Container");
 
 
 namespace wrench {
+
+    unsigned long Container::_creation_id_counter = 0;
+
     /**
      * @brief Constructor
      * @param function
@@ -35,10 +40,19 @@ namespace wrench {
                          const ServerlessComputeNode* compute_node,
                          const ServerlessComputeService* serverless_compute_service,
                          const State initial_state) {
+        _creation_id = _creation_id_counter++;
         _function = function;
         _compute_node = compute_node;
         _serverless_compute_service = serverless_compute_service;
         _state = initial_state;
+    }
+
+    /**
+     * @brief Return the container's creation id
+     * @return the id
+     */
+    unsigned long Container::getCreationId() const {
+        return _creation_id;
     }
 
     /**
@@ -112,6 +126,15 @@ namespace wrench {
         _state = State::BUSY;
         _idle_date = DBL_MAX;
         _idle_sequence += 1;
+
+        // A warm invocation uses these layers too. Refresh their recency
+        // using the same zero-time touch as on a cold container start.
+        for (const auto& file : _opened_image_layer_disk_files) {
+            file->read(1, false);
+        }
+        for (const auto& file : _opened_image_layer_ram_files) {
+            file->read(1, false);
+        }
     }
 
 
@@ -125,27 +148,35 @@ namespace wrench {
 
         /** This method's implementation is overly paranoid exception-wise, but it's likely a good thing **/
 
-
-        // Open the image disk file (do this first to pin it to RAM - would
-        // be weird if, due to LRU, the container itself kicked out the image!)
+        // Open all image layer disk files (do this first to pin them to RAM - would
+        // be weird if somebody removed them
         auto compute_disk_ss = _compute_node->getDiskStorage();
         try {
-            _opened_image_disk_file = compute_disk_ss->openFile(
-                FileLocation::LOCATION(compute_disk_ss, _function->getImageFile()));
+            for (auto const &layer : _function->getImage()->getLayers()) {
+                auto fd = compute_disk_ss->openFile(
+                    FileLocation::LOCATION(compute_disk_ss, layer->getFile()));
+                fd->read(1, false); // To update the last access date
+                _opened_image_layer_disk_files.insert(fd);
+            }
         } catch (ExecutionException&) {
             this->freeDiskAndMemoryResources();
             throw;
         } catch (simgrid::Exception&) {
             this->freeDiskAndMemoryResources();
-            throw ExecutionException(std::make_shared<FatalFailure>("Can't open image in RAM"));
+            throw ExecutionException(std::make_shared<FatalFailure>("Can't open image layer file in RAM"));
         }
 
-        // Open the image memory file (do this first to pin it to RAM - would
-        // be weird if, due to LRU, the container itself kicked out the image!)
+        // Open the image layer memory files (do this first to pin them to RAM - would
+        // be weird if somebody removed them
         auto compute_ram_ss = _compute_node->getMemoryStorage();
         try {
-            _opened_image_ram_file = compute_ram_ss->openFile(
-                FileLocation::LOCATION(compute_ram_ss, _function->getImage()->getRAMFile()));
+            for (auto const &layer : _function->getImage()->getLayers()) {
+                auto fd = compute_ram_ss->openFile(
+                    FileLocation::LOCATION(compute_ram_ss, layer->getRAMFile()));
+                _opened_image_layer_ram_files.insert(fd);
+                fd->read(1, false); // To update the last access date
+
+            }
         } catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
             throw;
@@ -217,9 +248,8 @@ namespace wrench {
         // Create and open a tmp memory file in RAM for the invocation's RAM space
         auto tmp_memory_file = Simulation::addTmpFile(_function->getRAMSpaceLimit());
         try {
-            auto file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
-            StorageService::createFileAtLocation(file_location);
-            _tmp_ram_file_location = file_location;
+            _tmp_ram_file_location = FileLocation::LOCATION(compute_ram_ss, tmp_memory_file);
+            StorageService::createFileAtLocation(_tmp_ram_file_location);
             _opened_tmp_ram_file = compute_ram_ss->openFile(_tmp_ram_file_location);
         } catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
@@ -247,7 +277,7 @@ namespace wrench {
     /**
      * @brief Clear the private storage's content
      */
-    void Container::clearPrivateStorage() {
+    void Container::clearPrivateStorage() const {
         for (auto const& partition :
              _tmp_storage_service->getFileSystem()->get_partitions()) {
             partition->erase_all_content();
@@ -278,6 +308,7 @@ namespace wrench {
                 if (StorageService::hasFileAtLocation(_tmp_file_location)) {
                     StorageService::removeFileAtLocation(_tmp_file_location);
                 }
+                Simulation::removeFile(_tmp_file_location->getFile());
             }
         } catch (ExecutionException& ignore) {
         }
@@ -295,22 +326,27 @@ namespace wrench {
                 if (StorageService::hasFileAtLocation(_tmp_ram_file_location)) {
                     StorageService::removeFileAtLocation(_tmp_ram_file_location);
                 }
+                Simulation::removeFile(_tmp_ram_file_location->getFile());
             }
         } catch (ExecutionException& ignore) {
         }
 
         // Close the image disk file
         try {
-            if (_opened_image_disk_file) {
-                _opened_image_disk_file->close();
+            for (auto const &layer_file : _opened_image_layer_disk_files) {
+                if (layer_file) {
+                    layer_file->close();
+                }
             }
         } catch (simgrid::Exception& ignore) {
         }
 
         // Close the image ram file
         try {
-            if (_opened_image_ram_file) {
-                _opened_image_ram_file->close();
+            for (auto const &layer_file : _opened_image_layer_ram_files) {
+                if (layer_file) {
+                    layer_file->close();
+                }
             }
         } catch (simgrid::Exception& ignore) {
         }
@@ -321,7 +357,7 @@ namespace wrench {
         _tmp_file_location.reset();
         _opened_tmp_ram_file.reset();
         _tmp_ram_file_location.reset();
-        _opened_image_disk_file.reset();
-        _opened_image_ram_file.reset();
+        _opened_image_layer_disk_files.clear();
+        _opened_image_layer_ram_files.clear();
     }
 }

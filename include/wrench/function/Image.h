@@ -12,26 +12,29 @@
 
 #include <string>
 #include <functional>
+#include <set>
 #include <memory>
 
 #include <simgrid/forward.h>
 
+#include <wrench/function/ImageLayer.h>
+
 
 namespace wrench {
     class FileLocation;
+    class ImageLayer;
     class DataFile;
 
     /**
-     * @brief A class that implements the notion of a function that
-     *        can be invoked at a serverless compute service
+     * @brief A class that implements the notion of an image for containers
      */
     class Image {
     public:
         [[nodiscard]] std::string getName() const;
+        [[nodiscard]] const std::set<std::shared_ptr<ImageLayer>>& getLayers() const;
         [[nodiscard]] sg_size_t getRAMFootprint() const;
         [[nodiscard]] sg_size_t getDiskFootprint() const;
-        [[nodiscard]] std::shared_ptr<FileLocation> getLocation() const;
-        [[nodiscard]] std::shared_ptr<DataFile> getFile() const;
+
 
     private:
         friend class FunctionManager;
@@ -42,15 +45,13 @@ namespace wrench {
         friend class ServerlessComputeService;
 
         Image(std::string  name,
-              const std::shared_ptr<FileLocation>& location,
-              sg_size_t ram_footprint);
-
-        [[nodiscard]] std::shared_ptr<DataFile> getRAMFile() const;
+              const std::set<std::shared_ptr<ImageLayer>>& layers);
+        Image(std::string  name,
+              const std::shared_ptr<Image> &parent_image,
+              const std::set<std::shared_ptr<ImageLayer>>& layers);
 
         std::string _name;
-        std::shared_ptr<FileLocation> _location;
-        sg_size_t _ram_footprint;
-        std::shared_ptr<DataFile> _ram_file;
+        std::set<std::shared_ptr<ImageLayer>> _layers;
     };
 } // namespace wrench
 

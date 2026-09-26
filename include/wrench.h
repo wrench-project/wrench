@@ -26,21 +26,25 @@
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
-#include "wrench/services/compute/serverless/ServerlessComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
-#include "wrench/services/compute/serverless/ServerlessComputeService.h"
-#include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 #include "wrench/services/storage/proxy/StorageServiceProxy.h"
 #include "wrench/services/compute/serverless/ServerlessComputeService.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/RandomServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/greedy/FCFSServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/workload_balancing/WorkloadBalancingServerlessScheduler.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/ServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/ServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/RandomServerlessPlanSelectionPolicy.h"
+
 
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"
@@ -50,8 +54,13 @@
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/WorkflowTask.h"
 
+// Serverless
+#include "wrench/managers/function_manager/FunctionManager.h"
+#include "wrench/function/Image.h"
+#include "wrench/function/ImageLayer.h"
+#include "wrench/function/Function.h"
+
 // Tools
 #include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
-
 
 #endif//WRENCH_WRENCH_H

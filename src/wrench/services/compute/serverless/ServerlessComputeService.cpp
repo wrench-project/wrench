@@ -14,6 +14,8 @@
 #include <wrench/services/compute/serverless/Container.h>
 #include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/function/Function.h>
+#include <wrench/function/Image.h>
+#include <wrench/function/ImageLayer.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/failure_causes/NotAllowed.h>
@@ -23,6 +25,7 @@
 
 #include "wrench/action/CustomAction.h"
 #include "wrench/failure_causes/NotEnoughResources.h"
+#include "wrench/failure_causes/ServiceIsDown.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
@@ -173,6 +176,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the service's scheduler
+     * @return a scheduler
+     */
+    std::shared_ptr<ServerlessScheduler> ServerlessComputeService::getScheduler() const {
+        return _scheduler;
+    }
+
+    /**
      * @brief Method to submit a compound job to the service
      *
      * @param job: The job being submitted
@@ -285,6 +296,7 @@ namespace wrench {
         // Get the answer
         const auto msg = answer_commport->getMessage<ServerlessComputeServiceFunctionRegisterAnswerMessage>(
             this->network_timeout, "ServerlessComputeService::registerFunction(): Received an");
+        S4U_CommPort::retireTemporaryCommPort(answer_commport);
 
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -313,6 +325,7 @@ namespace wrench {
         // Get the answer
         const auto msg = answer_commport->getMessage<ServerlessComputeServiceFunctionInvocationAnswerMessage>(
             this->network_timeout, "ServerlessComputeService::invokeFunction(): Received an");
+        S4U_CommPort::retireTemporaryCommPort(answer_commport);
 
         if (not msg->success) {
             throw ExecutionException(msg->failure_cause);
@@ -340,16 +353,18 @@ namespace wrench {
 
         bool do_scheduling;
         while (processNextMessage(do_scheduling)) {
-            // At each compute node, if an image is in RAM but not on Disk, due to what we did in the previous
+            // At each compute node, if an image layer is in RAM but not on Disk, due to what we did in the previous
             // scheduling decisions, remove it from RAM (to be realistic).
-            // This is a hack, but, as of now, there is no way to "tie" two files together. And
-            // the LRU behavior is outside of wrench's control (in fsmod), and not observable/callbackable.
+            // This is a hack, but, as of now, there is no way to "tie" two files together. This
+            // should never happen unless the scheduler is buggy, but better safe than sorry
             for (auto const& node : _state_of_the_system->_compute_nodes) {
                 for (auto const& rf : _state_of_the_system->_functions) {
                     auto image = rf->getImage();
-                    if (node->isImageInRAM(image) and (not node->isImageOnDisk(image))) {
-                        StorageService::removeFileAtLocation(
-                            FileLocation::LOCATION(node->_memory, image->getRAMFile()));
+                    for (auto const& layer : image->getLayers()) {
+                        if (node->isImageLayerInRAM(layer) and (not node->isImageLayerOnDisk(layer))) {
+                            StorageService::removeFileAtLocation(
+                                FileLocation::LOCATION(node->_memory, layer->getRAMFile()));
+                        }
                     }
                 }
             }
@@ -362,19 +377,22 @@ namespace wrench {
                 auto decisions = invokeScheduler();
 
                 // Implement the scheduler's decisions, if possible. Note that
-                // some decision can be invalid, and that's ok. For instance, the scheduler
-                // is likely not accounting for LRU behavior on compute node
-                // disk and RAM, and of which files are currently unevictable. The idea is that
+                // some decision could perhaps be invalid, and that's ok. The idea is that
                 // even a super naive scheduler can be used, even though most of its scheduling
                 // decisions may not feasible at a given time. It will just be invoked again later.
-                // It is unlikely that a crazy-sophisticated scheduling will mode/capture everything.
 
-                // First, do invocations (before the image loads/copies to avoid LRU evictions)
+                // Terminate idle containers if any
+                terminateIdleContainers(decisions->idle_container_terminations);
+                // Evict layers from RAM if any
+                evictLayersFromRAM(decisions->layer_evictions_from_ram);
+                // Evict layers from disk if any
+                evictLayersFromDisk(decisions->layer_evictions_from_disk);
+                // Do invocations
                 dispatchInvocations(decisions->invocation_dispatches);
-                // Second, do the image loads (before image copies to avoid LRU evictions)
-                initiateImageLoads(decisions->image_loads_to_RAM);
-                // Third, do the image copies
-                initiateImageCopies(decisions->image_copies_to_disk);
+                // Do the image loads
+                initiateImageLayerLoads(decisions->image_layer_loads_to_RAM);
+                // Do the image copies
+                initiateImageLayerCopies(decisions->image_layer_copies_to_disk);
 
                 do_scheduling = false;
             }
@@ -407,8 +425,18 @@ namespace wrench {
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (const auto ss_msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-            // TODO: Die...
+            this->state = Service::DOWN;
+            terminateAllServicesAndReleaseAllResources();
+
+            // Send back an ack
+            if (ss_msg->ack_commport) {
+                ss_msg->ack_commport->putMessage(
+                    new ServiceDaemonStoppedMessage(
+                        getMessagePayloadValue(
+                            ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+            }
             return false;
+
         } else if (const auto scsfrr_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
             processFunctionRegistrationRequest(
@@ -424,7 +452,7 @@ namespace wrench {
             return true;
         } else if (const auto scsdc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceDownloadCompleteMessage>(message)) {
-            processImageDownloadCompletion(scsdc_msg->_action, scsdc_msg->_image);
+            processImageLayerDownloadCompletion(scsdc_msg->_action, scsdc_msg->_layer);
             return true;
         } else if (const auto scsiec_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
@@ -432,31 +460,70 @@ namespace wrench {
             return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
-            scsncc_msg->_compute_node->_images_being_copied.erase(scsncc_msg->_image);
+            _state_of_the_system->_image_layers_being_copied_to_disk.at(scsncc_msg->_compute_node).erase(
+                scsncc_msg->_layer);
             if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("An image copy has failed (due to disk pressure) for image [%s]... oh well",
-                            scsncc_msg->_image->getName().c_str());
+                WRENCH_INFO("An image layer copy has failed (due to disk pressure) for image layer [%s]... oh well",
+                            scsncc_msg->_layer->getName().c_str());
                 do_scheduling = false;
             } else {
-                WRENCH_INFO("Image [%s] was stored on disk at [%s]",
-                            scsncc_msg->_image->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
+                WRENCH_INFO("Image layer [%s] was stored on disk at [%s]",
+                            scsncc_msg->_layer->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
+                _state_of_the_system->_image_layers_on_disk.at(scsncc_msg->_compute_node).insert(scsncc_msg->_layer);
             }
             return true;
         } else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
-            scsnlc_msg->_compute_node->_images_being_loaded.erase(scsnlc_msg->_image);
+            _state_of_the_system->_image_layers_being_loaded_in_ram.at(scsnlc_msg->_compute_node).erase(
+                scsnlc_msg->_layer);
             if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("A memory load has failed (due to memory pressure) for image [%s]... oh well",
-                            scsnlc_msg->_image->getName().c_str());
+                WRENCH_INFO("A memory load has failed (due to memory pressure) for image layer [%s]... oh well",
+                            scsnlc_msg->_layer->getName().c_str());
                 do_scheduling = false;
             } else {
-                WRENCH_INFO("Image [%s] was loaded in RAM at [%s]",
-                            scsnlc_msg->_image->getName().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
+                WRENCH_INFO("Image layer [%s] was loaded in RAM at [%s]",
+                            scsnlc_msg->_layer->getName().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
+                _state_of_the_system->_image_layers_in_ram.at(scsnlc_msg->_compute_node).insert(scsnlc_msg->_layer);
             }
             return true;
         } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerIdleTimeoutMessage>(message)) {
             processContainerIdleTimeout(sclcit_msg->_container, sclcit_msg->_idle_sequence);
+            return true;
+        } else if (const auto csrir_msg =
+            std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
+            csrir_msg->answer_commport->dputMessage(
+                new ComputeServiceResourceInformationAnswerMessage(
+                    constructResourceInformation(csrir_msg->key),
+                    getMessagePayloadValue(
+                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD)));
+            // This request only observes resources; it need not trigger scheduling.
+            do_scheduling = false;
+            return true;
+        } else if (const auto csitalohwarr_msg =
+            std::dynamic_pointer_cast<
+                ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage>(
+                message)) {
+            bool has_available_resources = false;
+
+            for (const auto& node : _state_of_the_system->_compute_nodes) {
+                // Both requirements must be satisfied on the same node.
+                if (node->_available_cores >= csitalohwarr_msg->num_cores &&
+                    node->_memory->getTotalFreeSpaceZeroTime() >= csitalohwarr_msg->ram) {
+                    has_available_resources = true;
+                    break;
+                }
+            }
+
+            csitalohwarr_msg->answer_commport->dputMessage(
+                new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
+                    has_available_resources,
+                    getMessagePayloadValue(
+                        ComputeServiceMessagePayload::
+                        IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+
+            // Observational request: no scheduling round is needed.
+            do_scheduling = false;
             return true;
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -470,9 +537,9 @@ namespace wrench {
     * @param name the name of the function to register
     * @param code the function's code
     * @param image the function's image
-    * @param time_limit the time limit for execution
+    * @param time_limit_in_seconds the time limit for execution
     * @param disk_space_limit_in_bytes the disk space limit for the function
-    * @param ram_limit_in_bytes the RAM limit for the function
+    * @param RAM_limit_in_bytes the RAM limit for the function
     * @param ingress_in_bytes the ingress data limit
     * @param egress_in_bytes the egress data limit
     * @return The Function object that was registered
@@ -483,14 +550,14 @@ namespace wrench {
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
         const std::shared_ptr<Image>& image,
-        double time_limit,
+        double time_limit_in_seconds,
         sg_size_t disk_space_limit_in_bytes,
-        sg_size_t ram_limit_in_bytes,
+        sg_size_t RAM_limit_in_bytes,
         sg_size_t ingress_in_bytes,
         sg_size_t egress_in_bytes) {
         // Check that function can ever run!
         sg_size_t needed_disk_space = image->getDiskFootprint() + disk_space_limit_in_bytes;
-        sg_size_t needed_ram_space = image->getRAMFootprint() + ram_limit_in_bytes;
+        sg_size_t needed_ram_space = image->getRAMFootprint() + RAM_limit_in_bytes;
 
         if (needed_disk_space > _compute_node_disk_space) {
             throw ExecutionException(
@@ -508,9 +575,9 @@ namespace wrench {
             name,
             code,
             image,
-            time_limit,
+            time_limit_in_seconds,
             disk_space_limit_in_bytes,
-            ram_limit_in_bytes,
+            RAM_limit_in_bytes,
             ingress_in_bytes,
             egress_in_bytes);
         // Add it to the set of registered function
@@ -539,11 +606,11 @@ namespace wrench {
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
         const std::shared_ptr<Image>& image,
-        double time_limit,
-        sg_size_t disk_space_limit_in_bytes,
-        sg_size_t ram_limit_in_bytes,
-        sg_size_t ingress_in_bytes,
-        sg_size_t egress_in_bytes) {
+        const double time_limit,
+        const sg_size_t disk_space_limit_in_bytes,
+        const sg_size_t ram_limit_in_bytes,
+        const sg_size_t ingress_in_bytes,
+        const sg_size_t egress_in_bytes) {
         std::shared_ptr<Function> new_function;
         try {
             new_function = this->addRegisteredFunction(name, code, image, time_limit, disk_space_limit_in_bytes,
@@ -555,6 +622,7 @@ namespace wrench {
                 this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_REGISTER_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answerMessage);
+            return;
         }
 
         // At this point, the function has been registered, so we can reply
@@ -594,9 +662,9 @@ namespace wrench {
             auto invocation = std::make_shared<Invocation>(function, input, notify_commport);
             invocation->_submit_date = Simulation::getCurrentSimulatedDate();
 
-            if (_state_of_the_system->_head_storage_service->hasFile(function->getImageFile())) {
+            if (this->isInvocationSchedulable(invocation)) {
                 _state_of_the_system->_schedulable_invocations.push_back(invocation);
-            } else if (_state_of_the_system->_being_downloaded_images.count(function->getImage())) {
+            } else if (this->isInvocationAdmittable(invocation)) {
                 _state_of_the_system->_admitted_invocations[function->getImage()].push(invocation);
             } else {
                 _state_of_the_system->_new_invocations.push(invocation);
@@ -610,46 +678,82 @@ namespace wrench {
     }
 
     /**
-     * @brief Helper method to process an "image download completion" message
+     * @brief Helper method to process an "image layer download completion" message
      *
      * @param action to get failure cause from
-     * @param image The image that was downloaded, used as key to map downloading functions
+     * @param layer The image layer that was downloaded, used as key to map downloading functions
      */
-    void ServerlessComputeService::processImageDownloadCompletion(const std::shared_ptr<Action>& action,
-                                                                  const std::shared_ptr<Image>& image) {
+    void ServerlessComputeService::processImageLayerDownloadCompletion(const std::shared_ptr<Action>& action,
+                                                                       const std::shared_ptr<ImageLayer>& layer) {
         // If the download has failed, fail all corresponding admitted function invocations
         if (action->getFailureCause()) {
-            _state_of_the_system->_free_space_on_head_storage += image->getDiskFootprint();
-            _state_of_the_system->_being_downloaded_images.erase(image);
+            _state_of_the_system->_free_space_on_head_storage += layer->getDiskFootprint();
+            _state_of_the_system->_being_downloaded_image_layers.erase(layer);
 
-            while (not _state_of_the_system->_admitted_invocations[image].empty()) {
-                auto invocation = _state_of_the_system->_admitted_invocations[image].front();
-                invocation->_notify_commport->dputMessage(
-                    new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-                        false,
-                        invocation,
-                        action->getFailureCause(), this->getMessagePayloadValue(
-                            ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-                _state_of_the_system->_admitted_invocations[image].pop();
+            std::set<std::shared_ptr<Image>> images_to_remove_from_admitted_map;
+            for (auto const& [image, list] : _state_of_the_system->_admitted_invocations) {
+                // If this layer concerns this image, nevermind, we're good
+                const auto& layers = image->getLayers();
+                if (std::find(layers.begin(), layers.end(), layer) == layers.end()) {
+                    continue;
+                }
+
+                while (not _state_of_the_system->_admitted_invocations[image].empty()) {
+                    auto invocation = _state_of_the_system->_admitted_invocations[image].front();
+                    invocation->_notify_commport->dputMessage(
+                        new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                            false,
+                            invocation,
+                            action->getFailureCause(), this->getMessagePayloadValue(
+                                ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+                    _state_of_the_system->_admitted_invocations[image].pop();
+                }
+                _state_of_the_system->_admitted_invocations[image] = std::queue<std::shared_ptr<Invocation>>();
+                images_to_remove_from_admitted_map.insert(image);
             }
-            _state_of_the_system->_admitted_invocations[image] = std::queue<std::shared_ptr<Invocation>>();
-            _state_of_the_system->_admitted_invocations.erase(image);
+            // Clean up (should we leave them around?)
+            for (auto const& image : images_to_remove_from_admitted_map) {
+                _state_of_the_system->_admitted_invocations.erase(image);
+            }
             return;
         }
 
-        WRENCH_INFO("ServerlessComputeService::processImageDownloadCompletion(): Image [%s] was downloaded",
-                    image->getName().c_str());
-        _state_of_the_system->_being_downloaded_images.erase(image);
+        WRENCH_INFO("ServerlessComputeService::processImageLayerDownloadCompletion(): Image layer [%s] was downloaded",
+                    layer->getName().c_str());
+        _state_of_the_system->_being_downloaded_image_layers.erase(layer);
         // _state_of_the_system->_downloaded_image_files.insert(image_file);
 
         // Move all relevant invocations from the admitted to the schedulable queue
-        auto& queue = _state_of_the_system->_admitted_invocations.at(image);
-        while (not queue.empty()) {
-            _state_of_the_system->_schedulable_invocations.emplace(
-                _state_of_the_system->_schedulable_invocations.end(), std::move(queue.front()));
-            queue.pop();
+        std::set<std::shared_ptr<Image>> images_to_remove_from_admitted_map;
+        for (auto const& [image, list] : _state_of_the_system->_admitted_invocations) {
+            // If this layer concerns this image, nevermind, we're good
+            if (std::find(image->getLayers().begin(), image->getLayers().end(), layer) == image->getLayers().end()) {
+                continue;
+            }
+            // If not all layers for the image have been download, nevermind
+            bool all_layers_downloaded_for_image = true;
+            for (auto const& l : image->getLayers()) {
+                if (not _state_of_the_system->_head_storage_service->hasFile(l->getFile())) {
+                    all_layers_downloaded_for_image = false;
+                    break;
+                }
+            }
+            if (not all_layers_downloaded_for_image) {
+                continue;
+            }
+            // All layers are available for this image!
+            auto& queue = _state_of_the_system->_admitted_invocations.at(image);
+            while (not queue.empty()) {
+                _state_of_the_system->_schedulable_invocations.emplace(
+                    _state_of_the_system->_schedulable_invocations.end(), std::move(queue.front()));
+                queue.pop();
+            }
+            images_to_remove_from_admitted_map.insert(image);
         }
-        _state_of_the_system->_admitted_invocations.erase(image);
+        // Remove images from the map (should we keep them around?)
+        for (auto const& image : images_to_remove_from_admitted_map) {
+            _state_of_the_system->_admitted_invocations.erase(image);
+        }
     }
 
     /**
@@ -707,7 +811,7 @@ namespace wrench {
      * @param idle_sequence the idle sequence number
      */
     void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container,
-                                                               std::uint64_t idle_sequence) {
+                                                               const std::uint64_t idle_sequence) {
         // If this isn't a stale/no-longer-valid message, nevermind
         if (container->getIdleSequence() != idle_sequence) {
             return;
@@ -719,7 +823,6 @@ namespace wrench {
     /**
      * @brief Dispatches scheduled function invocations to compute nodes
      * @param decisions Scheduling decisions
-     * @return true if at least one invocation was dispatched
      */
     void ServerlessComputeService::dispatchInvocations(
         const std::vector<DispatchInvocation>& decisions) {
@@ -744,6 +847,40 @@ namespace wrench {
             }
         }
         _state_of_the_system->_schedulable_invocations = updated_list_of_schedulable_invocations;
+    }
+
+    /**
+     * @brief Terminate idle containers
+     * @param decisions Scheduling decisions
+     */
+    void ServerlessComputeService::terminateIdleContainers(const std::vector<TerminateIdleContainer>& decisions) const {
+        // Terminate the containers
+        for (const auto& [container] : decisions) {
+            auto node = container->getComputeNode();
+            node->shutdownContainer(container);
+        }
+    }
+
+    /**
+     * @brief Evict layers from RAM
+     * @param decisions Scheduling decisions
+     */
+    void ServerlessComputeService::evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const {
+        for (const auto& [layer, node] : decisions) {
+            StorageService::removeFileAtLocation(FileLocation::LOCATION(node->_memory, layer->getRAMFile()));
+            _state_of_the_system->_image_layers_in_ram.at(node).erase(layer);
+        }
+    }
+
+    /**
+     * @brief Evict layers from disk
+     * @param decisions Scheduling decisions
+     */
+    void ServerlessComputeService::evictLayersFromDisk(const std::vector<EvictLayerFromDisk>& decisions) const {
+        for (const auto& [layer, node] : decisions) {
+            StorageService::removeFileAtLocation(FileLocation::LOCATION(node->_disk, layer->getFile()));
+            _state_of_the_system->_image_layers_on_disk.at(node).erase(layer);
+        }
     }
 
     /**
@@ -854,6 +991,60 @@ namespace wrench {
     }
 
     /**
+     * @brief Method to shut everything down
+     */
+    void ServerlessComputeService::terminateAllServicesAndReleaseAllResources() {
+
+        // Shutdown all containers (it doesn't actually kill the running functions, but who cares really)
+        for (auto const &node : _state_of_the_system->_compute_nodes) {
+            node->killAllContainers();
+        }
+
+        // Terminate the head storage service
+        _state_of_the_system->_head_storage_service->stop();
+
+        // Terminate all node storage services
+        for (auto const &node : _state_of_the_system->_compute_nodes) {
+            node->_disk->stop();
+            node->_memory->stop();
+        }
+
+        // Send all failure notifications
+        for (auto &[image, q] : _state_of_the_system->_admitted_invocations) {
+            while (not q.empty()) {
+                const auto inv = q.front();
+                q.pop();
+                inv->_notify_commport->dputMessage(
+                new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                    false,
+                    inv,
+                    std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()), this->getMessagePayloadValue(
+                        ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+            }
+        }
+        for (auto const &inv : _state_of_the_system->_schedulable_invocations) {
+            inv->_notify_commport->dputMessage(
+            new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                false,
+                inv,
+                std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()), this->getMessagePayloadValue(
+                    ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+        }
+        for (auto const &inv : _state_of_the_system->_running_invocations) {
+            inv->_notify_commport->dputMessage(
+            new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                false,
+                inv,
+                std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()), this->getMessagePayloadValue(
+                    ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+        }
+
+        _state_of_the_system->_admitted_invocations.clear();
+        _state_of_the_system->_schedulable_invocations.clear();
+        _state_of_the_system->_running_invocations.clear();
+    }
+
+    /**
      * @brief Start a SimpleStorageService for each compute node. We don't start a bare-metal
      *        service as we'll do everything ourselves with action executor services.
      */
@@ -864,14 +1055,13 @@ namespace wrench {
                     "each compute node in a serverless compute service should have a \"/\" mountpoint");
             }
 
-            // Start a compute service, with LRU caching, to implement compute-node storage
+            // Start a compute service, to implement compute-node storage
             {
                 const auto ss = std::dynamic_pointer_cast<SimpleStorageService>(this->simulation_->startNewService(
                     SimpleStorageService::createSimpleStorageService(
                         compute_node->hostname,
                         {"/"},
                         {
-                            {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"},
                             {
                                 SimpleStorageServiceProperty::BUFFER_SIZE,
                                 this->getPropertyValueAsString(
@@ -901,7 +1091,7 @@ namespace wrench {
                         compute_node->hostname,
                         {ram_mount_point},
                         {
-                            {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"},
+                            // {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"},
                             {
                                 SimpleStorageServiceProperty::BUFFER_SIZE,
                                 this->getPropertyValueAsString(
@@ -954,44 +1144,51 @@ namespace wrench {
             const auto image = invocation->_function->getImage();
             WRENCH_INFO("Admitting invocation %llu...", invocation->getId());
 
-            // If the image file is being downloaded, make the invocation admitted
-            if (_state_of_the_system->_head_storage_service->hasFile(image->getFile()) or
-                _state_of_the_system->_being_downloaded_images.count(image) > 0) {
+            if (this->isInvocationAdmittable(invocation)) {
                 _state_of_the_system->_new_invocations.pop();
                 _state_of_the_system->_admitted_invocations[image].push(invocation);
                 continue;
             }
 
-            // Otherwise, if there is enough space on the head node storage service to store it,
-            // then launch the downloaded and admit the invocation
-            if (_state_of_the_system->_free_space_on_head_storage >= image->getDiskFootprint()) {
-                // "Reserve" space on the storage service
-                _state_of_the_system->_free_space_on_head_storage -= image->getDiskFootprint();
-                // initiate the download
-                _state_of_the_system->_being_downloaded_images.insert(image);
-                initiateImageDownloadFromRemote(invocation);
-                _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_admitted_invocations[image].push(invocation);
-            } else {
-                throw std::runtime_error("ServerlessComputeService::admitInvocations(): "
-                    "An invocation cannot be admitted because there is not enough space on the head storage to download its (remote) image. "
-                    "Currently, no mechanism is implemented to manage the head storage (just make it bigger).");
+            // Otherwise, initiate all layer downloads (in parallel)
+            for (auto const& layer : image->getLayers()) {
+                // If already available, nevermind
+                if (_state_of_the_system->_head_storage_service->hasFile(layer->getFile())) {
+                    continue;
+                }
+                // If being downloaded, nevermind
+                if (_state_of_the_system->_being_downloaded_image_layers.count(layer) > 0) {
+                    continue;
+                }
+
+                if (_state_of_the_system->_free_space_on_head_storage >= layer->getDiskFootprint()) {
+                    // "Reserve" space on the storage service
+                    _state_of_the_system->_free_space_on_head_storage -= layer->getDiskFootprint();
+                    // initiate the download
+                    _state_of_the_system->_being_downloaded_image_layers.insert(layer);
+                    initiateImageLayerDownloadFromRemote(layer);
+                } else {
+                    throw std::runtime_error("ServerlessComputeService::admitInvocations(): "
+                        "An invocation cannot be admitted because there is not enough space on the head storage to download its (remote) image. "
+                        "Currently, no mechanism is implemented to manage the head storage (just make it bigger).");
+                }
             }
+            _state_of_the_system->_new_invocations.pop();
+            _state_of_the_system->_admitted_invocations[image].push(invocation);
         }
     }
 
     /**
-     * @brief Helper method to initiate an image download
+     * @brief Helper method to initiate an image layer download
      *
-     * @param invocation an invocation for which the download is needed
+     * @param layer an image layer
      */
-    void ServerlessComputeService::initiateImageDownloadFromRemote(const std::shared_ptr<Invocation>& invocation) {
-        // Create a custom action (we could use a simple FileCopyAction here, but we are using a CustomAction
-        // to demonstrate its use)
-        const std::function lambda_execute = [invocation, this
+    void ServerlessComputeService::initiateImageLayerDownloadFromRemote(const std::shared_ptr<ImageLayer>& layer) {
+        // Create a custom action
+        const std::function lambda_execute = [layer, this
             ](const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the lambda execute!!");
-            const auto src_location = invocation->_function->getImage()->getLocation();
+            const auto src_location = layer->getLocation();
             const auto dst_location = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
                                                              src_location->getFile());
             if (this->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS)) {
@@ -1004,13 +1201,13 @@ namespace wrench {
 
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "download_image_" + invocation->_function->getImageFile()->getID(),
+                "download_image_layer_" + layer->getName(),
                 0, 0, lambda_execute, lambda_terminate));
 
         // Spin up an ActionExecutor service, and have it send us back a custom message
         auto custom_message = new ServerlessComputeServiceDownloadCompleteMessage(
             action,
-            invocation->_function->getImage(), 0);
+            layer, 0);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             this->getHostname(),
@@ -1038,8 +1235,9 @@ namespace wrench {
      * @return the scheduler's scheduling decisions
      */
     std::shared_ptr<ServerlessSchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
-        auto decisions = _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
-                                              _state_of_the_system.get());
+        auto decisions =
+            _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
+                                 _state_of_the_system.get());
 #if 0
         decisions->print();
 #endif
@@ -1050,10 +1248,10 @@ namespace wrench {
      * @brief Helper method to initiate image loads
      * @param decisions scheduling decisions
      */
-    void ServerlessComputeService::initiateImageLoads(const std::vector<LoadImage>& decisions) {
+    void ServerlessComputeService::initiateImageLayerLoads(const std::vector<LoadImageLayer>& decisions) {
         // For each compute node, load initiate image load from disk into RAM and if space
-        for (const auto& [image, compute_node] : decisions) {
-            initiateImageLoadAtComputeNode(compute_node, image);
+        for (const auto& [layer, compute_node] : decisions) {
+            initiateImageLayerLoadAtComputeNode(compute_node, layer);
         }
     }
 
@@ -1061,39 +1259,71 @@ namespace wrench {
     * @brief Helper method to initiate image copies
     * @param decisions scheduling decisions
     */
-    void ServerlessComputeService::initiateImageCopies(
-        const std::vector<CopyImage>& decisions) {
+    void ServerlessComputeService::initiateImageLayerCopies(
+        const std::vector<CopyImageLayer>& decisions) {
         // For each compute node, initiate image copy (from head node) if need be
-        for (const auto& [image_file, compute_node] : decisions) {
-            initiateImageCopyToComputeNode(compute_node, image_file);
+        for (const auto& [layer, compute_node] : decisions) {
+            initiateImageLayerCopyToComputeNode(compute_node, layer);
         }
     }
 
     /**
-     * @brief Method to initiate an image copy from the head host to a compute node
-     * @param compute_node The compute node
-     * @param image The image
+     * @brief Determine whether an invocation is schedulable
+     * @param invocation An invocation
+     * @return true if schedulable, false otherwise
      */
-    void ServerlessComputeService::initiateImageCopyToComputeNode(
+    bool ServerlessComputeService::isInvocationSchedulable(const std::shared_ptr<Invocation>& invocation) const {
+        for (auto const& layer : invocation->getFunction()->getImage()->getLayers()) {
+            if (not _state_of_the_system->_head_storage_service->hasFile(layer->getFile())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @brief Determine whether an invocation is admittable
+     * @param invocation An invocation
+     * @return true if admittable, false otherwise
+     */
+    bool ServerlessComputeService::isInvocationAdmittable(const std::shared_ptr<Invocation>& invocation) const {
+        for (auto const& layer : invocation->getFunction()->getImage()->getLayers()) {
+            if (_state_of_the_system->_head_storage_service->hasFile(layer->getFile())) {
+                continue;
+            }
+            if (not _state_of_the_system->_being_downloaded_image_layers.count(layer)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @brief Method to initiate an image layer copy from the head host to a compute node
+     * @param compute_node The compute node
+     * @param layer The image layer
+     */
+    void ServerlessComputeService::initiateImageLayerCopyToComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
-        const std::shared_ptr<Image>& image) {
+        const std::shared_ptr<ImageLayer>& layer) {
         // Sanity checks
-        if (compute_node->isImageOnDisk(image)) {
+        if (compute_node->isImageLayerOnDisk(layer)) {
             throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to copy image [" +
-                image->getName() + "] to node [" + compute_node->hostname + "], but the image is already on disk!");
+                "ServerlessComputeService::initiateImageLayerCopyToComputeNode(): Being told to copy image layer [" +
+                layer->getName() + "] to node [" + compute_node->hostname +
+                "], but the image layer is already on disk!");
         }
 
         const std::function lambda_terminate = lambda_noop;
 
-        const std::function lambda_execute = [compute_node, image, this](
+        const std::function lambda_execute = [compute_node, layer, this](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the image copy lambda execute!!");
 
             // Copy the image file from the head host to the current compute node's storage service
             auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
-                                                               image->getFile());
-            auto local_image_path = FileLocation::LOCATION(compute_node->_disk, image->getFile());
+                                                               layer->getFile());
+            auto local_image_path = FileLocation::LOCATION(compute_node->_disk, layer->getFile());
             StorageService::copyFile(head_host_image_path, local_image_path);
             // WRENCH_INFO("Done with the lambda execute!!");
         };
@@ -1101,12 +1331,12 @@ namespace wrench {
         // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "copy_image_" + image->getName() + "_to_" + compute_node->hostname,
+                "copy_image_layer_" + layer->getName() + "_to_" + compute_node->hostname,
                 0, 0, lambda_execute, lambda_terminate));
 
         auto custom_message = new ServerlessComputeServiceNodeCopyCompleteMessage(
             action,
-            image,
+            layer,
             compute_node,
             0);
 
@@ -1131,57 +1361,60 @@ namespace wrench {
         }
 
         // Add the image to the being_copied_images data structure for this compute node
-        compute_node->_images_being_copied.insert(image);
+        _state_of_the_system->_image_layers_being_copied_to_disk.at(compute_node).insert(layer);
 
-        WRENCH_INFO("Initiated image copy: [%s] to [%s]", image->getName().c_str(), compute_node->hostname.c_str());
+
+        WRENCH_INFO("Initiated image layer copy: [%s] to [%s]", layer->getName().c_str(),
+                    compute_node->hostname.c_str());
     }
 
     /**
-     * @brief Method to initiate an image load from disk to RAM at a compute node
+     * @brief Method to initiate an image layer load from disk to RAM at a compute node
      * @param compute_node The compute node
-     * @param image The image
+     * @param layer The image layer
      */
-    void ServerlessComputeService::initiateImageLoadAtComputeNode(
+    void ServerlessComputeService::initiateImageLayerLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
-        const std::shared_ptr<Image>& image) {
+        const std::shared_ptr<ImageLayer>& layer) {
         // Sanity check
-        if (compute_node->isImageInRAM(image)) {
+        if (compute_node->isImageLayerInRAM(layer)) {
             throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image [" +
-                image->getName() + "] at node [" + compute_node->hostname + "], but the image is already in RAM!");
+                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image layer [" +
+                layer->getName() + "] at node [" + compute_node->hostname +
+                "], but the image layer is already in RAM!");
         }
 
         // Initiate an asynchronous action that simply read the image file from disk
         const std::function lambda_terminate = lambda_noop;
 
-        const std::function lambda_execute = [compute_node, image](
+        const std::function lambda_execute = [compute_node, layer](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the image load lambda execute!!");
             auto src_location = wrench::FileLocation::LOCATION(
-                compute_node->_disk, image->getFile());
+                compute_node->_disk, layer->getFile());
             auto dst_location = wrench::FileLocation::LOCATION(
                 compute_node->_memory, compute_node->_memory->getBaseRootPath(),
-                image->getRAMFile());
+                layer->getRAMFile());
 
             // This below is a "hack" to implement the "read only the RAM portion of the on-disk image",
             // for which StorageService implementations don't provide an API to
             // create and open a tmp file to "reserve" space while the reading occurs. AND,
             // this also correctly simulates that the disk bandwidth is the bottleneck.
-            auto tmp_file = Simulation::addTmpFile(image->getRAMFootprint());
+            auto tmp_file = Simulation::addTmpFile(layer->getRAMFootprint());
             auto tmp_file_location = wrench::FileLocation::LOCATION(compute_node->_memory, tmp_file);
             std::shared_ptr<simgrid::fsmod::File> open_tmp_file;
             try {
                 SimpleStorageService::createFileAtLocation(tmp_file_location);
                 open_tmp_file = compute_node->_memory->openFile(tmp_file_location);
                 // Simulate the read of the RAM portion of the image on disk
-                compute_node->_disk->readFile(src_location, image->getRAMFootprint());
+                compute_node->_disk->readFile(src_location, layer->getRAMFootprint());
                 // Close and remove the tmp file
                 open_tmp_file->close();
                 open_tmp_file.reset();
                 SimpleStorageService::removeFileAtLocation(tmp_file_location);
                 Simulation::removeFile(tmp_file);
                 // Create the RAM file in its place
-                compute_node->_memory->createFile(image->getRAMFile());
+                compute_node->_memory->createFile(layer->getRAMFile());
             } catch (ExecutionException&) {
                 // Remove/close the tmp file if failed
                 if (open_tmp_file) {
@@ -1199,12 +1432,12 @@ namespace wrench {
         // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
-                "load_image_" + image->getName() + "_at_" + compute_node->hostname,
+                "load_image_layer_" + layer->getName() + "_at_" + compute_node->hostname,
                 0, 0, lambda_execute, lambda_terminate));
 
         auto custom_message = new ServerlessComputeServiceNodeLoadCompleteMessage(
             action,
-            image,
+            layer,
             compute_node,
             0);
 
@@ -1229,9 +1462,9 @@ namespace wrench {
         }
 
         // Add the image to the being_copied_images data structure for this compute node
-        compute_node->_images_being_loaded.insert(image);
+        _state_of_the_system->_image_layers_being_loaded_in_ram.at(compute_node).insert(layer);
 
-        WRENCH_INFO("Initiated image load: [%s] at [%s]", image->getName().c_str(),
+        WRENCH_INFO("Initiated image layer load: [%s] at [%s]", layer->getName().c_str(),
                     compute_node->hostname.c_str());
     }
 } // namespace wrench

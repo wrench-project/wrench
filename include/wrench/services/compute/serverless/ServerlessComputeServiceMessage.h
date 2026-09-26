@@ -17,6 +17,7 @@
 
 namespace wrench {
     class Image;
+    class ImageLayer;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -142,17 +143,17 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent to a ServerlessComputeService to notify it that an image download has completed
+     * @brief A message sent to a ServerlessComputeService to notify it that an image layer download has completed
      */
     class ServerlessComputeServiceDownloadCompleteMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceDownloadCompleteMessage(std::shared_ptr<CustomAction> action,
-                                                        std::shared_ptr<Image> image, sg_size_t payload);
+                                                        std::shared_ptr<ImageLayer> layer, sg_size_t payload);
 
         /** @brief The action that did the download */
         std::shared_ptr<CustomAction> _action;
-        /** @brief The image the download was for */
-        std::shared_ptr<Image> _image;
+        /** @brief The image layer the download was for */
+        std::shared_ptr<ImageLayer> _layer;
     };
 
     /**
@@ -176,13 +177,13 @@ namespace wrench {
     class ServerlessComputeServiceNodeCopyCompleteMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceNodeCopyCompleteMessage(std::shared_ptr<CustomAction> action,
-                                                        std::shared_ptr<Image> image,
+                                                        std::shared_ptr<ImageLayer> layer,
                                                         std::shared_ptr<ServerlessComputeNode> compute_node,
                                                         sg_size_t payload);
         /** @brief The action that did the copy */
         std::shared_ptr<CustomAction> _action;
-        /** @brief The image that was copied */
-        std::shared_ptr<Image> _image;
+        /** @brief The image layer that was copied */
+        std::shared_ptr<ImageLayer> _layer;
         /** @brief The compute node on which the image was copied to */
         std::shared_ptr<ServerlessComputeNode> _compute_node;
     };
@@ -193,13 +194,13 @@ namespace wrench {
     class ServerlessComputeServiceNodeLoadCompleteMessage : public ServerlessComputeServiceMessage {
     public:
         ServerlessComputeServiceNodeLoadCompleteMessage(std::shared_ptr<CustomAction> action,
-                                                        std::shared_ptr<Image> image,
+                                                        std::shared_ptr<ImageLayer> layer,
                                                         std::shared_ptr<ServerlessComputeNode> compute_node,
                                                         sg_size_t payload);
         /** @brief The action that did the copy */
         std::shared_ptr<CustomAction> _action;
-        /** @brief The image that was loaded */
-        std::shared_ptr<Image> _image;
+        /** @brief The image layer that was loaded */
+        std::shared_ptr<ImageLayer> _layer;
         /** @brief The compute node at which the image was  loaded */
         std::shared_ptr<ServerlessComputeNode> _compute_node;
     };

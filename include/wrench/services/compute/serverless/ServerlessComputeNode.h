@@ -26,6 +26,7 @@ namespace wrench {
     class Function;
     class SimpleStorageService;
     class Image;
+    class ImageLayer;
     class Invocation;
     class Container;
 
@@ -45,7 +46,6 @@ namespace wrench {
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
-
         [[nodiscard]] unsigned int getNumCores() const;
         [[nodiscard]] unsigned int getNumIdleCores() const;
         [[nodiscard]] sg_size_t getFreeDiskSpace() const;
@@ -54,15 +54,12 @@ namespace wrench {
         std::shared_ptr<Container> findIdleContainer(
             const Function* function,
             const std::set<std::shared_ptr<Container>>& excluded_container) const;
-        [[nodiscard]] std::set<std::shared_ptr<Container>> getIdleContainers() const;
+        [[nodiscard]] std::set<std::shared_ptr<Container>>& getIdleContainers();
+        [[nodiscard]] std::set<std::shared_ptr<Container>>& getBusyContainers();
 
-        [[nodiscard]] bool isImageBeingCopied(const std::shared_ptr<Image>& image) const;
-        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingCopied() const;
-        [[nodiscard]] bool isImageOnDisk(const std::shared_ptr<Image>& image) const;
+        [[nodiscard]] bool isImageLayerOnDisk(const std::shared_ptr<ImageLayer>& layer) const;
 
-        [[nodiscard]] bool isImageBeingLoaded(const std::shared_ptr<Image>& image) const;
-        [[nodiscard]] std::set<std::shared_ptr<Image>> getImagesBeingLoaded() const;
-        [[nodiscard]] bool isImageInRAM(const std::shared_ptr<Image>& image) const;
+        [[nodiscard]] bool isImageLayerInRAM(const std::shared_ptr<ImageLayer>& layer) const;
 
         [[nodiscard]] bool isInvocationFeasible(const std::shared_ptr<Invocation>& invocation,
                                                 const std::shared_ptr<Container>& target_container) const;
@@ -70,14 +67,15 @@ namespace wrench {
         [[nodiscard]] std::shared_ptr<SimpleStorageService> getDiskStorage() const;
         [[nodiscard]] std::shared_ptr<SimpleStorageService> getMemoryStorage() const;
 
+        [[nodiscard]] double getLayerLastAccessDateInRAM(const std::shared_ptr<ImageLayer>& layer) const;
+        [[nodiscard]] double getLayerLastAccessDateOnDisk(const std::shared_ptr<ImageLayer>& layer) const;
+
 	/** @brief The hostname of the compute node */
         const std::string hostname;
 
-        bool findIdleContainersToTerminate(sg_size_t needed_free_ram_space,
-                                           sg_size_t needed_free_disk_space,
-                                           std::set<std::shared_ptr<Container>>& to_terminate) const;
-
     private:
+        friend class ServerlessComputeService;
+
         ServerlessComputeService* _serverless_compute_service;
 
         unsigned int _total_cores;
@@ -86,19 +84,11 @@ namespace wrench {
         std::shared_ptr<SimpleStorageService> _disk;
         std::shared_ptr<SimpleStorageService> _memory;
 
-        friend class ServerlessComputeService;
-        std::set<std::shared_ptr<Image>> _images_being_copied;
-        std::set<std::shared_ptr<Image>> _images_being_loaded;
-
         std::set<std::shared_ptr<Container>> _busy_containers;
         std::set<std::shared_ptr<Container>> _idle_containers;
 
-        bool pickVictimContainersRAM(sg_size_t ram_space_to_free_up,
-                                     sg_size_t disk_space_to_free_up,
-                                     std::set<std::shared_ptr<Container>>& to_terminate) const;
-        bool pickVictimContainersLRU(sg_size_t ram_space_to_free_up,
-                                     sg_size_t disk_space_to_free_up,
-                                     std::set<std::shared_ptr<Container>>& to_terminate) const;
+         void killAllContainers();
+
     };
 
     /***********************/

@@ -8,6 +8,7 @@
  */
 
 #include <memory>
+#include <algorithm>
 #include <string>
 #include <boost/algorithm/string/split.hpp>
 #include <utility>
@@ -41,11 +42,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Stop the function manager
-     */
+    * @brief Stop the manager
+    *
+    */
     void FunctionManager::stop() {
-        // Implementation of stop logic, e.g., cleanup resources or notify shutdown
-        this->Service::stop();
+        this->_commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -69,16 +70,39 @@ namespace wrench {
 
 
     /**
-     *
-     * @param name
-     * @param location
-     * @param ram_foot_print
+     * @brief Create an image layer
+     * @param name a name
+     * @param location the location of the image layer file
+     * @param ram_foot_print the RAM footprint of the image layer
+     * @return An image layer
+     */
+    std::shared_ptr<ImageLayer> FunctionManager::createImageLayer(const std::string& name,
+                                                                  const std::shared_ptr<FileLocation>& location, sg_size_t ram_foot_print) {
+        return std::shared_ptr<ImageLayer>(new ImageLayer(name, location, ram_foot_print));
+    }
+
+    /**
+     * @brief create an image
+     * @param name a name
+     * @param layers The layers that comprise the image
      * @return
      */
     std::shared_ptr<Image> FunctionManager::createImage(const std::string& name,
-                                                        const std::shared_ptr<FileLocation>& location,
-                                                        sg_size_t ram_foot_print) {
-        return std::shared_ptr<Image>(new Image(name, location, ram_foot_print));
+                                                        const std::set<std::shared_ptr<ImageLayer>>& layers) {
+        return std::shared_ptr<Image>(new Image(name, layers));
+    }
+
+    /**
+     *
+     * @param name
+     * @param parent_image The parent image
+     * @param additional_layers The additional layers that make up the image
+     * @return
+     */
+    std::shared_ptr<Image> FunctionManager::createImage(const std::string& name,
+                                                        const std::shared_ptr<Image>& parent_image,
+                                                        const std::set<std::shared_ptr<ImageLayer>>& additional_layers) {
+        return std::shared_ptr<Image>(new Image(name, parent_image, additional_layers));
     }
 
 
@@ -112,6 +136,9 @@ namespace wrench {
         sg_size_t RAM_limit_in_bytes,
         sg_size_t ingress_in_bytes,
         sg_size_t egress_in_bytes) {
+
+        sl_compute_service->assertServiceIsUp();
+
         return sl_compute_service->registerFunction(name, code, image, time_limit_in_seconds, disk_space_limit_in_bytes,
                                                     RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
     }
@@ -130,6 +157,8 @@ namespace wrench {
         const std::shared_ptr<FunctionInput>& function_input) {
         // WRENCH_INFO("Function [%s] invoked with compute service [%s]", _function->getFunction()->getName().c_str(), sl_compute_service->getName().c_str());
         // Pass in the function manager's commport as the commport to notify
+        sl_compute_service->assertServiceIsUp();
+
         return sl_compute_service->invokeFunction(_function, function_input, this->_commport);
     }
 
@@ -167,6 +196,7 @@ namespace wrench {
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
             // this->network_timeout, // commented out for unlimited timeout time
             "FunctionManager::wait_one(): Received an");
+        S4U_CommPort::retireTemporaryCommPort(answer_commport);
 
         // WRENCH_INFO("FunctionManager::wait_one(): Received a wakeup message");
     }
@@ -178,6 +208,12 @@ namespace wrench {
      */
     void FunctionManager::wait_all(const std::vector<std::shared_ptr<Invocation>>& invocations) {
         // WRENCH_INFO("FunctionManager::wait_all(): Waiting for list of invocations to finish");
+
+        // Nothing to wait for? return immediately
+        if (invocations.empty()) {
+            return;
+        }
+
         auto answer_commport = S4U_CommPort::getTemporaryCommPort();
 
         // send a "wait one" message to the FunctionManager's commport
@@ -191,6 +227,7 @@ namespace wrench {
         auto msg = answer_commport->getMessage<FunctionManagerWakeupMessage>(
             // this->network_timeout, // commented out for unlimited timeout time
             "FunctionManager::wait_one(): Received an");
+        S4U_CommPort::retireTemporaryCommPort(answer_commport);
 
         // WRENCH_INFO("FunctionManager::wait_all(): Received a wakeup message");
     }
@@ -317,11 +354,21 @@ namespace wrench {
         while (it != _invocations_being_waited_for.end()) {
             // check if the invocation is finished
             if (_finished_invocations.find(it->first) != _finished_invocations.end()) {
-                // if there's only 1 invocation being waited for remaining, send a wakeup message
-                if (_invocations_being_waited_for.size() <= 1) {
-                    it->second->putMessage(new FunctionManagerWakeupMessage());
-                }
+                // Preserve the request's reply destination before removing this record.
+                auto* answer_commport = it->second;
                 it = _invocations_being_waited_for.erase(it);
+
+                // Other callers' outstanding invocations must not block this caller.
+                const bool request_still_waiting = std::any_of(
+                    _invocations_being_waited_for.begin(),
+                    _invocations_being_waited_for.end(),
+                    [answer_commport](const auto& pending) {
+                        return pending.second == answer_commport;
+                    });
+
+                if (!request_still_waiting) {
+                    answer_commport->putMessage(new FunctionManagerWakeupMessage());
+                }
             } else {
                 ++it;
             }
