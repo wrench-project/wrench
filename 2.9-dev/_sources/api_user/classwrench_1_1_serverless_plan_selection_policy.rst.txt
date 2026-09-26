@@ -1,0 +1,8 @@
+.. _ServerlessPlanSelectionPolicy:
+wrench::ServerlessPlanSelectionPolicy
+*************************************
+
+.. doxygenclass:: wrench::ServerlessPlanSelectionPolicy
+   :project: user
+   :members:
+

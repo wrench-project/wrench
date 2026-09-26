@@ -1,0 +1,8 @@
+.. _RandomServerlessPlanSelectionPolicy:
+wrench::RandomServerlessPlanSelectionPolicy
+*******************************************
+
+.. doxygenclass:: wrench::RandomServerlessPlanSelectionPolicy
+   :project: internal
+   :members:
+

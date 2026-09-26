@@ -21,7 +21,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="wrench::Invocation" href="classwrench_1_1_invocation.html" />
+    <link rel="next" title="wrench::ImageLayer" href="classwrench_1_1_image_layer.html" />
     <link rel="prev" title="wrench::HTCondorComputeServiceProperty" href="classwrench_1_1_h_t_condor_compute_service_property.html" /> 
 </head>
 
@@ -81,14 +81,15 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_custom_parallel_model.html">wrench::CustomParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_eviction_averse_serverless_plan_selection_policy.html">wrench::EvictionAverseServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_invocation_ordering_policy.html">wrench::FCFSServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fewest_serverless_eviction_policy.html">wrench::FewestServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_message_payload.html">wrench::FileRegistryServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service_property.html">wrench::FileRegistryServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function.html">wrench::Function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_input.html">wrench::FunctionInput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_greedy_scheduling_state.html">wrench::GreedySchedulingState</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_greedy_serverless_scheduler.html">wrench::GreedyServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service.html">wrench::HTCondorComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_compute_service_message_payload.html">wrench::HTCondorComputeServiceMessagePayload</a></li>
@@ -96,15 +97,16 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Image</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench5ImageE"><code class="docutils literal notranslate"><span class="pre">wrench::Image</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench5Image16getDiskFootprintEv"><code class="docutils literal notranslate"><span class="pre">getDiskFootprint()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench5Image7getFileEv"><code class="docutils literal notranslate"><span class="pre">getFile()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench5Image11getLocationEv"><code class="docutils literal notranslate"><span class="pre">getLocation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench5Image9getLayersEv"><code class="docutils literal notranslate"><span class="pre">getLayers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench5Image7getNameEv"><code class="docutils literal notranslate"><span class="pre">getName()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench5Image15getRAMFootprintEv"><code class="docutils literal notranslate"><span class="pre">getRAMFootprint()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image_layer.html">wrench::ImageLayer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_l_r_u_serverless_eviction_policy.html">wrench::LRUServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
@@ -112,10 +114,14 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_invocation_ordering_policy.html">wrench::RandomServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_plan_selection_policy.html">wrench::RandomServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_property.html">wrench::ServiceProperty</a></li>
@@ -209,36 +215,27 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench5ImageE">
 <span id="_CPPv3N6wrench5ImageE"></span><span id="_CPPv2N6wrench5ImageE"></span><span id="wrench::Image"></span><span class="target" id="classwrench_1_1_image"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Image</span></span></span><br /></dt>
-<dd><p>A class that implements the notion of a function that can be invoked at a serverless compute service. </p>
+<dd><p>A class that implements the notion of an image for containers. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench5Image16getDiskFootprintEv">
 <span id="_CPPv3NK6wrench5Image16getDiskFootprintEv"></span><span id="_CPPv2NK6wrench5Image16getDiskFootprintEv"></span><span id="wrench::Image::getDiskFootprintC"></span><span class="target" id="classwrench_1_1_image_1aff20c7a1474faed238baed5ab24f9de7"></span><span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getDiskFootprint</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The image’s disk footprint </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench5Image7getFileEv">
-<span id="_CPPv3NK6wrench5Image7getFileEv"></span><span id="_CPPv2NK6wrench5Image7getFileEv"></span><span id="wrench::Image::getFileC"></span><span class="target" id="classwrench_1_1_image_1ace05e0db607bd5e72e81c40f112c0e6f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_data_file.html#_CPPv4N6wrench8DataFileE" title="wrench::DataFile"><span class="n"><span class="pre">DataFile</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The image file </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench5Image11getLocationEv">
-<span id="_CPPv3NK6wrench5Image11getLocationEv"></span><span id="_CPPv2NK6wrench5Image11getLocationEv"></span><span id="wrench::Image::getLocationC"></span><span class="target" id="classwrench_1_1_image_1a8303c4568b83dcda7c7ee3c42e74addc"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getLocation</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><p>Get the image’s file location. </p>
+<dd><p>Get the image’s disk footprint. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>a location </p>
+<dd class="field-odd"><p>a number of bytes </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench5Image9getLayersEv">
+<span id="_CPPv3NK6wrench5Image9getLayersEv"></span><span id="_CPPv2NK6wrench5Image9getLayersEv"></span><span id="wrench::Image::getLayersC"></span><span class="target" id="classwrench_1_1_image_1a63a288101b28340d88f74fce20b3ffaf"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">getLayers</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the image’s layers. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of layers </p>
 </dd>
 </dl>
 </dd></dl>
@@ -275,7 +272,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="classwrench_1_1_h_t_condor_compute_service_property.html" class="btn btn-neutral float-left" title="wrench::HTCondorComputeServiceProperty" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="classwrench_1_1_invocation.html" class="btn btn-neutral float-right" title="wrench::Invocation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="classwrench_1_1_image_layer.html" class="btn btn-neutral float-right" title="wrench::ImageLayer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

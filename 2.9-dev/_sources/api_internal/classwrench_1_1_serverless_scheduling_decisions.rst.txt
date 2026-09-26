@@ -1,0 +1,8 @@
+.. _ServerlessSchedulingDecisions:
+wrench::ServerlessSchedulingDecisions
+*************************************
+
+.. doxygenclass:: wrench::ServerlessSchedulingDecisions
+   :project: internal
+   :members:
+

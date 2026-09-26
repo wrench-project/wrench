@@ -1,0 +1,8 @@
+.. _ImageLayer:
+wrench::ImageLayer
+******************
+
+.. doxygenclass:: wrench::ImageLayer
+   :project: user
+   :members:
+

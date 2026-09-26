@@ -1,0 +1,8 @@
+.. _EvictionAverseServerlessPlanSelectionPolicy:
+wrench::EvictionAverseServerlessPlanSelectionPolicy
+***************************************************
+
+.. doxygenclass:: wrench::EvictionAverseServerlessPlanSelectionPolicy
+   :project: internal
+   :members:
+

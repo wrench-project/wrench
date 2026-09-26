@@ -1,0 +1,8 @@
+.. _ServerlessInvocationOrderingPolicy:
+wrench::ServerlessInvocationOrderingPolicy
+******************************************
+
+.. doxygenclass:: wrench::ServerlessInvocationOrderingPolicy
+   :project: developer
+   :members:
+

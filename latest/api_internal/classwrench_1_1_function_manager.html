@@ -161,6 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_movement_manager_message.html">wrench::DataMovementManagerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_easy_backfilling_batch_scheduler.html">wrench::EasyBackfillingBatchScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_eviction_averse_serverless_plan_selection_policy.html">wrench::EvictionAverseServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller.html">wrench::ExecutionController</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_alarm_timer_message.html">wrench::ExecutionControllerAlarmTimerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_custom_event_message.html">wrench::ExecutionControllerCustomEventMessage</a></li>
@@ -168,9 +169,10 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_event.html">wrench::ExecutionEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_exception.html">wrench::ExecutionException</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_batch_scheduler.html">wrench::FCFSBatchScheduler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_scheduler.html">wrench::FCFSServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_invocation_ordering_policy.html">wrench::FCFSServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_failure_cause.html">wrench::FailureCause</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fatal_failure.html">wrench::FatalFailure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fewest_serverless_eviction_policy.html">wrench::FewestServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_copied.html">wrench::FileAlreadyBeingCopied</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_read.html">wrench::FileAlreadyBeingRead</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_already_being_written.html">wrench::FileAlreadyBeingWritten</a></li>
@@ -218,7 +220,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench15FunctionManager4stopEv"><code class="docutils literal notranslate"><span class="pre">stop()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench15FunctionManager8wait_allERKNSt6vectorINSt10shared_ptrI10InvocationEEEE"><code class="docutils literal notranslate"><span class="pre">wait_all()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench15FunctionManager8wait_oneERKNSt10shared_ptrI10InvocationEE"><code class="docutils literal notranslate"><span class="pre">wait_one()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">createImage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench15FunctionManager11createImageERKNSt6stringERKNSt3setINSt10shared_ptrI10ImageLayerEEEE"><code class="docutils literal notranslate"><span class="pre">createImage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI5ImageEERKNSt3setINSt10shared_ptrI10ImageLayerEEEE"><code class="docutils literal notranslate"><span class="pre">createImage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench15FunctionManager16createImageLayerERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"><code class="docutils literal notranslate"><span class="pre">createImageLayer()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -232,7 +236,6 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_not_found.html">wrench::FunctionNotFound</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_function_output.html">wrench::FunctionOutput</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_functionality_not_available.html">wrench::FunctionalityNotAvailable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_greedy_scheduling_state.html">wrench::GreedySchedulingState</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_greedy_serverless_scheduler.html">wrench::GreedyServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service.html">wrench::HTCondorCentralManagerService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_h_t_condor_central_manager_service_message.html">wrench::HTCondorCentralManagerServiceMessage</a></li>
@@ -250,6 +253,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_message.html">wrench::HostStateChangeDetectorMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_host_state_change_detector_property.html">wrench::HostStateChangeDetectorProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image.html">wrench::Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image_layer.html">wrench::ImageLayer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
@@ -262,6 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_standard_job_failed_message.html">wrench::JobManagerStandardJobFailedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_manager_wakeup_message.html">wrench::JobManagerWakeupMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_timeout.html">wrench::JobTimeout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_l_r_u_serverless_eviction_policy.html">wrench::LRUServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___alltoall__participant.html">wrench::MPI_Alltoall_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___barrier__participant.html">wrench::MPI_Barrier_participant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_m_p_i___bcast__participant.html">wrench::MPI_Bcast_participant</a></li>
@@ -293,7 +298,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job_started_event.html">wrench::PilotJobStartedEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pointer_util.html">wrench::PointerUtil</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_proxy_location.html">wrench::ProxyLocation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_scheduler.html">wrench::RandomServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_invocation_ordering_policy.html">wrench::RandomServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_plan_selection_policy.html">wrench::RandomServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html">wrench::S4U_CommPort</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon.html">wrench::S4U_Daemon</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon_1_1_life_saver.html">wrench::S4U_Daemon::LifeSaver</a></li>
@@ -317,7 +323,12 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduling_decisions.html">wrench::ServerlessSchedulingDecisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduling_state.html">wrench::ServerlessSchedulingState</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_state_of_the_system.html">wrench::ServerlessStateOfTheSystem</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_daemon_stopped_message.html">wrench::ServiceDaemonStoppedMessage</a></li>
@@ -412,7 +423,6 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_wf_commons_workflow_parser.html">wrench::WfCommonsWorkflowParser</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow.html">wrench::Workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workflow_task.html">wrench::WorkflowTask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_balancing_serverless_scheduler.html">wrench::WorkloadBalancingServerlessScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_trace_file_replayer.html">wrench::WorkloadTraceFileReplayer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_workload_trace_file_replayer_event_receiver.html">wrench::WorkloadTraceFileReplayerEventReceiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_x_root_d_1_1_advanced_continue_search_message.html">wrench::XRootD::AdvancedContinueSearchMessage</a></li>
@@ -543,7 +553,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench15FunctionManager4stopEv">
 <span id="_CPPv3N6wrench15FunctionManager4stopEv"></span><span id="_CPPv2N6wrench15FunctionManager4stopEv"></span><span id="wrench::FunctionManager::stop"></span><span class="target" id="classwrench_1_1_function_manager_1abfbb6ef97f0fb8223ce849e39939a200"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stop</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><br /></dt>
-<dd><p>Stop the function manager. </p>
+<dd><p>Stop the manager. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -572,18 +582,53 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t">
-<span id="_CPPv3N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"></span><span id="_CPPv2N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"></span><span id="wrench::FunctionManager::createImage__ssCR.std::shared_ptr:FileLocation:CR.sg_size_t"></span><span class="target" id="classwrench_1_1_function_manager_1a10644af5ae190824241829c7828b1584"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createImage</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">location</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ram_foot_print</span></span><span class="sig-paren">)</span><br /></dt>
-<dd><dl class="field-list simple">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench15FunctionManager11createImageERKNSt6stringERKNSt3setINSt10shared_ptrI10ImageLayerEEEE">
+<span id="_CPPv3N6wrench15FunctionManager11createImageERKNSt6stringERKNSt3setINSt10shared_ptrI10ImageLayerEEEE"></span><span id="_CPPv2N6wrench15FunctionManager11createImageERKNSt6stringERKNSt3setINSt10shared_ptrI10ImageLayerEEEE"></span><span id="wrench::FunctionManager::createImage__ssCR.std::set:std::shared_ptr:ImageLayer::CR"></span><span class="target" id="classwrench_1_1_function_manager_1a6249039abc0d145e5cea47f8daeeec5b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createImage</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">layers</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>create an image </p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – </p></li>
-<li><p><strong>location</strong> – </p></li>
-<li><p><strong>ram_foot_print</strong> – </p></li>
+<li><p><strong>name</strong> – a name </p></li>
+<li><p><strong>layers</strong> – The layers that comprise the image </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI5ImageEERKNSt3setINSt10shared_ptrI10ImageLayerEEEE">
+<span id="_CPPv3N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI5ImageEERKNSt3setINSt10shared_ptrI10ImageLayerEEEE"></span><span id="_CPPv2N6wrench15FunctionManager11createImageERKNSt6stringERKNSt10shared_ptrI5ImageEERKNSt3setINSt10shared_ptrI10ImageLayerEEEE"></span><span id="wrench::FunctionManager::createImage__ssCR.std::shared_ptr:Image:CR.std::set:std::shared_ptr:ImageLayer::CR"></span><span class="target" id="classwrench_1_1_function_manager_1a52a02350b62f810d58155a201fc03448"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createImage</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">parent_image</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">additional_layers</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – </p></li>
+<li><p><strong>parent_image</strong> – The parent image </p></li>
+<li><p><strong>additional_layers</strong> – The additional layers that make up the image </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench15FunctionManager16createImageLayerERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t">
+<span id="_CPPv3N6wrench15FunctionManager16createImageLayerERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"></span><span id="_CPPv2N6wrench15FunctionManager16createImageLayerERKNSt6stringERKNSt10shared_ptrI12FileLocationEE9sg_size_t"></span><span id="wrench::FunctionManager::createImageLayer__ssCR.std::shared_ptr:FileLocation:CR.sg_size_t"></span><span class="target" id="classwrench_1_1_function_manager_1a6c2ff77a6c0793fa8299bc647a8242ff"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">createImageLayer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_file_location.html#_CPPv4N6wrench12FileLocationE" title="wrench::FileLocation"><span class="n"><span class="pre">FileLocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">location</span></span>, <span class="n"><span class="pre">sg_size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ram_foot_print</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Create an image layer. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – a name </p></li>
+<li><p><strong>location</strong> – the location of the image layer file </p></li>
+<li><p><strong>ram_foot_print</strong> – the RAM footprint of the image layer </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An image layer </p>
 </dd>
 </dl>
 </dd></dl>

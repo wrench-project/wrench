@@ -1,0 +1,8 @@
+.. _FCFSServerlessInvocationOrderingPolicy:
+wrench::FCFSServerlessInvocationOrderingPolicy
+**********************************************
+
+.. doxygenclass:: wrench::FCFSServerlessInvocationOrderingPolicy
+   :project: internal
+   :members:
+

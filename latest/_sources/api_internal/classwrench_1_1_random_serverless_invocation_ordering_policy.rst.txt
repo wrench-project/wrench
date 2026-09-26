@@ -1,0 +1,8 @@
+.. _RandomServerlessInvocationOrderingPolicy:
+wrench::RandomServerlessInvocationOrderingPolicy
+************************************************
+
+.. doxygenclass:: wrench::RandomServerlessInvocationOrderingPolicy
+   :project: internal
+   :members:
+

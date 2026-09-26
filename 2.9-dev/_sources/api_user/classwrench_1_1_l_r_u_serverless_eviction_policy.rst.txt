@@ -1,0 +1,8 @@
+.. _LRUServerlessEvictionPolicy:
+wrench::LRUServerlessEvictionPolicy
+***********************************
+
+.. doxygenclass:: wrench::LRUServerlessEvictionPolicy
+   :project: user
+   :members:
+

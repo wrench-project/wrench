@@ -1,0 +1,8 @@
+.. _FewestServerlessEvictionPolicy:
+wrench::FewestServerlessEvictionPolicy
+**************************************
+
+.. doxygenclass:: wrench::FewestServerlessEvictionPolicy
+   :project: internal
+   :members:
+
