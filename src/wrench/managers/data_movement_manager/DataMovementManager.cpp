@@ -84,8 +84,15 @@ namespace wrench {
         }
 
 
-        this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
-        wrench::StorageService::initiateFileCopy(this->_commport, src, dst);
+        this->pending_file_copies.push_front(
+			std::make_unique<CopyRequestSpecs>(src, dst, file_registry_service));
+	try {
+        	wrench::StorageService::initiateFileCopy(this->_commport, src, dst);
+	} catch (...) {
+		// Initiation failed: this request must not remain pending.
+    		this->pending_file_copies.remove_if(
+        		[&request](const auto& pending) { return *pending == request; });
+	}
     }
 
     /**
