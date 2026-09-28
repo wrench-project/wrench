@@ -253,7 +253,7 @@ namespace wrench {
                 }
             }
 
-            if (request.file_registry_service) {
+            if (msg->success and request.file_registry_service) {
                 WRENCH_INFO("Trying to do a register");
                 try {
                     request.file_registry_service->addEntry(request.dst);
@@ -263,7 +263,7 @@ namespace wrench {
                 }
             }
 
-            // Replay
+            // Reply
             this->creator_commport->dputMessage(
                     new DataManagerFileCopyAnswerMessage(msg->src,
                                                          msg->dst,
