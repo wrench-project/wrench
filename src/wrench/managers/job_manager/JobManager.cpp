@@ -411,6 +411,10 @@ namespace wrench {
                     throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first + ")");
                 }
                 task = workflow->getTaskByID(arg.first);
+		const auto action_it = job->task_compute_actions.find(task);
+		if (action_it == job->task_compute_actions.end()) {
+    				throw std::invalid_argument( "JobManager::submitJob(): Task " + arg.first + " is not part of this standard job");
+		}
                 new_args[job->task_compute_actions[task]->getName()] = arg.second;
             }
         }
