@@ -92,6 +92,7 @@ namespace wrench {
 		// Initiation failed: this request must not remain pending.
     		this->pending_file_copies.remove_if(
         		[&request](const auto& pending) { return *pending == request; });
+		throw; // propagate the error
 	}
     }
 
