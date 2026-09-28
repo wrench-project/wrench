@@ -827,6 +827,11 @@ namespace wrench {
         }
         this->killAction(action, failure_cause);
 
+        // Forget this terminated action and its executor.
+        this->action_executors.erase(action);
+        this->all_actions.erase(action);
+        this->action_run_specs.erase(action);
+
         // reply
         auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
             true, nullptr, 0);
@@ -1080,6 +1085,8 @@ namespace wrench {
             WRENCH_INFO("Putting action %s back in the ready queue", action->getName().c_str());
             this->ready_actions.push_back(action);
         } else {
+            this->all_actions.erase(action);
+            this->action_run_specs.erase(action);
             // Send the notification
             WRENCH_INFO("Sending action failure notification to '%s'", parent_service->_commport->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
