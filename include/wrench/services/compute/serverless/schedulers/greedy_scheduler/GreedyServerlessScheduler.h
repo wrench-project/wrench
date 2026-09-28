@@ -13,8 +13,13 @@ namespace wrench {
 
 namespace wrench {
     /**
-     * @brief A class that implements an abstract two-pass scheduler to use in a
-     *        serverless compute service.
+     * @brief A class that implements a greedy scheduler for a serverless compute service. It can be
+     * instantiated with various policies for ordering schedulable invocations, deciding on
+     * evictions (idle containers, in-RAM layers, on-disk layers), and comparing various action/evication
+     * plans on different compute nodes. Some policies are provided, but custom one can be developed.
+     *
+     * Note that this scheduling algorithm, while reasonable, is not necessarily in line with the
+     * scheduling in real-world serverless platforms.
      */
     class GreedyServerlessScheduler : public ServerlessScheduler {
 
