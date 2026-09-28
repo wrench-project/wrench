@@ -45,7 +45,7 @@ namespace wrench {
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
             const std::shared_ptr<Invocation>& inv);
 
-        std::shared_ptr<ServerlessSchedulingDecisions> makeEvictionPlan(
+        [[nodiscard]] std::shared_ptr<ServerlessSchedulingDecisions> makeEvictionPlan(
             const std::shared_ptr<ServerlessComputeNode>& node,
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
             sg_size_t needed_ram,
