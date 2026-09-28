@@ -347,12 +347,16 @@ namespace wrench {
                 continue;
             }
 
-            unsigned long available_cores = std::get<0>(r.second) - this->running_thread_counts[r.first];
+	    // If the host doesn't even have the required minimum number of cores, forget it
+            unsigned long available_cores = std::get<0>(r.second);
+            // THE CODE BELOW WOULD LIMIT CORE OVERSUBSCRIPTION
+            //      unsigned long available_cores = std::get<0>(r.second) - this->running_thread_counts[r.first];
             if (required_num_cores == 0) {
                 if (available_cores < action->getMinNumCores()) {
                     continue;
                 }
             }
+	    // If the host doesn't even have the required number of cores, if provided, forget it
             if (required_num_cores != 0) {
                 if (available_cores < required_num_cores) {
                     continue;
@@ -398,10 +402,12 @@ namespace wrench {
             unsigned long used_num_cores;
             if (required_num_cores == 0) {
                 used_num_cores = std::min(num_cores, action->getMaxNumCores());// as many cores as possible
+                // THIS CODE BELOW WOULD AVOID OVER-SUBSCRIPTION OF CORES, BUT OUR POLICY IS TO ALLOW OVERSUBSCRIBING:
+		        //    used_num_cores = std::min(num_cores - num_running_threads, action->getMaxNumCores());// as many cores as possible
             } else {
                 used_num_cores = required_num_cores;
             }
-            // A totally heuristic load estimate
+            // A totally heuristical load estimate
             const double load = ((static_cast<double>(num_running_threads + used_num_cores) / static_cast<double>(num_cores))) /
                           (flop_rate / (1000.0 * 1000.0 * 1000.0));
             if (load < lowest_load) {
@@ -1016,8 +1022,8 @@ namespace wrench {
             for (auto const &r: this->running_thread_counts) {
                 unsigned long cores = std::get<0>(this->compute_resources[r.first]);
                 const unsigned long running_threads = r.second;
-                num_idle_cores.insert(
-                        std::make_pair(r.first->get_name(), static_cast<double>(std::max<unsigned long>(cores - running_threads, 0))));
+		const unsigned long idle_cores = running_threads < cores ? cores - running_threads : 0;
+                num_idle_cores.insert( std::make_pair(r.first->get_name(), static_cast<double>(idle_cores)));
             }
             return num_idle_cores;
 
