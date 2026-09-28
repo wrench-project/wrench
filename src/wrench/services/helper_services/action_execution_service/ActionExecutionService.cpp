@@ -495,19 +495,15 @@ namespace wrench {
 
         }
 
-        // Remove the Actions from the ready queue (this is inefficient, better data structs would help)
-        while (not dispatched_actions.empty()) {
-            std::shared_ptr<Action> dispatched_action = *(dispatched_actions.begin());
-            for (auto const &ready_action: this->ready_actions) {
-                for (auto it = this->ready_actions.begin(); it != this->ready_actions.end(); it++) {
-                    if ((*it) == dispatched_action) {
-                        this->ready_actions.erase(it);
-                        dispatched_actions.erase(dispatched_action);
-                        break;
-                    }
-                }
-            }
-        }
+	// Remove dispatched actions while preserving the order of pending ones
+	this->ready_actions.erase(
+    		std::remove_if(
+        	this->ready_actions.begin(),
+        	this->ready_actions.end(),
+        	[&dispatched_actions](const auto& action) {
+            		return dispatched_actions.count(action) != 0;
+        	}),
+    	this->ready_actions.end());
 
         this->releaseDaemonLock();
     }
