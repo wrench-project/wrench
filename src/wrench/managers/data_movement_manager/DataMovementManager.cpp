@@ -314,7 +314,7 @@ namespace wrench {
                 }
             }
 
-            if (request.file_registry_service) {
+            if (msg->success and request.file_registry_service) {
                 //                WRENCH_INFO("Trying to do a register");
                 try {
                     request.file_registry_service->addEntry(request.location);
