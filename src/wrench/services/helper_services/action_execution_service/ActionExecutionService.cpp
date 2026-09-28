@@ -975,7 +975,9 @@ namespace wrench {
                     throw std::runtime_error("ActionExecutionService::IsThereAtLeastOneHostWithAvailableResources(): The number of running threads exceeds "
                                              "the number of cores. This should not have happened [Internal error]");
                 }
-                if (running_threads < cores and (cores - running_threads >= num_cores)) {
+                if (this->ram_availabilities.at(r.first) >= ram and 
+		    running_threads < cores and 
+		    (cores - running_threads >= num_cores)) {
                     enough_cores = true;
                     break;
                 }
