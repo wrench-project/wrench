@@ -113,6 +113,7 @@ namespace wrench {
             auto host = h.first;
             unsigned long num_cores = h.second;
             std::vector<double> zeros;
+            zeros.reserve(num_cores);
             for (unsigned int i = 0; i < num_cores; i++) {
                 zeros.push_back(0);
             }
@@ -167,7 +168,7 @@ namespace wrench {
             std::vector<std::pair<simgrid::s4u::Host*, double>> earliest_start_times;
             for (auto h : core_available_times) {
                 double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
-                earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
+                earliest_start_times.emplace_back(h.first, earliest_start_time);
             }
 
             // Sort the hosts by earliest start times
@@ -241,7 +242,7 @@ namespace wrench {
                 std::vector<std::pair<simgrid::s4u::Host*, double>> earliest_start_times;
                 for (auto h : core_available_times) {
                     double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
-                    earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
+                    earliest_start_times.emplace_back(h.first, earliest_start_time);
                 }
 
 
