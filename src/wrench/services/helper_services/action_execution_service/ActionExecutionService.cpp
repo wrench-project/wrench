@@ -775,6 +775,8 @@ namespace wrench {
 
         // Forget the action executor
         this->action_executors.erase(action);
+        this->all_actions.erase(action);
+        this->action_run_specs.erase(action);
 
         // Send the notification
         WRENCH_INFO("Sending action failure notification to '%s'", parent_service->_commport->get_cname());
@@ -829,8 +831,6 @@ namespace wrench {
 
         // Forget this terminated action and its executor.
         this->action_executors.erase(action);
-        this->all_actions.erase(action);
-        this->action_run_specs.erase(action);
 
         // reply
         auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
