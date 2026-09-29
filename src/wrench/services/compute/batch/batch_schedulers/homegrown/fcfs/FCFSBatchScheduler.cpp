@@ -104,6 +104,7 @@ namespace wrench {
         // Assumes time origin is zero for simplicity! Will go back to absolute time at the end.
         double time_origin = wrench::S4U_Simulation::getClock();
 
+
         // Set the available time of each node to zero (i.e., now)
         // (invariant: for each host, core availabilities are sorted by
         //             non-decreasing available time)

@@ -39,36 +39,35 @@ public:
     int seed;
 
 protected:
-    ~BatchServiceCONSERVATIVE_BFTest() {
+    ~BatchServiceCONSERVATIVE_BFTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
 
-    BatchServiceCONSERVATIVE_BFTest() {
-
+    BatchServiceCONSERVATIVE_BFTest(): seed(0) {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-                          "<platform version=\"4.1\"> "
-                          "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
-                          "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"2\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"3\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
-                          "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
-                          "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
-                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
-                          "/> </route>"
-                          "   </zone> "
-                          "</platform>";
-        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+            "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
+            "<platform version=\"4.1\"> "
+            "   <zone id=\"AS0\" routing=\"Full\"> "
+            "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
+            "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
+            "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+            "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+            "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
+            "       <link id=\"2\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
+            "       <link id=\"3\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
+            "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
+            "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
+            "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
+            "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
+            "/> </route>"
+            "   </zone> "
+            "</platform>";
+        FILE* platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
     }
@@ -490,8 +489,8 @@ private:
 
         // Expectations
         std::map<std::string, double> expectations;
-        expectations.insert(std::make_pair("job1", 0));
-        expectations.insert(std::make_pair("job2", 0));
+        expectations.insert(std::make_pair("job1", 10));
+        expectations.insert(std::make_pair("job2", 10));
         expectations.insert(std::make_pair("job3", 60));
         expectations.insert(std::make_pair("job4", 240));
         expectations.insert(std::make_pair("job5", -1));

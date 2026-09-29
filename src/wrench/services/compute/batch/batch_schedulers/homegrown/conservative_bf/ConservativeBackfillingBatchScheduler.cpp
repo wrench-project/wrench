@@ -282,6 +282,10 @@ namespace wrench {
             std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) {
         std::map<std::string, double> to_return;
 
+        // Discard past availability before searching for a future start date.
+        this->schedule->setTimeOrigin(
+            static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate()));
+
         for (auto const &j: set_of_jobs) {
             const std::string &id = std::get<0>(j);
             u_int64_t num_nodes = std::get<1>(j);
