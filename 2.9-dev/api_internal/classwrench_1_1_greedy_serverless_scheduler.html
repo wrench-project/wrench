@@ -467,7 +467,8 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessSchedulerE">
 <span id="_CPPv3N6wrench25GreedyServerlessSchedulerE"></span><span id="_CPPv2N6wrench25GreedyServerlessSchedulerE"></span><span id="wrench::GreedyServerlessScheduler"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GreedyServerlessScheduler</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE" title="wrench::ServerlessScheduler"><span class="n"><span class="pre">ServerlessScheduler</span></span></a><br /></dt>
-<dd><p>A class that implements an abstract two-pass scheduler to use in a serverless compute service. </p>
+<dd><p>A class that implements a greedy scheduler for a serverless compute service. It can be instantiated with various policies for ordering schedulable invocations, deciding on evictions (idle containers, in-RAM layers, on-disk layers), and comparing various action/evication plans on different compute nodes. Some policies are provided, but custom one can be developed. </p>
+<p>Note that this scheduling algorithm, while reasonable, is not necessarily in line with the scheduling in real-world serverless platforms. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
