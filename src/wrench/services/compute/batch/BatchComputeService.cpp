@@ -729,6 +729,10 @@ namespace wrench {
 
         WRENCH_INFO("Terminating a one-shot bare-metal service");
         executor->stop(false, termination_cause); // failure notifications sent by me later, if needed
+        // The executor will not send a failure notification, so cleanup is ours.
+        this->compound_job_alarms.at(cjob)->kill();
+        this->compound_job_alarms.erase(cjob);
+        this->running_bare_metal_one_shot_compute_services.erase(cjob);
     }
 
     /**
