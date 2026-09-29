@@ -326,16 +326,16 @@ private:
 
         // Expectations
         std::map<std::string, double> expectations;
-        expectations.insert(std::make_pair("job1", 490));
+        expectations.insert(std::make_pair("job1", 480));
         expectations.insert(std::make_pair("job2", -1));
-        expectations.insert(std::make_pair("job3", 610));
-        expectations.insert(std::make_pair("job4", 490));
-        expectations.insert(std::make_pair("job5", 490));
-        expectations.insert(std::make_pair("job6", 490));
-        expectations.insert(std::make_pair("job7", 610));
-        expectations.insert(std::make_pair("job8", 550));
-        expectations.insert(std::make_pair("job9", 490));
-        expectations.insert(std::make_pair("job10", 490));
+        expectations.insert(std::make_pair("job3", 600));
+        expectations.insert(std::make_pair("job4", 480));
+        expectations.insert(std::make_pair("job5", 480));
+        expectations.insert(std::make_pair("job6", 480));
+        expectations.insert(std::make_pair("job7", 600));
+        expectations.insert(std::make_pair("job8", 540));
+        expectations.insert(std::make_pair("job9", 480));
+        expectations.insert(std::make_pair("job10", 480));
 
         std::map<std::string, double> jobs_estimated_start_times =
                 this->test->compute_service->getStartTimeEstimates(set_of_jobs);

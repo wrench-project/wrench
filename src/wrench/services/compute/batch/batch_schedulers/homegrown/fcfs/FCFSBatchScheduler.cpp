@@ -254,11 +254,6 @@ namespace wrench {
                 earliest_job_start_time = ((earliest_start_times.begin() + num_hosts - 1))->second;
             }
 
-
-            // Note that below we translate predictions back to actual start dates given the current time
-            if (earliest_job_start_time > 0) {
-                earliest_job_start_time = wrench::Simulation::getCurrentSimulatedDate() + earliest_job_start_time;
-            }
             predictions.insert(std::make_pair(id, earliest_job_start_time));
         }
 
