@@ -1211,10 +1211,12 @@ namespace wrench {
         else if (key == "ram_availabilities") {
             // RAM availability per host  (0 if something is running, full otherwise)
             for (const auto& h : this->available_nodes_to_cores) {
-                if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
+                if (h.second < this->nodes_to_cores_map.at(h.first)) {
+                    // Not idle: nothing can run
                     dict.insert(std::make_pair(h.first->get_name(), 0.0));
                 }
                 else {
+                    // Idle: full capacity
                     dict.insert(std::make_pair(h.first->get_name(), S4U_Simulation::getHostMemoryCapacity(h.first)));
                 }
             }
