@@ -101,12 +101,24 @@ namespace wrench {
         // Assumes time origin is zero for simplicity! Will go back to absolute time at the end.
         double time_origin = wrench::S4U_Simulation::getClock();
 
+        // Reclaimed hosts remain unavailable until explicitly released.
+        // Keep currently busy, non-reclaimed hosts: their release times
+        // will be accounted for by the running-job loop.
+        auto usable_nodes_to_cores = cs->nodes_to_cores_map;
+
+        for (const auto& [reclaim_job, reclaimed_hosts] :
+             cs->reclaimed_host_jobs) {
+            for (auto* host : reclaimed_hosts) {
+                usable_nodes_to_cores.erase(host);
+            }
+        }
+
 
         // Set the available time of each node to zero (i.e., now)
         // (invariant: for each host, core availabilities are sorted by
         //             non-decreasing available time)
         std::map<simgrid::s4u::Host*, std::vector<double>> core_available_times;
-        for (auto h : cs->nodes_to_cores_map) {
+        for (auto h : usable_nodes_to_cores) {
             auto host = h.first;
             unsigned long num_cores = h.second;
             std::vector<double> zeros;
@@ -196,7 +208,7 @@ namespace wrench {
 
             // Go through all hosts and make sure that no core is available before earliest_job_start_time
             // since this is a simple fcfs algorithm with no "jumping ahead" of any kind
-            for (auto h : cs->nodes_to_cores_map) {
+            for (auto h : usable_nodes_to_cores) {
                 auto host = h.first;
                 unsigned long num_cores = h.second;
                 for (unsigned int i = 0; i < num_cores; i++) {
