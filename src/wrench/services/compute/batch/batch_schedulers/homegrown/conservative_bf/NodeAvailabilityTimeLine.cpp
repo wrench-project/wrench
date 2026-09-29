@@ -52,8 +52,13 @@ namespace wrench {
     void NodeAvailabilityTimeLine::addSlotForRunningJob(const std::shared_ptr<BatchJob> &job) {
         BatchJobSet job_set;
         job_set.add(job);
-        this->availability_timeslots +=
-                    make_pair(boost::icl::interval<u_int32_t>::right_open(this->getTimeOrigin(), job->conservative_bf_expected_end_date), job_set);
+        // this->availability_timeslots +=
+                    // make_pair(boost::icl::interval<u_int32_t>::right_open(this->getTimeOrigin(), job->conservative_bf_expected_end_date), job_set);
+        this->availability_timeslots += make_pair(
+                boost::icl::interval<u_int32_t>::right_open(
+                    this->getTimeOrigin(),
+                    static_cast<u_int32_t>(job->getEndingTimestamp())),
+                job_set);
     }
 
     /**
