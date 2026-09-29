@@ -67,7 +67,17 @@ namespace wrench {
             return HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
         }
         else if (host_selection_algorithm == "ROUNDROBIN") {
-            static unsigned long round_robin_host_selector_idx = -1;
+            const auto num_hosts = cs->compute_hosts.size();
+            if (num_hosts == 0) {
+                return {};
+            }
+
+            // Initialize to the last host so the first search starts at host 0.
+            // Also handles a cursor outside the current host-index range.
+            if (round_robin_host_selector_idx >= num_hosts) {
+                round_robin_host_selector_idx = static_cast<unsigned long>(num_hosts - 1);
+            }
+
             return HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes,
                                                                   cores_per_node, ram_per_node);
         }

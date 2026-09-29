@@ -46,6 +46,10 @@ namespace wrench {
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, sg_size_t>> set_of_jobs) override;
 
         void processReclaimedHosts(const std::set<simgrid::s4u::Host*> &hosts, std::shared_ptr<BatchJob> reclaim_job) override;
+
+    private:
+        unsigned long round_robin_host_selector_idx = static_cast<unsigned long>(-1);
+
     };
 
 }// namespace wrench
