@@ -297,6 +297,8 @@ namespace wrench {
 
         // Clear the schedule
         this->schedule->clear();
+	this->schedule->setTimeOrigin(static_cast<u_int32_t>(Simulation::getCurrentSimulatedDate()));
+
 
         // Re-create the schedule for all running jobs
         for (const auto & [fst, snd] : this->cs->running_jobs) {
