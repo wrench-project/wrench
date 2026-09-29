@@ -1338,9 +1338,9 @@ namespace wrench {
             this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
+            const auto to_free = *batch_pending_it; // NEED A COPY, NOT A REFERENCE
             this->batch_queue.erase(batch_pending_it); // This needs to be done BEFORE calling the scheduler's method
-            this->scheduler->processJobTermination((*batch_pending_it));
-            auto to_free = *batch_pending_it;
+            this->scheduler->processJobTermination(to_free);
             this->removeBatchJobFromJobsList(to_free);
         }
 #ifdef ENABLE_BATSCHED
