@@ -23,8 +23,7 @@ namespace wrench {
     std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() const {
         if (this->cs->batch_queue.empty()) {
             return nullptr;
-        }
-        else {
+        } else {
             return *this->cs->batch_queue.begin();
         }
     }
@@ -49,7 +48,8 @@ namespace wrench {
         if (ram_per_node > S4U_Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first)) {
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too much RAM per host");
         }
-        if (num_nodes > cs->available_nodes_to_cores.size() - cs->num_reclaimed_hosts) { // shouldn't happen
+        if (num_nodes > cs->available_nodes_to_cores.size() - cs->num_reclaimed_hosts) {
+            // shouldn't happen
             throw std::runtime_error("FCFSBatchScheduler::scheduleOnHosts(): Asking for too many hosts");
         }
         if (cores_per_node > static_cast<unsigned long>(cs->available_nodes_to_cores.begin()->first->
@@ -62,11 +62,9 @@ namespace wrench {
 
         if (host_selection_algorithm == "FIRSTFIT") {
             return HomegrownBatchScheduler::selectHostsFirstFit(cs, num_nodes, cores_per_node, ram_per_node);
-        }
-        else if (host_selection_algorithm == "BESTFIT") {
+        } else if (host_selection_algorithm == "BESTFIT") {
             return HomegrownBatchScheduler::selectHostsBestFit(cs, num_nodes, cores_per_node, ram_per_node);
-        }
-        else if (host_selection_algorithm == "ROUNDROBIN") {
+        } else if (host_selection_algorithm == "ROUNDROBIN") {
             const auto num_hosts = cs->compute_hosts.size();
             if (num_hosts == 0) {
                 return {};
@@ -80,8 +78,7 @@ namespace wrench {
 
             return HomegrownBatchScheduler::selectHostsRoundRobin(cs, &round_robin_host_selector_idx, num_nodes,
                                                                   cores_per_node, ram_per_node);
-        }
-        else {
+        } else {
             throw std::invalid_argument(
                 "FCFSBatchScheduler::scheduleOnHosts(): We don't support " + host_selection_algorithm +
                 " as host selection algorithm");
@@ -104,12 +101,24 @@ namespace wrench {
         // Assumes time origin is zero for simplicity! Will go back to absolute time at the end.
         double time_origin = wrench::S4U_Simulation::getClock();
 
+        // Reclaimed hosts remain unavailable until explicitly released.
+        // Keep currently busy, non-reclaimed hosts: their release times
+        // will be accounted for by the running-job loop.
+        auto usable_nodes_to_cores = cs->nodes_to_cores_map;
+
+        for (const auto& [reclaim_job, reclaimed_hosts] :
+             cs->reclaimed_host_jobs) {
+            for (auto* host : reclaimed_hosts) {
+                usable_nodes_to_cores.erase(host);
+            }
+        }
+
 
         // Set the available time of each node to zero (i.e., now)
         // (invariant: for each host, core availabilities are sorted by
         //             non-decreasing available time)
         std::map<simgrid::s4u::Host*, std::vector<double>> core_available_times;
-        for (auto h : cs->nodes_to_cores_map) {
+        for (auto h : usable_nodes_to_cores) {
             auto host = h.first;
             unsigned long num_cores = h.second;
             std::vector<double> zeros;
@@ -124,23 +133,29 @@ namespace wrench {
         // Update core availabilities for jobs that are currently running
         for (auto const& job : cs->running_jobs) {
             auto batch_job = job.second;
-            double time_to_finish = std::max<double>(0, batch_job->getBeginTimestamp() +
-                                                     static_cast<double>(batch_job->getRequestedTime()) -
-                                                     wrench::Simulation::getCurrentSimulatedDate());
-            for (auto resource : batch_job->getResourcesAllocated()) {
-                auto host = resource.first;
-                unsigned long num_cores = std::get<0>(resource.second);
-                // sg_size_t ram = std::get<1>(resource.second);
-                // Update available_times
-                double new_available_time = *(core_available_times[host].begin() + static_cast<double>(num_cores) - 1) +
-                    time_to_finish;
-                for (unsigned int i = 0; i < num_cores; i++) {
-                    *(core_available_times[host].begin() + i) = new_available_time;
+            const double time_to_finish = std::max(
+                0.0, batch_job->getBeginTimestamp() + static_cast<double>(batch_job->getRequestedTime()) -
+                wrench::Simulation::getCurrentSimulatedDate());
+
+            for (const auto& [host, resources] : batch_job->getResourcesAllocated()) {
+                const unsigned long num_cores = std::get<0>(resources);
+                auto& available_times = core_available_times.at(host);
+
+                // Read the num_cores-th earliest availability time, then add
+                // the job's remaining duration.
+                const double new_available_time =
+                    available_times.at(num_cores - 1) + time_to_finish;
+
+                // Update the selected core slots.
+                for (unsigned long i = 0; i < num_cores; ++i) {
+                    available_times[i] = new_available_time;
                 }
-                // Sort them!
-                std::sort(core_available_times[host].begin(), core_available_times[host].end());
+
+                // Restore the non-decreasing availability-time ordering.
+                std::sort(available_times.begin(), available_times.end());
             }
         }
+
 
 #if 0
         std::cerr << "TIMELINES AFTER ACCOUNTING FOR RUNNING JOBS: \n";
@@ -155,7 +170,7 @@ namespace wrench {
 
         // Go through the pending jobs and update core availabilities
         for (auto const& job : this->cs->batch_queue) {
-            double duration = static_cast<double>(job->getRequestedTime());
+            auto duration = static_cast<double>(job->getRequestedTime());
             unsigned long num_hosts = job->getRequestedNumNodes();
             unsigned long num_cores_per_host = job->getRequestedCoresPerNode();
 
@@ -166,9 +181,10 @@ namespace wrench {
 
             // Compute the  earliest start times on all hosts
             std::vector<std::pair<simgrid::s4u::Host*, double>> earliest_start_times;
-            for (auto h : core_available_times) {
-                double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
-                earliest_start_times.emplace_back(h.first, earliest_start_time);
+            for (const auto& [host, times] : core_available_times) {
+                // Sorted availability times: wait for the k-th earliest core.
+                const double earliest_start_time = times.at(num_cores_per_host - 1);
+                earliest_start_times.emplace_back(host, earliest_start_time);
             }
 
             // Sort the hosts by earliest start times
@@ -179,7 +195,7 @@ namespace wrench {
                       });
 
             // Compute the actual earliest start time
-            double earliest_job_start_time = ((earliest_start_times.begin() + num_hosts - 1))->second;
+            double earliest_job_start_time = earliest_start_times.at(num_hosts-1).second;
 
             // Update the core available times on each host used for the job
             for (unsigned int i = 0; i < num_hosts; i++) {
@@ -192,7 +208,7 @@ namespace wrench {
 
             // Go through all hosts and make sure that no core is available before earliest_job_start_time
             // since this is a simple fcfs algorithm with no "jumping ahead" of any kind
-            for (auto h : cs->nodes_to_cores_map) {
+            for (auto h : usable_nodes_to_cores) {
                 auto host = h.first;
                 unsigned long num_cores = h.second;
                 for (unsigned int i = 0; i < num_cores; i++) {
@@ -231,8 +247,7 @@ namespace wrench {
             if ((num_hosts > core_available_times.size()) ||
                 (num_cores_per_host > cs->num_cores_per_node)) {
                 earliest_job_start_time = -1.0;
-            }
-            else {
+            } else {
 #if 0
                 std::cerr << "COMPUTING PREDICTIONS for JOB: num_hosts=" << num_hosts <<
                     ", num_cores_per_hosts=" << num_cores_per_host << "\n";
@@ -268,8 +283,6 @@ namespace wrench {
 
         return predictions;
     }
-
-
 
 
     /**
@@ -346,7 +359,7 @@ namespace wrench {
      * @brief No-op method
      * @param job_id: a BatchComputeService job id
      */
-    void processUnknownJobTermination(std::string job_id) {
+    void processUnknownJobTermination([[maybe_unused]] std::string job_id) {
         // Do nothing
     }
 
@@ -363,9 +376,8 @@ namespace wrench {
      * @param host the host
      * @param reclaim_job the reclaim job
      */
-    void FCFSBatchScheduler::processReclaimedHosts(const std::set<simgrid::s4u::Host*> &host, std::shared_ptr<BatchJob> reclaim_job) {
+    void FCFSBatchScheduler::processReclaimedHosts(const std::set<simgrid::s4u::Host*>& host,
+                                                   std::shared_ptr<BatchJob> reclaim_job) {
         // Do nothing
     }
-
-
 } // namespace wrench
