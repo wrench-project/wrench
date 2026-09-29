@@ -110,15 +110,15 @@ namespace wrench {
      * @param job: the BatchComputeService job
      */
     void CoreAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
-        auto job_set = new BatchJobSetCoreLevel();
-        job_set->add(std::move(job));
+        BatchJobSetCoreLevel job_set;
+        job_set.add(std::move(job));
 
         if (add) {
             this->availability_timeslots +=
-                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), *job_set);
+                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), job_set);
         } else {
             this->availability_timeslots -=
-                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), *job_set);
+                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), job_set);
         }
     }
 
