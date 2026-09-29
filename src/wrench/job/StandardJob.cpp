@@ -587,7 +587,13 @@ namespace wrench {
             // Create fileread time stamps
             for (auto const &a: this->task_file_read_actions[t]) {
                 auto fra = std::dynamic_pointer_cast<FileReadAction>(a);
+		if (not fra->getUsedFileLocation()) {
+    		    // The action stopped before selecting a storage location.
+    		    // No file-read attempt exists to describe in the I/O trace.
+    		    continue;
+		}
                 auto fra_file = fra->getFile();
+
                 switch (a->getState()) {
                     case Action::NOT_READY:
                     case Action::READY:
