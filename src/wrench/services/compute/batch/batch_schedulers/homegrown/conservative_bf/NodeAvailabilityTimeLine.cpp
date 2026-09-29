@@ -147,6 +147,7 @@ namespace wrench {
             // Nope!
             if (available_nodes < num_nodes) {
                 start_time = UINT32_MAX;
+                remaining_duration = duration; // Reset to full duration for the next search!
                 continue;
             }
             u_int32_t interval_length = availability_timeslot.first.upper() - availability_timeslot.first.lower();

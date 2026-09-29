@@ -153,6 +153,7 @@ namespace wrench {
             // Nope!
             if (possible_node_indices.size() < num_nodes) {
                 start_time = UINT32_MAX;
+                remaining_duration = duration; // Reset to full duration for the next search!
                 // Assume all nodes are feasible again
                 possible_node_indices = this->integer_sequence;
                 continue;
