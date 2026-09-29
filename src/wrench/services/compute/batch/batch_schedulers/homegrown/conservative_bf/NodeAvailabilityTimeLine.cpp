@@ -50,10 +50,15 @@ namespace wrench {
      * @brief Method to add a slot for a running job
      */
     void NodeAvailabilityTimeLine::addSlotForRunningJob(const std::shared_ptr<BatchJob> &job) {
-        auto job_set = new BatchJobSet();
-        job_set->add(job);
-        this->availability_timeslots +=
-                    make_pair(boost::icl::interval<u_int32_t>::right_open(this->getTimeOrigin(), job->conservative_bf_expected_end_date), *job_set);
+        BatchJobSet job_set;
+        job_set.add(job);
+        // this->availability_timeslots +=
+                    // make_pair(boost::icl::interval<u_int32_t>::right_open(this->getTimeOrigin(), job->conservative_bf_expected_end_date), job_set);
+        this->availability_timeslots += make_pair(
+                boost::icl::interval<u_int32_t>::right_open(
+                    this->getTimeOrigin(),
+                    static_cast<u_int32_t>(job->getEndingTimestamp())),
+                job_set);
     }
 
     /**
@@ -117,15 +122,15 @@ namespace wrench {
      */
     void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         // std::cerr << "ENTERING UPDATE: add= " << add << "start= " << start << "  end= " << end << "job = " << job->getCompoundJob()->getName() << "\n";
-        auto job_set = new BatchJobSet();
-        job_set->add(std::move(job));
+        BatchJobSet job_set;
+        job_set.add(std::move(job));
 
         if (add) {
             this->availability_timeslots +=
-                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), *job_set);
+                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), job_set);
         } else {
             this->availability_timeslots -=
-                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), *job_set);
+                    make_pair(boost::icl::interval<u_int32_t>::right_open(start, end), job_set);
         }
     }
 
