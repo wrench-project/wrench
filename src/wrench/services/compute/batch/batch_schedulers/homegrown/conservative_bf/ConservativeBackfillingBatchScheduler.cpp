@@ -289,7 +289,7 @@ namespace wrench {
         for (auto const &j: set_of_jobs) {
             const std::string &id = std::get<0>(j);
             u_int64_t num_nodes = std::get<1>(j);
-            u_int64_t num_cores_per_host = this->cs->num_cores_per_node;// Ignore this one. Assume all  cores!
+            u_int64_t num_cores_per_host = std::get<2>(j);
             if (std::get<3>(j) > UINT32_MAX) {
                 throw std::runtime_error("ConservativeBackfillingBatchScheduler::getStartTimeEstimates(): job duration too large");
             }
