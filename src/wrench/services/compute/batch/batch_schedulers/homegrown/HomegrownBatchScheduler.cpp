@@ -67,6 +67,10 @@ namespace wrench {
 
             for (auto h: cs->available_nodes_to_cores) {
                 auto host = std::get<0>(h);
+                // Each requested node must be a distinct host.
+                if (resources.count(host) != 0) {
+                    continue;
+                }
                 unsigned long num_available_cores = std::get<1>(h);
                 if (num_available_cores < cores_per_node) {
                     continue;
