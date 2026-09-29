@@ -651,8 +651,6 @@ namespace wrench {
                                                                  const std::shared_ptr<FailureCause>& cause) {
         WRENCH_INFO("Sending compound job failure notification for job %s", job->getName().c_str());
 
-        std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
-
         try {
             job->popCallbackCommPort()->putMessage(
                 new ComputeServiceCompoundJobFailedMessage(

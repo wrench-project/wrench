@@ -293,6 +293,13 @@ namespace wrench {
             if (std::get<3>(j) > UINT32_MAX) {
                 throw std::runtime_error("ConservativeBackfillingBatchScheduler::getStartTimeEstimates(): job duration too large");
             }
+	    // Whole-node allocation still requires that the requested
+   	    // per-host core count fit on a physical host.
+            if (num_cores_per_host > this->cs->num_cores_per_node) {
+                 to_return[id] = -1.0;
+                 continue;
+             }
+
             auto duration = static_cast<u_int32_t>(std::get<3>(j));
 
             auto est = this->schedule->findEarliestStartTime(duration, num_nodes, nullptr);
