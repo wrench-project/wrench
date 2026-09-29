@@ -303,6 +303,14 @@ namespace wrench {
             this->schedule->addSlotForRunningJob(snd);
         }
 
+        // Restore reservations for hosts reclaimed by earlier calls.
+        for (const auto& entry : this->cs->reclaimed_host_jobs) {
+            this->schedule->add(
+                this->schedule->getTimeOrigin(),
+                UINT32_MAX,
+                entry.first);
+        }
+
         // Insert the reclaim job
         this->schedule->add(this->schedule->getTimeOrigin(), UINT32_MAX, reclaim_job);
         reclaim_job->easy_bf_start_date = this->schedule->getTimeOrigin();
