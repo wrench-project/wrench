@@ -661,6 +661,12 @@ namespace wrench {
             child->parents.erase(action.get());
             child->updateState();
         }
+
+	// The removed action may outlive its former neighbors.
+	// Do not retain raw pointers to those neighbors.		
+	action->parents.clear();
+	action->children.clear();
+
         this->actions.erase(action);
         this->name_map.erase(action->getName());
     }
