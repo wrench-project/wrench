@@ -34,7 +34,9 @@ namespace wrench {
                                    std::shared_ptr<FileLocation> dst_file_location) : Action(name, "file_copy_"),
                                                                                       src_file_location(std::move(src_file_location)),
                                                                                       dst_file_location(std::move(dst_file_location)) {
+											      this->file = this->src_file_location->getFile();
     }
+
 
     /**
      * @brief Returns the action's file
