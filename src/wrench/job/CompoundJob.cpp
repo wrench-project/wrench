@@ -36,7 +36,7 @@ namespace wrench {
      */
     CompoundJob::CompoundJob(const std::string& name, const std::shared_ptr<JobManager> &job_manager)
         : Job((name),job_manager),
-          state(CompoundJob::State::NOT_SUBMITTED), priority(0.0) {
+          state(CompoundJob::State::NOT_SUBMITTED) {
         this->state_task_map[Action::State::NOT_READY] = {};
         this->state_task_map[Action::State::COMPLETED] = {};
         this->state_task_map[Action::State::KILLED] = {};

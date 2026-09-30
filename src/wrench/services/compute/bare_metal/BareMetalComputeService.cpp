@@ -795,7 +795,7 @@ namespace wrench {
                           else if (a->getName() < b->getName()) {
                               return true;
                           }
-                          else if (a->getName() < b->getName()) {
+                          else if (a->getName() > b->getName()) {
                               return false;
                           }
                           else {

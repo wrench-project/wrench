@@ -401,8 +401,23 @@ private:
         } catch (std::invalid_argument &ignore) {}
 
         job->setPriority(10.0); // coverage
-        job->getPriority();     // coverage
-        job->getStateAsString();// coverage
+        if (job->getPriority() != 10.0) {
+            throw std::runtime_error(
+                "CompoundJob::getPriority() does not reflect setPriority()");
+        }// coverage
+
+        std::shared_ptr<wrench::Job> base_job = job;
+
+        if (base_job->getPriority() != 10.0) {
+            throw std::runtime_error(
+                "Job and CompoundJob disagree about the priority");
+        }
+
+        if (job->getStateAsString() != "NOT SUBMITTED") {
+            throw std::runtime_error(
+                "Job's state as string should be 'NOT SUBMITTED'");
+        };// coverage
+
         auto action = job->addSleepAction("my_sleep", 10.0);
         auto same_action = job->getActionByName("my_sleep");
         try {

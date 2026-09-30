@@ -22,19 +22,25 @@ WRENCH_LOG_CATEGORY(wrench_core_file_copy_action, "Log category for FileCopyActi
 
 
 namespace wrench {
-
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param src_file_location: the location from which the file should be read
     * @param dst_file_location: the location to which the file should be written
     */
-    FileCopyAction::FileCopyAction(const std::string &name,
+    FileCopyAction::FileCopyAction(const std::string& name,
                                    std::shared_ptr<FileLocation> src_file_location,
-                                   std::shared_ptr<FileLocation> dst_file_location) : Action(name, "file_copy_"),
-                                                                                      src_file_location(std::move(src_file_location)),
-                                                                                      dst_file_location(std::move(dst_file_location)) {
+                                   std::shared_ptr<FileLocation> dst_file_location) :
+        Action(name, "file_copy_"),
+        src_file_location(std::move(src_file_location)),
+        dst_file_location(std::move(dst_file_location)) {
+
+        if (this->src_file_location->getFile() != this->dst_file_location->getFile()) {
+            throw std::invalid_argument("FileCopyAction::FileCopyAction(): the src and dst locations must be for the same file");
+        }
+        this->file = this->src_file_location->getFile();
     }
+
 
     /**
      * @brief Returns the action's file
@@ -64,18 +70,24 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileCopyAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
+    void FileCopyAction::execute(const std::shared_ptr<ActionExecutor>& action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File copy
         // "Fix" the scratch locations, if any
         if (this->src_file_location->isScratch()) {
-            auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-            this->src_file_location = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath() + this->getJob()->getName(), this->src_file_location->getFile());
+            auto cs = std::dynamic_pointer_cast<ComputeService>(
+                action_executor->getActionExecutionService()->getParentService());
+            this->src_file_location = FileLocation::LOCATION(cs->getScratch(),
+                                                             cs->getScratch()->getBaseRootPath() + this->getJob()->
+                                                             getName(), this->src_file_location->getFile());
         }
         if (this->dst_file_location->isScratch()) {
-            auto cs = std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
-            this->dst_file_location = FileLocation::LOCATION(cs->getScratch(), cs->getScratch()->getBaseRootPath() + this->getJob()->getName(), this->src_file_location->getFile());
+            auto cs = std::dynamic_pointer_cast<ComputeService>(
+                action_executor->getActionExecutionService()->getParentService());
+            this->dst_file_location = FileLocation::LOCATION(cs->getScratch(),
+                                                             cs->getScratch()->getBaseRootPath() + this->getJob()->
+                                                             getName(), this->src_file_location->getFile());
         }
         StorageService::copyFile(this->src_file_location, this->dst_file_location);
     }
@@ -84,7 +96,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileCopyAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
+    void FileCopyAction::terminate(const std::shared_ptr<ActionExecutor>& action_executor) {
         // Nothing to do
     }
 
@@ -96,6 +108,4 @@ namespace wrench {
     bool FileCopyAction::usesScratch() const {
         return (this->src_file_location->isScratch() or this->dst_file_location->isScratch());
     }
-
-
-}// namespace wrench
+} // namespace wrench

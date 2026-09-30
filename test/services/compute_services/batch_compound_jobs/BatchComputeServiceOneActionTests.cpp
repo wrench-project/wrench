@@ -48,7 +48,7 @@ public:
     std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-    ~BatchComputeServiceOneActionTest() {
+    ~BatchComputeServiceOneActionTest() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
