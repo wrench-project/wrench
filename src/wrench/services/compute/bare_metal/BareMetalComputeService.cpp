@@ -792,6 +792,9 @@ namespace wrench {
                           else if (a->getJob()->getSubmitDate() < b->getJob()->getSubmitDate()) {
                               return true;
                           }
+                          else if (a->getJob()->getSubmitDate() > b->getJob()->getSubmitDate()) {
+                              return false;
+                          }
                           else if (a->getName() < b->getName()) {
                               return true;
                           }
