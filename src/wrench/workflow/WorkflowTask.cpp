@@ -66,14 +66,18 @@ namespace wrench {
                                         "' is already an output file of task '" + this->getID() + "'");
         }
 
-        // Add the file
-        this->input_files[file->getID()] = file;
-        this->workflow->task_input_files[file].insert(this->getSharedPtr());
+	// Establish the required dependency first. A rejected dependency
+	// must not leave the file registered as an input.
+	if (this->workflow->task_output_files.find(file) !=
+    		this->workflow->task_output_files.end()) {
+    		workflow->addControlDependency(
+				this->workflow->task_output_files[file],
+        			this->getSharedPtr());
+	}
 
-        // Add control dependency
-        if (this->workflow->task_output_files.find(file) != this->workflow->task_output_files.end()) {
-            workflow->addControlDependency(this->workflow->task_output_files[file], this->getSharedPtr());
-        }
+	// The dependency was accepted, or the file has no producer.
+	this->input_files[file->getID()] = file;
+	this->workflow->task_input_files[file].insert(this->getSharedPtr());
     }
 
     /**
