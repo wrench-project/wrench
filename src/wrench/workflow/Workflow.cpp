@@ -697,11 +697,19 @@ namespace wrench {
      */
     double Workflow::getStartDate() const {
         double start_date = -1.0;
-        for (auto const &task: this->tasks) {
-            if (task.second->getState() == WorkflowTask::State::COMPLETED) {
-                start_date = std::min<double>(start_date, task.second->getStartDate());
-            }
-        }
+    	for (const auto& [id, task] : this->tasks) {
+       		if (task->getState() != WorkflowTask::State::COMPLETED) {
+            		continue;
+        	}
+
+        	const double task_start_date = task->getStartDate();
+
+        	// The first completed task replaces the "no date" sentinel.
+        	// Subsequent completed tasks can move the date earlier.
+        	if (start_date < 0.0 or task_start_date < start_date) {
+            	start_date = task_start_date;
+        	}
+    	}
         return start_date;
     }
 
