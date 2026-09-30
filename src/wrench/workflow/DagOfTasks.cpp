@@ -50,8 +50,11 @@ namespace wrench {
         // Remove all in and out edges at that vertex
         boost::clear_vertex(this->task_map[task], this->dag);
 
-        // Remove the vertex
-        boost::remove_vertex(this->task_map[task], this->dag);
+	// Remove the vertex.
+	boost::remove_vertex(this->task_map[task], this->dag);
+
+	// The task no longer identifies any vertex.
+	this->task_map.erase(task);
     }
 
 
