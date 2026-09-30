@@ -66,13 +66,12 @@ namespace wrench {
                                         "' is already an output file of task '" + this->getID() + "'");
         }
 
-	// Establish the required dependency first. A rejected dependency
-	// must not leave the file registered as an input.
-	if (this->workflow->task_output_files.find(file) !=
-    		this->workflow->task_output_files.end()) {
-    		workflow->addControlDependency(
-				this->workflow->task_output_files[file],
-        			this->getSharedPtr());
+	const auto producer = this->workflow->getTaskThatOutputs(file);
+
+	if (producer and not this->workflow->dag.doesEdgeExist(producer.get(), this)) {
+    		// Keep a direct data-dependency edge even if another path exists.
+    		this->workflow->addControlDependency(
+        	producer, this->getSharedPtr(), true);
 	}
 
 	// The dependency was accepted, or the file has no producer.
@@ -120,7 +119,11 @@ namespace wrench {
 	this->workflow->task_output_files[file] = producer;
 	
 	for (const auto& consumer : consumers) {
-    		this->workflow->addControlDependency(producer, consumer);
+    		if (not this->workflow->dag.doesEdgeExist(
+            		producer.get(), consumer.get())) {
+        		// Keep a direct data-dependency edge even if another path exists.
+        		this->workflow->addControlDependency(producer, consumer, true);
+    		}
 	}
     }
 
