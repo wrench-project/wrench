@@ -521,7 +521,7 @@ namespace wrench {
          */
         if (this->pre_overhead_action) {
             if (this->pre_overhead_action->getState() == Action::State::KILLED) {
-                job_failure_cause = std::make_shared<JobKilled>();
+		job_failure_cause = this->pre_overhead_action->getFailureCause();
                 for (auto const &t: this->tasks) {
                     failure_count_increments.insert(t);
                 }
