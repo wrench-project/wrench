@@ -49,6 +49,7 @@ namespace wrench {
 
         this->action_execution_service = nullptr; // to avoid leak due to circular refs
         this->current_jobs.clear();
+	this->num_dispatched_actions_for_cjob.clear();
         this->not_ready_actions.clear();
         this->ready_actions.clear();
         this->dispatched_actions.clear();
