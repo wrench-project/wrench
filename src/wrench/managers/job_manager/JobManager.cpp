@@ -585,7 +585,7 @@ namespace wrench {
 
 
         auto callback_commport = this->_commport;
-        std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
+        auto cjob = this->createCompoundJob("cjob_for_" + this->getName());
         const std::weak_ptr<PilotJob> weak_job = job;
         cjob->addCustomAction(
             "pilot_job_" + job->getName() + "_action",
@@ -635,7 +635,7 @@ namespace wrench {
                 if (not job) {
                     throw std::logic_error("Pilot execution callback invoked after its PilotJob was destroyed");
                 }
-		// Cancellation can occur during executor startup, before the
+                // Cancellation can occur during executor startup, before the
                 // execution callback creates the pilot's compute service.
                 if (job->compute_service) {
                     job->compute_service->stop(
@@ -747,7 +747,7 @@ namespace wrench {
         std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation_);
-        job->applyTaskUpdates(state_changes, failure_count_increments);
+        StandardJob::applyTaskUpdates(state_changes, failure_count_increments);
     }
 
 
@@ -911,26 +911,26 @@ namespace wrench {
         } else if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // There shouldn't be any need to clean up any state
             return false;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobDoneMessage>(message)) {
+        } else if (auto cscjd_msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobDoneMessage>(message)) {
             // Is this in fact a standard job???
-            if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
-                auto sjob = this->cjob_to_sjob_map[msg->job];
-                this->cjob_to_sjob_map.erase(msg->job);
-                processStandardJobCompletion(sjob, msg->compute_service);
+            if (this->cjob_to_sjob_map.find(cscjd_msg->job) != this->cjob_to_sjob_map.end()) {
+                auto sjob = this->cjob_to_sjob_map[cscjd_msg->job];
+                this->cjob_to_sjob_map.erase(cscjd_msg->job);
+                processStandardJobCompletion(sjob, cscjd_msg->compute_service);
             } else {
-                processCompoundJobCompletion(msg->job, msg->compute_service);
+                processCompoundJobCompletion(cscjd_msg->job, cscjd_msg->compute_service);
             }
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobFailedMessage>(message)) {
-            if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
-                auto sjob = this->cjob_to_sjob_map[msg->job];
-                this->cjob_to_sjob_map.erase(msg->job);
-                processStandardJobFailure(sjob, msg->compute_service);
-            } else if (this->cjob_to_pjob_map.find(msg->job) != this->cjob_to_pjob_map.end()) {
-                auto pjob = this->cjob_to_pjob_map[msg->job];
-                auto pjob_action = *(msg->job->getActions().begin());
+        } else if (auto cscjf_msg = std::dynamic_pointer_cast<ComputeServiceCompoundJobFailedMessage>(message)) {
+            if (this->cjob_to_sjob_map.find(cscjf_msg->job) != this->cjob_to_sjob_map.end()) {
+                auto sjob = this->cjob_to_sjob_map[cscjf_msg->job];
+                this->cjob_to_sjob_map.erase(cscjf_msg->job);
+                processStandardJobFailure(sjob, cscjf_msg->compute_service);
+            } else if (this->cjob_to_pjob_map.find(cscjf_msg->job) != this->cjob_to_pjob_map.end()) {
+                auto pjob = this->cjob_to_pjob_map[cscjf_msg->job];
+                auto pjob_action = *(cscjf_msg->job->getActions().begin());
                 if (std::dynamic_pointer_cast<JobTimeout>(pjob_action->getFailureCause())) {
-                    processPilotJobExpiration(pjob, msg->compute_service);
+                    processPilotJobExpiration(pjob, cscjf_msg->compute_service);
                 } else {
                     throw std::runtime_error(
                         "JobManager::processNextMessage(): Received unexpected pilot job failure cause " + pjob_action->
@@ -938,14 +938,14 @@ namespace wrench {
                     //                    processPilotJobFailure(pjob, msg->compute_service, pjob_action->getFailureCause());
                 }
             } else {
-                processCompoundJobFailure(msg->job, msg->compute_service);
+                processCompoundJobFailure(cscjf_msg->job, cscjf_msg->compute_service);
             }
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
-            processPilotJobStart(msg->job, msg->compute_service);
+        } else if (auto cspjs_msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+            processPilotJobStart(cspjs_msg->job, cspjs_msg->compute_service);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
-            processPilotJobExpiration(msg->job, msg->compute_service);
+        } else if (auto cspje_msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+            processPilotJobExpiration(cspje_msg->job, cspje_msg->compute_service);
             return true;
         } else {
             throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");
@@ -1050,14 +1050,18 @@ namespace wrench {
      */
     void JobManager::processPilotJobExpiration(const std::shared_ptr<PilotJob>& job,
                                                std::shared_ptr<ComputeService> compute_service) {
-        // update job state
+        // Startup may have timed out before a pilot-start notification.
+        // Only a pilot counted as running should decrement the counter.
+        if (job->state == PilotJob::State::RUNNING) {
+            this->num_running_pilot_jobs--;
+        }
+
         job->state = PilotJob::State::EXPIRED;
-        this->num_running_pilot_jobs--;
 
         // Remove the job from the "dispatched" list and put it in the completed list
         this->jobs_dispatched.erase(job->compound_job);
-	// Remove the job from the cjob to pjob maping
-	this->cjob_to_pjob_map.erase(job->compound_job);
+        // Remove the job from the cjob to pjob mapping
+        this->cjob_to_pjob_map.erase(job->compound_job);
 
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackCommPort()->get_cname());
@@ -1070,8 +1074,8 @@ namespace wrench {
      * @param name: the job's name (if empty, a unique job name will be picked for you)
      * @return the job
      */
-    std::shared_ptr<CompoundJob> JobManager::createCompoundJob(std::string name) {
-        auto job = std::shared_ptr<CompoundJob>(new CompoundJob(std::move(name), this->getSharedPtr<JobManager>()));
+    std::shared_ptr<CompoundJob> JobManager::createCompoundJob(const std::string& name) {
+        auto job = std::shared_ptr<CompoundJob>(new CompoundJob(name, this->getSharedPtr<JobManager>()));
         return job;
     }
 
@@ -1124,7 +1128,7 @@ namespace wrench {
                                                                        state_changes, failure_count_increments,
                                                                        e.getCause());
                             job->popCallbackCommPort()->dputMessage(message);
-                        } catch (NetworkError& e) {
+                        } catch (NetworkError& ignore) {
                         }
                     }
                 }

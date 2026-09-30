@@ -59,7 +59,7 @@ namespace wrench {
 
         void kill();
 
-        std::shared_ptr<CompoundJob> createCompoundJob(std::string name);
+        std::shared_ptr<CompoundJob> createCompoundJob(const std::string& name);
 
         std::shared_ptr<StandardJob> createStandardJob(const std::vector<std::shared_ptr<WorkflowTask>> &tasks,
                                                        const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> &file_locations,
