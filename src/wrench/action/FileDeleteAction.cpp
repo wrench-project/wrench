@@ -14,6 +14,9 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
+#include <wrench/job/CompoundJob.h>
+#include <wrench/services/compute/ComputeService.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 
 
 #include <utility>
@@ -59,7 +62,22 @@ namespace wrench {
     void FileDeleteAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
-        // File write
+
+	// Resolve scratch to this job's directory on the executing service.
+    	if (this->file_location->isScratch()) {
+		std::cerr << "IT IS SCRATCH\n";
+        	const auto compute_service =
+            	std::dynamic_pointer_cast<ComputeService>(action_executor->getActionExecutionService()->getParentService());
+
+        	const auto scratch = compute_service->getScratch();
+
+        	this->file_location = FileLocation::LOCATION(
+            		scratch,
+            		scratch->getBaseRootPath() + this->getJob()->getName(),
+            		this->file_location->getFile());
+    	}
+	
+        // File deletion
         StorageService::deleteFileAtLocation(this->file_location);
     }
 
