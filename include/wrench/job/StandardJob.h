@@ -41,7 +41,8 @@ namespace wrench {
     class StandardJob : public Job, public std::enable_shared_from_this<StandardJob> {
 
     public:
-        //        ~StandardJob() {
+	~StandardJob() override;
+        //        ~StandardJob() override {
         //            std::cerr << "IN STANDARD JOB DESTRUCTOR: CJOB.REF# = " << this->compound_job.use_count() << "\n";
         //        }
 
