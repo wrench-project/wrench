@@ -209,10 +209,6 @@ namespace wrench {
          * @brief Job state
          */
         State state;
-        /**
-         * @brief Job priority
-         */
-        double priority;
 
         /**
          * @brief Job detached status
