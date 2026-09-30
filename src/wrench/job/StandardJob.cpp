@@ -71,6 +71,19 @@ namespace wrench {
     }
 
     /**
+     * @brief Destructor
+     */
+    StandardJob::~StandardJob() {
+        for (const auto& task : this->tasks) {
+            // A task may since have been associated with another job.
+            // Clear only associations that still point to this one.
+            if (task->getJob() == this) {
+                task->setJob(nullptr);
+            }
+        }
+    }
+
+    /**
      * @brief Returns the minimum number of cores required to run the job (i.e., at least
      *        one task in the job cannot run if fewer cores than this minimum are available)
      * @return the number of cores
