@@ -460,7 +460,12 @@ namespace wrench {
             }
 
             if (action->getState() == Action::State::FAILED || action->getState() == Action::State::KILLED) {
-                *at_least_one_failed = true;
+	        if (action->getState() == Action::State::KILLED and
+    		    std::dynamic_pointer_cast<JobKilled>(action->getFailureCause())) {
+    		    *at_least_one_killed = true;
+		} else {
+    		    *at_least_one_failed = true;
+		}
                 if (not *failure_cause) {
                     *failure_cause = action->getFailureCause();
                 }
@@ -473,12 +478,12 @@ namespace wrench {
     }
 
     /**
- * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
- * @param state_changes: the set of task state changes to apply
- * @param failure_count_increments: the set ot task failure count increments to apply
- * @param job_failure_cause: the job failure cause, if any
- * @param simulation: the simulation (to add timestamps!)
- */
+     * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
+     * @param state_changes: the set of task state changes to apply
+     * @param failure_count_increments: the set ot task failure count increments to apply
+     * @param job_failure_cause: the job failure cause, if any
+     * @param simulation: the simulation (to add timestamps!)
+     */
     void StandardJob::processCompoundJobOutcome(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                                                 std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
                                                 std::shared_ptr<FailureCause> &job_failure_cause,
