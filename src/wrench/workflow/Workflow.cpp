@@ -21,12 +21,15 @@ namespace wrench {
      *         by these tasks
      */
     void Workflow::clear() {
-        this->tasks.clear();
-        //        for (auto const &f: this->data_files) {
-        //            //            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
-        //            Simulation::removeFile(f);
-        //        }
-        //        this->data_files.clear();
+        // Discard graph vertices, edges, and task-to-vertex indexes.
+    	this->dag = DagOfTasks{};
+	
+    	// Release every workflow-local task/file association.
+    	this->ready_tasks.clear();
+    	this->task_input_files.clear();
+    	this->task_output_files.clear();
+    	this->tasks.clear();
+    	this->data_files.clear();
     }
 
     /**
