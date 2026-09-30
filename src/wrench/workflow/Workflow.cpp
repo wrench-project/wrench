@@ -225,7 +225,7 @@ namespace wrench {
 
         /*  Check that the two tasks don't have a data dependency; if so, just return */
         for (auto const &f: dst->getInputFiles()) {
-            if (this->getTaskThatOutputst(f) == src) {
+            if (this->getTaskThatOutputs(f) == src) {
                 return;
             }
         }
