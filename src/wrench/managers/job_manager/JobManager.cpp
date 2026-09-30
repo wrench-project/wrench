@@ -635,7 +635,13 @@ namespace wrench {
                 if (not job) {
                     throw std::logic_error("Pilot execution callback invoked after its PilotJob was destroyed");
                 }
-                job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
+		// Cancellation can occur during executor startup, before the
+                // execution callback creates the pilot's compute service.
+                if (job->compute_service) {
+                    job->compute_service->stop(
+                        true,
+                        ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
+                }
             });
 
         job->compound_job = cjob;
