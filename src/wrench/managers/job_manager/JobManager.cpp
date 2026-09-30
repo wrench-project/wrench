@@ -578,10 +578,16 @@ namespace wrench {
 
         auto callback_commport = this->_commport;
         std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
+	const std::weak_ptr<PilotJob> weak_job = job;
         cjob->addCustomAction(
                 "pilot_job_" + job->getName() + "_action",
                 0, 0,
-                [callback_commport, job, compute_service](const std::shared_ptr<ActionExecutor> &executor) {
+                [callback_commport, weak_job, compute_service](const std::shared_ptr<ActionExecutor> &executor) {
+		    const auto job = weak_job.lock();
+    		    if (not job) {
+        		return;
+    		    }
+
                     // Create a bare-metal compute service and start it
                     auto execution_service = executor->getActionExecutionService();
 
@@ -615,7 +621,11 @@ namespace wrench {
                     // Sleep FOREVER (will be killed by service above)
                     Simulation::sleep(DBL_MAX);
                 },
-                [job](const std::shared_ptr<ActionExecutor> &executor) {
+                [weak_job](const std::shared_ptr<ActionExecutor> &executor) {
+		    const auto job = weak_job.lock();
+    		    if (not job) {
+        		    return;
+    		    }
                     job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
                 });
 
