@@ -101,13 +101,27 @@ namespace wrench {
                                         this->workflow->getTaskThatOutputs(file)->getID() + "')");
         }
 
-        // Otherwise proceed
-        this->output_files[file->getID()] = file;
-        this->workflow->task_output_files[file] = this->getSharedPtr();
+	const auto producer = this->getSharedPtr();
+	const auto consumers = this->workflow->getTasksThatInput(file);
 
-        for (auto const &x: this->workflow->getTasksThatInput(file)) {
-            workflow->addControlDependency(this->getSharedPtr(), x);
-        }
+	// Validate ALL prospective dependencies before registering the
+	// output or adding any edges.
+	for (const auto& consumer : consumers) {
+    		if (this->workflow->pathExists(consumer, producer)) {
+        		throw std::runtime_error(
+            		"WorkflowTask::addOutputFile(): Adding output file '" +
+            		file->getID() + "' would create a cycle through task '" +
+            		consumer->getID() + "'");
+    		}
+	}
+
+	// All prospective dependencies passed the cycle check.
+	this->output_files[file->getID()] = file;
+	this->workflow->task_output_files[file] = producer;
+	
+	for (const auto& consumer : consumers) {
+    		this->workflow->addControlDependency(producer, consumer);
+	}
     }
 
     /**
