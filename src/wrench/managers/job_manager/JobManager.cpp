@@ -1050,6 +1050,8 @@ namespace wrench {
 
         // Remove the job from the "dispatched" list and put it in the completed list
         this->jobs_dispatched.erase(job->compound_job);
+	// Remove the job from the cjob to pjob maping
+	this->cjob_to_pjob_map.erase(job->compound_job);
 
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackCommPort()->get_cname());
