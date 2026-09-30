@@ -195,6 +195,9 @@ namespace wrench {
         this->scratch_cleanup = nullptr;
 
         auto cjob = this->job_manager->createCompoundJob("cjob_for_" + this->getName());
+	
+	// Preserve the priority configured on the standard job
+	cjob->setPriority(this->getPriority());
 
         // Create pre- and post-overhead work units
         if (this->getPreJobOverheadInSeconds() > 0.0) {

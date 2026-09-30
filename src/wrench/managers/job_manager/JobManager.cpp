@@ -1115,7 +1115,6 @@ namespace wrench {
                     } else {
                         auto sjob = this->cjob_to_sjob_map[cjob];
                         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
-                        std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
                         // Set all tasks to not-ready (will be fixed later)
                         for (auto const& t : sjob->getTasks()) {
                             state_changes[t] = WorkflowTask::State::NOT_READY;
@@ -1123,6 +1122,7 @@ namespace wrench {
 
                         this->cjob_to_sjob_map.erase(cjob);
                         try {
+                            std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
                             auto message =
                                 new JobManagerStandardJobFailedMessage(sjob, sjob->parent_compute_service,
                                                                        state_changes, failure_count_increments,
