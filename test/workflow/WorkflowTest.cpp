@@ -453,3 +453,26 @@ TEST_F(WorkflowTest, LowLevelDagOfTasksTest) {
     ASSERT_NO_THROW(dag.getParents((wrench::WorkflowTask *) 1));
     ASSERT_THROW(dag.getParents((wrench::WorkflowTask *) 3), std::invalid_argument);
 }
+
+TEST_F(WorkflowTest, ControlDependencyTest) {
+	auto wf = wrench::Workflow::createWorkflow();
+
+	auto a = wf->addTask("data_dep_A", 1.0, 1, 1, 0);
+	auto b = wf->addTask("data_dep_B", 1.0, 1, 1, 0);
+	auto c = wf->addTask("data_dep_C", 1.0, 1, 1, 0);
+	auto f = wrench::Simulation::addFile("data_dependency_file", 1);
+	
+	wf->addControlDependency(a, b);
+	wf->addControlDependency(b, c);
+	
+	a->addOutputFile(f);
+	c->addInputFile(f);
+	
+	wf->removeControlDependency(b, c);
+	
+	// The file dependency must survive removal of the unrelated control edge.
+	EXPECT_TRUE(wf->pathExists(a, c));
+	EXPECT_EQ(c->getState(), wrench::WorkflowTask::State::NOT_READY);
+	EXPECT_EQ(wf->getTaskThatOutputs(f), a);
+}
+
