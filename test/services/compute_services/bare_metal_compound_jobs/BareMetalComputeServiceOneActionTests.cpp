@@ -413,7 +413,11 @@ private:
                 "Job and CompoundJob disagree about the priority");
         }
 
-        job->getStateAsString();// coverage
+        if (job->getStateAsString() != "NOT SUBMITTED") {
+            throw std::runtime_error(
+                "Job's state as string should be 'NOT SUBMITTED'");
+        };// coverage
+
         auto action = job->addSleepAction("my_sleep", 10.0);
         auto same_action = job->getActionByName("my_sleep");
         try {
