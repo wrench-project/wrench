@@ -883,6 +883,11 @@ namespace wrench {
             }
             else if (job->hasFailed() and ((this->num_dispatched_actions_for_cjob[job] == 0))) {
                 this->current_jobs.erase(job);
+		// This job is terminally failed. Its blocked actions will not run,
+		// so release the service's pending-work references.
+		for (const auto& pending_action : job->getActions()) {
+    			this->not_ready_actions.erase(pending_action);
+		}
                 this->num_dispatched_actions_for_cjob.erase(job);
                 job->popCallbackCommPort()->dputMessage(
                     new ComputeServiceCompoundJobFailedMessage(
