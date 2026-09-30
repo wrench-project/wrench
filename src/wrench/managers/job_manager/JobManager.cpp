@@ -763,11 +763,15 @@ namespace wrench {
         }
 
         job->getParentComputeService()->terminateJob(job->compound_job);
+
+	if (job->state == PilotJob::State::RUNNING) {
+    		this->num_running_pilot_jobs--;
+	}
+
         job->state = PilotJob::State::TERMINATED;
         this->jobs_dispatched.erase(job->compound_job);
         this->cjob_to_pjob_map.erase(job->compound_job);
 
-        this->num_running_pilot_jobs--;
     }
 
     /**

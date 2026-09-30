@@ -521,7 +521,7 @@ namespace wrench {
          */
         if (this->pre_overhead_action) {
             if (this->pre_overhead_action->getState() == Action::State::KILLED) {
-                job_failure_cause = std::make_shared<JobKilled>();
+		job_failure_cause = this->pre_overhead_action->getFailureCause();
                 for (auto const &t: this->tasks) {
                     failure_count_increments.insert(t);
                 }
@@ -767,6 +767,16 @@ namespace wrench {
                 return;
             }
         }
+
+	/*
+	 * Account for failure during post-job overhead without replacing
+	 * a failure cause already identified in an earlier stage.
+	 */
+	if (not job_failure_cause and this->post_overhead_action and
+    		(this->post_overhead_action->getState() == Action::State::FAILED or
+     		this->post_overhead_action->getState() == Action::State::KILLED)) {
+    		job_failure_cause = this->post_overhead_action->getFailureCause();
+	}
 
         /*
         * Look at Cleanup file_deletion actions
