@@ -713,6 +713,8 @@ namespace wrench {
 
         job->compound_job->state = CompoundJob::State::DISCONTINUED;
         job->state = StandardJob::State::TERMINATED;
+	this->jobs_dispatched.erase(job->compound_job);
+	this->cjob_to_sjob_map.erase(job->compound_job);
 
         // Update task states based on compound job
         std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;

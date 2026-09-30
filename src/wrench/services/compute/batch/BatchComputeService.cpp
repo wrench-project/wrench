@@ -273,6 +273,10 @@ namespace wrench {
             if (host_to_reclaim == nullptr) {
                 throw std::invalid_argument("BatchComputeService::reclaimHost(): unknown physical host '" + h + "'");
             }
+            if (this->nodes_to_cores_map.count(host_to_reclaim) == 0) {
+                throw std::invalid_argument(
+                    "BatchComputeService::reclaimHosts(): Host '" + h +"' is not a compute host of this service");
+            }
             hosts_to_reclaim.insert(host_to_reclaim);
         }
 
@@ -646,8 +650,6 @@ namespace wrench {
                                                                  const std::string& job_id,
                                                                  const std::shared_ptr<FailureCause>& cause) {
         WRENCH_INFO("Sending compound job failure notification for job %s", job->getName().c_str());
-
-        std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
         try {
             job->popCallbackCommPort()->putMessage(

@@ -439,7 +439,7 @@ namespace wrench {
         if (parent == nullptr) {
             throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
         }
-        if (pathExists(this->getSharedPtr(), parent)) {
+        if (parent.get() == this or pathExists(this->getSharedPtr(), parent)) {
             throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
         this->parents.insert(parent);
@@ -455,7 +455,7 @@ namespace wrench {
         if (child == nullptr) {
             throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
         }
-        if (pathExists(child, this->getSharedPtr())) {
+        if (child.get() == this or pathExists(child, this->getSharedPtr())) {
             throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
         this->children.insert(child);
@@ -661,6 +661,12 @@ namespace wrench {
             child->parents.erase(action.get());
             child->updateState();
         }
+
+	// The removed action may outlive its former neighbors.
+	// Do not retain raw pointers to those neighbors.		
+	action->parents.clear();
+	action->children.clear();
+
         this->actions.erase(action);
         this->name_map.erase(action->getName());
     }
