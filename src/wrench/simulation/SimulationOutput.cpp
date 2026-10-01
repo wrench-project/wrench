@@ -1940,8 +1940,8 @@ namespace wrench {
      * @param enabled true to enable, false to disable
      */
     void SimulationOutput::enableEnergyTimestamps(bool enabled) {
-        this->setEnabled<SimulationTimestampPstateSet>(true);
-        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+        this->setEnabled<SimulationTimestampPstateSet>(enabled);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(enabled);
     }
 
     /**
@@ -1950,7 +1950,7 @@ namespace wrench {
      * @param enabled true to enable, false to disable
      */
     void SimulationOutput::enableBandwidthTimestamps(bool enabled) {
-        this->setEnabled<SimulationTimestampLinkUsage>(true);
+        this->setEnabled<SimulationTimestampLinkUsage>(enabled);
     }
 
 }// namespace wrench
