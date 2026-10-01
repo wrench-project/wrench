@@ -1383,16 +1383,16 @@ namespace wrench {
                     });
                     disk_reads.push_back(disk_read);
                 }
-                if (!read_failure_timestamps.empty()) {
-                    for (auto& timestamp : read_failure_timestamps) {
-                        for (auto& disk_read : disk_reads) {
-                            if (timestamp->getContent()->getDate() == disk_read["end"] &&
-                                timestamp->getContent()->getEndpoint()->getDate() == disk_read["start"]) {
-                                disk_read["failed"] = "1";
-                            }
-                        }
-                    }
-                }
+                // if (!read_failure_timestamps.empty()) {
+                //     for (auto& timestamp : read_failure_timestamps) {
+                //         for (auto& disk_read : disk_reads) {
+                //             if (timestamp->getContent()->getDate() == disk_read["end"] &&
+                //                 timestamp->getContent()->getEndpoint()->getDate() == disk_read["start"]) {
+                //                 disk_read["failed"] = "1";
+                //             }
+                //         }
+                //     }
+                // }
 
                 nlohmann::json disk_writes;
                 for (auto const& w : writes) {
@@ -1404,16 +1404,16 @@ namespace wrench {
                     });
                     disk_writes.push_back(disk_write);
                 }
-                if (!write_failure_timestamps.empty()) {
-                    for (auto& timestamp : write_failure_timestamps) {
-                        for (auto& disk_write : disk_writes) {
-                            if (timestamp->getContent()->getDate() == disk_write["end"] &&
-                                timestamp->getContent()->getEndpoint()->getDate() == disk_write["start"]) {
-                                disk_write["failed"] = "1";
-                            }
-                        }
-                    }
-                }
+                // if (!write_failure_timestamps.empty()) {
+                //     for (auto& timestamp : write_failure_timestamps) {
+                //         for (auto& disk_write : disk_writes) {
+                //             if (timestamp->getContent()->getDate() == disk_write["end"] &&
+                //                 timestamp->getContent()->getEndpoint()->getDate() == disk_write["start"]) {
+                //                 disk_write["failed"] = "1";
+                //             }
+                //         }
+                //     }
+                // }
 
                 disk_operations_json[host][mount]["reads"] = disk_reads;
                 disk_operations_json[host][mount]["writes"] = disk_writes;
