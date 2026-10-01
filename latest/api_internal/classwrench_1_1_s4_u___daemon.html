@@ -294,6 +294,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon7cleanupEbi"><code class="docutils literal notranslate"><span class="pre">cleanup()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon15createLifeSaverENSt10shared_ptrI10S4U_DaemonEE"><code class="docutils literal notranslate"><span class="pre">createLifeSaver()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon15deleteLifeSaverEv"><code class="docutils literal notranslate"><span class="pre">deleteLifeSaver()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon11getCommPortEv"><code class="docutils literal notranslate"><span class="pre">getCommPort()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10S4U_Daemon7getNameEv"><code class="docutils literal notranslate"><span class="pre">getName()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10S4U_Daemon14getReturnValueEv"><code class="docutils literal notranslate"><span class="pre">getReturnValue()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10S4U_Daemon13getSimulationEv"><code class="docutils literal notranslate"><span class="pre">getSimulation()</span></code></a></li>
@@ -311,11 +312,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon19setupOnExitFunctionEv"><code class="docutils literal notranslate"><span class="pre">setupOnExitFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon11startDaemonEbb"><code class="docutils literal notranslate"><span class="pre">startDaemon()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10S4U_Daemon12suspendActorEv"><code class="docutils literal notranslate"><span class="pre">suspendActor()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon9_commportE"><code class="docutils literal notranslate"><span class="pre">_commport</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon9_hostnameE"><code class="docutils literal notranslate"><span class="pre">_hostname</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon10life_saverE"><code class="docutils literal notranslate"><span class="pre">life_saver</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon12process_nameE"><code class="docutils literal notranslate"><span class="pre">process_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon13recv_commportE"><code class="docutils literal notranslate"><span class="pre">recv_commport</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon27getRunningActorRecvCommPortEv"><code class="docutils literal notranslate"><span class="pre">getRunningActorRecvCommPort()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon25map_actor_to_held_mutexesE"><code class="docutils literal notranslate"><span class="pre">map_actor_to_held_mutexes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench10S4U_Daemon26map_actor_to_recv_commportE"><code class="docutils literal notranslate"><span class="pre">map_actor_to_recv_commport</span></code></a></li>
@@ -591,6 +590,17 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon11getCommPortEv">
+<span id="_CPPv3N6wrench10S4U_Daemon11getCommPortEv"></span><span id="_CPPv2N6wrench10S4U_Daemon11getCommPortEv"></span><span id="wrench::S4U_Daemon::getCommPort"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1aef7a67b4912ba9897d38edc8c7d70378"></span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getCommPort</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon11getCommPortEv" title="Link to this definition"></a><br /></dt>
+<dd><p>&#64;brieg Retrieve the daemon’s commport </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A commport </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench10S4U_Daemon7getNameEv">
 <span id="_CPPv3NK6wrench10S4U_Daemon7getNameEv"></span><span id="_CPPv2NK6wrench10S4U_Daemon7getNameEv"></span><span id="wrench::S4U_Daemon::getNameC"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a4ff60b0013ae664599370a3a28ddac50"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getName</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10S4U_Daemon7getNameEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Retrieve the process name. </p>
@@ -765,12 +775,6 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon9_commportE">
-<span id="_CPPv3N6wrench10S4U_Daemon9_commportE"></span><span id="_CPPv2N6wrench10S4U_Daemon9_commportE"></span><span id="wrench::S4U_Daemon::_commport__S4U_CommPortP"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a6d4b18e09566ff92252e34f346c5627f"></span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">_commport</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon9_commportE" title="Link to this definition"></a><br /></dt>
-<dd><p>The daemon’s commport. </p>
-</dd></dl>
-
-<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon9_hostnameE">
 <span id="_CPPv3N6wrench10S4U_Daemon9_hostnameE"></span><span id="_CPPv2N6wrench10S4U_Daemon9_hostnameE"></span><span id="wrench::S4U_Daemon::_hostname__ss"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a070c7713a75264eb4f7ee77de0df8583"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_hostname</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon9_hostnameE" title="Link to this definition"></a><br /></dt>
 <dd><p>The name of the host on which the daemon is running. </p>
@@ -786,12 +790,6 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon12process_nameE">
 <span id="_CPPv3N6wrench10S4U_Daemon12process_nameE"></span><span id="_CPPv2N6wrench10S4U_Daemon12process_nameE"></span><span id="wrench::S4U_Daemon::process_name__ss"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a1d2ace7c5ba85d790b8db6a54d61aeec"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">process_name</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon12process_nameE" title="Link to this definition"></a><br /></dt>
 <dd><p>The name of the daemon. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon13recv_commportE">
-<span id="_CPPv3N6wrench10S4U_Daemon13recv_commportE"></span><span id="_CPPv2N6wrench10S4U_Daemon13recv_commportE"></span><span id="wrench::S4U_Daemon::recv_commport__S4U_CommPortP"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a2a0adb6361b584126f95b83054932f4a"></span><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html#_CPPv4N6wrench12S4U_CommPortE" title="wrench::S4U_CommPort"><span class="n"><span class="pre">S4U_CommPort</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">recv_commport</span></span></span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon13recv_commportE" title="Link to this definition"></a><br /></dt>
-<dd><p>The daemon’s receive commport (to send to another daemon so that that daemon can reply) </p>
 </dd></dl>
 
 </div>
