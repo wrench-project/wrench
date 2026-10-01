@@ -398,7 +398,7 @@ namespace wrench {
                     auto cacheCopies = getCached(file);
                     auto best = selectBest(cacheCopies);
 
-                    best->getStorageService()->_commport->dputMessage(
+                    best->getStorageService()->getCommPort()->dputMessage(
                         new StorageServiceFileReadRequestMessage(
                             msg->answer_commport,
                             simgrid::s4u::this_actor::get_host(),
@@ -413,7 +413,7 @@ namespace wrench {
                         WRENCH_DEBUG("File %s found in internal Storage", file->getID().c_str());
                         //File in internal storage
                         cache.add(file, FileLocation::LOCATION(internalStorage, file));
-                        internalStorage->_commport->dputMessage(
+                        internalStorage->getCommPort()->dputMessage(
                             new StorageServiceFileReadRequestMessage(
                                 msg->answer_commport,
                                 simgrid::s4u::this_actor::get_host(),
@@ -583,7 +583,7 @@ namespace wrench {
                             //this was a file read
                             shared_ptr<FileLocation> best = selectBest(cacheCopies);
                             //msg->original->location=best;
-                            best->getStorageService()->_commport->dputMessage(
+                            best->getStorageService()->getCommPort()->dputMessage(
                                 new StorageServiceFileReadRequestMessage(
                                     msg->answer_commport,
                                     simgrid::s4u::this_actor::get_host(),
@@ -702,7 +702,7 @@ namespace wrench {
                     msg->location = FileLocation::LOCATION(internalStorage, file);
                     //                    msg->buffer_size = internalStorage->getPropertyValueAsSizeInByte(
                     //                            SimpleStorageServiceProperty::BUFFER_SIZE);
-                    internalStorage->_commport->dputMessage(message.release());
+                    internalStorage->getCommPort()->dputMessage(message.release());
                 }
             }
             else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage*>(message.get())) {
@@ -724,7 +724,7 @@ namespace wrench {
                 else {
                     // Forward the message
                     msg->dst = FileLocation::LOCATION(internalStorage, file);
-                    internalStorage->_commport->dputMessage(message.release());
+                    internalStorage->getCommPort()->dputMessage(message.release());
                 }
             }
             else if (auto msg = dynamic_cast<StorageServiceMessage*>(message.get())) {
@@ -737,7 +737,7 @@ namespace wrench {
                 }
                 else {
                     // Forwarding the message as-is to the internal Storage
-                    internalStorage->_commport->dputMessage(message.release());
+                    internalStorage->getCommPort()->dputMessage(message.release());
                 }
             }
             else {

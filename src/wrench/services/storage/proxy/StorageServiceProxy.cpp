@@ -122,7 +122,7 @@ namespace wrench {
             } else if (target) {
                 pending[msg->location->getFile()].push_back(std::move(message));
                 //message=std::move(pending[msg->location->getFile()][0]);
-                target->_commport->dputMessage(
+                target->getCommPort()->dputMessage(
                         new StorageServiceFileLookupRequestMessage(
                                 _commport,
                                 FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile()),
@@ -172,7 +172,7 @@ namespace wrench {
                     pending[msg->location->getFile()].push_back(std::move(message));
                     WRENCH_DEBUG("Adding pending write");
                 }
-                cache->_commport->putMessage(new StorageServiceFileWriteRequestMessage(_commport, msg->requesting_host,
+                cache->getCommPort()->putMessage(new StorageServiceFileWriteRequestMessage(_commport, msg->requesting_host,
                                                                                       FileLocation::LOCATION(cache, msg->location->getFile()), msg->location->getFile()->getSize(), 0));
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileWriteAnswerMessage(msg->location, false, nullptr, {}, 0, StorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD));
@@ -530,7 +530,7 @@ namespace wrench {
     bool StorageServiceProxy::commonReadFile(StorageServiceFileReadRequestMessage *msg, unique_ptr<ServiceMessage> &message) {
         if (cache->hasFile(msg->location->getFile(), msg->location->getDirectoryPath())) {//check cache
             WRENCH_INFO("Forwarding to cache reply commport %s", msg->answer_commport->get_name().c_str());
-            cache->_commport->putMessage(
+            cache->getCommPort()->putMessage(
                     new StorageServiceFileReadRequestMessage(
                             msg->answer_commport,
                             msg->requesting_host,//msg->commport_to_receive_the_file_content,
@@ -708,7 +708,7 @@ namespace wrench {
                 auto forward = new StorageServiceFileReadRequestMessage(msg);
                 forward->answer_commport = _commport;                                                                   //setup intercept commport
                 forward->location = FileLocation::LOCATION(target, msg->location->getDirectoryPath(), msg->location->getFile());//hijack location to be on target
-                target->_commport->dputMessage(forward);                                                                //send to target
+                target->getCommPort()->dputMessage(forward);                                                                //send to target
             } else {
                 msg->answer_commport->putMessage(new StorageServiceFileReadAnswerMessage(msg->location, false, std::make_shared<FileNotFound>(msg->location), nullptr, 0, 1, StorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD));
             }

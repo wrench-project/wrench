@@ -100,6 +100,14 @@ namespace wrench {
         UNTRACK_OBJECT("actor");
     }
 
+    /**
+     * @brieg Retrieve the daemon's commport
+     * @return A commport
+     */
+    S4U_CommPort* S4U_Daemon::getCommPort() {
+        return this->_commport;
+    }
+
     //    /**
     //     * @brief Release all mutexes that the running actor holds, if any
     //     */

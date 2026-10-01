@@ -419,7 +419,7 @@ namespace wrench {
 
             // assertServiceIsUp(loc->getStorageService());
 
-            loc->getStorageService()->_commport->putMessage(new StorageServiceFileDeleteRequestMessage(
+            loc->getStorageService()->getCommPort()->putMessage(new StorageServiceFileDeleteRequestMessage(
                     answer_commport,
                     loc,
                     this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
@@ -480,7 +480,7 @@ namespace wrench {
         for (const auto &loc: file_parts) {
             assertServiceIsUp(loc->getStorageService());
 
-            loc->getStorageService()->_commport->putMessage(new StorageServiceFileLookupRequestMessage(
+            loc->getStorageService()->getCommPort()->putMessage(new StorageServiceFileLookupRequestMessage(
                     answer_commport,
                     location,
                     this->getMessagePayloadValue(
@@ -589,11 +589,11 @@ namespace wrench {
 
             S4U_CommPort *commport_to_contact;
             if (dst_is_non_bufferized) {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->getCommPort();
             } else if (src_is_non_bufferized) {
-                commport_to_contact = src_parts[copy_idx]->getStorageService()->_commport;
+                commport_to_contact = src_parts[copy_idx]->getStorageService()->getCommPort();
             } else {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->getCommPort();
             }
 
             this->simulation_->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
@@ -726,11 +726,11 @@ namespace wrench {
 
             S4U_CommPort *commport_to_contact;
             if (dst_is_non_bufferized) {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->getCommPort();
             } else if (src_is_non_bufferized) {
-                commport_to_contact = src_parts[copy_idx]->getStorageService()->_commport;
+                commport_to_contact = src_parts[copy_idx]->getStorageService()->getCommPort();
             } else {
-                commport_to_contact = dst_parts[copy_idx]->getStorageService()->_commport;
+                commport_to_contact = dst_parts[copy_idx]->getStorageService()->getCommPort();
             }
 
             this->simulation_->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
@@ -880,7 +880,7 @@ namespace wrench {
             //TODO: THIS IS UGLY, PERHAPS WOULD BE BETTER TO THINK UP ANOTHER "RESERVE" SCHEME...
             dloc->getStorageService()->unreserveSpace(dloc);
 
-            dloc->getStorageService()->_commport->dputMessage(
+            dloc->getStorageService()->getCommPort()->dputMessage(
                     new StorageServiceFileWriteRequestMessage(
                             recv_commport,
                             simgrid::s4u::this_actor::get_host(),
@@ -1020,7 +1020,7 @@ namespace wrench {
             WRENCH_DEBUG("CSS::readFile(): Sending full read request %d on file %s (<%llu> b) to %s",
                          request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
 
-            dloc->getStorageService()->_commport->dputMessage(
+            dloc->getStorageService()->getCommPort()->dputMessage(
                     new StorageServiceFileReadRequestMessage(
                             recv_commport,
                             simgrid::s4u::this_actor::get_host(),

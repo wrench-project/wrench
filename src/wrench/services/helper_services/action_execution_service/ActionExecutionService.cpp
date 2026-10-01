@@ -665,10 +665,10 @@ namespace wrench {
         // Send back an action failed message if necessary
         if (not killed_due_to_job_cancellation) {
             WRENCH_INFO("Sending action failure notification to '%s'",
-                        this->parent_service->_commport->get_cname());
+                        this->parent_service->getCommPort()->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                this->parent_service->_commport->dputMessage(
+                this->parent_service->getCommPort()->dputMessage(
                     new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException& e) {
                 return;
@@ -756,7 +756,7 @@ namespace wrench {
         this->action_run_specs.erase(action);
 
         // Send the notification to the originator
-        this->parent_service->_commport->dputMessage(
+        this->parent_service->getCommPort()->dputMessage(
             new ActionExecutionServiceActionDoneMessage(
                 action, 0.0));
     }
@@ -779,11 +779,11 @@ namespace wrench {
         this->action_run_specs.erase(action);
 
         // Send the notification
-        WRENCH_INFO("Sending action failure notification to '%s'", parent_service->_commport->get_cname());
+        WRENCH_INFO("Sending action failure notification to '%s'", parent_service->getCommPort()->get_cname());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
             auto msg = new ActionExecutionServiceActionDoneMessage(action, 0);
-            this->parent_service->_commport->dputMessage(msg);
+            this->parent_service->getCommPort()->dputMessage(msg);
         } catch (ExecutionException&) {
             return;
         }
@@ -1088,10 +1088,10 @@ namespace wrench {
             this->all_actions.erase(action);
             this->action_run_specs.erase(action);
             // Send the notification
-            WRENCH_INFO("Sending action failure notification to '%s'", parent_service->_commport->get_cname());
+            WRENCH_INFO("Sending action failure notification to '%s'", parent_service->getCommPort()->get_cname());
             // NOTE: This is synchronous so that the process doesn't fall off the end
             try {
-                this->parent_service->_commport->dputMessage(
+                this->parent_service->getCommPort()->dputMessage(
                     new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (ExecutionException&) {
                 return;

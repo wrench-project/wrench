@@ -74,7 +74,7 @@ namespace wrench {
                     "", 0, 0,
                     [this, job](const std::shared_ptr<ActionExecutor>& action_executor) {
                         WRENCH_INFO("Sending back a 'job has started' notification");
-                            _originator->_commport->dputMessage(new JobStartNotificationMessage(job->getName()));
+                            _originator->getCommPort()->dputMessage(new JobStartNotificationMessage(job->getName()));
                     },
                     [](const std::shared_ptr<ActionExecutor>& action_executor) {
                     });
@@ -99,6 +99,6 @@ namespace wrench {
         auto job_name = event->job->getName();
         WRENCH_INFO("%s, which I ran locally, has completed. Notifying the job generating controller...",
                     job_name.c_str());
-        _originator->_commport->dputMessage(new JobCompletionNotificationMessage(job_name));
+        _originator->getCommPort()->dputMessage(new JobCompletionNotificationMessage(job_name));
     }
 } // namespace wrench

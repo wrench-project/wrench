@@ -318,11 +318,11 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<NextContactDaemonRequestMessage>(message)) {
             auto chosen_peer = NetworkProximityService::getCommunicationPeer(msg->daemon);
 
-            msg->daemon->_commport->dputMessage(
+            msg->daemon->getCommPort()->dputMessage(
                     new NextContactDaemonAnswerMessage(
                             chosen_peer->getHostname(),
                             chosen_peer,
-                            chosen_peer->_commport,
+                            chosen_peer->getCommPort(),
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
@@ -392,7 +392,7 @@ namespace wrench {
 
         // all the network daemons EXCEPT the sender get pushed into this vector
         for (unsigned long index = 0; index < this->network_sender_daemons.size(); ++index) {
-            if (this->network_sender_daemons[index]->_commport != sender_daemon->_commport) {
+            if (this->network_sender_daemons[index]->getCommPort() != sender_daemon->getCommPort()) {
                 peer_list.push_back(index);
             }
         }

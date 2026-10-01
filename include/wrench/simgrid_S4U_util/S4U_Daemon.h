@@ -57,10 +57,13 @@ namespace wrench {
         /** @brief The name of the daemon */
         std::string process_name;
 
+    protected:
         /** @brief The daemon's commport **/
         S4U_CommPort *_commport;
         /** @brief The daemon's receive commport (to send to another daemon so that that daemon can reply) **/
         S4U_CommPort *recv_commport;
+
+    public:
 
         /** @brief The name of the host on which the daemon is running */
         std::string _hostname;
@@ -73,6 +76,8 @@ namespace wrench {
         //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         virtual ~S4U_Daemon();
+
+        S4U_CommPort *getCommPort();
 
         void startDaemon(bool daemonized, bool auto_restart);
 
