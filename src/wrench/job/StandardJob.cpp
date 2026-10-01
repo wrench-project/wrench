@@ -743,7 +743,7 @@ namespace wrench {
                 if (at_least_one_killed) {
                     job_failure_cause = std::make_shared<JobKilled>();
                     failure_count_increments.insert(t);
-                    t->setFailureDate(earliest_failure_date);
+                    t->setTerminationDate(earliest_failure_date);
                     simulation->getOutput().addTimestampTaskTermination(earliest_failure_date, t);
                 } else if (at_least_one_failed) {
                     t->setFailureDate(earliest_failure_date);
