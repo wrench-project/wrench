@@ -1845,6 +1845,7 @@ namespace wrench {
 
         if (can_merge) {
             last_two_timestamps[hostname].at(1)->setDate(new_timestamp->getDate());
+	    delete new_timestamp;
         } else {
             last_two_timestamps[hostname][0] = last_two_timestamps[hostname][1];
             last_two_timestamps[hostname][1] = new_timestamp;
@@ -1882,6 +1883,7 @@ namespace wrench {
 
         if (can_merge) {
             last_two_timestamps[link_name].at(1)->setDate(new_timestamp->getDate());
+	    delete new_timestamp;
         } else {
             last_two_timestamps[link_name][0] = last_two_timestamps[link_name][1];
             last_two_timestamps[link_name][1] = new_timestamp;
