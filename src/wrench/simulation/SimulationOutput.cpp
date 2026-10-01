@@ -1822,7 +1822,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampEnergyConsumption(double date, const std::string &hostname,
                                                          double joules) {
-        static std::unordered_map<std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
+        auto& last_two_timestamps = this->last_two_energy_timestamps;
 
         if (not this->isEnabled<SimulationTimestampEnergyConsumption>()) {
             return;
@@ -1861,7 +1861,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampLinkUsage(double date, const std::string &link_name,
                                                  double bytes_per_second) {
-        static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
+	auto& last_two_timestamps = this->last_two_link_usage_timestamps;
 
         if (not this->isEnabled<SimulationTimestampLinkUsage>()) {
             return;
