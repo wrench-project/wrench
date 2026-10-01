@@ -683,7 +683,7 @@ namespace wrench {
                 t->updateStartDate(t->getComputationStartDate());
             }
 
-            simulation->getOutput().addTimestampTaskStart(compute_action->getStartDate(), t);
+            simulation->getOutput().addTimestampTaskStart(t->getStartDate(), t);
 
             if (compute_action->getState() != Action::State::COMPLETED) {
                 if (not job_failure_cause) job_failure_cause = compute_action->getFailureCause();
