@@ -1822,7 +1822,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampEnergyConsumption(double date, const std::string &hostname,
                                                          double joules) {
-        static std::unordered_map<std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
+        auto& last_two_timestamps = this->last_two_energy_timestamps;
 
         if (not this->isEnabled<SimulationTimestampEnergyConsumption>()) {
             return;
@@ -1845,6 +1845,7 @@ namespace wrench {
 
         if (can_merge) {
             last_two_timestamps[hostname].at(1)->setDate(new_timestamp->getDate());
+	    delete new_timestamp;
         } else {
             last_two_timestamps[hostname][0] = last_two_timestamps[hostname][1];
             last_two_timestamps[hostname][1] = new_timestamp;
@@ -1860,7 +1861,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampLinkUsage(double date, const std::string &link_name,
                                                  double bytes_per_second) {
-        static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
+	auto& last_two_timestamps = this->last_two_link_usage_timestamps;
 
         if (not this->isEnabled<SimulationTimestampLinkUsage>()) {
             return;
@@ -1882,6 +1883,7 @@ namespace wrench {
 
         if (can_merge) {
             last_two_timestamps[link_name].at(1)->setDate(new_timestamp->getDate());
+	    delete new_timestamp;
         } else {
             last_two_timestamps[link_name][0] = last_two_timestamps[link_name][1];
             last_two_timestamps[link_name][1] = new_timestamp;
@@ -1938,8 +1940,8 @@ namespace wrench {
      * @param enabled true to enable, false to disable
      */
     void SimulationOutput::enableEnergyTimestamps(bool enabled) {
-        this->setEnabled<SimulationTimestampPstateSet>(true);
-        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+        this->setEnabled<SimulationTimestampPstateSet>(enabled);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(enabled);
     }
 
     /**
@@ -1948,7 +1950,7 @@ namespace wrench {
      * @param enabled true to enable, false to disable
      */
     void SimulationOutput::enableBandwidthTimestamps(bool enabled) {
-        this->setEnabled<SimulationTimestampLinkUsage>(true);
+        this->setEnabled<SimulationTimestampLinkUsage>(enabled);
     }
 
 }// namespace wrench

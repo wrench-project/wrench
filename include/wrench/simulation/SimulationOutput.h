@@ -190,6 +190,10 @@ namespace wrench {
 
         std::map<std::type_index, bool> enabledStatus;
 
+	std::unordered_map<std::string,std::vector<SimulationTimestampEnergyConsumption*>> last_two_energy_timestamps;
+
+	std::unordered_map<std::string,std::vector<SimulationTimestampLinkUsage*>> last_two_link_usage_timestamps;
+
         /**
          * @brief  Determines whether a time stamp time is enabled
          * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
