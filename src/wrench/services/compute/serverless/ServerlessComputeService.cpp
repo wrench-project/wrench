@@ -422,7 +422,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (const auto ss_msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->state = Service::DOWN;
