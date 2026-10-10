@@ -397,17 +397,39 @@ namespace wrench {
                 prewarmContainers(decisions->container_prewarms);
 
                 // Setup scheduler wake-up, if any
-                if (decisions->scheduler_wakeup_date.has_value() and decisions->scheduler_wakeup_date.value() > S4U_Simulation::getClock()) {
-                    std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
-                        this->simulation_, decisions->scheduler_wakeup_date.value(),
-                        _hostname, _commport, new  ServerlessComputeServiceSchedulerWakeupMessage(),
-                        "scheduler_wakeup");
+                if (decisions->scheduler_wakeup_date.has_value()) {
+                    setNextSchedulerWakeup(decisions->scheduler_wakeup_date.value());
                 }
-
                 do_scheduling = false;
             }
         }
+
         return 0;
+    }
+
+    void ServerlessComputeService::setNextSchedulerWakeup(double wakeup_date) {
+        // Ignore wakeup_date in the past
+        if (wakeup_date < S4U_Simulation::getClock()) {
+            return;
+        }
+        // If previous wakeup exists and will occur sooner, do nothing
+        if (_next_scheduler_wakeup_date.has_value() and _next_scheduler_wakeup_date.value() < wakeup_date) {
+            return;
+        }
+
+        // Kill any previous wakeup
+        if (_next_scheduler_wakeup_date.has_value()) {
+            _scheduler_wakeup_alarm->kill();
+            _scheduler_wakeup_alarm = nullptr;
+            _next_scheduler_wakeup_date.reset();
+        }
+
+        // Set up wakeup
+        _scheduler_wakeup_alarm = Alarm::createAndStartAlarm(this->simulation_, wakeup_date,
+                                                             _hostname, _commport,
+                                                             new ServerlessComputeServiceSchedulerWakeupMessage(),
+                                                             "scheduler_wakeup");
+        _next_scheduler_wakeup_date = wakeup_date;
     }
 
     /**
@@ -446,7 +468,6 @@ namespace wrench {
                             ServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             }
             return false;
-
         } else if (const auto scsfrr_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
             processFunctionRegistrationRequest(
@@ -468,7 +489,8 @@ namespace wrench {
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             processInvocationCompletion(scsiec_msg->_invocation, scsiec_msg->_action);
             return true;
-        } else if (const auto scscpc_msg= std::dynamic_pointer_cast<ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
+        } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
+            ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
             processPrewarmCompletion(scscpc_msg->_container);
             return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
@@ -537,6 +559,12 @@ namespace wrench {
 
             // Observational request: no scheduling round is needed.
             do_scheduling = false;
+            return true;
+        } else if (const auto scsswu_msg = std::dynamic_pointer_cast<
+            ServerlessComputeServiceSchedulerWakeupMessage>(message)) {
+            do_scheduling = true;
+            _scheduler_wakeup_alarm = nullptr;
+            _next_scheduler_wakeup_date.reset();
             return true;
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -1039,9 +1067,8 @@ namespace wrench {
      * @brief Method to shut everything down
      */
     void ServerlessComputeService::terminateAllServicesAndReleaseAllResources() {
-
         // Shutdown all containers (it doesn't actually kill the running functions, but who cares really)
-        for (auto const &node : _state_of_the_system->_compute_nodes) {
+        for (auto const& node : _state_of_the_system->_compute_nodes) {
             node->killAllContainers();
         }
 
@@ -1049,39 +1076,42 @@ namespace wrench {
         _state_of_the_system->_head_storage_service->stop();
 
         // Terminate all node storage services
-        for (auto const &node : _state_of_the_system->_compute_nodes) {
+        for (auto const& node : _state_of_the_system->_compute_nodes) {
             node->_disk->stop();
             node->_memory->stop();
         }
 
         // Send all failure notifications
-        for (auto &[image, q] : _state_of_the_system->_admitted_invocations) {
+        for (auto& [image, q] : _state_of_the_system->_admitted_invocations) {
             while (not q.empty()) {
                 const auto inv = q.front();
                 q.pop();
                 inv->_notify_commport->dputMessage(
+                    new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                        false,
+                        inv,
+                        std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()),
+                        this->getMessagePayloadValue(
+                            ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+            }
+        }
+        for (auto const& inv : _state_of_the_system->_schedulable_invocations) {
+            inv->_notify_commport->dputMessage(
                 new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                     false,
                     inv,
-                    std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()), this->getMessagePayloadValue(
+                    std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()),
+                    this->getMessagePayloadValue(
                         ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-            }
         }
-        for (auto const &inv : _state_of_the_system->_schedulable_invocations) {
+        for (auto const& inv : _state_of_the_system->_running_invocations) {
             inv->_notify_commport->dputMessage(
-            new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-                false,
-                inv,
-                std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()), this->getMessagePayloadValue(
-                    ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-        }
-        for (auto const &inv : _state_of_the_system->_running_invocations) {
-            inv->_notify_commport->dputMessage(
-            new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-                false,
-                inv,
-                std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()), this->getMessagePayloadValue(
-                    ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+                new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                    false,
+                    inv,
+                    std::make_shared<ServiceIsDown>(this->getSharedPtr<ServerlessComputeService>()),
+                    this->getMessagePayloadValue(
+                        ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
         }
 
         _state_of_the_system->_admitted_invocations.clear();
@@ -1530,28 +1560,32 @@ namespace wrench {
      * @param compute_node the compute node
      * @param function the function for which a container should be prewarmed
      */
-    void ServerlessComputeService::prewarmContainerAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
-                                                                 const std::shared_ptr<Function>& function) {
+    void ServerlessComputeService::prewarmContainerAtComputeNode(
+        const std::shared_ptr<ServerlessComputeNode>& compute_node,
+        const std::shared_ptr<Function>& function) {
         // TODO: to implement
 
         // Check that pre-warming can even do anything
         double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0.0) {
-            WRENCH_INFO("Ignoring container pre-warm scheduling decision because the CONTAINER_IDLE_TIMEOUT value is set to 0.0");
+            WRENCH_INFO(
+                "Ignoring container pre-warm scheduling decision because the CONTAINER_IDLE_TIMEOUT value is set to 0.0")
+;
             return;
         }
 
         // Check that there is one core available (which will be freed as soon as the container idles)
         if (compute_node->_available_cores == 0) {
-            WRENCH_INFO( "Couldn't pre-warm container for function %s at node %s because no core is available",
-                function->getName().c_str(), compute_node->hostname.c_str());
+            WRENCH_INFO("Couldn't pre-warm container for function %s at node %s because no core is available",
+                        function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
 
         // Check that all layers are in RAM
-        for (auto const &layer : function->getImage()->getLayers()) {
+        for (auto const& layer : function->getImage()->getLayers()) {
             if (!_state_of_the_system->isImageLayerInRAMAtNode(compute_node, layer)) {
-                WRENCH_INFO("Couldn't pre-warm container for function %s at node %s because image layer %s is not in RAM",
+                WRENCH_INFO(
+                    "Couldn't pre-warm container for function %s at node %s because image layer %s is not in RAM",
                     function->getName().c_str(), compute_node->hostname.c_str(), layer->getName().c_str());
                 return;
             }
@@ -1559,12 +1593,12 @@ namespace wrench {
         // Check that there is enough disk/RAM space to start the new container
         if (_state_of_the_system->getAvailableDiskSpace().at(compute_node) < function->getDiskSpaceLimit()) {
             WRENCH_INFO("Couldn't pre-warm container for function %s at node %s due to lack of available disk space",
-                function->getName().c_str(), compute_node->hostname.c_str());
+                        function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
         if (_state_of_the_system->getAvailableRAMSpace().at(compute_node) < function->getRAMSpaceLimit()) {
             WRENCH_INFO("Couldn't pre-warm container for function %s at node %s due to lack of available RAM space",
-                function->getName().c_str(), compute_node->hostname.c_str());
+                        function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
         // At this point, we can start the container
@@ -1583,7 +1617,8 @@ namespace wrench {
         compute_node->_available_cores -= 1;
 
         // Declare the function invocation's necessary lambdas
-        const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {};
+        const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {
+        };
 
         // Create the action and create a corresponding action executor
         auto action = std::shared_ptr<CustomAction>(
@@ -1611,6 +1646,5 @@ namespace wrench {
 
         WRENCH_INFO("Initiate a container pre-warm for function %s at node %s",
                     function->getName().c_str(), compute_node->hostname.c_str());
-
     }
 } // namespace wrench
