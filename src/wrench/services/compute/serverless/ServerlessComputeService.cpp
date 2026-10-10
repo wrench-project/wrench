@@ -7,6 +7,9 @@
  * (at your option) any later version.
  */
 
+#include <utility>
+#include <cmath>
+
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
 #include <wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h>
@@ -20,17 +23,14 @@
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/failure_causes/NotAllowed.h>
 #include <wrench/failure_causes/FunctionNotFound.h>
-
-#include <utility>
-
-#include "wrench/action/CustomAction.h"
-#include "wrench/failure_causes/NotEnoughResources.h"
-#include "wrench/failure_causes/ServiceIsDown.h"
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
-#include "wrench/services/helper_services/action_executor/ActionExecutor.h"
-#include "wrench/services/storage/simple/SimpleStorageService.h"
-#include "wrench/simulation/Simulation.h"
+#include <wrench/action/CustomAction.h>
+#include <wrench/failure_causes/NotEnoughResources.h>
+#include <wrench/failure_causes/ServiceIsDown.h>
+#include <wrench/services/ServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
+#include <wrench/services/storage/simple/SimpleStorageService.h>
+#include <wrench/simulation/Simulation.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
 
@@ -351,7 +351,7 @@ namespace wrench {
         // Start a storage service on each compute node.
         startComputeNodeServices();
 
-        bool do_scheduling;
+        bool do_scheduling = true;
         do {
             // At each compute node, if an image layer is in RAM but not on Disk, due to what we did in the previous
             // scheduling decisions, remove it from RAM (to be realistic).
