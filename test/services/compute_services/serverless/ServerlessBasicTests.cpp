@@ -1093,9 +1093,15 @@ private:
             function_manager->invokeFunction(registered_function1, this->compute_service, input);
             throw std::runtime_error("The fourth invocation should have been rejected");
         } catch (wrench::ExecutionException& e) {
-
+            if (!std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
+                throw std::runtime_error("The execution exception doesn't have the correct error cause");
+            }
         }
         function_manager->wait_all({invocation1, invocation2, invocation3});
+        auto invocation4 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+        function_manager->wait_one(invocation4);
+
+
 
         return 0;
     }
