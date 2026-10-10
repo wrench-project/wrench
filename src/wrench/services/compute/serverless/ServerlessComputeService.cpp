@@ -352,7 +352,7 @@ namespace wrench {
         startComputeNodeServices();
 
         bool do_scheduling;
-        while (processNextMessage(do_scheduling)) {
+        do {
             // At each compute node, if an image layer is in RAM but not on Disk, due to what we did in the previous
             // scheduling decisions, remove it from RAM (to be realistic).
             // This is a hack, but, as of now, there is no way to "tie" two files together. This
@@ -402,18 +402,22 @@ namespace wrench {
                 }
                 do_scheduling = false;
             }
-        }
+        } while (processNextMessage(do_scheduling));
 
         return 0;
     }
 
     void ServerlessComputeService::setNextSchedulerWakeup(double wakeup_date) {
+        const double now = S4U_Simulation::getClock();
+
         // Ignore wakeup_date in the past
-        if (wakeup_date < S4U_Simulation::getClock()) {
+        if (!std::isfinite(wakeup_date) || wakeup_date <= now) {
+            WRENCH_INFO("Ignoring serverless scheduler wakeup date in the past");
             return;
         }
         // If previous wakeup exists and will occur sooner, do nothing
-        if (_next_scheduler_wakeup_date.has_value() and _next_scheduler_wakeup_date.value() < wakeup_date) {
+        if (_next_scheduler_wakeup_date.has_value() and _next_scheduler_wakeup_date.value() <= wakeup_date) {
+            WRENCH_INFO("Ignoring serverless scheduler wakeup date later than the current wakeup date");
             return;
         }
 
@@ -1078,7 +1082,16 @@ namespace wrench {
         // Terminate all node storage services
         for (auto const& node : _state_of_the_system->_compute_nodes) {
             node->_disk->stop();
+            node->_disk.reset();
             node->_memory->stop();
+            node->_memory.reset();
+        }
+
+        // Terminate the scheduler wakeup alarm if any
+        if (_scheduler_wakeup_alarm) {
+            _scheduler_wakeup_alarm->kill();
+            _scheduler_wakeup_alarm.reset();;
+            _next_scheduler_wakeup_date.reset();
         }
 
         // Send all failure notifications
