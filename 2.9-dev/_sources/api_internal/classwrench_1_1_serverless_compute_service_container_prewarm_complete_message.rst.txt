@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceContainerPrewarmCompleteMessage:
+wrench::ServerlessComputeServiceContainerPrewarmCompleteMessage
+***************************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceContainerPrewarmCompleteMessage
+   :project: internal
+   :members:
+

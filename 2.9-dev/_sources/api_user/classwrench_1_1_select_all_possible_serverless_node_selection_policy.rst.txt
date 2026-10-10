@@ -1,0 +1,8 @@
+.. _SelectAllPossibleServerlessNodeSelectionPolicy:
+wrench::SelectAllPossibleServerlessNodeSelectionPolicy
+******************************************************
+
+.. doxygenclass:: wrench::SelectAllPossibleServerlessNodeSelectionPolicy
+   :project: user
+   :members:
+
