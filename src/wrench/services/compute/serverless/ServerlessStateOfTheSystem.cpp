@@ -14,6 +14,7 @@
 #include "wrench/simgrid_S4U_util//S4U_Simulation.h"
 
 #include <utility>
+#include <numeric>
 
 WRENCH_LOG_CATEGORY(wrench_core_serverless_state_of_the_system, "Log category for Serverless State of the System");
 

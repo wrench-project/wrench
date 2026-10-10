@@ -94,8 +94,10 @@ namespace wrench {
         this->setProperties(this->default_property_values, property_list);
 
         // Deal with the 0-value default number of slots
-        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE) == 0) {
-            this->setProperty(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, std::to_string(_compute_node_num_cores));
+        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE)
+            == 0) {
+            this->setProperty(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE,
+                              std::to_string(_compute_node_num_cores));
         }
 
         // Create the state of the system object
@@ -234,7 +236,9 @@ namespace wrench {
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 unsigned long num_used_slots = compute_node->getNumSlots() - compute_node->getNumFreeSlots();
-                unsigned long count = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
+                unsigned long count = (num_used_slots < _compute_node_num_cores
+                                           ? _compute_node_num_cores - num_used_slots
+                                           : 0);
                 num_idle_cores[compute_node->hostname] = static_cast<double>(count);
             }
             return num_idle_cores;
@@ -555,7 +559,9 @@ namespace wrench {
             for (const auto& node : _state_of_the_system->_compute_nodes) {
                 // Both requirements must be satisfied on the same node.
                 unsigned long num_used_slots = node->getNumSlots() - node->getNumFreeSlots();
-                unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
+                unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores
+                                                    ? _compute_node_num_cores - num_used_slots
+                                                    : 0);
                 if (num_idle_cores >= csitalohwarr_msg->num_cores &&
                     node->_memory->getTotalFreeSpaceZeroTime() >= csitalohwarr_msg->ram) {
                     has_available_resources = true;
@@ -700,8 +706,23 @@ namespace wrench {
         const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
 
+        // Apply the overhead
+        S4U_Simulation::sleep(
+            this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
+
+        // If the function is not registered, answer with some error
+        if (_state_of_the_system->_functions.find(function) == _state_of_the_system->_functions.end()) {
+            // Not found
+            const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+                false, nullptr, std::make_shared<FunctionNotFound>(function), this->getMessagePayloadValue(
+                    ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
+            answer_commport->dputMessage(answerMessage);
+            return;
+        }
+
         // Reject the invocation if too many outstanding requests
-        auto max_outstanding = this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS);
+        auto max_outstanding = this->getPropertyValueAsUnsignedLong(
+            ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS);
         if (_state_of_the_system->getNumOutstandingInvocations() >= max_outstanding) {
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 false, nullptr, std::make_shared<NotAllowed>(
@@ -712,37 +733,22 @@ namespace wrench {
             return;
         }
 
+        // Put the invocation in the right list
+        auto invocation = std::make_shared<Invocation>(function, input, notify_commport);
+        invocation->_submit_date = Simulation::getCurrentSimulatedDate();
 
-        // Apply the overhead
-        S4U_Simulation::sleep(
-            this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
-
-        // If the function is not registered, answer with some error
-        if (_state_of_the_system->_functions.find(function) ==
-            _state_of_the_system->_functions.end()) {
-            // Not found
-            const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                false, nullptr, std::make_shared<FunctionNotFound>(function), this->getMessagePayloadValue(
-                    ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
-            answer_commport->dputMessage(answerMessage);
+        if (this->isInvocationSchedulable(invocation)) {
+            _state_of_the_system->_schedulable_invocations.push_back(invocation);
+        } else if (this->isInvocationAdmittable(invocation)) {
+            _state_of_the_system->_admitted_invocations[function->getImage()].push(invocation);
         } else {
-            // Put the invocation in the right list
-            auto invocation = std::make_shared<Invocation>(function, input, notify_commport);
-            invocation->_submit_date = Simulation::getCurrentSimulatedDate();
-
-            if (this->isInvocationSchedulable(invocation)) {
-                _state_of_the_system->_schedulable_invocations.push_back(invocation);
-            } else if (this->isInvocationAdmittable(invocation)) {
-                _state_of_the_system->_admitted_invocations[function->getImage()].push(invocation);
-            } else {
-                _state_of_the_system->_new_invocations.push(invocation);
-            }
-
-            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                true, invocation, nullptr, this->getMessagePayloadValue(
-                    ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
-            answer_commport->dputMessage(answerMessage);
+            _state_of_the_system->_new_invocations.push(invocation);
         }
+
+        auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+            true, invocation, nullptr, this->getMessagePayloadValue(
+                ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
+        answer_commport->dputMessage(answerMessage);
     }
 
     /**
