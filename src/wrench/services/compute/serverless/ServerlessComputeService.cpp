@@ -823,7 +823,7 @@ namespace wrench {
                     (failure_cause ? "FAILURE" : "SUCCESS"));
 
         auto compute_node = invocation->_compute_node;
-        // Free up the core
+        // Free up the slot
         compute_node->_num_free_slots++;
 
         // Make container idle
@@ -867,7 +867,7 @@ namespace wrench {
         WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
 
         auto compute_node = container->getComputeNode();
-        // Free up the core
+        // Free up the slot
         compute_node->_num_free_slots++;
 
         // Make container idle
@@ -1005,7 +1005,7 @@ namespace wrench {
         invocation->_dispatch_date = Simulation::getCurrentSimulatedDate();
         invocation->_dispatched = true;
 
-        // Update the core count of the compute node
+        // Update the slot count of the compute node
         target_compute_node->_num_free_slots -= 1;
 
         // Make the container busy if it was idling
@@ -1596,7 +1596,7 @@ namespace wrench {
             return;
         }
 
-        // Check that there is one core available (which will be freed as soon as the container idles)
+        // Check that there is one slot available (which will be freed as soon as the container idles)
         if (compute_node->_num_free_slots == 0) {
             WRENCH_INFO("Couldn't pre-warm container for function %s at node %s because no slot is available",
                         function->getName().c_str(), compute_node->hostname.c_str());

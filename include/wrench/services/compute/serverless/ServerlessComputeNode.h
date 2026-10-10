@@ -79,8 +79,8 @@ namespace wrench {
 
         ServerlessComputeService* _serverless_compute_service;
 
-        unsigned int _num_slots;
-        unsigned int _num_free_slots;
+        unsigned long _num_slots;
+        unsigned long _num_free_slots;
 
         std::shared_ptr<SimpleStorageService> _disk;
         std::shared_ptr<SimpleStorageService> _memory;
