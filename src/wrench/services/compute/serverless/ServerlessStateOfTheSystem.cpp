@@ -29,9 +29,10 @@ namespace wrench {
           _free_space_on_head_storage(0),
           _serverless_compute_service(service) {
         for (const auto& hostname : compute_hosts) {
-            auto num_cores = S4U_Simulation::getHostNumCores(hostname);
+            auto num_slots = service->getPropertyValueAsUnsignedLong(
+                ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE);
             auto compute_node = std::make_shared<
-                ServerlessComputeNode>(hostname, num_cores, service);
+                ServerlessComputeNode>(hostname, num_slots, service);
             _compute_nodes.push_back(compute_node);
             _image_layers_in_ram[compute_node] = {};
             _image_layers_being_loaded_in_ram[compute_node] = {};
@@ -49,15 +50,15 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter for the map of available cores
+     * @brief Getter for the map of available slots
      *
-     * @return The core availability map
+     * @return The free slot availability map
      */
-    std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int>
-    ServerlessStateOfTheSystem::getAvailableCores() const {
-        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> to_return;
+    std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long>
+    ServerlessStateOfTheSystem::getNumFreeSlots() const {
+        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> to_return;
         for (const auto& compute_node : _compute_nodes) {
-            to_return[compute_node] = compute_node->getNumIdleCores();
+            to_return[compute_node] = compute_node->getNumFreeSlots();
         }
         return to_return;
     }

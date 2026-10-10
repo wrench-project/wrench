@@ -23,6 +23,12 @@ namespace wrench {
     class ServerlessComputeServiceProperty : public ComputeServiceProperty {
 
     public:
+
+        /** @brief The maximum number of containers that can be started/running per compute node
+         * (default value: same as number of cores per compute node)
+         **/
+        DECLARE_PROPERTY_NAME(NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE);
+
         /** @brief The overhead for the compute service to process an incoming request (default value: "0", default unit: seconds):
          *         Examples: "5", "5s", "5000ms", etc.
          **/

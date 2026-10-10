@@ -36,19 +36,19 @@ namespace wrench
 
     public:
         [[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>> getComputeNodes() const;
-        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> getAvailableCores() const;
+        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> getNumFreeSlots() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
         [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
         [[nodiscard]] bool isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
         [[nodiscard]] bool isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>&layer) const;
-        std::set<std::shared_ptr<ImageLayer>> getImageLayersOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
 
         [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
         [[nodiscard]] bool isImageLayerInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
         [[nodiscard]] bool isImageLayerBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
-        std::set<std::shared_ptr<ImageLayer>> getImageLayersInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
 
 
         ~ServerlessStateOfTheSystem() = default;

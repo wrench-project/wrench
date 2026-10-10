@@ -39,15 +39,15 @@ namespace wrench {
      */
     class ServerlessComputeNode {
     public:
-        ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService* service);
+        ServerlessComputeNode(std::string h, unsigned long num_slots, ServerlessComputeService* service);
 
         std::shared_ptr<Container> spawnContainer(const Function* function, bool prewarm);
         void makeContainerIdle(const std::shared_ptr<Container>& container);
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
-        [[nodiscard]] unsigned int getNumCores() const;
-        [[nodiscard]] unsigned int getNumIdleCores() const;
+        [[nodiscard]] unsigned long getNumSlots() const;
+        [[nodiscard]] unsigned long getNumFreeSlots() const;
         [[nodiscard]] sg_size_t getFreeDiskSpace() const;
         [[nodiscard]] sg_size_t getFreeRAMSpace() const;
 
@@ -79,8 +79,8 @@ namespace wrench {
 
         ServerlessComputeService* _serverless_compute_service;
 
-        unsigned int _total_cores;
-        unsigned int _available_cores;
+        unsigned long _num_slots;
+        unsigned long _num_free_slots;
 
         std::shared_ptr<SimpleStorageService> _disk;
         std::shared_ptr<SimpleStorageService> _memory;

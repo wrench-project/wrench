@@ -20,7 +20,7 @@ namespace wrench {
         const std::vector<std::shared_ptr<Invocation>>&schedulable_invocations) {
 
         _compute_nodes = state->getComputeNodes();
-        _cores_available = state->getAvailableCores();
+        _slots_available = state->getNumFreeSlots();
         _ram_available = state->getAvailableRAMSpace();
         _disk_available = state->getAvailableDiskSpace();
 
