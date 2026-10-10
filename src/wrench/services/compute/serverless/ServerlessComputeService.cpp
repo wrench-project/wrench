@@ -234,13 +234,7 @@ namespace wrench {
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 unsigned long num_used_slots = compute_node->getNumSlots() - compute_node->getNumFreeSlots();
-<<<<<<< HEAD
-                unsigned long count = (num_used_slots < _compute_node_num_cores
-                                           ? _compute_node_num_cores - num_used_slots
-                                           : 0);
-=======
                 unsigned long count = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
->>>>>>> master
                 num_idle_cores[compute_node->hostname] = static_cast<double>(count);
             }
             return num_idle_cores;
@@ -561,13 +555,7 @@ namespace wrench {
             for (const auto& node : _state_of_the_system->_compute_nodes) {
                 // Both requirements must be satisfied on the same node.
                 unsigned long num_used_slots = node->getNumSlots() - node->getNumFreeSlots();
-<<<<<<< HEAD
-                unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores
-                                                    ? _compute_node_num_cores - num_used_slots
-                                                    : 0);
-=======
                 unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
->>>>>>> master
                 if (num_idle_cores >= csitalohwarr_msg->num_cores &&
                     node->_memory->getTotalFreeSpaceZeroTime() >= csitalohwarr_msg->ram) {
                     has_available_resources = true;
