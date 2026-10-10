@@ -396,6 +396,14 @@ namespace wrench {
                 // Prewarm containers if any
                 prewarmContainers(decisions->container_prewarms);
 
+                // Setup scheduler wake-up, if any
+                if (decisions->scheduler_wakeup_date.has_value() and decisions->scheduler_wakeup_date.value() > S4U_Simulation::getClock()) {
+                    std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
+                        this->simulation_, decisions->scheduler_wakeup_date.value(),
+                        _hostname, _commport, new  ServerlessComputeServiceSchedulerWakeupMessage(),
+                        "scheduler_wakeup");
+                }
+
                 do_scheduling = false;
             }
         }

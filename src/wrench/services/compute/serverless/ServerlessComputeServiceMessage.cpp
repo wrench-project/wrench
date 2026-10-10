@@ -199,4 +199,10 @@ namespace wrench
     ServerlessComputeServiceContainerPrewarmCompleteMessage::ServerlessComputeServiceContainerPrewarmCompleteMessage(
         std::shared_ptr<Container> container) : ServerlessComputeServiceMessage(0), _container(std::move(container)) {}
 
+    /**
+     * @brief Constructor
+     */
+    ServerlessComputeServiceSchedulerWakeupMessage::ServerlessComputeServiceSchedulerWakeupMessage() : ServerlessComputeServiceMessage(0) {
+    }
+
 } // namespace wrench

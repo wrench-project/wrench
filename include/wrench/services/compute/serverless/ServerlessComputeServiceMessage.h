@@ -226,6 +226,11 @@ namespace wrench {
         std::shared_ptr<Container> _container;
     };
 
+    class ServerlessComputeServiceSchedulerWakeupMessage : public ServerlessComputeServiceMessage {
+        public:
+             ServerlessComputeServiceSchedulerWakeupMessage();
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

@@ -148,6 +148,9 @@ namespace wrench {
         /** @brief The list of container prewarms at compute nodes */
         std::vector<PrewarmContainer> container_prewarms;
 
+        /** @brief The (optional) next scheduler wake-up time */
+        std::optional<double> scheduler_wakeup_date;
+
         /**
          * @brief Method to print scheduling decisions
          */
