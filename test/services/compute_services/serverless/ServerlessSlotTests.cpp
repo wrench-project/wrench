@@ -192,7 +192,7 @@ private:
         for (int i = 0; i < 4; i++) {
             if (std::abs(elapsed[i] - expected_elapsed[i]) > 10.0E-6) {
                 throw std::runtime_error("The " + std::to_string(i+2) + "-th invocation should have taken exactly " +
-                                       std::to_string(expected_elapsed[i]) + " seconds (it took " + std::to_string(expected_elapsed[i]) + ")");
+                                       std::to_string(expected_elapsed[i]) + " seconds (it took " + std::to_string(elapsed[i]) + ")");
             }
         }
 

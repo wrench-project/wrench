@@ -42,6 +42,7 @@ public:
     void do_PreRegisteredFunctionInvocationTest_test();
     void do_FunctionTimeoutTest_test();
     void do_FunctionErrorTest_test();
+    void do_TooManyOutstandingTest_test();
 
 protected:
     ~ServerlessBasicTest() override {
@@ -1023,6 +1024,114 @@ void ServerlessBasicTest::do_FunctionErrorTest_test() {
     auto wms = simulation->add(
         new ServerlessBasicTestFunctionErrorController(this, user_host, serverless_provider, other_serverless_provider,
                                                        storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/** TOO MANY OUTSTANDING TEST                                        **/
+/**********************************************************************/
+
+class ServerlessBasicTestTooManyOutstandingController : public wrench::ExecutionController {
+public:
+    ServerlessBasicTestTooManyOutstandingController(ServerlessBasicTest* test,
+                                               const std::string& hostname,
+                                               const std::shared_ptr<wrench::ServerlessComputeService>& compute_service,
+                                               const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessBasicTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+    std::shared_ptr<wrench::DataFile> data_file;
+
+    int main() override {
+        // Create a datafile that's nowhere
+        this->data_file = wrench::Simulation::addFile("data_file", 100 * MB);
+
+        auto function_manager = this->createFunctionManager();
+
+        // Create a layer
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_image", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
+
+
+        // Create a function code
+        const std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                      const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(10);
+            return std::make_shared<
+                MyFunctionOutput>("Processed: " + std::to_string(real_input->x1_ + real_input->x2_));
+        };
+
+        // Registering a function with one of the two compute services
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image,
+                                                                       this->compute_service, 10, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
+
+        // Place four invocation, the third one should be rejected
+        auto invocation1 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+        auto invocation2 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+        auto invocation3 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+        try {
+            function_manager->invokeFunction(registered_function1, this->compute_service, input);
+            throw std::runtime_error("The fourth invocation should have been rejected");
+        } catch (wrench::ExecutionException& e) {
+
+        }
+        function_manager->wait_all({invocation1, invocation2, invocation3});
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessBasicTest, TooManyOutstanding) {
+    DO_TEST_WITH_FORK(do_TooManyOutstandingTest_test);
+}
+
+void ServerlessBasicTest::do_TooManyOutstandingTest_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
+            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
+            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
+            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
+            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+            {{wrench::ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "3"}},
+            {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessBasicTestTooManyOutstandingController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 

@@ -699,6 +699,20 @@ namespace wrench {
         const std::shared_ptr<Function>& function,
         const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
+
+        // Reject the invocation if too many outstanding requests
+        auto max_outstanding = this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS);
+        if (_state_of_the_system->getNumOutstandingInvocations() >= max_outstanding) {
+            const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+                false, nullptr, std::make_shared<NotAllowed>(
+                    this->getSharedPtr<ServerlessComputeService>(),
+                    "Too many outstanding invocations"), this->getMessagePayloadValue(
+                    ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
+            answer_commport->dputMessage(answerMessage);
+            return;
+        }
+
+
         // Apply the overhead
         S4U_Simulation::sleep(
             this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
