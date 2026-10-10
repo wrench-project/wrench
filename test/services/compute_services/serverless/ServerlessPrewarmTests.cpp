@@ -118,23 +118,23 @@ protected:
             auto compute_node = state->getComputeNodes().front();
 
             switch (called) {
-            case 3:
+            case 4:
                 decisions->image_layer_copies_to_disk.push_back({layer, compute_node});
                 break;
-            case 4:
+            case 5:
                 decisions->image_layer_loads_to_RAM.push_back({layer, compute_node});
                 break;
-            case 5:
+            case 6:
                 decisions->invocation_dispatches.push_back({inv, compute_node});
                 break;
-            case 6:
-                break;
             case 7:
-                decisions->container_prewarms.push_back({function, compute_node});
                 break;
             case 8:
+                decisions->container_prewarms.push_back({function, compute_node});
                 break;
             case 9:
+                break;
+            case 10:
                 container = *(state->getComputeNodes().front()->getIdleContainers().begin());
                 decisions->invocation_dispatches.push_back({inv, compute_node, container});
                 break;
