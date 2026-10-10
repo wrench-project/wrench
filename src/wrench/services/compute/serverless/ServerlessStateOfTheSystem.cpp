@@ -14,6 +14,7 @@
 #include "wrench/simgrid_S4U_util//S4U_Simulation.h"
 
 #include <utility>
+#include <numeric>
 
 WRENCH_LOG_CATEGORY(wrench_core_serverless_state_of_the_system, "Log category for Serverless State of the System");
 
@@ -188,4 +189,17 @@ namespace wrench {
         return _image_layers_in_ram.at(node);
     }
 
+    /**
+     * @brief Get the current number of outstanding invocations
+     * @return
+     */
+    unsigned long ServerlessStateOfTheSystem::getNumOutstandingInvocations() const {
+        unsigned long count = 0;
+        count += _new_invocations.size();
+        count += std::accumulate(_admitted_invocations.begin(), _admitted_invocations.end(),
+            std::size_t{0}, [](std::size_t total, const auto& entry) { return total + entry.second.size(); });
+        count += _schedulable_invocations.size();
+        count += _running_invocations.size();
+        return count;
+    }
 } // namespace wrench

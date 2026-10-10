@@ -699,36 +699,50 @@ namespace wrench {
         const std::shared_ptr<Function>& function,
         const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
+
         // Apply the overhead
         S4U_Simulation::sleep(
             this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
 
         // If the function is not registered, answer with some error
-        if (_state_of_the_system->_functions.find(function) ==
-            _state_of_the_system->_functions.end()) {
+        if (_state_of_the_system->_functions.find(function) == _state_of_the_system->_functions.end()) {
             // Not found
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 false, nullptr, std::make_shared<FunctionNotFound>(function), this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answerMessage);
-        } else {
-            // Put the invocation in the right list
-            auto invocation = std::make_shared<Invocation>(function, input, notify_commport);
-            invocation->_submit_date = Simulation::getCurrentSimulatedDate();
+            return;
+        }
 
-            if (this->isInvocationSchedulable(invocation)) {
-                _state_of_the_system->_schedulable_invocations.push_back(invocation);
-            } else if (this->isInvocationAdmittable(invocation)) {
-                _state_of_the_system->_admitted_invocations[function->getImage()].push(invocation);
-            } else {
-                _state_of_the_system->_new_invocations.push(invocation);
-            }
-
-            auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
-                true, invocation, nullptr, this->getMessagePayloadValue(
+        // Reject the invocation if too many outstanding requests
+        auto max_outstanding = this->getPropertyValueAsUnsignedLong(
+            ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS);
+        if (_state_of_the_system->getNumOutstandingInvocations() >= max_outstanding) {
+            const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+                false, nullptr, std::make_shared<NotAllowed>(
+                    this->getSharedPtr<ServerlessComputeService>(),
+                    "Too many outstanding invocations"), this->getMessagePayloadValue(
                     ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answerMessage);
+            return;
         }
+
+        // Put the invocation in the right list
+        auto invocation = std::make_shared<Invocation>(function, input, notify_commport);
+        invocation->_submit_date = Simulation::getCurrentSimulatedDate();
+
+        if (this->isInvocationSchedulable(invocation)) {
+            _state_of_the_system->_schedulable_invocations.push_back(invocation);
+        } else if (this->isInvocationAdmittable(invocation)) {
+            _state_of_the_system->_admitted_invocations[function->getImage()].push(invocation);
+        } else {
+            _state_of_the_system->_new_invocations.push(invocation);
+        }
+
+        auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
+            true, invocation, nullptr, this->getMessagePayloadValue(
+                ServerlessComputeServiceMessagePayload::FUNCTION_INVOKE_ANSWER_MESSAGE_PAYLOAD));
+        answer_commport->dputMessage(answerMessage);
     }
 
     /**

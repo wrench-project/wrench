@@ -28,6 +28,7 @@ namespace wrench {
     class ServerlessComputeService : public ComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+            {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "infinity"},
             {ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "0"},
             {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
@@ -217,7 +218,6 @@ namespace wrench {
         void terminateAllServicesAndReleaseAllResources();
 
         void setNextSchedulerWakeup(double wakeup_date);
-
 
         unsigned long _compute_node_num_cores;
         double _compute_node_core_speed;
