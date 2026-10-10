@@ -20,6 +20,7 @@
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/SelectAllPossibleServerlessNodeSelectionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
@@ -290,7 +291,11 @@ void ServerlessMultiLayerTest::do_FunctionInvocationTest_test() {
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", "/", compute_nodes,
-        std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0), std::make_shared<wrench::FewestServerlessEvictionPolicy>(), std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+        std::make_shared<wrench::GreedyServerlessScheduler>(
+            std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0),
+            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
+            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
+            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(

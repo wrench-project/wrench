@@ -41,7 +41,7 @@ namespace wrench {
     public:
         ServerlessComputeNode(std::string h, unsigned int num_cores, ServerlessComputeService* service);
 
-        std::shared_ptr<Container> spawnContainer(const Function* function);
+        std::shared_ptr<Container> spawnContainer(const Function* function, bool prewarm);
         void makeContainerIdle(const std::shared_ptr<Container>& container);
         void makeContainerBusy(const std::shared_ptr<Container>& container);
         void shutdownContainer(const std::shared_ptr<Container>& container);
@@ -56,6 +56,7 @@ namespace wrench {
             const std::set<std::shared_ptr<Container>>& excluded_container) const;
         [[nodiscard]] std::set<std::shared_ptr<Container>>& getIdleContainers();
         [[nodiscard]] std::set<std::shared_ptr<Container>>& getBusyContainers();
+        [[nodiscard]] std::set<std::shared_ptr<Container>>& getPrewarmingContainers();
 
         [[nodiscard]] bool isImageLayerOnDisk(const std::shared_ptr<ImageLayer>& layer) const;
 
@@ -85,6 +86,7 @@ namespace wrench {
         std::shared_ptr<SimpleStorageService> _memory;
 
         std::set<std::shared_ptr<Container>> _busy_containers;
+        std::set<std::shared_ptr<Container>> _prewarming_containers;
         std::set<std::shared_ptr<Container>> _idle_containers;
 
          void killAllContainers();

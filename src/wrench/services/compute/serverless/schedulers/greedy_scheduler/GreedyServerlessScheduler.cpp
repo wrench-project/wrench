@@ -179,17 +179,20 @@ namespace wrench {
      */
     GreedyServerlessScheduler::GreedyServerlessScheduler(
             std::shared_ptr<ServerlessInvocationOrderingPolicy> invocation_ordering,
+            std::shared_ptr<ServerlessNodeSelectionPolicy> node_selection,
             std::shared_ptr<ServerlessEvictionPolicy> eviction,
             std::shared_ptr<ServerlessPlanSelectionPolicy> plan_selection) :
                   _invocation_ordering_policy(std::move(invocation_ordering)),
+                  _node_selection_policy(std::move(node_selection)),
                   _eviction_policy(std::move(eviction)),
                   _plan_selection_policy(std::move(plan_selection)) {
 
         if (!_invocation_ordering_policy ||
+            !_node_selection_policy ||
             !_eviction_policy ||
             !_plan_selection_policy) {
             throw std::invalid_argument(
-                "GreedyServerlessScheduler requires three non-null policies");
+                "GreedyServerlessScheduler requires non-null policies");
             }
     }
 
@@ -199,6 +202,14 @@ namespace wrench {
      */
     ServerlessInvocationOrderingPolicy* GreedyServerlessScheduler::getInvocationOrderingPolicy() const {
         return _invocation_ordering_policy.get();
+    }
+
+    /**
+     * @brief Get the schedule's node selection policy
+     * @return the policy
+     */
+    ServerlessNodeSelectionPolicy* GreedyServerlessScheduler::getNodeSelectionPolicy() const {
+        return _node_selection_policy.get();
     }
 
     /**
@@ -362,19 +373,22 @@ namespace wrench {
         const std::shared_ptr<Invocation>& inv) {
         std::shared_ptr<ServerlessComputeNode> picked_node;
 
-        /* First, filter out all compute nodes that have no available cores, to preserve some efficiency */
-        std::vector<std::shared_ptr<ServerlessComputeNode>> not_fully_busy_compute_nodes;
-        for (auto const& node : scheduling_state->_compute_nodes) {
-            if (scheduling_state->_cores_available.at(node) > 0) {
-                not_fully_busy_compute_nodes.push_back(node);
+        /* Invoke the node selection policy */
+        auto selected_nodes = _node_selection_policy->selectCandidateNodes(scheduling_state, inv);
+
+        /* Filter out all compute nodes that have no available cores, just in case the node
+         * selection policy didn't! (and preserve an deterministic order) */
+        std::vector<std::shared_ptr<ServerlessComputeNode>> candidate_nodes;
+        for (const auto& node : scheduling_state->_compute_nodes) {
+            if (selected_nodes.count(node) && scheduling_state->_cores_available.at(node) > 0) {
+                candidate_nodes.push_back(node);
             }
         }
-
 
         /* Go through the compute node in multiple passes, each time lowering "standards" */
 
         // Pass #1: Can we reuse an existing idle container?
-        for (auto const& node : not_fully_busy_compute_nodes) {
+        for (auto const& node : candidate_nodes) {
             for (auto const& idle_container : scheduling_state->_idle_containers.at(node)) {
                 if (idle_container->getFunction() == inv->getFunction().get()) {
                     auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
@@ -389,7 +403,7 @@ namespace wrench {
         // Pass #2: Can we start a new container (with some desirable eviction actions)
         std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>
             invocation_plan;
-        for (auto const& node : not_fully_busy_compute_nodes) {
+        for (auto const& node : candidate_nodes) {
             if (not scheduling_state->areAllImageLayersOnDisk(image, node)) continue;
             if (not scheduling_state->areAllImageLayersInRAM(image, node)) continue;
 
@@ -422,7 +436,7 @@ namespace wrench {
         /* At this point, we cannot start a container right now, even with evictions, but we can look at loading layers in RAM */
 
         // Pass #3: Are all layers on their way to RAM, then optimistically reserve a core that should be used in the next round */
-        for (auto const& node : not_fully_busy_compute_nodes) {
+        for (auto const& node : candidate_nodes) {
             const bool waiting_for_ram =
                 not scheduling_state->areAllImageLayersInRAM(image, node) &&
                 scheduling_state->areAllImageLayersInRAMOrOnTheirWayToRAM(image, node);
@@ -432,7 +446,7 @@ namespace wrench {
 
         // Pass #4: Can we just trigger ALL necessary layer loads (with some desirable eviction actions)
         std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>> load_plan;
-        for (auto const& node : not_fully_busy_compute_nodes) {
+        for (auto const& node : candidate_nodes) {
             if (not scheduling_state->areAllImageLayersOnDisk(image, node)) continue;
 
             auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
@@ -470,7 +484,7 @@ namespace wrench {
         /* At this point, we cannot trigger a layer load, so perhaps look at disk copies */
 
         // Pass #5: Are all layers on their way to disk, then reserve a core that should be used in the next round */
-        for (auto const& node : not_fully_busy_compute_nodes) {
+        for (auto const& node : candidate_nodes) {
             const bool waiting_for_disk =
                 not scheduling_state->areAllImageLayersOnDisk(image, node) &&
                 scheduling_state->areAllImageLayersOnDiskOrOnTheirWayToDisk(image, node);
@@ -484,7 +498,7 @@ namespace wrench {
 
         // Pass 6: Can we just trigger ALL layer copies (with some desirable eviction actions)
         std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>> copy_plan;
-        for (auto const& node : not_fully_busy_compute_nodes) {
+        for (auto const& node : candidate_nodes) {
             if (scheduling_state->areAllImageLayersOnDisk(image, node)) continue;
 
             auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
@@ -637,6 +651,19 @@ namespace wrench {
                     continue;
                 }
 
+                // Perhaps it's being used by a pre-warming container?
+                is_victim_layer_evictable = true;
+                for (auto& container : scheduling_state->_prewarming_containers.at(node)) {
+                    // If the container uses the layer, then the layer cannot be evicted
+                    if (container->getFunction()->getImage()->getLayers().count(candidate)) {
+                        is_victim_layer_evictable = false;
+                        break;
+                    }
+                }
+                if (not is_victim_layer_evictable) {
+                    continue;
+                }
+
                 candidate_victims.insert(candidate);
             }
 
@@ -705,6 +732,19 @@ namespace wrench {
                 // Perhaps it's being used by a busy container that's not marked for eviction?
                 is_victim_layer_evictable = true;
                 for (auto& container : scheduling_state->_busy_containers.at(node)) {
+                    // If the container uses the layer, then the layer cannot be evicted
+                    if (container->getFunction()->getImage()->getLayers().count(candidate)) {
+                        is_victim_layer_evictable = false;
+                        break;
+                    }
+                }
+                if (not is_victim_layer_evictable) {
+                    continue;
+                }
+
+                // Perhaps it's being used by a pre-warming container?
+                is_victim_layer_evictable = true;
+                for (auto& container : scheduling_state->_prewarming_containers.at(node)) {
                     // If the container uses the layer, then the layer cannot be evicted
                     if (container->getFunction()->getImage()->getLayers().count(candidate)) {
                         is_victim_layer_evictable = false;

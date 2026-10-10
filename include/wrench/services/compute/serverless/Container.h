@@ -38,11 +38,13 @@ namespace wrench {
         enum class State {
             BUSY,
             IDLE,
+            PREWARMING
         };
 
         [[nodiscard]] unsigned long getCreationId() const;
         [[nodiscard]] bool isIdle() const;
         [[nodiscard]] bool isBusy() const;
+        [[nodiscard]] bool isPrewarming() const;
         [[nodiscard]] unsigned long getIdleSequence() const;
         [[nodiscard]] double getIdleDate() const;
         [[nodiscard]] const Function *getFunction() const;

@@ -47,6 +47,9 @@ namespace wrench {
         /** @brief Map of running containers */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _busy_containers;
 
+    	/** @brief Map of pre-warming containers */
+    	std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _prewarming_containers;
+
 	    /** @brief Map of on-disk image layers */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_disk;
 	    /** @brief Map of soon-to-be-on-disk image layers */

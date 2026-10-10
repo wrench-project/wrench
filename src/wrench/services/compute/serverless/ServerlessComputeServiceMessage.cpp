@@ -192,4 +192,11 @@ namespace wrench
     ServerlessComputeServiceContainerIdleTimeoutMessage::ServerlessComputeServiceContainerIdleTimeoutMessage(
         std::shared_ptr<Container> container, const std::uint64_t idle_sequence) : ServerlessComputeServiceMessage(0), _container(std::move(container)), _idle_sequence(idle_sequence) {}
 
+    /**
+     * @brief Constructor
+     * @param container The container
+     */
+    ServerlessComputeServiceContainerPrewarmCompleteMessage::ServerlessComputeServiceContainerPrewarmCompleteMessage(
+        std::shared_ptr<Container> container) : ServerlessComputeServiceMessage(0), _container(std::move(container)) {}
+
 } // namespace wrench

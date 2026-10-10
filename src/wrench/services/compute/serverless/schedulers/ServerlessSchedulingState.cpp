@@ -57,6 +57,11 @@ namespace wrench {
             for (auto const &container : node->getBusyContainers()) {
                 _busy_containers.at(node).insert(container);
             }
+
+            _prewarming_containers[node] = {};
+            for (auto const &container : node->getPrewarmingContainers()) {
+                _prewarming_containers.at(node).insert(container);
+            }
         }
 
     }

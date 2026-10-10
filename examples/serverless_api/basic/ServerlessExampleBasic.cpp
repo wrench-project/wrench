@@ -146,6 +146,7 @@ int main(int argc, char** argv) {
     /* Using the built-in greedy scheduler with some policy options */
     auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
         std::make_unique<wrench::FCFSServerlessInvocationOrderingPolicy>(),
+        std::make_unique<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
         std::make_unique<wrench::LRUServerlessEvictionPolicy>(),
         std::make_unique<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
 

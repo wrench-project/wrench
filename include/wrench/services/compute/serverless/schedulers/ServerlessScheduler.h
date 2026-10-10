@@ -34,6 +34,20 @@ namespace wrench {
     };
 
     /**
+     * @brief A structure to encode a container prewarm scheduling decision
+     */
+    struct PrewarmContainer {
+        /**
+         * @brief The function for which a container should be pre-warmed
+         */
+        std::shared_ptr<Function> function;
+        /**
+         * @brief The compute node where to start the container
+         */
+        std::shared_ptr<ServerlessComputeNode> compute_node;
+    };
+
+    /**
      * @brief A structure to encode an image-layer-copy scheduling decision
      */
     struct CopyImageLayer {
@@ -131,6 +145,8 @@ namespace wrench {
         std::vector<LoadImageLayer> image_layer_loads_to_RAM;
         /** @brief The list of function invocations at compute nodes */
         std::vector<DispatchInvocation> invocation_dispatches;
+        /** @brief The list of container prewarms at compute nodes */
+        std::vector<PrewarmContainer> container_prewarms;
 
         /**
          * @brief Method to print scheduling decisions
@@ -141,7 +157,8 @@ namespace wrench {
                 layer_evictions_from_disk.empty() and
                 image_layer_copies_to_disk.empty() and
                 image_layer_loads_to_RAM.empty() and
-                invocation_dispatches.empty()) {
+                invocation_dispatches.empty() and
+                container_prewarms.empty()) {
                 std::cerr << "** NO SCHEDULING DECISIONS **" << std::endl;
                 return;
             }
@@ -166,10 +183,13 @@ namespace wrench {
                 std::cerr << "  Image layer load: " << layer->getName() << " at " << node->hostname << std::endl;
             }
             for (const auto& [invocation, node, container] : invocation_dispatches) {
-                std::cerr << "  Invocation dispatch: for " << invocation->getFunction()->getImage()->
-                                                                          getName() <<
+                std::cerr << "  Invocation dispatch: for " << invocation->getFunction()->getName() <<
                     " at " << node->hostname << " (" << (container ? "on an idle container" : "on a new container")
                     << ")" << std::endl;
+            }
+            for (const auto& [function, node] : container_prewarms) {
+                std::cerr << "  Container prewarm: for " << function->getName() <<
+                    " at " << node->hostname << std::endl;
             }
         }
     };

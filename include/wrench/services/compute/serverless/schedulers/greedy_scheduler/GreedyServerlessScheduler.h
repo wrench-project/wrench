@@ -4,6 +4,7 @@
 #include <wrench/services/compute/serverless/schedulers/ServerlessScheduler.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/ServerlessInvocationOrderingPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/ServerlessNodeSelectionPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/ServerlessEvictionPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/ServerlessPlanSelectionPolicy.h>
 
@@ -27,10 +28,12 @@ namespace wrench {
 
         GreedyServerlessScheduler(
             std::shared_ptr<ServerlessInvocationOrderingPolicy> invocation_ordering,
+            std::shared_ptr<ServerlessNodeSelectionPolicy> node_selection,
             std::shared_ptr<ServerlessEvictionPolicy> eviction,
             std::shared_ptr<ServerlessPlanSelectionPolicy> plan_selection);
 
         [[nodiscard]] ServerlessInvocationOrderingPolicy* getInvocationOrderingPolicy() const;
+        [[nodiscard]] ServerlessNodeSelectionPolicy* getNodeSelectionPolicy() const;
         [[nodiscard]] ServerlessEvictionPolicy* getEvictionPolicy() const;
         [[nodiscard]] ServerlessPlanSelectionPolicy* getPlanSelectionPolicy() const;
 
@@ -58,11 +61,13 @@ namespace wrench {
             const std::set<std::shared_ptr<ImageLayer>>& invocation_layers_to_protect) const;
 
 
-	/** @brief The invocation ordering policy **/
+	    /** @brief The invocation ordering policy **/
         std::shared_ptr<ServerlessInvocationOrderingPolicy> _invocation_ordering_policy;
-	/** @brief The eviction policy **/
+        /** @brief The node selection policy **/
+        std::shared_ptr<ServerlessNodeSelectionPolicy> _node_selection_policy;
+	    /** @brief The eviction policy **/
         std::shared_ptr<ServerlessEvictionPolicy> _eviction_policy;
-	/** @brief The plan selection policy **/
+	    /** @brief The plan selection policy **/
         std::shared_ptr<ServerlessPlanSelectionPolicy> _plan_selection_policy;
 
         /***********************/

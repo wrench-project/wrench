@@ -39,6 +39,8 @@
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/ServerlessInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/ServerlessNodeSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/SelectAllPossibleServerlessNodeSelectionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/ServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"

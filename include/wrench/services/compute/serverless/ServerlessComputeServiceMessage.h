@@ -218,6 +218,14 @@ namespace wrench {
         std::uint64_t _idle_sequence;
     };
 
+    class ServerlessComputeServiceContainerPrewarmCompleteMessage : public ServerlessComputeServiceMessage {
+    public:
+        explicit ServerlessComputeServiceContainerPrewarmCompleteMessage(std::shared_ptr<Container> container);
+
+        /** @brief The container that was pre-warmed */
+        std::shared_ptr<Container> _container;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

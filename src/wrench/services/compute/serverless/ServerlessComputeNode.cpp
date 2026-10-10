@@ -41,10 +41,18 @@ namespace wrench {
      * @param container a container
      */
     void ServerlessComputeNode::makeContainerIdle(const std::shared_ptr<Container>& container) {
-        if (_busy_containers.find(container) == _busy_containers.end()) {
-            throw std::runtime_error("Trying to make a non-busy container idle");
+        bool is_busy = _busy_containers.count(container) > 0;
+        bool is_prewarming = _prewarming_containers.count(container) > 0;
+
+        if (not is_busy and not is_prewarming) {
+            throw std::runtime_error("Trying to make a non-busy/non-prewarming container idle");
         }
-        _busy_containers.erase(container);
+        if (is_busy) {
+            _busy_containers.erase(container);
+        } else if (is_prewarming) {
+            _prewarming_containers.erase(container);
+        }
+
         container->makeIdle();
         _idle_containers.insert(container);
     }
@@ -102,7 +110,8 @@ namespace wrench {
      */
     double ServerlessComputeNode::getLayerLastAccessDateInRAM(const std::shared_ptr<ImageLayer>& layer) const {
         if (not this->_memory->hasFile(layer->getRAMFile())) {
-            throw std::runtime_error("ServerlessComputeNode::getLayerLastAccessDateInRAM(): Layer " + layer->getName() + " is not in RAM");
+            throw std::runtime_error(
+                "ServerlessComputeNode::getLayerLastAccessDateInRAM(): Layer " + layer->getName() + " is not in RAM");
         }
         return _memory->getLastAccessDate(FileLocation::LOCATION(_memory, layer->getRAMFile()));
     }
@@ -114,7 +123,8 @@ namespace wrench {
      */
     double ServerlessComputeNode::getLayerLastAccessDateOnDisk(const std::shared_ptr<ImageLayer>& layer) const {
         if (not this->_disk->hasFile(layer->getFile())) {
-            throw std::runtime_error("ServerlessComputeNode::getLayerLastAccessDateOnDisk(): Layer " + layer->getName() + " is not on disk");
+            throw std::runtime_error(
+                "ServerlessComputeNode::getLayerLastAccessDateOnDisk(): Layer " + layer->getName() + " is not on disk");
         }
         return _disk->getLastAccessDate(FileLocation::LOCATION(_disk, layer->getFile()));
     }
@@ -124,11 +134,16 @@ namespace wrench {
      */
     void ServerlessComputeNode::killAllContainers() {
         // Idle containers
-        for (auto const &container : _idle_containers) {
+        for (auto const& container : _idle_containers) {
             container->shutdown();
         }
         // Busy containers
-        for (auto const &container : _busy_containers) {
+        for (auto const& container : _busy_containers) {
+            container->makeIdle();
+            container->shutdown();
+        }
+        // Prewarming containers
+        for (auto const& container : _prewarming_containers) {
             container->makeIdle();
             container->shutdown();
         }
@@ -163,7 +178,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the set of non-idle containers
+     * @brief Retrieve the set of busy containers
      * @return A set of containers
      */
     std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getBusyContainers() {
@@ -171,45 +186,37 @@ namespace wrench {
     }
 
     /**
+     * @brief Retrieve the set of prewarming containers
+     * @return A set of containers
+     */
+    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getPrewarmingContainers() {
+        return _prewarming_containers;
+    }
+
+
+    /**
      * @brief Spawn a container (and try to kill idle containers if it helps)
      * @param function a function
+     * @param prewarm whether this is a prewarm (i.e., no invocation) or not
      * @return A container
      */
-    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function) {
+    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function, bool prewarm) {
         // Create a container object
         auto container = std::shared_ptr<Container>(
-            new Container(function, this, _serverless_compute_service, Container::State::BUSY));
+            new Container(function,
+                          this,
+                          _serverless_compute_service,
+                          (prewarm ? Container::State::PREWARMING : Container::State::BUSY)));
         try {
             container->spawn();
         } catch (ExecutionException& e) {
             throw;
-            // // Try to terminate idle containers
-            // std::set<std::shared_ptr<Container>> victims;
-            // auto success = this->findIdleContainersToTerminate(
-            //     function->getRAMSpaceLimit(),
-            //     function->getDiskSpaceLimit(),
-            //     victims);
-            // if (not success) {
-            //     throw;
-            // } else {
-            //     for (auto const& victim : victims) {
-            //         WRENCH_INFO(
-            //             "Evicting an idle container [%s, idle for %.2lf seconds, %llu bytes in RAM, %llu bytes on disk",
-            //             victim->getFunction()->getName().c_str(),
-            //             S4U_Simulation::getClock() - victim->getIdleDate(),
-            //             victim->getFunction()->getRAMSpaceLimit(),
-            //             victim->getFunction()->getDiskSpaceLimit());
-            //         this->shutdownContainer(victim);
-            //     }
-            // }
-            // // Attempt again!
-            // try {
-            //     container->spawn();
-            // } catch (ExecutionException&) {
-            //     throw;
-            // }
         }
-        _busy_containers.insert(container);
+        if (prewarm) {
+            _prewarming_containers.insert(container);
+        } else {
+            _busy_containers.insert(container);
+        }
         return container;
     }
 
@@ -336,5 +343,4 @@ namespace wrench {
 
         return true;
     }
-
 } // namespace wrench

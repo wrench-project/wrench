@@ -372,7 +372,7 @@ namespace wrench {
             // Admit invocations whose images have or are being downloaded
             admitInvocations();
 
-            if (do_scheduling and not _state_of_the_system->_schedulable_invocations.empty()) {
+            if (do_scheduling) {
                 // Invoke the scheduler
                 auto decisions = invokeScheduler();
 
@@ -387,12 +387,14 @@ namespace wrench {
                 evictLayersFromRAM(decisions->layer_evictions_from_ram);
                 // Evict layers from disk if any
                 evictLayersFromDisk(decisions->layer_evictions_from_disk);
-                // Do invocations
+                // Do invocations if any
                 dispatchInvocations(decisions->invocation_dispatches);
-                // Do the image loads
+                // Do the image loads if any
                 initiateImageLayerLoads(decisions->image_layer_loads_to_RAM);
-                // Do the image copies
+                // Do the image copies if any
                 initiateImageLayerCopies(decisions->image_layer_copies_to_disk);
+                // Prewarm containers if any
+                prewarmContainers(decisions->container_prewarms);
 
                 do_scheduling = false;
             }
@@ -457,6 +459,9 @@ namespace wrench {
         } else if (const auto scsiec_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             processInvocationCompletion(scsiec_msg->_invocation, scsiec_msg->_action);
+            return true;
+        } else if (const auto scscpc_msg= std::dynamic_pointer_cast<ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
+            processPrewarmCompletion(scscpc_msg->_container);
             return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
@@ -806,6 +811,38 @@ namespace wrench {
     }
 
     /**
+     * @brief Process a container pre-warm
+     * @param container The container
+     */
+    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container) {
+        WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
+
+        auto compute_node = container->getComputeNode();
+        // Free up the core
+        compute_node->_available_cores++;
+
+        // Make container idle
+        compute_node->makeContainerIdle(container);
+
+        // Should the container be terminated or left idling?
+        double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        if (idle_timeout <= 0) {
+            compute_node->shutdownContainer(container);
+        } else {
+            // Start the timeout alarm
+            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
+                this->simulation_,
+                S4U_Simulation::getClock() + idle_timeout,
+                _hostname,
+                _commport,
+                new
+                ServerlessComputeServiceContainerIdleTimeoutMessage(
+                    container, container->getIdleSequence()),
+                "container_idle_timout");
+        }
+    }
+
+    /**
      * @brief Helper method to process a container idle timeout
      * @param container the container that has idle-timed out
      * @param idle_sequence the idle sequence number
@@ -904,7 +941,7 @@ namespace wrench {
         if (not hot_start) {
             // Try to spawn a container
             try {
-                target_container = target_compute_node->spawnContainer(invocation->getFunction().get());
+                target_container = target_compute_node->spawnContainer(invocation->getFunction().get(), false);
             } catch (ExecutionException& e) {
                 WRENCH_INFO("Couldn't spawn a container for an invocation for function %s: %s",
                             invocation->_function->getName().c_str(),
@@ -1268,6 +1305,18 @@ namespace wrench {
     }
 
     /**
+    * @brief Helper method to prewarm containers
+    * @param decisions scheduling decisions
+    */
+    void ServerlessComputeService::prewarmContainers(
+        const std::vector<PrewarmContainer>& decisions) {
+        // For each compute node, prewarm a container (if possible)
+        for (const auto& [function, compute_node] : decisions) {
+            prewarmContainerAtComputeNode(compute_node, function);
+        }
+    }
+
+    /**
      * @brief Determine whether an invocation is schedulable
      * @param invocation An invocation
      * @return true if schedulable, false otherwise
@@ -1466,5 +1515,94 @@ namespace wrench {
 
         WRENCH_INFO("Initiated image layer load: [%s] at [%s]", layer->getName().c_str(),
                     compute_node->hostname.c_str());
+    }
+
+    /**
+     * @brief Helper method to prewarm a container at a compute node
+     * @param compute_node the compute node
+     * @param function the function for which a container should be prewarmed
+     */
+    void ServerlessComputeService::prewarmContainerAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
+                                                                 const std::shared_ptr<Function>& function) {
+        // TODO: to implement
+
+        // Check that pre-warming can even do anything
+        double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        if (idle_timeout <= 0.0) {
+            WRENCH_INFO("Ignoring container pre-warm scheduling decision because the CONTAINER_IDLE_TIMEOUT value is set to 0.0");
+            return;
+        }
+
+        // Check that there is one core available (which will be freed as soon as the container idles)
+        if (compute_node->_available_cores == 0) {
+            WRENCH_INFO( "Couldn't pre-warm container for function %s at node %s because no core is available",
+                function->getName().c_str(), compute_node->hostname.c_str());
+            return;
+        }
+
+        // Check that all layers are in RAM
+        for (auto const &layer : function->getImage()->getLayers()) {
+            if (!_state_of_the_system->isImageLayerInRAMAtNode(compute_node, layer)) {
+                WRENCH_INFO("Couldn't pre-warm container for function %s at node %s because image layer %s is not in RAM",
+                    function->getName().c_str(), compute_node->hostname.c_str(), layer->getName().c_str());
+                return;
+            }
+        }
+        // Check that there is enough disk/RAM space to start the new container
+        if (_state_of_the_system->getAvailableDiskSpace().at(compute_node) < function->getDiskSpaceLimit()) {
+            WRENCH_INFO("Couldn't pre-warm container for function %s at node %s due to lack of available disk space",
+                function->getName().c_str(), compute_node->hostname.c_str());
+            return;
+        }
+        if (_state_of_the_system->getAvailableRAMSpace().at(compute_node) < function->getRAMSpaceLimit()) {
+            WRENCH_INFO("Couldn't pre-warm container for function %s at node %s due to lack of available RAM space",
+                function->getName().c_str(), compute_node->hostname.c_str());
+            return;
+        }
+        // At this point, we can start the container
+        std::shared_ptr<Container> container;
+        try {
+            container = compute_node->spawnContainer(function.get(), true);
+        } catch (ExecutionException& e) {
+            WRENCH_INFO("Couldn't pre-warm a container for function %s at node %s: %s",
+                        function->getName().c_str(),
+                        compute_node->hostname.c_str(),
+                        e.getCause()->toString().c_str());
+            return;
+        }
+
+        // Update the core count of the compute node
+        compute_node->_available_cores -= 1;
+
+        // Declare the function invocation's necessary lambdas
+        const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {};
+
+        // Create the action and create a corresponding action executor
+        auto action = std::shared_ptr<CustomAction>(
+            new CustomAction("run_invocation_noop", 0, 0, noop, noop));
+
+        auto custom_message = new ServerlessComputeServiceContainerPrewarmCompleteMessage(container);
+
+        const auto action_executor = std::make_shared<ActionExecutor>(
+            compute_node->hostname, 1, 0,
+            this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD),
+            false,
+            _commport,
+            custom_message,
+            action,
+            nullptr);
+
+        action_executor->setSimulation(this->simulation_);
+        // Start the action executor object
+        try {
+            action_executor->start(action_executor, true, false);
+        } catch (ExecutionException&) {
+            throw std::runtime_error(
+                "ServerlessComputeService::prewarmContainerAtComputeNode(): Action executor could not be started - internal error");
+        }
+
+        WRENCH_INFO("Initiate a container pre-warm for function %s at node %s",
+                    function->getName().c_str(), compute_node->hostname.c_str());
+
     }
 } // namespace wrench

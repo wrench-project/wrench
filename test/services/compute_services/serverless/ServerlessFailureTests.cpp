@@ -20,6 +20,7 @@
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/SelectAllPossibleServerlessNodeSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -228,6 +229,7 @@ void ServerlessFailureTest::do_RemoteDownloadFailure_test() {
         "ServerlessHeadNode", "/", compute_nodes,
         std::make_shared<wrench::GreedyServerlessScheduler>(
             std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
+            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
             std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
             std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
         {{wrench::ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "50MB"}}, {}));

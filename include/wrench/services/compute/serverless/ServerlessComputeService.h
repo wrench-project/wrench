@@ -176,6 +176,8 @@ namespace wrench {
         void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation,
                                          const std::shared_ptr<Action>& action);
 
+        void processPrewarmCompletion(const std::shared_ptr<Container>& container);
+
         void processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence);
 
         void admitInvocations();
@@ -186,6 +188,7 @@ namespace wrench {
         void dispatchInvocations(const std::vector<DispatchInvocation>& decisions);
         void initiateImageLayerLoads(const std::vector<LoadImageLayer>& decisions);
         void initiateImageLayerCopies(const std::vector<CopyImageLayer>& decisions);
+        void prewarmContainers(const std::vector<PrewarmContainer>& decisions);
 
         bool isInvocationSchedulable(const std::shared_ptr<Invocation>& invocation) const;
         bool isInvocationAdmittable(const std::shared_ptr<Invocation>& invocation) const;
@@ -203,6 +206,8 @@ namespace wrench {
                                                  const std::shared_ptr<ImageLayer>& layer);
         void initiateImageLayerLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
                                                  const std::shared_ptr<ImageLayer>& layer);
+        void prewarmContainerAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
+                                                 const std::shared_ptr<Function>& function);
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                 const std::shared_ptr<ServerlessComputeNode>& target_compute_node,

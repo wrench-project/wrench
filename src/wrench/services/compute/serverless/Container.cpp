@@ -72,6 +72,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Determine whether the container is pre-warming or not
+     * @return true if pre-warming, false otherwise
+     */
+    bool Container::isPrewarming() const {
+        return _state == State::PREWARMING;
+    }
+
+    /**
      * @brief Get the container's idle sequence
      * @return the sequence number
      */
