@@ -12,10 +12,10 @@ namespace wrench {
                 const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
                 const std::shared_ptr<Invocation>& invocation) {
 
-                /* Just filter out all compute nodes that have no available cores */
+                /* Just filter out all compute nodes that have no available slots */
                 std::set<std::shared_ptr<ServerlessComputeNode>> not_fully_busy_compute_nodes;
                 for (auto const& node : scheduling_state->_compute_nodes) {
-                        if (scheduling_state->_cores_available.at(node) > 0) {
+                        if (scheduling_state->_slots_available.at(node) > 0) {
                                 not_fully_busy_compute_nodes.insert(node);
                         }
                 }

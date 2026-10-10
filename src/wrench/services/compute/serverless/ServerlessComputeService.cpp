@@ -75,7 +75,7 @@ namespace wrench {
                 "ServerlessComputeService::ServerlessComputeService(): A non-null scheduler must be provided");
         }
 
-        // Check platform homogeneity
+        // Set some convenient node-spec values and heck platform homogeneity
         auto first_hostname = *(compute_nodes.begin());
         _compute_node_num_cores = S4U_Simulation::getHostNumCores(first_hostname);
         _compute_node_core_speed = S4U_Simulation::getHostFlopRate(first_hostname);
@@ -92,6 +92,11 @@ namespace wrench {
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, property_list);
+
+        // Deal with the 0-value default number of slots
+        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE) == 0) {
+            this->setProperty(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, std::to_string(_compute_node_num_cores));
+        }
 
         // Create the state of the system object
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
@@ -221,14 +226,16 @@ namespace wrench {
             // Num cores per host
             std::map<std::string, double> num_cores;
             for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
-                num_cores[compute_node->hostname] = static_cast<double>(compute_node->_total_cores);
+                num_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
             }
             return num_cores;
         } else if (key == "num_idle_cores") {
             // Num idle cores per host
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
-                num_idle_cores[compute_node->hostname] = static_cast<double>(compute_node->_available_cores);
+                unsigned long num_used_slots = compute_node->getNumSlots() - compute_node->getNumFreeSlots();
+                unsigned long count = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
+                num_idle_cores[compute_node->hostname] = static_cast<double>(count);
             }
             return num_idle_cores;
         } else if (key == "flop_rates") {
@@ -547,7 +554,9 @@ namespace wrench {
 
             for (const auto& node : _state_of_the_system->_compute_nodes) {
                 // Both requirements must be satisfied on the same node.
-                if (node->_available_cores >= csitalohwarr_msg->num_cores &&
+                unsigned long num_used_slots = node->getNumSlots() - node->getNumFreeSlots();
+                unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
+                if (num_idle_cores >= csitalohwarr_msg->num_cores &&
                     node->_memory->getTotalFreeSpaceZeroTime() >= csitalohwarr_msg->ram) {
                     has_available_resources = true;
                     break;
@@ -815,7 +824,7 @@ namespace wrench {
 
         auto compute_node = invocation->_compute_node;
         // Free up the core
-        compute_node->_available_cores++;
+        compute_node->_num_free_slots++;
 
         // Make container idle
         auto container = invocation->_container;
@@ -859,7 +868,7 @@ namespace wrench {
 
         auto compute_node = container->getComputeNode();
         // Free up the core
-        compute_node->_available_cores++;
+        compute_node->_num_free_slots++;
 
         // Make container idle
         compute_node->makeContainerIdle(container);
@@ -997,7 +1006,7 @@ namespace wrench {
         invocation->_dispatched = true;
 
         // Update the core count of the compute node
-        target_compute_node->_available_cores -= 1;
+        target_compute_node->_num_free_slots -= 1;
 
         // Make the container busy if it was idling
         if (hot_start) {
@@ -1588,8 +1597,8 @@ namespace wrench {
         }
 
         // Check that there is one core available (which will be freed as soon as the container idles)
-        if (compute_node->_available_cores == 0) {
-            WRENCH_INFO("Couldn't pre-warm container for function %s at node %s because no core is available",
+        if (compute_node->_num_free_slots == 0) {
+            WRENCH_INFO("Couldn't pre-warm container for function %s at node %s because no slot is available",
                         function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
@@ -1626,8 +1635,8 @@ namespace wrench {
             return;
         }
 
-        // Update the core count of the compute node
-        compute_node->_available_cores -= 1;
+        // Update the slot count of the compute node
+        compute_node->_num_free_slots -= 1;
 
         // Declare the function invocation's necessary lambdas
         const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {

@@ -26,13 +26,16 @@ namespace wrench {
     /**
     *  @brief Constructor
     *  @param h: hostname
-    *  @param num_cores: number of cores
+    *  @param num_slots: number of container slots at the compute node
     *  @param service: the ServerlessComputeService that owns this compute node
     */
-    ServerlessComputeNode::ServerlessComputeNode(std::string h, const unsigned int num_cores,
+    ServerlessComputeNode::ServerlessComputeNode(std::string h,
+                                                 const unsigned int num_slots,
                                                  ServerlessComputeService* service) :
-        hostname(std::move(h)), _serverless_compute_service(service), _total_cores(num_cores),
-        _available_cores(num_cores) {
+        hostname(std::move(h)),
+        _serverless_compute_service(service),
+        _num_slots(num_slots),
+        _num_free_slots(num_slots) {
     }
 
 
@@ -221,19 +224,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the compute node's number of cores
-     * @return a number of cores
+     * @brief Get the compute node's total number of slots
+     * @return a number of slots
      */
-    unsigned int ServerlessComputeNode::getNumCores() const {
-        return _total_cores;
+    unsigned int ServerlessComputeNode::getNumSlots() const {
+        return _num_slots;
     }
 
     /**
-     * @brief Get the compute node's number of idle cores
-     * @return a number of cores
+     * @brief Get the compute node's number of free slots
+     * @return a number of slots
      */
-    unsigned int ServerlessComputeNode::getNumIdleCores() const {
-        return _available_cores;
+    unsigned int ServerlessComputeNode::getNumFreeSlots() const {
+        return _num_free_slots;
     }
 
     /**
@@ -300,9 +303,9 @@ namespace wrench {
             }
         }
 
-        // The node has available cores?
-        if (this->_available_cores < 1) {
-            WRENCH_INFO("Scheduled invocation cannot be started because there is no available core");
+        // The node has available slots?
+        if (this->_num_free_slots < 1) {
+            WRENCH_INFO("Scheduled invocation cannot be started because there is no free slot");
             return false;
         }
 

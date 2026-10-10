@@ -252,7 +252,7 @@ namespace wrench {
 
         // Determine the total number of cores available
         unsigned int num_cores_still_available = 0;
-        for (auto const& [node, count] : scheduling_state->_cores_available) {
+        for (auto const& [node, count] : scheduling_state->_slots_available) {
             num_cores_still_available += count;
         }
 
@@ -270,7 +270,7 @@ namespace wrench {
             }
 
             // At this point, a core is to be reserved at the target_node
-            scheduling_state->_cores_available.at(target_node)--;
+            scheduling_state->_slots_available.at(target_node)--;
             num_cores_still_available--;
 
             // Make the layers of this invocation protected to avoid eviction by subsequence scheduling decisions
@@ -380,7 +380,7 @@ namespace wrench {
          * selection policy didn't! (and preserve an deterministic order) */
         std::vector<std::shared_ptr<ServerlessComputeNode>> candidate_nodes;
         for (const auto& node : scheduling_state->_compute_nodes) {
-            if (selected_nodes.count(node) && scheduling_state->_cores_available.at(node) > 0) {
+            if (selected_nodes.count(node) && scheduling_state->_slots_available.at(node) > 0) {
                 candidate_nodes.push_back(node);
             }
         }
