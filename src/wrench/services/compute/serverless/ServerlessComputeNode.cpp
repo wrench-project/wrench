@@ -30,7 +30,7 @@ namespace wrench {
     *  @param service: the ServerlessComputeService that owns this compute node
     */
     ServerlessComputeNode::ServerlessComputeNode(std::string h,
-                                                 const unsigned int num_slots,
+                                                 const unsigned long num_slots,
                                                  ServerlessComputeService* service) :
         hostname(std::move(h)),
         _serverless_compute_service(service),
@@ -227,7 +227,7 @@ namespace wrench {
      * @brief Get the compute node's total number of slots
      * @return a number of slots
      */
-    unsigned int ServerlessComputeNode::getNumSlots() const {
+    unsigned long ServerlessComputeNode::getNumSlots() const {
         return _num_slots;
     }
 
@@ -235,7 +235,7 @@ namespace wrench {
      * @brief Get the compute node's number of free slots
      * @return a number of slots
      */
-    unsigned int ServerlessComputeNode::getNumFreeSlots() const {
+    unsigned long ServerlessComputeNode::getNumFreeSlots() const {
         return _num_free_slots;
     }
 

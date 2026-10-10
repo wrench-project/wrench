@@ -54,9 +54,9 @@ namespace wrench {
      *
      * @return The free slot availability map
      */
-    std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int>
+    std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long>
     ServerlessStateOfTheSystem::getNumFreeSlots() const {
-        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> to_return;
+        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> to_return;
         for (const auto& compute_node : _compute_nodes) {
             to_return[compute_node] = compute_node->getNumFreeSlots();
         }

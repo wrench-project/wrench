@@ -177,20 +177,23 @@ private:
         // Place TWO invocations and wait for then
         auto invocation3 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
         auto invocation4 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
-        function_manager->wait_all({invocation3, invocation4});
+        wrench::Simulation::sleep(1);
+        auto invocation5 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+        function_manager->wait_all({invocation3, invocation4, invocation5});
 
         auto elapsed2 = invocation2->getFunctionEndDate() - invocation2->getSubmitDate();
         auto elapsed3 = invocation3->getFunctionEndDate() - invocation3->getSubmitDate();
         auto elapsed4 = invocation4->getFunctionEndDate() - invocation4->getSubmitDate();
+        auto elapsed5 = invocation5->getFunctionEndDate() - invocation5->getSubmitDate();
 
-        if (std::abs(elapsed2 - 10) > 10.0E-6) {
-            throw std::runtime_error("The second invocation should have taken exactly 10 seconds.");
-        }
-        if (std::abs(elapsed3 - 20) > 10.0E-6) {
-            throw std::runtime_error("The third invocation should have taken exactly 10 seconds.");
-        }
-        if (std::abs(elapsed4 - 20) > 10.0E-6) {
-            throw std::runtime_error("The fourth invocation should have taken exactly 10 seconds.");
+        double elapsed[4] = {elapsed2, elapsed3, elapsed4, elapsed5};
+        double expected_elapsed[4] = {10, 20, 20, 29};
+
+        for (int i = 0; i < 4; i++) {
+            if (std::abs(elapsed[i] - expected_elapsed[i]) > 10.0E-6) {
+                throw std::runtime_error("The " + std::to_string(i+2) + "-th invocation should have taken exactly " +
+                                       std::to_string(expected_elapsed[i]) + " seconds (it took " + std::to_string(expected_elapsed[i]) + ")");
+            }
         }
 
         return 0;

@@ -251,7 +251,7 @@ namespace wrench {
             scheduling_state, schedulable_invocations);
 
         // Determine the total number of slots available
-        unsigned int num_slots_still_available = 0;
+        unsigned long num_slots_still_available = 0;
         for (auto const& [node, count] : scheduling_state->_slots_available) {
             num_slots_still_available += count;
         }

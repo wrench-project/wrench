@@ -35,7 +35,7 @@ namespace wrench {
         std::vector<std::shared_ptr<ServerlessComputeNode>> _compute_nodes;
 
 	    /** @brief Map of slot availability */
-        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned int> _slots_available;
+        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _slots_available;
         /** @brief Map of RAM availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _ram_available;
         /** @brief Map of disk availability */
