@@ -215,11 +215,16 @@ namespace wrench {
 
         void terminateAllServicesAndReleaseAllResources();
 
+        void setNextSchedulerWakeup(double wakeup_date);
+
 
         unsigned long _compute_node_num_cores;
         double _compute_node_core_speed;
         sg_size_t _compute_node_ram;
         sg_size_t _compute_node_disk_space;
+
+        std::optional<double> _next_scheduler_wakeup_date;
+        std::shared_ptr<Alarm> _scheduler_wakeup_alarm;
 
         /***********************/
         /** \endcond          **/
