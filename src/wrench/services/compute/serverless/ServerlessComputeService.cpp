@@ -94,8 +94,10 @@ namespace wrench {
         this->setProperties(this->default_property_values, property_list);
 
         // Deal with the 0-value default number of slots
-        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE) == 0) {
-            this->setProperty(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, std::to_string(_compute_node_num_cores));
+        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE)
+            == 0) {
+            this->setProperty(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE,
+                              std::to_string(_compute_node_num_cores));
         }
 
         // Create the state of the system object
@@ -234,7 +236,9 @@ namespace wrench {
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
                 unsigned long num_used_slots = compute_node->getNumSlots() - compute_node->getNumFreeSlots();
-                unsigned long count = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
+                unsigned long count = (num_used_slots < _compute_node_num_cores
+                                           ? _compute_node_num_cores - num_used_slots
+                                           : 0);
                 num_idle_cores[compute_node->hostname] = static_cast<double>(count);
             }
             return num_idle_cores;
@@ -557,7 +561,9 @@ namespace wrench {
             for (const auto& node : _state_of_the_system->_compute_nodes) {
                 // Both requirements must be satisfied on the same node.
                 unsigned long num_used_slots = node->getNumSlots() - node->getNumFreeSlots();
-                unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores ? _compute_node_num_cores - num_used_slots : 0);
+                unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores
+                                                    ? _compute_node_num_cores - num_used_slots
+                                                    : 0);
                 if (num_idle_cores >= csitalohwarr_msg->num_cores &&
                     node->_memory->getTotalFreeSpaceZeroTime() >= csitalohwarr_msg->ram) {
                     has_available_resources = true;
@@ -701,7 +707,6 @@ namespace wrench {
         const std::shared_ptr<Function>& function,
         const std::shared_ptr<FunctionInput>& input,
         S4U_CommPort* notify_commport) {
-
         // Apply the overhead
         S4U_Simulation::sleep(
             this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD));
@@ -768,7 +773,7 @@ namespace wrench {
                     continue;
                 }
 
-                for (auto const &invocation:  _state_of_the_system->_admitted_invocations.at(image)) {
+                for (auto const& invocation : _state_of_the_system->_admitted_invocations.at(image)) {
                     invocation->_notify_commport->dputMessage(
                         new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                             false,
@@ -812,7 +817,8 @@ namespace wrench {
             // All layers are available for this image!
             auto& to_make_schedulable = _state_of_the_system->_admitted_invocations.at(image);
             _state_of_the_system->_schedulable_invocations.insert(
-                _state_of_the_system->_schedulable_invocations.end(), to_make_schedulable.begin(), to_make_schedulable.end());
+                _state_of_the_system->_schedulable_invocations.end(), to_make_schedulable.begin(),
+                to_make_schedulable.end());
             _state_of_the_system->_admitted_invocations.at(image).clear();
             images_to_remove_from_admitted_map.insert(image);
         }
@@ -929,8 +935,15 @@ namespace wrench {
 
         // Dispatch invocation
         for (const auto& [invocation, compute_node, container] : decisions) {
-            // WRENCH_INFO("Trying to dispatch scheduled invocation for function [%s]...",
-            //             invocation_to_place->_function->getName().c_str());
+            // If the invocation is not schedulable or already dispatched, ignore the scheduling decision!
+            const auto& ready = _state_of_the_system->_schedulable_invocations;
+            if (std::find(ready.begin(), ready.end(), invocation) == ready.end() ||
+                dispatched_invocations.count(invocation) != 0) {
+                WRENCH_INFO("Ignoring dispatch scheduling decision for non-dispatchable invocation for function %s",
+                    invocation->getFunction()->getName());
+                continue;
+            }
+
             if (dispatchInvocation(invocation, compute_node, container)) {
                 _state_of_the_system->_running_invocations.insert(invocation);
                 dispatched_invocations.insert(invocation);
@@ -965,9 +978,10 @@ namespace wrench {
 
             // Is the invocation admitted?
             {
-                if (_state_of_the_system->_admitted_invocations.find(image) != _state_of_the_system->_admitted_invocations.end()) {
+                if (_state_of_the_system->_admitted_invocations.find(image) != _state_of_the_system->
+                                                                               _admitted_invocations.end()) {
                     auto it = std::find(_state_of_the_system->_admitted_invocations.at(image).begin(),
-                        _state_of_the_system->_admitted_invocations.at(image).end(), inv);
+                                        _state_of_the_system->_admitted_invocations.at(image).end(), inv);
                     if (it != _state_of_the_system->_admitted_invocations.at(image).end()) {
                         _state_of_the_system->_admitted_invocations.at(image).erase(it);
                         send_notification_message = true;
@@ -978,7 +992,7 @@ namespace wrench {
             // Is the invocation schedulable?
             {
                 auto it = std::find(_state_of_the_system->_schedulable_invocations.begin(),
-                    _state_of_the_system->_schedulable_invocations.end(), inv);
+                                    _state_of_the_system->_schedulable_invocations.end(), inv);
                 if (it != _state_of_the_system->_schedulable_invocations.end()) {
                     _state_of_the_system->_schedulable_invocations.erase(it);
                     send_notification_message = true;
@@ -989,11 +1003,12 @@ namespace wrench {
             if (send_notification_message) {
                 inv->_notify_commport->dputMessage(
                     new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-                    false,
-                    inv,
-                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                        "Invocation was forcefully failed by the scheduler"),
-                    this->getMessagePayloadValue(ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+                        false,
+                        inv,
+                        std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
+                                                     "Invocation was forcefully failed by the scheduler"),
+                        this->getMessagePayloadValue(
+                            ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
             }
         }
     }
@@ -1168,7 +1183,7 @@ namespace wrench {
 
         // Send all failure notifications
         for (auto& [image, list] : _state_of_the_system->_admitted_invocations) {
-            for (auto const &inv : list) {
+            for (auto const& inv : list) {
                 inv->_notify_commport->dputMessage(
                     new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                         false,
