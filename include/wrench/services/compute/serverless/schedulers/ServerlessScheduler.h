@@ -24,6 +24,16 @@ namespace wrench {
     /***********************/
 
     /**
+    * @brief A structure to encode an invocation fail action
+    */
+    struct FailInvocation {
+        /**
+         * @brief The invocation to fail
+         */
+        std::shared_ptr<Invocation> invocation;
+    };
+
+    /**
      * @brief A structure to encode an idle container termination scheduling decision
      */
     struct TerminateIdleContainer {
@@ -124,6 +134,7 @@ namespace wrench {
 
     /**
      * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
+     *        - Which invocations to fail
      *        - Which idle container to terminate
      *        - Which layer to evict from RAM
      *        - Which layer to evict from disk
@@ -133,6 +144,8 @@ namespace wrench {
      */
     class ServerlessSchedulingDecisions {
     public:
+        /** @brief The list of invocations to fail  */
+        std::vector<FailInvocation> invocation_fails;
         /** @brief The list of idle container terminations  */
         std::vector<TerminateIdleContainer> idle_container_terminations;
         /** @brief The list of layer from RAM evictions */
@@ -155,7 +168,8 @@ namespace wrench {
          * @brief Method to print scheduling decisions
          */
         void print() {
-            if (idle_container_terminations.empty() and
+            if (invocation_fails.empty() and
+                idle_container_terminations.empty() and
                 layer_evictions_from_ram.empty() and
                 layer_evictions_from_disk.empty() and
                 image_layer_copies_to_disk.empty() and
@@ -167,6 +181,9 @@ namespace wrench {
             }
 
             std::cerr << "** SCHEDULING DECISIONS **" << std::endl;
+            for (const auto& [invocation] : invocation_fails) {
+                std::cerr << "  Forceful invocation fail: for function " << invocation->getFunction()->getName() << std::endl;
+            }
             for (const auto& [container] : idle_container_terminations) {
                 std::cerr << "  Idle container termination: for function " << container->getFunction()->getName() <<
                     " at " << container->getComputeNode()->hostname << std::endl;
@@ -209,21 +226,19 @@ namespace wrench {
 
         /**
          * @brief Given the list of schedulable invocations and the current system state, decide:
+         *   - which invocations to forcefully fail
          *   - which idle containers to terminate
-         *   - which images to copy to compute nodes
-         *   - which images to load into memory at compute nodes
-         *   - which invocations to start at compute nodes
-         *
-         *   Note that the disk and RAM at each compute host is managed using LRU, and so the scheduler
-         *   doesn't have full control (which would likely be intractable anyway). But that means that
-         *   when asking from the system state questions like "how much RAM is available at that node?"
-         *   is not clear-cut: the answer may be 0 but one can perhaps use the node because some memory
-         *   content will be evicted due to the LRU behavior...
+         *   - which layers to evict from RAM
+         *   - which layers to evict from disk
+         *   - which layers to copy to compute nodes
+         *   - which layers to load into memory at compute nodes
+         *   - which invocations to dispatch at compute nodes
+         *   - which containers to prewarm at compute nodes
          *
          *   A scheduling decision is an intent, not a reservation. The serverless compute service checks
          *   whether the decision can actually be executed when it processes it.
          *
-         * @param schedulable_invocations A list of invocations whose images reside on the head node
+         * @param schedulable_invocations A list of invocations whose all necessary layers reside on the head node
          * @param state The current system state
          * @return A SchedulingDecisions object
          */

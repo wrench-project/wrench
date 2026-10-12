@@ -65,7 +65,7 @@ namespace wrench
         // queue of function invocations waiting to be processed
         std::queue<std::shared_ptr<Invocation>> _new_invocations;
         // queues of function invocations whose image layers are being downloaded
-        std::map<std::shared_ptr<Image>, std::queue<std::shared_ptr<Invocation>>> _admitted_invocations;
+        std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> _admitted_invocations;
         // queue of function invocations whose images have been downloaded
         std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
         // set of function invocations currently running

@@ -388,6 +388,8 @@ namespace wrench {
                 // even a super naive scheduler can be used, even though most of its scheduling
                 // decisions may not feasible at a given time. It will just be invoked again later.
 
+                // Fail invocations if any
+                failInvocations(decisions->invocation_fails);
                 // Terminate idle containers if any
                 terminateIdleContainers(decisions->idle_container_terminations);
                 // Evict layers from RAM if any
@@ -734,7 +736,7 @@ namespace wrench {
         if (this->isInvocationSchedulable(invocation)) {
             _state_of_the_system->_schedulable_invocations.push_back(invocation);
         } else if (this->isInvocationAdmittable(invocation)) {
-            _state_of_the_system->_admitted_invocations[function->getImage()].push(invocation);
+            _state_of_the_system->_admitted_invocations[function->getImage()].push_back(invocation);
         } else {
             _state_of_the_system->_new_invocations.push(invocation);
         }
@@ -762,21 +764,19 @@ namespace wrench {
             for (auto const& [image, list] : _state_of_the_system->_admitted_invocations) {
                 // If this layer concerns this image, nevermind, we're good
                 const auto& layers = image->getLayers();
-                if (std::find(layers.begin(), layers.end(), layer) == layers.end()) {
+                if (layers.find(layer) == layers.end()) {
                     continue;
                 }
 
-                while (not _state_of_the_system->_admitted_invocations[image].empty()) {
-                    auto invocation = _state_of_the_system->_admitted_invocations[image].front();
+                for (auto const &invocation:  _state_of_the_system->_admitted_invocations.at(image)) {
                     invocation->_notify_commport->dputMessage(
                         new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                             false,
                             invocation,
                             action->getFailureCause(), this->getMessagePayloadValue(
                                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-                    _state_of_the_system->_admitted_invocations[image].pop();
                 }
-                _state_of_the_system->_admitted_invocations[image] = std::queue<std::shared_ptr<Invocation>>();
+                _state_of_the_system->_admitted_invocations.at(image).clear();
                 images_to_remove_from_admitted_map.insert(image);
             }
             // Clean up (should we leave them around?)
@@ -810,12 +810,10 @@ namespace wrench {
                 continue;
             }
             // All layers are available for this image!
-            auto& queue = _state_of_the_system->_admitted_invocations.at(image);
-            while (not queue.empty()) {
-                _state_of_the_system->_schedulable_invocations.emplace(
-                    _state_of_the_system->_schedulable_invocations.end(), std::move(queue.front()));
-                queue.pop();
-            }
+            auto& to_make_schedulable = _state_of_the_system->_admitted_invocations.at(image);
+            _state_of_the_system->_schedulable_invocations.insert(
+                _state_of_the_system->_schedulable_invocations.begin(), to_make_schedulable.begin(), to_make_schedulable.end());
+            _state_of_the_system->_admitted_invocations.at(image).clear();
             images_to_remove_from_admitted_map.insert(image);
         }
         // Remove images from the map (should we keep them around?)
@@ -947,6 +945,49 @@ namespace wrench {
             }
         }
         _state_of_the_system->_schedulable_invocations = updated_list_of_schedulable_invocations;
+    }
+
+    /**
+    * @brief Terminate idle containers
+    * @param decisions Scheduling decisions
+    */
+    void ServerlessComputeService::failInvocations(const std::vector<FailInvocation>& decisions) {
+        // Fail invocations
+        for (const auto& [inv] : decisions) {
+            // Is the invocation running?
+            if (_state_of_the_system->_running_invocations.count(inv) > 0) {
+                WRENCH_INFO("Cannot forcefully termine a running invocation");
+                continue;
+            }
+            auto image = inv->getFunction()->getImage();
+
+            // Is the invocation admitted?
+            {
+                auto it = std::find(_state_of_the_system->_admitted_invocations.at(image).begin(),
+                    _state_of_the_system->_admitted_invocations.at(image).end(), inv);
+                if (it != _state_of_the_system->_admitted_invocations.at(image).end()) {
+                    _state_of_the_system->_admitted_invocations.at(image).erase(it);
+                }
+            }
+
+            // Is the invocation schedulable?
+            {
+                auto it = std::find(_state_of_the_system->_schedulable_invocations.begin(),
+                    _state_of_the_system->_schedulable_invocations.end(), inv);
+                if (it != _state_of_the_system->_schedulable_invocations.end()) {
+                    _state_of_the_system->_schedulable_invocations.erase(it);
+                }
+            }
+
+            // Notify the submitted
+            inv->_notify_commport->dputMessage(
+                new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                false,
+                inv,
+                std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
+                    "Invocation was forcefully failed by the scheduler"),
+                this->getMessagePayloadValue(ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+        }
     }
 
     /**
@@ -1118,10 +1159,8 @@ namespace wrench {
         }
 
         // Send all failure notifications
-        for (auto& [image, q] : _state_of_the_system->_admitted_invocations) {
-            while (not q.empty()) {
-                const auto inv = q.front();
-                q.pop();
+        for (auto& [image, list] : _state_of_the_system->_admitted_invocations) {
+            for (auto const &inv : list) {
                 inv->_notify_commport->dputMessage(
                     new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                         false,
@@ -1257,7 +1296,7 @@ namespace wrench {
 
             if (this->isInvocationAdmittable(invocation)) {
                 _state_of_the_system->_new_invocations.pop();
-                _state_of_the_system->_admitted_invocations[image].push(invocation);
+                _state_of_the_system->_admitted_invocations[image].push_back(invocation);
                 continue;
             }
 
@@ -1285,7 +1324,7 @@ namespace wrench {
                 }
             }
             _state_of_the_system->_new_invocations.pop();
-            _state_of_the_system->_admitted_invocations[image].push(invocation);
+            _state_of_the_system->_admitted_invocations[image].push_back(invocation);
         }
     }
 
