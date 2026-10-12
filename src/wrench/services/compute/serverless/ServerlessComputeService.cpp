@@ -812,7 +812,7 @@ namespace wrench {
             // All layers are available for this image!
             auto& to_make_schedulable = _state_of_the_system->_admitted_invocations.at(image);
             _state_of_the_system->_schedulable_invocations.insert(
-                _state_of_the_system->_schedulable_invocations.begin(), to_make_schedulable.begin(), to_make_schedulable.end());
+                _state_of_the_system->_schedulable_invocations.end(), to_make_schedulable.begin(), to_make_schedulable.end());
             _state_of_the_system->_admitted_invocations.at(image).clear();
             images_to_remove_from_admitted_map.insert(image);
         }
@@ -956,17 +956,22 @@ namespace wrench {
         for (const auto& [inv] : decisions) {
             // Is the invocation running?
             if (_state_of_the_system->_running_invocations.count(inv) > 0) {
-                WRENCH_INFO("Cannot forcefully termine a running invocation");
+                WRENCH_INFO("Cannot forcefully termine a running invocation - ignoring scheduling decision");
                 continue;
             }
             auto image = inv->getFunction()->getImage();
 
+            bool send_notification_message = false;
+
             // Is the invocation admitted?
             {
-                auto it = std::find(_state_of_the_system->_admitted_invocations.at(image).begin(),
-                    _state_of_the_system->_admitted_invocations.at(image).end(), inv);
-                if (it != _state_of_the_system->_admitted_invocations.at(image).end()) {
-                    _state_of_the_system->_admitted_invocations.at(image).erase(it);
+                if (_state_of_the_system->_admitted_invocations.find(image) != _state_of_the_system->_admitted_invocations.end()) {
+                    auto it = std::find(_state_of_the_system->_admitted_invocations.at(image).begin(),
+                        _state_of_the_system->_admitted_invocations.at(image).end(), inv);
+                    if (it != _state_of_the_system->_admitted_invocations.at(image).end()) {
+                        _state_of_the_system->_admitted_invocations.at(image).erase(it);
+                        send_notification_message = true;
+                    }
                 }
             }
 
@@ -976,17 +981,20 @@ namespace wrench {
                     _state_of_the_system->_schedulable_invocations.end(), inv);
                 if (it != _state_of_the_system->_schedulable_invocations.end()) {
                     _state_of_the_system->_schedulable_invocations.erase(it);
+                    send_notification_message = true;
                 }
             }
 
             // Notify the submitted
-            inv->_notify_commport->dputMessage(
-                new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-                false,
-                inv,
-                std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                    "Invocation was forcefully failed by the scheduler"),
-                this->getMessagePayloadValue(ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+            if (send_notification_message) {
+                inv->_notify_commport->dputMessage(
+                    new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                    false,
+                    inv,
+                    std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
+                        "Invocation was forcefully failed by the scheduler"),
+                    this->getMessagePayloadValue(ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+            }
         }
     }
 
