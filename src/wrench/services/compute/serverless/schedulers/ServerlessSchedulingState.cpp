@@ -19,7 +19,7 @@ namespace wrench {
     ServerlessSchedulingState::ServerlessSchedulingState(const ServerlessStateOfTheSystem* state,
         const std::vector<std::shared_ptr<Invocation>>&schedulable_invocations) {
 
-        _compute_nodes = state->getComputeNodes();
+        _activated_compute_nodes = state->getActivatedComputeNodes();
         _slots_available = state->getNumFreeSlots();
         _ram_available = state->getAvailableRAMSpace();
         _disk_available = state->getAvailableDiskSpace();
@@ -31,7 +31,7 @@ namespace wrench {
         }
 
         // Initialize and build useful maps
-        for (const auto &node : state->getComputeNodes()) {
+        for (const auto &node : _activated_compute_nodes) {
 
             _image_layers_on_disk[node] = state->getImageLayersOnDiskAtNode(node);
             _image_layers_on_their_way_to_disk[node] = state->getImageLayersBeingCopiedToNode(node);

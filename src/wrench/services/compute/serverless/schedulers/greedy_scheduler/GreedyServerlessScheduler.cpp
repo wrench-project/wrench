@@ -379,7 +379,7 @@ namespace wrench {
         /* Filter out all compute nodes that have no available slots, just in case the node
          * selection policy didn't! (and preserve a deterministic order) */
         std::vector<std::shared_ptr<ServerlessComputeNode>> candidate_nodes;
-        for (const auto& node : scheduling_state->_compute_nodes) {
+        for (const auto& node : scheduling_state->_activated_compute_nodes) {
             if (selected_nodes.count(node) && scheduling_state->_slots_available.at(node) > 0) {
                 candidate_nodes.push_back(node);
             }

@@ -35,7 +35,7 @@ namespace wrench
     class ServerlessStateOfTheSystem {
 
     public:
-        [[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>> getComputeNodes() const;
+        [[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>> getActivatedComputeNodes() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> getNumFreeSlots() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
@@ -77,7 +77,8 @@ namespace wrench
         sg_size_t _free_space_on_head_storage; // We keep track of it ourselves to avoid concurrency shenanigans
 
         // list of compute nodes
-        std::vector<std::shared_ptr<ServerlessComputeNode>> _compute_nodes;
+        std::vector<std::shared_ptr<ServerlessComputeNode>> _activated_compute_nodes;
+        std::vector<std::shared_ptr<ServerlessComputeNode>> _deactivated_compute_nodes;
 
         // Layer tracking
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_in_ram;

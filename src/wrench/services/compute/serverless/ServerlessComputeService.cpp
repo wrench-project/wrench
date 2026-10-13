@@ -222,46 +222,63 @@ namespace wrench {
         if (key == "num_hosts") {
             // Num hosts
             std::map<std::string, double> num_hosts;
-            num_hosts.insert(std::make_pair(this->getName(), _state_of_the_system->_compute_nodes.size()));
+            num_hosts.insert(std::make_pair(this->getName(),
+                                            _state_of_the_system->_activated_compute_nodes.size() +
+                                            _state_of_the_system->_deactivated_compute_nodes.size()));
             return num_hosts;
         } else if (key == "num_cores") {
             // Num cores per host
             std::map<std::string, double> num_cores;
-            for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
+            for (auto const& compute_node : _state_of_the_system->_activated_compute_nodes) {
+                num_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
+            }
+            for (auto const& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
                 num_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
             }
             return num_cores;
         } else if (key == "num_idle_cores") {
             // Num idle cores per host
             std::map<std::string, double> num_idle_cores;
-            for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
+            for (const auto& compute_node : _state_of_the_system->_activated_compute_nodes) {
                 unsigned long num_used_slots = compute_node->getNumSlots() - compute_node->getNumFreeSlots();
                 unsigned long count = (num_used_slots < _compute_node_num_cores
                                            ? _compute_node_num_cores - num_used_slots
                                            : 0);
                 num_idle_cores[compute_node->hostname] = static_cast<double>(count);
             }
+            for (const auto& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
+                num_idle_cores[compute_node->hostname] = _compute_node_num_cores;
+            }
             return num_idle_cores;
         } else if (key == "flop_rates") {
             // Flop rate per host
             std::map<std::string, double> flop_rates;
-            for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
+            for (const auto& compute_node : _state_of_the_system->_activated_compute_nodes) {
+                flop_rates[compute_node->hostname] = S4U_Simulation::getHostFlopRate(compute_node->hostname);
+            }
+            for (const auto& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
                 flop_rates[compute_node->hostname] = S4U_Simulation::getHostFlopRate(compute_node->hostname);
             }
             return flop_rates;
         } else if (key == "ram_capacities") {
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
-            for (const auto& compute_node : _state_of_the_system->_compute_nodes) {
+            for (const auto& compute_node : _state_of_the_system->_activated_compute_nodes) {
+                ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
+            }
+            for (const auto& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
                 ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
             }
             return ram_capacities;
         } else if (key == "ram_availabilities") {
             // RAM availability per host
             std::map<std::string, double> ram_availability;
-            for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
+            for (auto const& compute_node : _state_of_the_system->_activated_compute_nodes) {
                 ram_availability[compute_node->hostname] = static_cast<double>(compute_node->_memory->
                     getTotalFreeSpaceZeroTime());
+            }
+            for (auto const& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
+                ram_availability[compute_node->hostname] = _compute_node_ram;
             }
             return ram_availability;
         } else {
@@ -364,11 +381,11 @@ namespace wrench {
 
         bool do_scheduling = true;
         do {
-            // At each compute node, if an image layer is in RAM but not on Disk, due to what we did in the previous
+            // At each activated compute node, if an image layer is in RAM but not on Disk, due to what we did in the previous
             // scheduling decisions, remove it from RAM (to be realistic).
             // This is a hack, but, as of now, there is no way to "tie" two files together. This
             // should never happen unless the scheduler is buggy, but better safe than sorry
-            for (auto const& node : _state_of_the_system->_compute_nodes) {
+            for (auto const& node : _state_of_the_system->_activated_compute_nodes) {
                 for (auto const& rf : _state_of_the_system->_functions) {
                     auto image = rf->getImage();
                     for (auto const& layer : image->getLayers()) {
@@ -558,7 +575,8 @@ namespace wrench {
                 message)) {
             bool has_available_resources = false;
 
-            for (const auto& node : _state_of_the_system->_compute_nodes) {
+            // Look at activated compute nodes first
+            for (const auto& node : _state_of_the_system->_activated_compute_nodes) {
                 // Both requirements must be satisfied on the same node.
                 unsigned long num_used_slots = node->getNumSlots() - node->getNumFreeSlots();
                 unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores
@@ -568,6 +586,16 @@ namespace wrench {
                     node->_memory->getTotalFreeSpaceZeroTime() >= csitalohwarr_msg->ram) {
                     has_available_resources = true;
                     break;
+                }
+            }
+            // Look at de-activated compute nodes if need be (as they could become activated)
+            if (not has_available_resources) {
+                for (const auto& node : _state_of_the_system->_deactivated_compute_nodes) {
+                    if (_compute_node_num_cores >= csitalohwarr_msg->num_cores && _compute_node_ram >= csitalohwarr_msg
+                        ->ram) {
+                        has_available_resources = true;
+                        break;
+                    }
                 }
             }
 
@@ -940,7 +968,7 @@ namespace wrench {
             if (std::find(ready.begin(), ready.end(), invocation) == ready.end() ||
                 dispatched_invocations.count(invocation) != 0) {
                 WRENCH_INFO("Ignoring dispatch scheduling decision for non-dispatchable invocation for function %s",
-                    invocation->getFunction()->getName().c_str());
+                            invocation->getFunction()->getName().c_str());
                 continue;
             }
 
@@ -1159,7 +1187,7 @@ namespace wrench {
      */
     void ServerlessComputeService::terminateAllServicesAndReleaseAllResources() {
         // Shutdown all containers (it doesn't actually kill the running functions, but who cares really)
-        for (auto const& node : _state_of_the_system->_compute_nodes) {
+        for (auto const& node : _state_of_the_system->_activated_compute_nodes) {
             node->killAllContainers();
         }
 
@@ -1167,7 +1195,13 @@ namespace wrench {
         _state_of_the_system->_head_storage_service->stop();
 
         // Terminate all node storage services
-        for (auto const& node : _state_of_the_system->_compute_nodes) {
+        for (auto const& node : _state_of_the_system->_activated_compute_nodes) {
+            node->_disk->stop();
+            node->_disk.reset();
+            node->_memory->stop();
+            node->_memory.reset();
+        }
+        for (auto const& node : _state_of_the_system->_deactivated_compute_nodes) {
             node->_disk->stop();
             node->_disk.reset();
             node->_memory->stop();
@@ -1218,66 +1252,75 @@ namespace wrench {
     }
 
     /**
+     * @brief Start disk/ram storage services at a node.
+     */
+    void ServerlessComputeService::startServicesAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node) {
+        if (not S4U_Simulation::hostHasMountPoint(node->hostname, "/")) {
+            throw std::invalid_argument("ServerlessComputeService::startComputeNodeServices(): "
+                "each compute node in a serverless compute service should have a \"/\" mountpoint");
+        }
+
+        // Start a compute service, to implement compute-node storage
+        {
+            const auto ss = std::dynamic_pointer_cast<SimpleStorageService>(this->simulation_->startNewService(
+                SimpleStorageService::createSimpleStorageService(
+                    node->hostname,
+                    {"/"},
+                    {
+                        {
+                            SimpleStorageServiceProperty::BUFFER_SIZE,
+                            this->getPropertyValueAsString(
+                                ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
+                        }
+                    },
+                    {})));
+            ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
+            node->_disk = ss;
+        }
+
+        // Start a compute service, with LRU caching, to implement compute-node memory
+        {
+            // Create a RAM disk on the compute node
+            auto host = simgrid::s4u::Engine::get_instance()->host_by_name(node->hostname);
+            auto ram_disk = host->add_disk(
+                "ram_disk_" + std::to_string(_sequence_number++),
+                S4U_Simulation::RAM_READ_BANDWIDTH,
+                S4U_Simulation::RAM_WRITE_BANDWIDTH);
+            auto ram_capacity = S4U_Simulation::getHostMemoryCapacity(node->hostname);
+            std::string ram_mount_point = "/" + ram_disk->get_name();
+            ram_disk->set_property("size", std::to_string(ram_capacity) + "B");
+            ram_disk->set_property("mount", ram_mount_point);
+
+            const auto ss = std::dynamic_pointer_cast<SimpleStorageService>(this->simulation_->startNewService(
+                SimpleStorageService::createSimpleStorageService(
+                    node->hostname,
+                    {ram_mount_point},
+                    {
+                        // {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"},
+                        {
+                            SimpleStorageServiceProperty::BUFFER_SIZE,
+                            this->getPropertyValueAsString(
+                                ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
+                        }
+                    },
+                    {})));
+            ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
+            node->_memory = ss;
+        }
+    }
+
+    /**
      * @brief Start a SimpleStorageService for each compute node. We don't start a bare-metal
      *        service as we'll do everything ourselves with action executor services.
      */
     void ServerlessComputeService::startComputeNodeServices() {
-        for (auto const& compute_node : _state_of_the_system->_compute_nodes) {
-            if (not S4U_Simulation::hostHasMountPoint(compute_node->hostname, "/")) {
-                throw std::invalid_argument("ServerlessComputeService::startComputeNodeServices(): "
-                    "each compute node in a serverless compute service should have a \"/\" mountpoint");
-            }
-
-            // Start a compute service, to implement compute-node storage
-            {
-                const auto ss = std::dynamic_pointer_cast<SimpleStorageService>(this->simulation_->startNewService(
-                    SimpleStorageService::createSimpleStorageService(
-                        compute_node->hostname,
-                        {"/"},
-                        {
-                            {
-                                SimpleStorageServiceProperty::BUFFER_SIZE,
-                                this->getPropertyValueAsString(
-                                    ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
-                            }
-                        },
-                        {})));
-                ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
-                compute_node->_disk = ss;
-            }
-
-            // Start a compute service, with LRU caching, to implement compute-node memory
-            {
-                // Create a RAM disk on the compute node
-                auto host = simgrid::s4u::Engine::get_instance()->host_by_name(compute_node->hostname);
-                auto ram_disk = host->add_disk(
-                    "ram_disk_" + std::to_string(_sequence_number++),
-                    S4U_Simulation::RAM_READ_BANDWIDTH,
-                    S4U_Simulation::RAM_WRITE_BANDWIDTH);
-                auto ram_capacity = S4U_Simulation::getHostMemoryCapacity(compute_node->hostname);
-                std::string ram_mount_point = "/" + ram_disk->get_name();
-                ram_disk->set_property("size", std::to_string(ram_capacity) + "B");
-                ram_disk->set_property("mount", ram_mount_point);
-
-                const auto ss = std::dynamic_pointer_cast<SimpleStorageService>(this->simulation_->startNewService(
-                    SimpleStorageService::createSimpleStorageService(
-                        compute_node->hostname,
-                        {ram_mount_point},
-                        {
-                            // {SimpleStorageServiceProperty::CACHING_BEHAVIOR, "LRU"},
-                            {
-                                SimpleStorageServiceProperty::BUFFER_SIZE,
-                                this->getPropertyValueAsString(
-                                    ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE)
-                            }
-                        },
-                        {})));
-                ss->setNetworkTimeoutValue(this->getNetworkTimeoutValue());
-                compute_node->_memory = ss;
-            }
+        for (auto const& compute_node : _state_of_the_system->_activated_compute_nodes) {
+            this->startServicesAtComputeNode(compute_node);
+        }
+        for (auto const& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
+            this->startServicesAtComputeNode(compute_node);
         }
     }
-
 
     /**
      * @brief Helper method to start the storage service on the head node

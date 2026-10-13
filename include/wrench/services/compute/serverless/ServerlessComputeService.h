@@ -28,8 +28,9 @@ namespace wrench {
     class ServerlessComputeService : public ComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-            {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "infinity"},
+            {ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED, "true"},
             {ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "0"},
+            {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "infinity"},
             {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0"},
@@ -203,6 +204,7 @@ namespace wrench {
 
         void startHeadStorageService();
         void startComputeNodeServices();
+        void startServicesAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
 
         void initiateImageLayerDownloadFromRemote(const std::shared_ptr<ImageLayer>& layer);
         void initiateImageLayerCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,

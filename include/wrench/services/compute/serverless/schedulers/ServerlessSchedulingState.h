@@ -31,13 +31,15 @@ namespace wrench {
 
         ~ServerlessSchedulingState() = default;
 
-	    /** @brief The compute nodes */
-        std::vector<std::shared_ptr<ServerlessComputeNode>> _compute_nodes;
+	    /** @brief The activated compute nodes */
+        std::vector<std::shared_ptr<ServerlessComputeNode>> _activated_compute_nodes;
 
 	    /** @brief Map of slot availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _slots_available;
+
         /** @brief Map of RAM availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _ram_available;
+
         /** @brief Map of disk availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _disk_available;
 
@@ -52,11 +54,13 @@ namespace wrench {
 
 	    /** @brief Map of on-disk image layers */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_disk;
+
 	    /** @brief Map of soon-to-be-on-disk image layers */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_their_way_to_disk;
 
 	    /** @brief Map of in-RAM image layers */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_in_ram;
+
 	    /** @brief Map of soon-to-be-in-RAM image layers */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_their_way_to_ram;
 

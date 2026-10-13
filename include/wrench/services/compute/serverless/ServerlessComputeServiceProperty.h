@@ -24,6 +24,11 @@ namespace wrench {
 
     public:
 
+        /** @brief Whether compute nodes are initially all activated (i.e., usable immediatelu).
+         * ("true": all activated, "false": all de-activated; default: "true")
+         **/
+        DECLARE_PROPERTY_NAME(COMPUTE_NODES_INITIALLY_ACTIVATED);
+
         /** @brief The maximum number of containers that can be started/running per compute node
          * (default value: same as number of cores per compute node)
          **/
