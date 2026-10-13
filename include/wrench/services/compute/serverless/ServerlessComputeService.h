@@ -184,6 +184,7 @@ namespace wrench {
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
+        void failInvocations(const std::vector<FailInvocation>& decisions);
         void terminateIdleContainers(const std::vector<TerminateIdleContainer>& decisions) const;
         void evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const;
         void evictLayersFromDisk(const std::vector<EvictLayerFromDisk>& decisions) const;
