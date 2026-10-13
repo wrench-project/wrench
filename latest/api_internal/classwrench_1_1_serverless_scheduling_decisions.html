@@ -323,6 +323,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions26image_layer_copies_to_diskE"><code class="docutils literal notranslate"><span class="pre">image_layer_copies_to_disk</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions24image_layer_loads_to_RAME"><code class="docutils literal notranslate"><span class="pre">image_layer_loads_to_RAM</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions21invocation_dispatchesE"><code class="docutils literal notranslate"><span class="pre">invocation_dispatches</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions16invocation_failsE"><code class="docutils literal notranslate"><span class="pre">invocation_fails</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions25layer_evictions_from_diskE"><code class="docutils literal notranslate"><span class="pre">layer_evictions_from_disk</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions24layer_evictions_from_ramE"><code class="docutils literal notranslate"><span class="pre">layer_evictions_from_ram</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions21scheduler_wakeup_dateE"><code class="docutils literal notranslate"><span class="pre">scheduler_wakeup_date</span></code></a></li>
@@ -477,6 +478,7 @@
 <span id="_CPPv3N6wrench29ServerlessSchedulingDecisionsE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisionsE"></span><span id="wrench::ServerlessSchedulingDecisions"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessSchedulingDecisions</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisionsE" title="Link to this definition"></a><br /></dt>
 <dd><p>A data structure that stores all scheduling decisions made by a serverless scheduler: </p>
 <p><ul class="simple">
+<li><p>Which invocations to fail</p></li>
 <li><p>Which idle container to terminate</p></li>
 <li><p>Which layer to evict from RAM</p></li>
 <li><p>Which layer to evict from disk</p></li>
@@ -524,6 +526,12 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessSchedulingDecisions21invocation_dispatchesE">
 <span id="_CPPv3N6wrench29ServerlessSchedulingDecisions21invocation_dispatchesE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisions21invocation_dispatchesE"></span><span id="wrench::ServerlessSchedulingDecisions::invocation_dispatches__std::vector:DispatchInvocation:"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions_1afc49305e2102edcae6d8be3178c23b37"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">DispatchInvocation</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">invocation_dispatches</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions21invocation_dispatchesE" title="Link to this definition"></a><br /></dt>
 <dd><p>The list of function invocations at compute nodes. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessSchedulingDecisions16invocation_failsE">
+<span id="_CPPv3N6wrench29ServerlessSchedulingDecisions16invocation_failsE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisions16invocation_failsE"></span><span id="wrench::ServerlessSchedulingDecisions::invocation_fails__std::vector:FailInvocation:"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions_1a5a196b270f70216e89cb713e71fa78ab"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">FailInvocation</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">invocation_fails</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions16invocation_failsE" title="Link to this definition"></a><br /></dt>
+<dd><p>The list of invocations to fail </p>
 </dd></dl>
 
 <dl class="cpp var">
