@@ -409,6 +409,8 @@ namespace wrench {
                 // even a super naive scheduler can be used, even though most of its scheduling
                 // decisions may not feasible at a given time. It will just be invoked again later.
 
+                // Activate compute nodes, if any
+                activateComputeNodes(decisions->compute_node_activations);
                 // Fail invocations if any
                 failInvocations(decisions->invocation_fails);
                 // Terminate idle containers if any
@@ -614,6 +616,12 @@ namespace wrench {
             do_scheduling = true;
             _scheduler_wakeup_alarm = nullptr;
             _next_scheduler_wakeup_date.reset();
+            return true;
+        } else if (const auto scsnam_msg = std::dynamic_pointer_cast<
+            ServerlessComputeServiceNodesActivatedMessage>(message)) {
+            for (auto const& node : scsnam_msg->_nodes) {
+                _state_of_the_system->_activated_compute_nodes.push_back(node);
+            }
             return true;
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -1458,6 +1466,44 @@ namespace wrench {
         decisions->print();
 #endif
         return decisions;
+    }
+
+    /**
+     * @brief Helper method to initiate compute node activations
+     * @param decisions
+     */
+    void ServerlessComputeService::activateComputeNodes(const std::vector<ActivateComputeNodes>& decisions) {
+        unsigned long num_to_activate = 0;
+        for (const auto& decision : decisions) {
+            num_to_activate += decision.num_compute_nodes;
+        }
+        if (num_to_activate == 0) {
+            return;
+        }
+
+        if (_state_of_the_system->_deactivated_compute_nodes.size() < num_to_activate) {
+            WRENCH_INFO(
+                "Scheduling decision to activate %lu compute nodes, but activating all %lu deactivated nodes instead",
+                num_to_activate, _state_of_the_system->_deactivated_compute_nodes.size());
+            num_to_activate = _state_of_the_system->_deactivated_compute_nodes.size();
+        }
+
+        // Remove the last num_to_activates compute node from the deactivated list
+        std::vector<std::shared_ptr<ServerlessComputeNode>>& deactivated_nodes =
+            _state_of_the_system->_deactivated_compute_nodes;
+        const auto first =
+            deactivated_nodes.end() -
+            static_cast<typename std::vector<std::shared_ptr<ServerlessComputeNode>>::difference_type>(num_to_activate);
+        std::vector to_activate(std::make_move_iterator(first),
+                                std::make_move_iterator(deactivated_nodes.end()));
+        deactivated_nodes.erase(first, deactivated_nodes.end());
+
+        Alarm::createAndStartAlarm(this->simulation_,
+                                   S4U_Simulation::getClock() + this->getPropertyValueAsDouble(
+                                       ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD),
+                                   _hostname, _commport,
+                                   new ServerlessComputeServiceNodesActivatedMessage(to_activate),
+                                   "nodes_activated");
     }
 
     /**

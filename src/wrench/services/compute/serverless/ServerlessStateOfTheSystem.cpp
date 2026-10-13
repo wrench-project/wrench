@@ -50,11 +50,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter for the compute hosts
-     * @return The compute hosts
+     * @brief Getter for the compute nodes
+     * @return The compute nodes
      */
     std::vector<std::shared_ptr<ServerlessComputeNode>> ServerlessStateOfTheSystem::getActivatedComputeNodes() const {
         return _activated_compute_nodes;
+    }
+
+    /**
+     * @brief Get the number of deactivated compute nodes
+     * @return A number of nodes
+     */
+    unsigned long ServerlessStateOfTheSystem::getNumDeactivatedComputeNodes() const {
+        return _deactivated_compute_nodes.size();
     }
 
     /**

@@ -29,11 +29,12 @@ namespace wrench {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
             {ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED, "true"},
+            {ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "0"},
             {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "infinity"},
-            {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0"},
-            {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0"},
-            {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0"},
+            {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0s"},
+            {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0s"},
+            {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0s"},
             {ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "0"},
             {ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "true"}
         };
@@ -185,6 +186,7 @@ namespace wrench {
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
+        void activateComputeNodes(const std::vector<ActivateComputeNodes>& decisions);
         void failInvocations(const std::vector<FailInvocation>& decisions);
         void terminateIdleContainers(const std::vector<TerminateIdleContainer>& decisions) const;
         void evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const;

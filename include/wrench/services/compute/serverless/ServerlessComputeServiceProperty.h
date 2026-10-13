@@ -24,10 +24,16 @@ namespace wrench {
 
     public:
 
-        /** @brief Whether compute nodes are initially all activated (i.e., usable immediatelu).
+        /** @brief Whether compute nodes are initially all activated (i.e., usable immediately).
          * ("true": all activated, "false": all de-activated; default: "true")
          **/
         DECLARE_PROPERTY_NAME(COMPUTE_NODES_INITIALLY_ACTIVATED);
+
+        /** @brief The compute node activation overhead; activating multiple nodes at once incurs this overhead only once (default value: "0s")
+         *  Examples: "5s", "5000ms", etc.
+         **/
+        DECLARE_PROPERTY_NAME(COMPUTE_NODE_ACTIVATION_OVERHEAD);
+
 
         /** @brief The maximum number of containers that can be started/running per compute node
          * (default value: same as number of cores per compute node)
@@ -39,13 +45,13 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(MAX_OUTSTANDING_INVOCATIONS);
 
-        /** @brief The overhead for the compute service to process an incoming request (default value: "0", default unit: seconds):
-         *         Examples: "5", "5s", "5000ms", etc.
+        /** @brief The overhead for the compute service to process an incoming request (default value: "0s", default unit: seconds):
+         *         Examples: "5s", "5000ms", etc.
          **/
         DECLARE_PROPERTY_NAME(INVOCATION_PROCESSING_OVERHEAD);
 
-        /** @brief The overhead to start a container after the image has been loaded into RAM (default value: "0", default unit: seconds):
-         *         Examples: "5", "5s", "5000ms", etc.
+        /** @brief The overhead to start a container after the image has been loaded into RAM (default value: "0s", default unit: seconds):
+         *         Examples: "5s", "5000ms", etc.
          **/
         DECLARE_PROPERTY_NAME(CONTAINER_STARTUP_OVERHEAD);
 

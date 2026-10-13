@@ -173,27 +173,39 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param invocation_ordering the invocation sorting policy
+     * @param node_activation_policy the node activation policy
+     * @param invocation_ordering the invocation ordering policy
+     * @param node_selection the node selection policy
      * @param eviction the eviction policy
      * @param plan_selection the plan selection policy
      */
     GreedyServerlessScheduler::GreedyServerlessScheduler(
-            std::shared_ptr<ServerlessInvocationOrderingPolicy> invocation_ordering,
-            std::shared_ptr<ServerlessNodeSelectionPolicy> node_selection,
-            std::shared_ptr<ServerlessEvictionPolicy> eviction,
-            std::shared_ptr<ServerlessPlanSelectionPolicy> plan_selection) :
-                  _invocation_ordering_policy(std::move(invocation_ordering)),
-                  _node_selection_policy(std::move(node_selection)),
-                  _eviction_policy(std::move(eviction)),
-                  _plan_selection_policy(std::move(plan_selection)) {
-
-        if (!_invocation_ordering_policy ||
+        std::shared_ptr<ServerlessNodeActivationPolicy> node_activation_policy,
+        std::shared_ptr<ServerlessInvocationOrderingPolicy> invocation_ordering,
+        std::shared_ptr<ServerlessNodeSelectionPolicy> node_selection,
+        std::shared_ptr<ServerlessEvictionPolicy> eviction,
+        std::shared_ptr<ServerlessPlanSelectionPolicy> plan_selection) :
+        _node_activation_policy(std::move(node_activation_policy)),
+        _invocation_ordering_policy(std::move(invocation_ordering)),
+        _node_selection_policy(std::move(node_selection)),
+        _eviction_policy(std::move(eviction)),
+        _plan_selection_policy(std::move(plan_selection)) {
+        if (!_node_activation_policy ||
+            !_invocation_ordering_policy ||
             !_node_selection_policy ||
             !_eviction_policy ||
             !_plan_selection_policy) {
             throw std::invalid_argument(
                 "GreedyServerlessScheduler requires non-null policies");
-            }
+        }
+    }
+
+    /**
+     * @brief Get the scheduler's node activation policy
+     * @return the policy
+     */
+    ServerlessNodeActivationPolicy* GreedyServerlessScheduler::getNodeActivationPolicy() const {
+        return _node_activation_policy.get();
     }
 
     /**
@@ -216,7 +228,7 @@ namespace wrench {
      * @brief Get the scheduler's eviction policy
      * @return the policy
      */
-    ServerlessEvictionPolicy *GreedyServerlessScheduler::getEvictionPolicy() const {
+    ServerlessEvictionPolicy* GreedyServerlessScheduler::getEvictionPolicy() const {
         return _eviction_policy.get();
     }
 
@@ -224,7 +236,7 @@ namespace wrench {
      * @brief Get the scheduler's plan selection policy
      * @return the policy
      */
-    ServerlessPlanSelectionPolicy *GreedyServerlessScheduler::getPlanSelectionPolicy() const {
+    ServerlessPlanSelectionPolicy* GreedyServerlessScheduler::getPlanSelectionPolicy() const {
         return _plan_selection_policy.get();
     }
 
@@ -245,6 +257,12 @@ namespace wrench {
 
         // Create a scheduling state
         auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, schedulable_invocations);
+
+        // In invoke the node activation policy
+        auto num_nodes_to_activate = _node_activation_policy->selectNumNodesToActivate(scheduling_state);
+        if (num_nodes_to_activate) {
+            decisions->compute_node_activations.push_back({num_nodes_to_activate});
+        }
 
         // Sort the schedulable invocations
         auto sorted_schedulable_invocations = _invocation_ordering_policy->sortSchedulableInvocations(
@@ -578,7 +596,7 @@ namespace wrench {
             // Pick candidate to evict
             auto to_evict =
                 _eviction_policy->pickIdleContainersForEviction(scheduling_state->_idle_containers.at(node), needed_ram,
-                                                    needed_disk);
+                                                                needed_disk);
 
             // Encode scheduling decisions
             for (auto const& idle_container : to_evict) {
@@ -793,5 +811,4 @@ namespace wrench {
 
         return eviction_decisions;
     }
-
 } // namespace wrench

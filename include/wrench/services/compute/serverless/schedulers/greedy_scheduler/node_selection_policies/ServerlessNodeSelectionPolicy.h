@@ -14,7 +14,7 @@ namespace wrench {
     class ServerlessComputeNode;
 
     /**
-     * @brief An abstract class to implement a serverless node evaluation policy
+     * @brief An abstract class to implement a serverless node selection policy
      */
     class ServerlessNodeSelectionPolicy {
     public:

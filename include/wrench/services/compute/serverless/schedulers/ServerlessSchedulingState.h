@@ -34,6 +34,9 @@ namespace wrench {
 	    /** @brief The activated compute nodes */
         std::vector<std::shared_ptr<ServerlessComputeNode>> _activated_compute_nodes;
 
+    	/** @brief The number of deactivated compute nodes */
+    	unsigned long _num_deactivated_compute_nodes;
+
 	    /** @brief Map of slot availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _slots_available;
 

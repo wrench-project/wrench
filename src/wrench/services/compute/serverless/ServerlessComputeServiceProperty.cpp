@@ -12,6 +12,7 @@
 namespace wrench {
 
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, COMPUTE_NODES_INITIALLY_ACTIVATED);
+    SET_PROPERTY_NAME(ServerlessComputeServiceProperty, COMPUTE_NODE_ACTIVATION_OVERHEAD);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, MAX_OUTSTANDING_INVOCATIONS);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, INVOCATION_PROCESSING_OVERHEAD);

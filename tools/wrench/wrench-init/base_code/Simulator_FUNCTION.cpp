@@ -124,6 +124,7 @@ int main(int argc, char **argv) {
 
     /* Instantiate the build-in serverless scheduler, with some policy options */
     auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
+        std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
         std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
         std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
         std::make_shared<wrench::LRUServerlessEvictionPolicy>(),

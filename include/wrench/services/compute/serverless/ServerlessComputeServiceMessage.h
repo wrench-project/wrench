@@ -218,6 +218,9 @@ namespace wrench {
         std::uint64_t _idle_sequence;
     };
 
+    /**
+     * @brief a message sent to a ServerlessComputeService to notify that a container prewarm has completed
+     */
     class ServerlessComputeServiceContainerPrewarmCompleteMessage : public ServerlessComputeServiceMessage {
     public:
         explicit ServerlessComputeServiceContainerPrewarmCompleteMessage(std::shared_ptr<Container> container);
@@ -226,9 +229,23 @@ namespace wrench {
         std::shared_ptr<Container> _container;
     };
 
+    /**
+     * @brief a message sent to a ServerlessComputeService to notify that the scheduler should be invoked
+     */
     class ServerlessComputeServiceSchedulerWakeupMessage : public ServerlessComputeServiceMessage {
-        public:
-             ServerlessComputeServiceSchedulerWakeupMessage();
+    public:
+        ServerlessComputeServiceSchedulerWakeupMessage();
+    };
+
+    /**
+     * @brief a message sent to a ServerlessComputeService to notify that some compute nodes have been activated
+     */
+    class ServerlessComputeServiceNodesActivatedMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceNodesActivatedMessage(std::vector<std::shared_ptr<ServerlessComputeNode>> nodes);
+
+        /** @brief The nodes to activate */
+        std::vector<std::shared_ptr<ServerlessComputeNode>> _nodes;
     };
 
     /***********************/
