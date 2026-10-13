@@ -940,7 +940,7 @@ namespace wrench {
             if (std::find(ready.begin(), ready.end(), invocation) == ready.end() ||
                 dispatched_invocations.count(invocation) != 0) {
                 WRENCH_INFO("Ignoring dispatch scheduling decision for non-dispatchable invocation for function %s",
-                    invocation->getFunction()->getName());
+                    invocation->getFunction()->getName().c_str());
                 continue;
             }
 
