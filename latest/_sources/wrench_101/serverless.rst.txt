@@ -29,7 +29,8 @@ on a core of a compute node consists in:
 
 - Copying the function's image from the head node's storage to the compute node's storage, if not already present there
 - Loading the function's image from the compute node's storage to the compute node's RAM, if not already present there
-- Executing the function's code
+- Starting a container on the compute node, if not re-using an idle or pre-warmed container
+- Executing the function's code on the container
 
 The choice of which function invocation to execute on which compute node is done by a
 :cpp:class:`wrench::ServerlessScheduler` class.  A key thing to note is that each compute node's

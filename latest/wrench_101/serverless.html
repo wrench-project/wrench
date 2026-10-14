@@ -110,7 +110,8 @@ on a core of a compute node consists in:</p>
 <ul class="simple">
 <li><p>Copying the function’s image from the head node’s storage to the compute node’s storage, if not already present there</p></li>
 <li><p>Loading the function’s image from the compute node’s storage to the compute node’s RAM, if not already present there</p></li>
-<li><p>Executing the function’s code</p></li>
+<li><p>Starting a container on the compute node, if not re-using an idle or pre-warmed container</p></li>
+<li><p>Executing the function’s code on the container</p></li>
 </ul>
 <p>The choice of which function invocation to execute on which compute node is done by a
 <a class="reference internal" href="../api_internal/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE" title="wrench::ServerlessScheduler"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">wrench::ServerlessScheduler</span></code></a> class.  A key thing to note is that each compute node’s
