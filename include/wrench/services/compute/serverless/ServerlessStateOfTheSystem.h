@@ -37,6 +37,7 @@ namespace wrench
     public:
         [[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>> getActivatedComputeNodes() const;
         [[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
+        [[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
 
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> getNumFreeSlots() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
@@ -80,6 +81,7 @@ namespace wrench
 
         // list of compute nodes
         std::vector<std::shared_ptr<ServerlessComputeNode>> _activated_compute_nodes;
+        std::set<std::shared_ptr<ServerlessComputeNode>> _being_activated_compute_nodes;
         std::vector<std::shared_ptr<ServerlessComputeNode>> _deactivated_compute_nodes;
 
         // Layer tracking

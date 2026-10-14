@@ -64,6 +64,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the number of deactivated compute nodes
+     * @return A number of nodes
+     */
+    unsigned long ServerlessStateOfTheSystem::getNumBeingActivatedComputeNodes() const {
+        return _being_activated_compute_nodes.size();
+    }
+
+    /**
      * @brief Getter for the map of available slots on activated nodes
      *
      * @return The free slot availability map

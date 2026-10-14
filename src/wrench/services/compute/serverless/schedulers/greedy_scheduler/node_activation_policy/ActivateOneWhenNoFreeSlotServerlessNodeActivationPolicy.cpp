@@ -10,10 +10,18 @@ namespace wrench {
     */
     unsigned long ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy::selectNumNodesToActivate(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
+
+        // If no node to activate, nevermind
         if (scheduling_state->_num_deactivated_compute_nodes == 0) {
             return 0;
         }
 
+        // If one activation in process, nevermind
+        if (scheduling_state->_num_being_activated_compute_nodes > 0) {
+            return 0;
+        }
+
+        // Activate one node only if there are no free slots in the system
         for (auto const& activated_node : scheduling_state->_activated_compute_nodes) {
             if (activated_node->getNumFreeSlots() > 0) {
                 return 0;

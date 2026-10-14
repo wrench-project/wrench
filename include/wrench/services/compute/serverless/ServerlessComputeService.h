@@ -197,7 +197,7 @@ namespace wrench {
         void prewarmContainers(const std::vector<PrewarmContainer>& decisions);
 
         bool isInvocationSchedulable(const std::shared_ptr<Invocation>& invocation) const;
-        bool isInvocationAdmittable(const std::shared_ptr<Invocation>& invocation) const;
+        bool canInvocationBeAdmitted(const std::shared_ptr<Invocation>& invocation) const;
 
         bool processNextMessage(bool& do_scheduling);
 
