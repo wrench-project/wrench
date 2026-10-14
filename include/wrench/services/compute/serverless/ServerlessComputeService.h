@@ -231,6 +231,7 @@ namespace wrench {
 
         std::optional<double> _next_scheduler_wakeup_date;
         std::shared_ptr<Alarm> _scheduler_wakeup_alarm;
+        std::set<std::shared_ptr<Alarm>> _node_activation_alarms;
 
         /***********************/
         /** \endcond          **/

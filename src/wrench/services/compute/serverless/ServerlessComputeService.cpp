@@ -606,6 +606,14 @@ namespace wrench {
                     break;
                 }
             }
+            // Look at being-activated compute nodes if need be (as they could become activated)
+            if (not has_available_resources) {
+                if ((not _state_of_the_system->_being_activated_compute_nodes.empty()) and
+                    (_compute_node_num_cores >= csitalohwarr_msg->num_cores) and
+                    (_compute_node_ram >= csitalohwarr_msg->ram)) {
+                    has_available_resources = true;
+                }
+            }
             // Look at de-activated compute nodes if need be (as they could become activated)
             if (not has_available_resources) {
                 if ((not _state_of_the_system->_deactivated_compute_nodes.empty()) and
@@ -636,6 +644,12 @@ namespace wrench {
             for (auto const& node : scsnam_msg->_nodes) {
                 _state_of_the_system->_being_activated_compute_nodes.erase(node);
                 _state_of_the_system->_activated_compute_nodes.push_back(node);
+            }
+            // If there are no nodes being activated, just clear all the alarms.
+            // Would be better to clear the specific alarm that sent us this message,
+            // but that's a bit complicated to do
+            if (_state_of_the_system->_being_activated_compute_nodes.empty()) {
+                _node_activation_alarms.clear();
             }
             return true;
         } else {
@@ -1251,6 +1265,12 @@ namespace wrench {
             _next_scheduler_wakeup_date.reset();
         }
 
+        // Terminate the node activation alarms if any
+        for (auto const &alarm : _node_activation_alarms) {
+            alarm->kill();
+        }
+        _node_activation_alarms.clear();
+
         // Send all failure notifications
         for (auto& [image, list] : _state_of_the_system->_admitted_invocations) {
             for (auto const& inv : list) {
@@ -1518,6 +1538,9 @@ namespace wrench {
             return;
         }
 
+        double activation_overhead = this->getPropertyValueAsTimeInSecond(
+                                       ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD);
+
         // Remove the last num_to_activates compute node from the deactivated list
         std::vector<std::shared_ptr<ServerlessComputeNode>>& deactivated_nodes =
             _state_of_the_system->_deactivated_compute_nodes;
@@ -1533,12 +1556,12 @@ namespace wrench {
             _state_of_the_system->_being_activated_compute_nodes.insert(node);
         }
 
-        Alarm::createAndStartAlarm(this->simulation_,
-                                   S4U_Simulation::getClock() + this->getPropertyValueAsTimeInSecond(
-                                       ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD),
+        auto alarm = Alarm::createAndStartAlarm(this->simulation_,
+                                   S4U_Simulation::getClock() + activation_overhead,
                                    _hostname, _commport,
                                    new ServerlessComputeServiceNodesActivatedMessage(to_activate),
                                    "nodes_activated");
+        _node_activation_alarms.insert(alarm);
     }
 
     /**
