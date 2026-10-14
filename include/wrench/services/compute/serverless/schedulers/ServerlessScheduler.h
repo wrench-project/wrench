@@ -1,5 +1,3 @@
-fmt: width must be positive
-
 #ifndef WRENCH_SERVERLESSSCHEDULER_H
 #define WRENCH_SERVERLESSSCHEDULER_H
 
