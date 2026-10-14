@@ -1,0 +1,8 @@
+.. _ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy:
+wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy
+***************************************************************
+
+.. doxygenclass:: wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy
+   :project: developer
+   :members:
+

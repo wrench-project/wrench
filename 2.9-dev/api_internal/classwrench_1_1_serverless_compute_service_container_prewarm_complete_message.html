@@ -74,6 +74,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_actor_with_timeout.html">wrench::ActionExecutorActorWithTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_done_message.html">wrench::ActionExecutorDoneMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_message.html">wrench::ActionExecutorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_all_serverless_node_activation_policy.html">wrench::ActivateAllServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy.html">wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm.html">wrench::Alarm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm_job_time_out_message.html">wrench::AlarmJobTimeOutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
@@ -315,10 +317,12 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_nodes_activated_message.html">wrench::ServerlessComputeServiceNodesActivatedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_scheduler_wakeup_message.html">wrench::ServerlessComputeServiceSchedulerWakeupMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html">wrench::ServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
@@ -468,7 +472,8 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench55ServerlessComputeServiceContainerPrewarmCompleteMessageE">
 <span id="_CPPv3N6wrench55ServerlessComputeServiceContainerPrewarmCompleteMessageE"></span><span id="_CPPv2N6wrench55ServerlessComputeServiceContainerPrewarmCompleteMessageE"></span><span id="wrench::ServerlessComputeServiceContainerPrewarmCompleteMessage"></span><span class="target" id="classwrench_1_1_serverless_compute_service_container_prewarm_complete_message"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessComputeServiceContainerPrewarmCompleteMessage</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message.html#_CPPv4N6wrench31ServerlessComputeServiceMessageE" title="wrench::ServerlessComputeServiceMessage"><span class="n"><span class="pre">ServerlessComputeServiceMessage</span></span></a><a class="headerlink" href="#_CPPv4N6wrench55ServerlessComputeServiceContainerPrewarmCompleteMessageE" title="Link to this definition"></a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dd><p>a message sent to a <a class="reference internal" href="../api_user/classwrench_1_1_serverless_compute_service.html#classwrench_1_1_serverless_compute_service"><span class="std std-ref">ServerlessComputeService</span></a> to notify that a container prewarm has completed </p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench55ServerlessComputeServiceContainerPrewarmCompleteMessage55ServerlessComputeServiceContainerPrewarmCompleteMessageENSt10shared_ptrI9ContainerEE">

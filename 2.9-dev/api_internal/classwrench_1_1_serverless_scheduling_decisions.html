@@ -74,6 +74,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_actor_with_timeout.html">wrench::ActionExecutorActorWithTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_done_message.html">wrench::ActionExecutorDoneMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_message.html">wrench::ActionExecutorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_all_serverless_node_activation_policy.html">wrench::ActivateAllServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy.html">wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm.html">wrench::Alarm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm_job_time_out_message.html">wrench::AlarmJobTimeOutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
@@ -308,16 +310,19 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_nodes_activated_message.html">wrench::ServerlessComputeServiceNodesActivatedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_scheduler_wakeup_message.html">wrench::ServerlessComputeServiceSchedulerWakeupMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html">wrench::ServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessSchedulingDecisions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisionsE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessSchedulingDecisions</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions5printEv"><code class="docutils literal notranslate"><span class="pre">print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions24compute_node_activationsE"><code class="docutils literal notranslate"><span class="pre">compute_node_activations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions18container_prewarmsE"><code class="docutils literal notranslate"><span class="pre">container_prewarms</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions27idle_container_terminationsE"><code class="docutils literal notranslate"><span class="pre">idle_container_terminations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions26image_layer_copies_to_diskE"><code class="docutils literal notranslate"><span class="pre">image_layer_copies_to_disk</span></code></a></li>
@@ -478,6 +483,7 @@
 <span id="_CPPv3N6wrench29ServerlessSchedulingDecisionsE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisionsE"></span><span id="wrench::ServerlessSchedulingDecisions"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessSchedulingDecisions</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisionsE" title="Link to this definition"></a><br /></dt>
 <dd><p>A data structure that stores all scheduling decisions made by a serverless scheduler: </p>
 <p><ul class="simple">
+<li><p>How many compute nodes to activate</p></li>
 <li><p>Which invocations to fail</p></li>
 <li><p>Which idle container to terminate</p></li>
 <li><p>Which layer to evict from RAM</p></li>
@@ -498,6 +504,12 @@
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessSchedulingDecisions24compute_node_activationsE">
+<span id="_CPPv3N6wrench29ServerlessSchedulingDecisions24compute_node_activationsE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisions24compute_node_activationsE"></span><span id="wrench::ServerlessSchedulingDecisions::compute_node_activations__std::vector:ActivateComputeNodes:"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions_1afb746aa51acb377775e04e96b780ab65"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ActivateComputeNodes</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_node_activations</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions24compute_node_activationsE" title="Link to this definition"></a><br /></dt>
+<dd><p>The list of compute node activations </p>
+</dd></dl>
+
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessSchedulingDecisions18container_prewarmsE">
 <span id="_CPPv3N6wrench29ServerlessSchedulingDecisions18container_prewarmsE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisions18container_prewarmsE"></span><span id="wrench::ServerlessSchedulingDecisions::container_prewarms__std::vector:PrewarmContainer:"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions_1aa3baf3bc4bd4c4b17947f713cf970348"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">PrewarmContainer</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">container_prewarms</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions18container_prewarmsE" title="Link to this definition"></a><br /></dt>

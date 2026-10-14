@@ -1,0 +1,8 @@
+.. _ActivateAllServerlessNodeActivationPolicy:
+wrench::ActivateAllServerlessNodeActivationPolicy
+*************************************************
+
+.. doxygenclass:: wrench::ActivateAllServerlessNodeActivationPolicy
+   :project: internal
+   :members:
+

@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="wrench::ServerlessComputeServiceSchedulerWakeupMessage" href="classwrench_1_1_serverless_compute_service_scheduler_wakeup_message.html" />
-    <link rel="prev" title="wrench::ServerlessComputeServiceNodeLoadCompleteMessage" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html" /> 
+    <link rel="prev" title="wrench::ServerlessComputeServiceNodesActivatedMessage" href="classwrench_1_1_serverless_compute_service_nodes_activated_message.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -74,6 +74,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_actor_with_timeout.html">wrench::ActionExecutorActorWithTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_done_message.html">wrench::ActionExecutorDoneMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_message.html">wrench::ActionExecutorMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_all_serverless_node_activation_policy.html">wrench::ActivateAllServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy.html">wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm.html">wrench::Alarm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm_job_time_out_message.html">wrench::AlarmJobTimeOutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
@@ -308,8 +310,11 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_nodes_activated_message.html">wrench::ServerlessComputeServiceNodesActivatedMessage</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessComputeServiceProperty</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServicePropertyE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessComputeServiceProperty</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty32COMPUTE_NODE_ACTIVATION_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">COMPUTE_NODE_ACTIVATION_OVERHEAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE"><code class="docutils literal notranslate"><span class="pre">COMPUTE_NODES_INITIALLY_ACTIVATED</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">INVOCATION_PROCESSING_OVERHEAD</span></code></a></li>
@@ -324,6 +329,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_scheduler_wakeup_message.html">wrench::ServerlessComputeServiceSchedulerWakeupMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html">wrench::ServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduler.html">wrench::ServerlessScheduler</a></li>
@@ -477,6 +483,18 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty32COMPUTE_NODE_ACTIVATION_OVERHEADE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty32COMPUTE_NODE_ACTIVATION_OVERHEADE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty32COMPUTE_NODE_ACTIVATION_OVERHEADE"></span><span id="wrench::ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a6e5e2d12458cb44e1f95885cbfe56f1d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPUTE_NODE_ACTIVATION_OVERHEAD</span></span></span><br /></dt>
+<dd><p>The compute node activation overhead; activating multiple nodes at once incurs this overhead only once (default value: “0s”) Examples: “5s”, “5000ms”, etc. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE"></span><span id="wrench::ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1ab08558ac4598f25f225faefde8c9afba"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPUTE_NODES_INITIALLY_ACTIVATED</span></span></span><br /></dt>
+<dd><p>Whether compute nodes are initially all activated (i.e., usable immediately). (“true”: all activated, “false”: all de-activated; default: “true”) </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"></span><span id="wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1ad830e1f44f716bc3a817d776e01e825c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></span></span><br /></dt>
 <dd><p>The timeout before an idle container is terminated and its disk/resources reclaimed. </p>
@@ -485,13 +503,13 @@
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"></span><span id="wrench::ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a37d489688aadebff1b97c5ac819f584a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></span></span><br /></dt>
-<dd><p>The overhead to start a container after the image has been loaded into RAM (default value: “0”, default unit: seconds): Examples: “5”, “5s”, “5000ms”, etc. </p>
+<dd><p>The overhead to start a container after the image has been loaded into RAM (default value: “0s”, default unit: seconds): Examples: “5s”, “5000ms”, etc. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"></span><span id="wrench::ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a367772508821a4a1bc1f1539a773c37b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">INVOCATION_PROCESSING_OVERHEAD</span></span></span><br /></dt>
-<dd><p>The overhead for the compute service to process an incoming request (default value: “0”, default unit: seconds): Examples: “5”, “5s”, “5000ms”, etc. </p>
+<dd><p>The overhead for the compute service to process an incoming request (default value: “0s”, default unit: seconds): Examples: “5s”, “5000ms”, etc. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -527,7 +545,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html" class="btn btn-neutral float-left" title="wrench::ServerlessComputeServiceNodeLoadCompleteMessage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_serverless_compute_service_nodes_activated_message.html" class="btn btn-neutral float-left" title="wrench::ServerlessComputeServiceNodesActivatedMessage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="classwrench_1_1_serverless_compute_service_scheduler_wakeup_message.html" class="btn btn-neutral float-right" title="wrench::ServerlessComputeServiceSchedulerWakeupMessage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

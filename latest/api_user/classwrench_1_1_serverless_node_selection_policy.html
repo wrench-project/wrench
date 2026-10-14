@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="wrench::ServerlessPlanSelectionPolicy" href="classwrench_1_1_serverless_plan_selection_policy.html" />
-    <link rel="prev" title="wrench::ServerlessInvocationOrderingPolicy" href="classwrench_1_1_serverless_invocation_ordering_policy.html" /> 
+    <link rel="prev" title="wrench::ServerlessNodeActivationPolicy" href="classwrench_1_1_serverless_node_activation_policy.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -59,6 +59,8 @@
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_all_serverless_node_activation_policy.html">wrench::ActivateAllServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy.html">wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
@@ -113,6 +115,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessNodeSelectionPolicy</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessNodeSelectionPolicyE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessNodeSelectionPolicy</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessNodeSelectionPolicy20selectCandidateNodesERKNSt10shared_ptrI25ServerlessSchedulingStateEERKNSt10shared_ptrI10InvocationEE"><code class="docutils literal notranslate"><span class="pre">selectCandidateNodes()</span></code></a></li>
@@ -214,7 +217,7 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessNodeSelectionPolicyE">
 <span id="_CPPv3N6wrench29ServerlessNodeSelectionPolicyE"></span><span id="_CPPv2N6wrench29ServerlessNodeSelectionPolicyE"></span><span id="wrench::ServerlessNodeSelectionPolicy"></span><span class="target" id="classwrench_1_1_serverless_node_selection_policy"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessNodeSelectionPolicy</span></span></span><br /></dt>
-<dd><p>An abstract class to implement a serverless node evaluation policy. </p>
+<dd><p>An abstract class to implement a serverless node selection policy. </p>
 <p>Subclassed by <a class="reference internal" href="classwrench_1_1_select_all_possible_serverless_node_selection_policy.html#classwrench_1_1_select_all_possible_serverless_node_selection_policy"><span class="std std-ref">wrench::SelectAllPossibleServerlessNodeSelectionPolicy</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
@@ -244,7 +247,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="classwrench_1_1_serverless_invocation_ordering_policy.html" class="btn btn-neutral float-left" title="wrench::ServerlessInvocationOrderingPolicy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_serverless_node_activation_policy.html" class="btn btn-neutral float-left" title="wrench::ServerlessNodeActivationPolicy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="classwrench_1_1_serverless_plan_selection_policy.html" class="btn btn-neutral float-right" title="wrench::ServerlessPlanSelectionPolicy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
