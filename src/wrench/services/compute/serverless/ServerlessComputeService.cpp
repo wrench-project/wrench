@@ -224,12 +224,16 @@ namespace wrench {
             std::map<std::string, double> num_hosts;
             num_hosts.insert(std::make_pair(this->getName(),
                                             _state_of_the_system->_activated_compute_nodes.size() +
+                                            _state_of_the_system->_being_activated_compute_nodes.size() +
                                             _state_of_the_system->_deactivated_compute_nodes.size()));
             return num_hosts;
         } else if (key == "num_cores") {
             // Num cores per host
             std::map<std::string, double> num_cores;
             for (auto const& compute_node : _state_of_the_system->_activated_compute_nodes) {
+                num_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
+            }
+            for (auto const& compute_node : _state_of_the_system->_being_activated_compute_nodes) {
                 num_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
             }
             for (auto const& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
@@ -246,6 +250,9 @@ namespace wrench {
                                            : 0);
                 num_idle_cores[compute_node->hostname] = static_cast<double>(count);
             }
+            for (const auto& compute_node : _state_of_the_system->_being_activated_compute_nodes) {
+                num_idle_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
+            }
             for (const auto& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
                 num_idle_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
             }
@@ -254,6 +261,9 @@ namespace wrench {
             // Flop rate per host
             std::map<std::string, double> flop_rates;
             for (const auto& compute_node : _state_of_the_system->_activated_compute_nodes) {
+                flop_rates[compute_node->hostname] = S4U_Simulation::getHostFlopRate(compute_node->hostname);
+            }
+            for (const auto& compute_node : _state_of_the_system->_being_activated_compute_nodes) {
                 flop_rates[compute_node->hostname] = S4U_Simulation::getHostFlopRate(compute_node->hostname);
             }
             for (const auto& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
@@ -266,6 +276,9 @@ namespace wrench {
             for (const auto& compute_node : _state_of_the_system->_activated_compute_nodes) {
                 ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
             }
+            for (const auto& compute_node : _state_of_the_system->_being_activated_compute_nodes) {
+                ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
+            }
             for (const auto& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
                 ram_capacities[compute_node->hostname] = static_cast<double>(compute_node->_memory->getTotalSpace());
             }
@@ -276,6 +289,9 @@ namespace wrench {
             for (auto const& compute_node : _state_of_the_system->_activated_compute_nodes) {
                 ram_availability[compute_node->hostname] = static_cast<double>(compute_node->_memory->
                     getTotalFreeSpaceZeroTime());
+            }
+            for (auto const& compute_node : _state_of_the_system->_being_activated_compute_nodes) {
+                ram_availability[compute_node->hostname] = static_cast<double>(_compute_node_ram);
             }
             for (auto const& compute_node : _state_of_the_system->_deactivated_compute_nodes) {
                 ram_availability[compute_node->hostname] = static_cast<double>(_compute_node_ram);
@@ -884,7 +900,7 @@ namespace wrench {
         compute_node->makeContainerIdle(container);
 
         // Should the container be terminated or left idling?
-        double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        double idle_timeout = this->getPropertyValueAsTimeInSecond(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
@@ -927,7 +943,7 @@ namespace wrench {
         compute_node->makeContainerIdle(container);
 
         // Should the container be terminated or left idling?
-        double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        double idle_timeout = this->getPropertyValueAsTimeInSecond(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
@@ -970,6 +986,13 @@ namespace wrench {
 
         // Dispatch invocation
         for (const auto& [invocation, compute_node, container] : decisions) {
+            if (std::find(_state_of_the_system->_activated_compute_nodes.begin(),
+                          _state_of_the_system->_activated_compute_nodes.end(), compute_node) ==
+                _state_of_the_system->_activated_compute_nodes.end()) {
+                WRENCH_INFO("Ignoring invocation dispatch scheduling decision at non-activated compute node %s",
+                            compute_node->hostname.c_str());
+                continue;
+            }
             // If the invocation is not schedulable or already dispatched, ignore the scheduling decision!
             const auto& ready = _state_of_the_system->_schedulable_invocations;
             if (std::find(ready.begin(), ready.end(), invocation) == ready.end() ||
@@ -1203,6 +1226,12 @@ namespace wrench {
 
         // Terminate all node storage services
         for (auto const& node : _state_of_the_system->_activated_compute_nodes) {
+            node->_disk->stop();
+            node->_disk.reset();
+            node->_memory->stop();
+            node->_memory.reset();
+        }
+        for (auto const& node : _state_of_the_system->_being_activated_compute_nodes) {
             node->_disk->stop();
             node->_disk.reset();
             node->_memory->stop();
@@ -1520,10 +1549,11 @@ namespace wrench {
         // For each compute node, load initiate image load from disk into RAM and if space
         for (const auto& [layer, compute_node] : decisions) {
             if (std::find(_state_of_the_system->_activated_compute_nodes.begin(),
-                          _state_of_the_system->_activated_compute_nodes.end(), compute_node) !=
+                          _state_of_the_system->_activated_compute_nodes.end(), compute_node) ==
                 _state_of_the_system->_activated_compute_nodes.end()) {
                 WRENCH_INFO("Ignoring image layer load scheduling decision at non-activated compute node %s",
-                            compute_node->hostname);
+                            compute_node->hostname.c_str());
+                continue;
             }
             initiateImageLayerLoadAtComputeNode(compute_node, layer);
         }
@@ -1538,10 +1568,11 @@ namespace wrench {
         // For each compute node, initiate image copy (from head node) if need be
         for (const auto& [layer, compute_node] : decisions) {
             if (std::find(_state_of_the_system->_activated_compute_nodes.begin(),
-                          _state_of_the_system->_activated_compute_nodes.end(), compute_node) !=
+                          _state_of_the_system->_activated_compute_nodes.end(), compute_node) ==
                 _state_of_the_system->_activated_compute_nodes.end()) {
                 WRENCH_INFO("Ignoring image layer copy scheduling decision to non-activated compute node %s",
-                            compute_node->hostname);
+                            compute_node->hostname.c_str());
+                continue;
             }
             initiateImageLayerCopyToComputeNode(compute_node, layer);
         }
@@ -1556,10 +1587,11 @@ namespace wrench {
         // For each compute node, prewarm a container (if possible)
         for (const auto& [function, compute_node] : decisions) {
             if (std::find(_state_of_the_system->_activated_compute_nodes.begin(),
-                          _state_of_the_system->_activated_compute_nodes.end(), compute_node) !=
+                          _state_of_the_system->_activated_compute_nodes.end(), compute_node) ==
                 _state_of_the_system->_activated_compute_nodes.end()) {
                 WRENCH_INFO("Ignoring container pre-warming scheduling decision at non-activated compute node %s",
-                            compute_node->hostname);
+                            compute_node->hostname.c_str());
+                continue;
             }
             prewarmContainerAtComputeNode(compute_node, function);
         }
@@ -1777,7 +1809,7 @@ namespace wrench {
         // TODO: to implement
 
         // Check that pre-warming can even do anything
-        double idle_timeout = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        double idle_timeout = this->getPropertyValueAsTimeInSecond(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0.0) {
             WRENCH_INFO(
                 "Ignoring container pre-warm scheduling decision because the CONTAINER_IDLE_TIMEOUT value is set to 0.0")
