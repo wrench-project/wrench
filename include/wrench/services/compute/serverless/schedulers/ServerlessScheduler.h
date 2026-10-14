@@ -1,11 +1,4 @@
-/**
- * Copyright (c) 2025. The WRENCH Team.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- */
+fmt: width must be positive
 
 #ifndef WRENCH_SERVERLESSSCHEDULER_H
 #define WRENCH_SERVERLESSSCHEDULER_H
@@ -24,7 +17,14 @@ namespace wrench {
     /***********************/
 
     /**
-    * @brief A structure to encode an invocation fail action
+     * @brief A structure to encode a compute node activations decision
+     */
+    struct ActivateComputeNodes {
+        unsigned long num_compute_nodes;
+    };
+
+    /**
+    * @brief A structure to encode an invocation fail decision
     */
     struct FailInvocation {
         /**
@@ -134,6 +134,10 @@ namespace wrench {
 
     /**
      * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
+<<<<<<< HEAD
+=======
+     *        - How many compute nodes to activate
+>>>>>>> serverless_dev
      *        - Which invocations to fail
      *        - Which idle container to terminate
      *        - Which layer to evict from RAM
@@ -144,6 +148,11 @@ namespace wrench {
      */
     class ServerlessSchedulingDecisions {
     public:
+<<<<<<< HEAD
+=======
+        /** @brief The list of compute node activations  */
+        std::vector<ActivateComputeNodes> compute_node_activations;
+>>>>>>> serverless_dev
         /** @brief The list of invocations to fail  */
         std::vector<FailInvocation> invocation_fails;
         /** @brief The list of idle container terminations  */
@@ -168,7 +177,12 @@ namespace wrench {
          * @brief Method to print scheduling decisions
          */
         void print() {
+<<<<<<< HEAD
             if (invocation_fails.empty() and
+=======
+            if (compute_node_activations.empty() and
+                invocation_fails.empty() and
+>>>>>>> serverless_dev
                 idle_container_terminations.empty() and
                 layer_evictions_from_ram.empty() and
                 layer_evictions_from_disk.empty() and
@@ -181,6 +195,12 @@ namespace wrench {
             }
 
             std::cerr << "** SCHEDULING DECISIONS **" << std::endl;
+<<<<<<< HEAD
+=======
+            for (const auto& [num_compute_nodes] : compute_node_activations) {
+                std::cerr << "  Compute node activations: " << num_compute_nodes <<  " compute nodes activated" << std::endl;
+            }
+>>>>>>> serverless_dev
             for (const auto& [invocation] : invocation_fails) {
                 std::cerr << "  Forceful invocation fail: for function " << invocation->getFunction()->getName() << std::endl;
             }
@@ -226,6 +246,10 @@ namespace wrench {
 
         /**
          * @brief Given the list of schedulable invocations and the current system state, decide:
+<<<<<<< HEAD
+=======
+         *   - how many compute nodes to activate
+>>>>>>> serverless_dev
          *   - which invocations to forcefully fail
          *   - which idle containers to terminate
          *   - which layers to evict from RAM

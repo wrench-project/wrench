@@ -11,7 +11,6 @@
 #include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
-#include "wrench/simgrid_S4U_util//S4U_Simulation.h"
 
 #include <utility>
 #include <numeric>
@@ -29,12 +28,18 @@ namespace wrench {
         : _head_storage_service(nullptr),
           _free_space_on_head_storage(0),
           _serverless_compute_service(service) {
+        auto compute_nodes_initially_activated =
+            service->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED);
         for (const auto& hostname : compute_hosts) {
             auto num_slots = service->getPropertyValueAsUnsignedLong(
                 ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE);
             auto compute_node = std::make_shared<
                 ServerlessComputeNode>(hostname, num_slots, service);
-            _compute_nodes.push_back(compute_node);
+            if (compute_nodes_initially_activated) {
+                _activated_compute_nodes.push_back(compute_node);
+            } else {
+                _deactivated_compute_nodes.push_back(compute_node);
+            }
             _image_layers_in_ram[compute_node] = {};
             _image_layers_being_loaded_in_ram[compute_node] = {};
             _image_layers_on_disk[compute_node] = {};
@@ -43,43 +48,59 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter for the compute hosts
-     * @return The compute hosts
+     * @brief Getter for the compute nodes
+     * @return The compute nodes
      */
-    std::vector<std::shared_ptr<ServerlessComputeNode>> ServerlessStateOfTheSystem::getComputeNodes() const {
-        return _compute_nodes;
+    std::vector<std::shared_ptr<ServerlessComputeNode>> ServerlessStateOfTheSystem::getActivatedComputeNodes() const {
+        return _activated_compute_nodes;
     }
 
     /**
-     * @brief Getter for the map of available slots
+     * @brief Get the number of deactivated compute nodes
+     * @return A number of nodes
+     */
+    unsigned long ServerlessStateOfTheSystem::getNumDeactivatedComputeNodes() const {
+        return _deactivated_compute_nodes.size();
+    }
+
+    /**
+     * @brief Get the number of deactivated compute nodes
+     * @return A number of nodes
+     */
+    unsigned long ServerlessStateOfTheSystem::getNumBeingActivatedComputeNodes() const {
+        return _being_activated_compute_nodes.size();
+    }
+
+    /**
+     * @brief Getter for the map of available slots on activated nodes
      *
      * @return The free slot availability map
      */
     std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long>
     ServerlessStateOfTheSystem::getNumFreeSlots() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> to_return;
-        for (const auto& compute_node : _compute_nodes) {
+        for (const auto& compute_node : _activated_compute_nodes) {
             to_return[compute_node] = compute_node->getNumFreeSlots();
         }
         return to_return;
     }
 
     /**
-     * @brief Getter for the map of available RAM. Note that RAM is managed in an LRU fashion, so it's
+     * @brief Getter for the map of available RAM for activated compute nodes. Note that RAM is managed in an LRU fashion, so it's
      *        not because RAM is full that nothing can be done, perhaps.
      *
      * @return The RAM availability map
      */
     std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAMSpace() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
-        for (const auto& compute_node : _compute_nodes) {
+        for (const auto& compute_node : _activated_compute_nodes) {
             to_return[compute_node] = compute_node->getMemoryStorage()->getTotalFreeSpaceZeroTime();
         }
         return to_return;
     }
 
     /**
-     * @brief Getter for the map of available disk space. Note that Disk space is managed in an LRU fashion, so it's
+     * @brief Getter for the map of available disk space for activated compute nodes. Note that Disk space is managed in an LRU fashion, so it's
      *        not because a disk is full that nothing can be done, perhaps.
      *
      * @return The RAM availability map
@@ -87,7 +108,7 @@ namespace wrench {
     std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t>
     ServerlessStateOfTheSystem::getAvailableDiskSpace() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
-        for (const auto& compute_node : _compute_nodes) {
+        for (const auto& compute_node : _activated_compute_nodes) {
             to_return[compute_node] = compute_node->getDiskStorage()->getTotalFreeSpaceZeroTime();
         }
         return to_return;

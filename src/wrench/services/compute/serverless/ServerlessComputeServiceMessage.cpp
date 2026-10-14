@@ -205,4 +205,12 @@ namespace wrench
     ServerlessComputeServiceSchedulerWakeupMessage::ServerlessComputeServiceSchedulerWakeupMessage() : ServerlessComputeServiceMessage(0) {
     }
 
+    /**
+    * @brief Constructor
+    * @param nodes The compute nodes to activate
+    */
+    ServerlessComputeServiceNodesActivatedMessage::ServerlessComputeServiceNodesActivatedMessage(
+        std::vector<std::shared_ptr<ServerlessComputeNode>> nodes) : ServerlessComputeServiceMessage(0), _nodes(std::move(nodes)) {}
+
+
 } // namespace wrench

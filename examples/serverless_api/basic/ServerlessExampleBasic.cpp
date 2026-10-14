@@ -26,6 +26,7 @@
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h>
 
 #include "ServerlessExampleExecutionController.h"
@@ -145,6 +146,7 @@ int main(int argc, char** argv) {
 
     /* Using the built-in greedy scheduler with some policy options */
     auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
+        std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
         std::make_unique<wrench::FCFSServerlessInvocationOrderingPolicy>(),
         std::make_unique<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
         std::make_unique<wrench::LRUServerlessEvictionPolicy>(),
@@ -178,8 +180,7 @@ int main(int argc, char** argv) {
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();
-    }
-    catch (std::runtime_error& e) {
+    } catch (std::runtime_error& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return 1;
     }

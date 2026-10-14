@@ -4,6 +4,7 @@
 #include <wrench/services/compute/serverless/schedulers/ServerlessScheduler.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/ServerlessInvocationOrderingPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/node_activation_policies//ServerlessNodeActivationPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/ServerlessNodeSelectionPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/ServerlessEvictionPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/ServerlessPlanSelectionPolicy.h>
@@ -27,11 +28,13 @@ namespace wrench {
     public:
 
         GreedyServerlessScheduler(
+            std::shared_ptr<ServerlessNodeActivationPolicy> node_activation_policy,
             std::shared_ptr<ServerlessInvocationOrderingPolicy> invocation_ordering,
             std::shared_ptr<ServerlessNodeSelectionPolicy> node_selection,
             std::shared_ptr<ServerlessEvictionPolicy> eviction,
             std::shared_ptr<ServerlessPlanSelectionPolicy> plan_selection);
 
+        [[nodiscard]] ServerlessNodeActivationPolicy* getNodeActivationPolicy() const;
         [[nodiscard]] ServerlessInvocationOrderingPolicy* getInvocationOrderingPolicy() const;
         [[nodiscard]] ServerlessNodeSelectionPolicy* getNodeSelectionPolicy() const;
         [[nodiscard]] ServerlessEvictionPolicy* getEvictionPolicy() const;
@@ -61,6 +64,8 @@ namespace wrench {
             const std::set<std::shared_ptr<ImageLayer>>& invocation_layers_to_protect) const;
 
 
+        /** @brief The node activation policy **/
+        std::shared_ptr<ServerlessNodeActivationPolicy> _node_activation_policy;
 	    /** @brief The invocation ordering policy **/
         std::shared_ptr<ServerlessInvocationOrderingPolicy> _invocation_ordering_policy;
         /** @brief The node selection policy **/

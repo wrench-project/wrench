@@ -39,6 +39,7 @@ namespace wrench {
      */
     class ServerlessComputeNode {
     public:
+
         ServerlessComputeNode(std::string h, unsigned long num_slots, ServerlessComputeService* service);
 
         std::shared_ptr<Container> spawnContainer(const Function* function, bool prewarm);

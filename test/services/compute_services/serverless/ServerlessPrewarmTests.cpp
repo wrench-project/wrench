@@ -115,7 +115,7 @@ protected:
                 function = inv->getFunction();
             }
             auto layer = (function ? *(function->getImage()->getLayers().begin()) : nullptr);
-            auto compute_node = state->getComputeNodes().front();
+            auto compute_node = state->getActivatedComputeNodes().front();
 
             switch (called) {
             case 4:
@@ -135,7 +135,7 @@ protected:
             case 9:
                 break;
             case 10:
-                container = *(state->getComputeNodes().front()->getIdleContainers().begin());
+                container = *(state->getActivatedComputeNodes().front()->getIdleContainers().begin());
                 decisions->invocation_dispatches.push_back({inv, compute_node, container});
                 break;
             default:
@@ -247,7 +247,7 @@ void ServerlessPrewarmTest::do_BasicTest_test() {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);

@@ -12,7 +12,7 @@ namespace wrench {
     class ServerlessComputeNode;
 
     /**
-     * @brief An abstract class to implement a serverless node evaluation policy
+     * @brief An class to implement a serverless node evaluation policy
      */
     class SelectAllPossibleServerlessNodeSelectionPolicy : public ServerlessNodeSelectionPolicy {
 
