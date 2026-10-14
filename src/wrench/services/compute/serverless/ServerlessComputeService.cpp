@@ -642,6 +642,7 @@ namespace wrench {
         } else if (const auto scsnam_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodesActivatedMessage>(message)) {
             for (auto const& node : scsnam_msg->_nodes) {
+                WRENCH_INFO("Activating compute node %s", node->hostname.c_str());
                 _state_of_the_system->_being_activated_compute_nodes.erase(node);
                 _state_of_the_system->_activated_compute_nodes.push_back(node);
             }
@@ -1230,6 +1231,20 @@ namespace wrench {
      * @brief Method to shut everything down
      */
     void ServerlessComputeService::terminateAllServicesAndReleaseAllResources() {
+
+        // Terminate the scheduler wakeup alarm if any
+        if (_scheduler_wakeup_alarm) {
+            _scheduler_wakeup_alarm->kill();
+            _scheduler_wakeup_alarm.reset();;
+            _next_scheduler_wakeup_date.reset();
+        }
+
+        // Terminate the node activation alarms if any
+        for (auto const &alarm : _node_activation_alarms) {
+            alarm->kill();
+        }
+        _node_activation_alarms.clear();
+
         // Shutdown all containers (it doesn't actually kill the running functions, but who cares really)
         for (auto const& node : _state_of_the_system->_activated_compute_nodes) {
             node->killAllContainers();
@@ -1257,19 +1272,6 @@ namespace wrench {
             node->_memory->stop();
             node->_memory.reset();
         }
-
-        // Terminate the scheduler wakeup alarm if any
-        if (_scheduler_wakeup_alarm) {
-            _scheduler_wakeup_alarm->kill();
-            _scheduler_wakeup_alarm.reset();;
-            _next_scheduler_wakeup_date.reset();
-        }
-
-        // Terminate the node activation alarms if any
-        for (auto const &alarm : _node_activation_alarms) {
-            alarm->kill();
-        }
-        _node_activation_alarms.clear();
 
         // Send all failure notifications
         for (auto& [image, list] : _state_of_the_system->_admitted_invocations) {
@@ -1538,8 +1540,12 @@ namespace wrench {
             return;
         }
 
-        double activation_overhead = this->getPropertyValueAsTimeInSecond(
+        double node_activation_overhead = this->getPropertyValueAsTimeInSecond(
                                        ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD);
+        if (!std::isfinite(node_activation_overhead) || node_activation_overhead < 0.0) {
+            throw std::invalid_argument(
+                "ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD must be finite and non-negative");
+        }
 
         // Remove the last num_to_activates compute node from the deactivated list
         std::vector<std::shared_ptr<ServerlessComputeNode>>& deactivated_nodes =
@@ -1557,7 +1563,7 @@ namespace wrench {
         }
 
         auto alarm = Alarm::createAndStartAlarm(this->simulation_,
-                                   S4U_Simulation::getClock() + activation_overhead,
+                                   S4U_Simulation::getClock() + node_activation_overhead,
                                    _hostname, _commport,
                                    new ServerlessComputeServiceNodesActivatedMessage(to_activate),
                                    "nodes_activated");
