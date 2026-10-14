@@ -40,13 +40,7 @@ namespace wrench {
     class ServerlessComputeNode {
     public:
 
-        enum class State {
-            DEACTIVATED,
-            ACTIVATING,
-            ACTIVATED
-        };
-
-        ServerlessComputeNode(std::string h, unsigned long num_slots, ServerlessComputeService* service, State state);
+        ServerlessComputeNode(std::string h, unsigned long num_slots, ServerlessComputeService* service);
 
         std::shared_ptr<Container> spawnContainer(const Function* function, bool prewarm);
         void makeContainerIdle(const std::shared_ptr<Container>& container);
@@ -85,8 +79,6 @@ namespace wrench {
         friend class ServerlessComputeService;
 
         ServerlessComputeService* _serverless_compute_service;
-
-        State _state;
 
         unsigned long _num_slots;
         unsigned long _num_free_slots;

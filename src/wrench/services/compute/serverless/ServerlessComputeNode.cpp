@@ -28,17 +28,14 @@ namespace wrench {
     *  @param h: hostname
     *  @param num_slots: number of container slots at the compute node
     *  @param service: the ServerlessComputeService that owns this compute node
-    *  @param state: the initial state (ACTIVE, INACTIVE)
     */
     ServerlessComputeNode::ServerlessComputeNode(std::string h,
                                                  const unsigned long num_slots,
-                                                 ServerlessComputeService* service,
-                                                 State state) :
+                                                 ServerlessComputeService* service) :
         hostname(std::move(h)),
         _serverless_compute_service(service),
         _num_slots(num_slots),
         _num_free_slots(num_slots) {
-        _state = state;
     }
 
 

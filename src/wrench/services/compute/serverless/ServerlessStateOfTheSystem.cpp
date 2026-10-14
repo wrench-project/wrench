@@ -28,16 +28,14 @@ namespace wrench {
         : _head_storage_service(nullptr),
           _free_space_on_head_storage(0),
           _serverless_compute_service(service) {
-        auto initial_node_state =
-            (service->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED) ?
-                ServerlessComputeNode::State::ACTIVATED :
-                ServerlessComputeNode::State::DEACTIVATED);
+        auto compute_nodes_initially_activated =
+            service->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED);
         for (const auto& hostname : compute_hosts) {
             auto num_slots = service->getPropertyValueAsUnsignedLong(
                 ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE);
             auto compute_node = std::make_shared<
-                ServerlessComputeNode>(hostname, num_slots, service, initial_node_state);
-            if (initial_node_state == ServerlessComputeNode::State::ACTIVATED) {
+                ServerlessComputeNode>(hostname, num_slots, service);
+            if (compute_nodes_initially_activated) {
                 _activated_compute_nodes.push_back(compute_node);
             } else {
                 _deactivated_compute_nodes.push_back(compute_node);
