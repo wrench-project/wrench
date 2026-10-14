@@ -171,6 +171,16 @@ private:
         auto invocation1 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
         function_manager->wait_one(invocation1);
 
+        if (!invocation1->hasSucceeded()) {
+            throw std::runtime_error(
+                "Invocation failed after compute-node activation");
+        }
+
+        if (invocation1->getComputeNode() != "ServerlessComputeNode1") {
+            throw std::runtime_error(
+                "Invocation did not execute on the expected compute node");
+        }
+
         auto elapsed1 = invocation1->getFunctionEndDate() - invocation1->getSubmitDate();
 
         if (std::abs(elapsed1 - 20) > 10E-6) {
@@ -210,7 +220,7 @@ void ServerlessNodeActivationTest::do_BasicTest_test() {
             std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
         {
             {wrench::ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "2"},
-            {wrench::ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "10s"},
+            {wrench::ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "10000ms"},
             {wrench::ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED, "false"},
         }, {}));
 
