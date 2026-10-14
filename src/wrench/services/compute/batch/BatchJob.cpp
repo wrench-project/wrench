@@ -191,6 +191,7 @@ namespace wrench {
     /**
      * @brief Determine whether the job is using a particular host
      * @param host: a host
+     * @return true or false
      */
     bool BatchJob::isRunningOnHost(simgrid::s4u::Host *host) {
         return this->resources_allocated.find(host) != this->resources_allocated.end();

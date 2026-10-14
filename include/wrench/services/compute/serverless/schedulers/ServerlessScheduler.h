@@ -18,6 +18,9 @@ namespace wrench {
      * @brief A structure to encode a compute node activations decision
      */
     struct ActivateComputeNodes {
+	/**
+	 * @brief The number of compute nodes to activate
+	 */
         unsigned long num_compute_nodes;
     };
 
