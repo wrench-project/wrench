@@ -122,13 +122,8 @@ int main(int argc, char **argv) {
     auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
             "UserHost", {"/"}, {}, {}));
 
-    /* Instantiate the build-in serverless scheduler, with some policy options */
-    auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
-        std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-        std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-        std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-        std::make_shared<wrench::LRUServerlessEvictionPolicy>(),
-        std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+    /* Instantiate the build-in serverless scheduler, with all default policies */
+    auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
 
     /* Instantiate a serverless compute service service, which uses the above scheduler, on the platform */
     auto baremetal_service = simulation->add(new wrench::ServerlessComputeService(

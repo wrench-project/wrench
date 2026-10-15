@@ -3,17 +3,19 @@
 
 #include <wrench/services/compute/serverless/schedulers/ServerlessScheduler.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/ServerlessInvocationOrderingPolicy.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/node_activation_policies//ServerlessNodeActivationPolicy.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/ServerlessNodeSelectionPolicy.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/ServerlessEvictionPolicy.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/ServerlessPlanSelectionPolicy.h>
+
 
 namespace wrench {
+    class ServerlessInvocationFailingPolicy;
+    class ServerlessContainerPrewarmPolicy;
+    class ServerlessPlanSelectionPolicy;
+    class ServerlessEvictionPolicy;
+    class ServerlessNodeSelectionPolicy;
     class ServerlessSchedulingState;
-}
+    class ServerlessNodeActivationPolicy;
+    class ServerlessInvocationOrderingPolicy;
 
-namespace wrench {
+
     /**
      * @brief A class that implements a greedy scheduler for a serverless compute service. It can be
      * instantiated with various policies for ordering schedulable invocations, deciding on
@@ -27,18 +29,23 @@ namespace wrench {
 
     public:
 
-        GreedyServerlessScheduler(
-            std::shared_ptr<ServerlessNodeActivationPolicy> node_activation_policy,
-            std::shared_ptr<ServerlessInvocationOrderingPolicy> invocation_ordering,
-            std::shared_ptr<ServerlessNodeSelectionPolicy> node_selection,
-            std::shared_ptr<ServerlessEvictionPolicy> eviction,
-            std::shared_ptr<ServerlessPlanSelectionPolicy> plan_selection);
+        GreedyServerlessScheduler();
 
         [[nodiscard]] ServerlessNodeActivationPolicy* getNodeActivationPolicy() const;
         [[nodiscard]] ServerlessInvocationOrderingPolicy* getInvocationOrderingPolicy() const;
         [[nodiscard]] ServerlessNodeSelectionPolicy* getNodeSelectionPolicy() const;
         [[nodiscard]] ServerlessEvictionPolicy* getEvictionPolicy() const;
         [[nodiscard]] ServerlessPlanSelectionPolicy* getPlanSelectionPolicy() const;
+        [[nodiscard]] ServerlessContainerPrewarmPolicy* getContainerPrewarmPolicy() const;
+        [[nodiscard]] ServerlessInvocationFailingPolicy* getInvocationFailingPolicy() const;
+
+         void setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessInvocationOrderingPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessNodeSelectionPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessEvictionPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessPlanSelectionPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessContainerPrewarmPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy);
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -74,6 +81,10 @@ namespace wrench {
         std::shared_ptr<ServerlessEvictionPolicy> _eviction_policy;
 	    /** @brief The plan selection policy **/
         std::shared_ptr<ServerlessPlanSelectionPolicy> _plan_selection_policy;
+        /** @brief The container prewarm policy **/
+        std::shared_ptr<ServerlessContainerPrewarmPolicy> _container_prewarm_policy;
+        /** @brief The invocation failing policy **/
+        std::shared_ptr<ServerlessInvocationFailingPolicy> _invocation_failing_policy;
 
         /***********************/
         /** \endcond          **/

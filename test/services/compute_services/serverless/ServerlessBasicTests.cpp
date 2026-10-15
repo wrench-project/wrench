@@ -16,15 +16,17 @@
 #include "wrench/failure_causes/OperationTimeout.h"
 #include "wrench/failure_causes/FunctionNotFound.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies//SelectAllPossibleServerlessNodeSelectionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_activation_policies/ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/RandomServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies//SelectAllPossibleServerlessNodeSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/LRUServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/RandomServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -297,72 +299,39 @@ void ServerlessBasicTest::do_SanityTest_test() {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongMountPoint"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::GreedyServerlessScheduler>(
-                             std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-                             std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-                             std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-                             std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-                             std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})),
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})),
                      std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongSpeed"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::GreedyServerlessScheduler>(
-                             std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(), std::make_shared<
-                             wrench::
-                             FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::
-                             SelectAllPossibleServerlessNodeSelectionPolicy>(), std::make_shared<wrench::
-                             FewestServerlessEvictionPolicy>(), std::make_shared<wrench::
-                             EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongCores"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::GreedyServerlessScheduler>(
-                             std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(), std::make_shared<
-                             wrench::
-                             FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::
-                             SelectAllPossibleServerlessNodeSelectionPolicy>(), std::make_shared<wrench::
-                             FewestServerlessEvictionPolicy>(), std::make_shared<wrench::
-                             EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongRAM"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::GreedyServerlessScheduler>(
-                             std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(), std::make_shared<
-                             wrench::
-                             FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::
-                             SelectAllPossibleServerlessNodeSelectionPolicy>(), std::make_shared<wrench::
-                             FewestServerlessEvictionPolicy>(), std::make_shared<wrench::
-                             EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
     }
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "HostWrongDiskSpace"};
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
-                         std::make_shared<wrench::GreedyServerlessScheduler>(std::make_shared<wrench::
-                             ActivateAllServerlessNodeActivationPolicy>(),
-                             std::make_shared<wrench::
-                             FCFSServerlessInvocationOrderingPolicy>(), std::make_shared<wrench::
-                             SelectAllPossibleServerlessNodeSelectionPolicy>(), std::make_shared<wrench::
-                             FewestServerlessEvictionPolicy>(), std::make_shared<wrench::
-                             EvictionAverseServerlessPlanSelectionPolicy>()), {}, {})), std::invalid_argument);
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
     }
 
     {
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
         auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-            "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
-                std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-                std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-                std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-                std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-                std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+            "ServerlessHeadNode", "/", compute_nodes,
+            std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
 
         std::string user_host = "UserHost";
         auto wms = simulation->add(
@@ -458,12 +427,8 @@ void ServerlessBasicTest::do_FunctionRegistrationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
-            std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,
+        std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -604,6 +569,12 @@ TEST_F(ServerlessBasicTest, FunctionInvocation) {
         std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>(),
         std::make_shared<wrench::RandomServerlessPlanSelectionPolicy>(0)
     };
+    std::vector<std::shared_ptr<wrench::ServerlessContainerPrewarmPolicy>> container_prewarm_policies = {
+        std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>()
+    };
+    std::vector<std::shared_ptr<wrench::ServerlessInvocationFailingPolicy>> invocation_failing_policies = {
+        std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>()
+    };
 
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     for (const auto& node_activation_policy : node_activation_policies) {
@@ -611,13 +582,19 @@ TEST_F(ServerlessBasicTest, FunctionInvocation) {
             for (const auto& node_selection_policy : node_selection_policies) {
                 for (const auto& eviction_policy : eviction_policies) {
                     for (const auto& selection_policy : selection_policies) {
-                        auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
-                            node_activation_policy,
-                            ordering_policy,
-                            node_selection_policy,
-                            eviction_policy,
-                            selection_policy);
-                        schedulers.push_back(scheduler);
+                        for (const auto& container_prewarm_policy : container_prewarm_policies) {
+                            for (const auto& invocation_failing_policy : invocation_failing_policies) {
+                                auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
+                                scheduler->setPolicy(node_activation_policy);
+                                scheduler->setPolicy(ordering_policy);
+                                scheduler->setPolicy(node_selection_policy);
+                                scheduler->setPolicy(eviction_policy);
+                                scheduler->setPolicy(selection_policy);
+                                scheduler->setPolicy(container_prewarm_policy);
+                                scheduler->setPolicy(invocation_failing_policy);
+                                schedulers.push_back(scheduler);
+                            }
+                        }
                     }
                 }
             }
@@ -738,12 +715,8 @@ void ServerlessBasicTest::do_PreRegisteredFunctionInvocationTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
-            std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,
+        std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
 
     std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
                               const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
@@ -890,12 +863,8 @@ void ServerlessBasicTest::do_FunctionTimeoutTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
-            std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes,
+        std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -1028,20 +997,10 @@ void ServerlessBasicTest::do_FunctionErrorTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
-            std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
 
     auto other_serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
-            std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
 
 
     std::string user_host = "UserHost";
@@ -1151,12 +1110,7 @@ void ServerlessBasicTest::do_TooManyOutstandingTest_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
-        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(
-            std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-            std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()),
+        "ServerlessHeadNode", "/", compute_nodes, std::make_shared<wrench::GreedyServerlessScheduler>(),
         {{wrench::ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "3"}},
         {}));
 

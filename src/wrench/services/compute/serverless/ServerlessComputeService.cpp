@@ -1525,8 +1525,8 @@ namespace wrench {
     void ServerlessComputeService::activateComputeNodes(const std::vector<ActivateComputeNodes>& decisions) {
         unsigned long num_to_activate = 0;
 
-        for (const auto& decision : decisions) {
-            num_to_activate += decision.num_compute_nodes;
+        for (const auto& [num_compute_nodes] : decisions) {
+            num_to_activate += num_compute_nodes;
         }
 
         if (_state_of_the_system->_deactivated_compute_nodes.size() < num_to_activate) {
