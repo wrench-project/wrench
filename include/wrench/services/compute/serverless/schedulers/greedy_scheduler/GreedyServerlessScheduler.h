@@ -54,7 +54,7 @@ namespace wrench {
         ~GreedyServerlessScheduler() override = default;
 
         std::shared_ptr<ServerlessSchedulingDecisions> schedule(
-            const std::vector<std::shared_ptr<Invocation>> schedulable_invocations,
+            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
             const ServerlessStateOfTheSystem* state) override;
 
     protected:

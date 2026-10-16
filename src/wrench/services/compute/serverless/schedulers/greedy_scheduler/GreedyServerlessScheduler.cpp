@@ -318,7 +318,7 @@ namespace wrench {
      * @return A SchedulingDecisions object
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::schedule(
-        const std::vector<std::shared_ptr<Invocation>> schedulable_invocations,
+        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
         const ServerlessStateOfTheSystem* state) {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
 
