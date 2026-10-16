@@ -32,6 +32,7 @@ namespace wrench {
             {ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "0"},
             {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "infinity"},
+            {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION, "infinity"},
             {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0s"},
@@ -232,6 +233,9 @@ namespace wrench {
         std::optional<double> _next_scheduler_wakeup_date;
         std::shared_ptr<Alarm> _scheduler_wakeup_alarm;
         std::set<std::shared_ptr<Alarm>> _node_activation_alarms;
+
+        std::map<std::shared_ptr<Function>, unsigned long> _outstanding_invocation_counts;
+        unsigned long _num_outstanding_invocations = 0;
 
         /***********************/
         /** \endcond          **/
