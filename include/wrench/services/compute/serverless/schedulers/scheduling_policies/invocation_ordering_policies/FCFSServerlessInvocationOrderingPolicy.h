@@ -22,7 +22,7 @@ namespace wrench {
 
         ~FCFSServerlessInvocationOrderingPolicy() override = default;
 
-        void sortSchedulableInvocations(std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
+        void sortSchedulableInvocations(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
 
     };
 }

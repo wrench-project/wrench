@@ -469,7 +469,9 @@ namespace wrench {
         earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
-        decisions->scheduler_wakeup_date = earliest_wake_update;
+        if (earliest_wake_update != DBL_MAX) {
+            decisions->scheduler_wakeup_date = earliest_wake_update;
+        }
 
         return decisions;
     }

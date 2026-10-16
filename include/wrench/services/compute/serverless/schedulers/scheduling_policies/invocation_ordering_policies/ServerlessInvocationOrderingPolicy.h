@@ -26,7 +26,7 @@ namespace wrench {
          * @param scheduling_state the scheduling state
          * @return a sorted list of invocations
          */
-        virtual void sortSchedulableInvocations(std::shared_ptr<ServerlessSchedulingState>& scheduling_state) = 0;
+        virtual void sortSchedulableInvocations(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) = 0;
 
     };
 }

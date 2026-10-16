@@ -11,7 +11,7 @@ namespace wrench {
      * @param scheduling_state the scheduling state
      */
     void FCFSServerlessInvocationOrderingPolicy::sortSchedulableInvocations(
-        std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
+        const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
         std::sort(
             scheduling_state->_schedulable_invocations.begin(),
             scheduling_state->_schedulable_invocations.end(),
