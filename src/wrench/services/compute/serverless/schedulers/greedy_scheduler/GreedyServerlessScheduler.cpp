@@ -443,6 +443,18 @@ namespace wrench {
                 scheduling_state->_disk_available.at(target_node) -= layer->getDiskFootprint();
             }
         }
+
+        // Set the minimum of the wake-up dates
+        double earliest_wake_update = DBL_MAX;
+        earliest_wake_update = std::min(earliest_wake_update, _invocation_ordering_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _node_selection_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _eviction_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _plan_selection_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
+        decisions->scheduler_wakeup_date = earliest_wake_update;
+
         return decisions;
     }
 
