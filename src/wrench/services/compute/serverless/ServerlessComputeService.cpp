@@ -1024,13 +1024,18 @@ namespace wrench {
         }
 
         // Update the list of schedulable invocations (not super efficient, but clearer than the erase-as-I-go)
-        std::vector<std::shared_ptr<Invocation>> updated_list_of_schedulable_invocations;
-        for (auto const& invocation : _state_of_the_system->_schedulable_invocations) {
-            if (dispatched_invocations.find(invocation) == dispatched_invocations.end()) {
-                updated_list_of_schedulable_invocations.push_back(invocation);
-            }
+        if (!dispatched_invocations.empty()) {
+            auto& ready = _state_of_the_system->_schedulable_invocations;
+
+            ready.erase(
+                std::remove_if(
+                    ready.begin(),
+                    ready.end(),
+                    [&dispatched_invocations](const auto& invocation) {
+                        return dispatched_invocations.count(invocation) != 0;
+                    }),
+                ready.end());
         }
-        _state_of_the_system->_schedulable_invocations = updated_list_of_schedulable_invocations;
     }
 
     /**
