@@ -22,14 +22,11 @@ namespace wrench {
         ~ServerlessInvocationOrderingPolicy() override = default;
 
         /**
-         * @brief Method to sort the schedulable invocations
+         * @brief Method to sort the schedulable invocations in the scheduling state
          * @param scheduling_state the scheduling state
-         * @param invocations the invocations
          * @return a sorted list of invocations
          */
-        virtual std::vector<std::shared_ptr<Invocation>> sortSchedulableInvocations(
-            const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-            const std::vector<std::shared_ptr<Invocation>>& invocations) = 0;
+        virtual void sortSchedulableInvocations(std::shared_ptr<ServerlessSchedulingState>& scheduling_state) = 0;
 
     };
 }

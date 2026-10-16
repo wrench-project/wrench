@@ -20,9 +20,7 @@ namespace wrench {
         explicit RandomServerlessInvocationOrderingPolicy(unsigned int seed);
         ~RandomServerlessInvocationOrderingPolicy() override = default;
 
-        std::vector<std::shared_ptr<Invocation>> sortSchedulableInvocations(
-            const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-            const std::vector<std::shared_ptr<Invocation>>& invocations) override;
+        void sortSchedulableInvocations(std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
 
     private:
         std::mt19937 _rng;

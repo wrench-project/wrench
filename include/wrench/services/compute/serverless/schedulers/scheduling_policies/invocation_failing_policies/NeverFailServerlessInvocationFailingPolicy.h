@@ -1,5 +1,5 @@
-#ifndef NONESERVERLESSINVOCATIONFAILINGPOLICY_H
-#define NONESERVERLESSINVOCATIONFAILINGPOLICY_H
+#ifndef NEVERFAILSERVERLESSINVOCATIONFAILINGPOLICY_H
+#define NEVERFAILSERVERLESSINVOCATIONFAILINGPOLICY_H
 
 #include <set>
 #include <memory>
@@ -21,9 +21,8 @@ namespace wrench {
         ~NeverFailServerlessInvocationFailingPolicy() override = default;
 
         std::set<std::shared_ptr<Invocation>> failSchedulableInvocations(
-            const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-            const std::vector<std::shared_ptr<Invocation>>& invocations) override;
+            const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
     };
 }
 
-#endif //SERVERLESSINVOCATIONFAILINGPOLICY_H
+#endif //NEVERFAILSERVERLESSINVOCATIONFAILINGPOLICY_H

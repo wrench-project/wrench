@@ -26,12 +26,10 @@ namespace wrench {
         /**
         * @brief Select a number of compute nodes to activate
         * @param scheduling_state the scheduling state
-        * @param invocations the schedulable invocations
         * @return a set of compute nodes
         */
         virtual unsigned long selectNumNodesToActivate(
-                const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-                const std::vector<std::shared_ptr<Invocation>>& invocations) = 0;
+                const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) = 0;
 
 };
 

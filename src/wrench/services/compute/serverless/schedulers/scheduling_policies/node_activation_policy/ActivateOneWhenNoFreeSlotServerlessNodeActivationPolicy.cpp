@@ -6,12 +6,10 @@ namespace wrench {
     /**
     * @brief Select a number of nodes to activate
     * @param scheduling_state the scheduling state
-    * @param invocations the schedulable invocations
     * @return a set of compute nodes
     */
     unsigned long ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy::selectNumNodesToActivate(
-        const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-        const std::vector<std::shared_ptr<Invocation>>& invocations) {
+        const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
 
         // If no node to activate, nevermind
         if (scheduling_state->_num_deactivated_compute_nodes == 0) {

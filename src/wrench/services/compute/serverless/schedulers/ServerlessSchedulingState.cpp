@@ -19,6 +19,8 @@ namespace wrench {
     ServerlessSchedulingState::ServerlessSchedulingState(const ServerlessStateOfTheSystem* state,
         const std::vector<std::shared_ptr<Invocation>>&schedulable_invocations) {
 
+        _schedulable_invocations = schedulable_invocations;
+
         _activated_compute_nodes = state->getActivatedComputeNodes();
         _num_deactivated_compute_nodes = state->getNumDeactivatedComputeNodes();
         _num_being_activated_compute_nodes = state->getNumBeingActivatedComputeNodes();

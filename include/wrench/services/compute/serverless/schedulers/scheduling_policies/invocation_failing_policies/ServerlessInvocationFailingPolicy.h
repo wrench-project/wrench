@@ -23,12 +23,10 @@ namespace wrench {
         /**
          * @brief Method to pick schedulable invocations to fail
          * @param scheduling_state the scheduling state
-         * @param invocations the schedulable invocations
          * @return a set of invocations
          */
         virtual std::set<std::shared_ptr<Invocation>> failSchedulableInvocations(
-            const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-            const std::vector<std::shared_ptr<Invocation>>& invocations) = 0;
+            const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) = 0;
 
     };
 }

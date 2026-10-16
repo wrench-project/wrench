@@ -318,25 +318,41 @@ namespace wrench {
      * @return A SchedulingDecisions object
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::schedule(
-        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
+        const std::vector<std::shared_ptr<Invocation>> schedulable_invocations,
         const ServerlessStateOfTheSystem* state) {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
 
         // Create a scheduling state
-        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, schedulable_invocations);
+        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, std::move(schedulable_invocations));
 
         // Invoke the invocation failing policy
-        auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state, schedulable_invocations);
+        auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);
+
+        // Encode the "to fail" decisions
+        for (auto const &inv : to_fail) {
+            decisions->invocation_fails.push_back({inv});
+        }
+
+        // Filter out the "to fail" invocations from the list of schedulable invocations
+        if (not to_fail.empty()) {
+            std::vector<std::shared_ptr<Invocation>> filtered_invocations;
+            for (auto const &inv : scheduling_state->_schedulable_invocations) {
+                if (to_fail.count(inv) == 0) {
+                    filtered_invocations.push_back(inv);
+                }
+            }
+            scheduling_state->_schedulable_invocations = filtered_invocations;
+        }
+
 
         // Invoke the node activation policy
-        auto num_nodes_to_activate = _node_activation_policy->selectNumNodesToActivate(scheduling_state, schedulable_invocations);
+        auto num_nodes_to_activate = _node_activation_policy->selectNumNodesToActivate(scheduling_state);
         if (num_nodes_to_activate) {
             decisions->compute_node_activations.push_back({num_nodes_to_activate});
         }
 
-        // Sort the schedulable invocations
-        auto sorted_schedulable_invocations = _invocation_ordering_policy->sortSchedulableInvocations(
-            scheduling_state, schedulable_invocations);
+        // Sort the schedulable invocations in place
+        _invocation_ordering_policy->sortSchedulableInvocations(scheduling_state);
 
         // Determine the total number of slots available
         unsigned long num_slots_still_available = 0;
@@ -345,7 +361,7 @@ namespace wrench {
         }
 
         // Go through the invocations and pick target compute node
-        for (const auto& inv : sorted_schedulable_invocations) {
+        for (const auto& inv : scheduling_state->_schedulable_invocations) {
             // If all slots are allocated abort
             if (num_slots_still_available == 0) break;
 
