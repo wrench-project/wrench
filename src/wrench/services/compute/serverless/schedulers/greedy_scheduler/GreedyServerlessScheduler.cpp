@@ -308,14 +308,25 @@ namespace wrench {
 
 
     /**
-     * @brief Given the list of schedulable invocations and the current system state, decide on which
-     *        compute node each invocation should go and then encode what needs to be done to make
-     *        it happen.
+     * @brief Construct one batch of serverless scheduling decisions.
      *
-     * @param schedulable_invocations A list of schedulable (i.e., with image on the head node's disk) invocations
-     * @param state the current system state
+     * Uses a fresh mutable planning state to select invocation failures,
+     * request node activation, order and greedily plan the retained invocations,
+     * and select prewarms from the remaining planning resources. Finally,
+     * combines the policies' requested wakeup dates.
      *
-     * @return A SchedulingDecisions object
+     * The supplied invocation vector is not modified. Decisions are returned
+     * for the compute service to apply; this method does not execute them.
+     * See the class documentation for policy precedence, placement passes,
+     * and planning-state semantics.
+     *
+     * @param schedulable_invocations Pending invocations whose required image
+     *        layers are available at the head node. May be empty.
+     * @param state Current system state from which to build the planning state.
+     * @return A newly constructed ServerlessSchedulingDecisions object,
+     *         potentially containing no operations and no wakeup request.
+     *
+     * @see GreedyServerlessScheduler
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::schedule(
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,

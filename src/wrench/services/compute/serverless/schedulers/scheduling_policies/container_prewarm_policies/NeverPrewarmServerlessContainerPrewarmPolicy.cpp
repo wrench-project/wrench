@@ -7,7 +7,7 @@ namespace wrench {
     * @param scheduling_state the scheduling state
     * @return a set of ServerlessComputeNode / Function pairs
     */
-    std::set<std::pair<std::shared_ptr<Function>, std::shared_ptr<ServerlessComputeNode>>>
+    std::vector<std::pair<std::shared_ptr<Function>, std::shared_ptr<ServerlessComputeNode>>>
     NeverPrewarmServerlessContainerPrewarmPolicy::prewarmContainers(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
         // Do nothing

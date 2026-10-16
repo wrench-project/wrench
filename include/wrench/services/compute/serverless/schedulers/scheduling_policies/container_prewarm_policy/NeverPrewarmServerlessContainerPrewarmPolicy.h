@@ -22,7 +22,7 @@ namespace wrench {
 
         ~NeverPrewarmServerlessContainerPrewarmPolicy() override = default;
 
-        std::set<std::pair<std::shared_ptr<Function>, std::shared_ptr<ServerlessComputeNode>>> prewarmContainers(
+        std::vector<std::pair<std::shared_ptr<Function>, std::shared_ptr<ServerlessComputeNode>>> prewarmContainers(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
 
     };
