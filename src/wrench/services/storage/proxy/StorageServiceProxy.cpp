@@ -65,6 +65,7 @@ namespace wrench {
      * @brief Determine whether the proxy has a file
      *
      * @param location: a file location
+     * @return true if the proxy has the file
      */
     bool StorageServiceProxy::hasFile(const std::shared_ptr<FileLocation> &location) {
         if (cache) {

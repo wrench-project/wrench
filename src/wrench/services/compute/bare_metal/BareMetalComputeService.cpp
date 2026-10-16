@@ -57,7 +57,7 @@ namespace wrench {
 
     /**
        * @brief Helper static method to parse resource specifications to the <cores,ram> format
-       * @param spec: specification string
+       * @param spec specification string
        * @return a <cores, ram> tuple
        */
     std::tuple<std::string, unsigned long> BareMetalComputeService::parseResourceSpec(const std::string& spec) {

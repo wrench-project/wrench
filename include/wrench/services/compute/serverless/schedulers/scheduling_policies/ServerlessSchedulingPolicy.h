@@ -14,8 +14,9 @@ namespace wrench {
         virtual ~ServerlessSchedulingPolicy() = default;
 
         /**
-         * @brief Earliest absolute simulated date at which this policy requests another scheduling round
+         * @brief Get the earliest absolute simulated date at which this policy requests another scheduling round
          *        (DBL_MAX: no future wake-up date, only even-based wake-ups)
+	 * @return a date
          */
         [[nodiscard]]
         virtual double getNextWakeupDate() const {

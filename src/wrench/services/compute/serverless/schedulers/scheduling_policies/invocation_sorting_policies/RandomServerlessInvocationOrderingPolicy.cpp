@@ -18,7 +18,6 @@ namespace wrench {
     /**
      * @brief Method to sort the schedulable invocations in the scheduling state
      * @param scheduling_state the scheduling state
-     * @return a sorted list of invocations
      */
     void RandomServerlessInvocationOrderingPolicy::sortSchedulableInvocations(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {

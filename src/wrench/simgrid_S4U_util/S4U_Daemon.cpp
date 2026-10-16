@@ -101,7 +101,7 @@ namespace wrench {
     }
 
     /**
-     * @brieg Retrieve the daemon's commport
+     * @brief Retrieve the daemon's commport
      * @return A commport
      */
     S4U_CommPort* S4U_Daemon::getCommPort() {
