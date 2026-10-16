@@ -788,9 +788,12 @@ namespace wrench {
         }
 
         // Reject the invocation if too many outstanding requests
-        auto max_outstanding = this->getPropertyValueAsUnsignedLong(
+        auto max_total = this->getPropertyValueAsUnsignedLong(
             ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS);
-        if (_state_of_the_system->getNumOutstandingInvocations() >= max_outstanding) {
+        auto max_per_function = this->getPropertyValueAsUnsignedLong(
+            ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION);
+        if ((_num_outstanding_invocations >= max_total) or (_outstanding_invocation_counts[function] >=
+            max_per_function)) {
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 false, nullptr, std::make_shared<NotAllowed>(
                     this->getSharedPtr<ServerlessComputeService>(),
@@ -811,6 +814,9 @@ namespace wrench {
         } else {
             _state_of_the_system->_new_invocations.push(invocation);
         }
+
+        _num_outstanding_invocations++;
+        _outstanding_invocation_counts.at(function)++;
 
         auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
             true, invocation, nullptr, this->getMessagePayloadValue(
@@ -910,12 +916,17 @@ namespace wrench {
         // Free up the slot
         compute_node->_num_free_slots++;
 
+        // Update outstanding counts
+        _num_outstanding_invocations--;
+        _outstanding_invocation_counts.at(invocation->getFunction())++;
+
         // Make container idle
         auto container = invocation->_container;
         compute_node->makeContainerIdle(container);
 
         // Should the container be terminated or left idling?
-        double idle_timeout = this->getPropertyValueAsTimeInSecond(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        double idle_timeout = this->getPropertyValueAsTimeInSecond(
+            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
@@ -958,7 +969,8 @@ namespace wrench {
         compute_node->makeContainerIdle(container);
 
         // Should the container be terminated or left idling?
-        double idle_timeout = this->getPropertyValueAsTimeInSecond(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        double idle_timeout = this->getPropertyValueAsTimeInSecond(
+            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
@@ -1236,7 +1248,6 @@ namespace wrench {
      * @brief Method to shut everything down
      */
     void ServerlessComputeService::terminateAllServicesAndReleaseAllResources() {
-
         // Terminate the scheduler wakeup alarm if any
         if (_scheduler_wakeup_alarm) {
             _scheduler_wakeup_alarm->kill();
@@ -1245,7 +1256,7 @@ namespace wrench {
         }
 
         // Terminate the node activation alarms if any
-        for (auto const &alarm : _node_activation_alarms) {
+        for (auto const& alarm : _node_activation_alarms) {
             alarm->kill();
         }
         _node_activation_alarms.clear();
@@ -1546,7 +1557,7 @@ namespace wrench {
         }
 
         double node_activation_overhead = this->getPropertyValueAsTimeInSecond(
-                                       ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD);
+            ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD);
         if (!std::isfinite(node_activation_overhead) || node_activation_overhead < 0.0) {
             throw std::invalid_argument(
                 "ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD must be finite and non-negative");
@@ -1568,10 +1579,10 @@ namespace wrench {
         }
 
         auto alarm = Alarm::createAndStartAlarm(this->simulation_,
-                                   S4U_Simulation::getClock() + node_activation_overhead,
-                                   _hostname, _commport,
-                                   new ServerlessComputeServiceNodesActivatedMessage(to_activate),
-                                   "nodes_activated");
+                                                S4U_Simulation::getClock() + node_activation_overhead,
+                                                _hostname, _commport,
+                                                new ServerlessComputeServiceNodesActivatedMessage(to_activate),
+                                                "nodes_activated");
         _node_activation_alarms.insert(alarm);
     }
 
@@ -1843,7 +1854,8 @@ namespace wrench {
         // TODO: to implement
 
         // Check that pre-warming can even do anything
-        double idle_timeout = this->getPropertyValueAsTimeInSecond(ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+        double idle_timeout = this->getPropertyValueAsTimeInSecond(
+            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0.0) {
             WRENCH_INFO(
                 "Ignoring container pre-warm scheduling decision because the CONTAINER_IDLE_TIMEOUT value is set to 0.0")

@@ -45,6 +45,11 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(MAX_OUTSTANDING_INVOCATIONS);
 
+        /** @brief The maximum number of outstanding per-function invocations, i.e., invocations that have not yet completed or failed, including
+         *         those waiting for image preparation or execution for a particular function. (default value: "infinity")
+         **/
+        DECLARE_PROPERTY_NAME(MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION);
+
         /** @brief The overhead for the compute service to process an incoming request (default value: "0s", default unit: seconds):
          *         Examples: "5s", "5000ms", etc.
          **/
