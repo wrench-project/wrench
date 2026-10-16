@@ -28,12 +28,6 @@ namespace wrench {
         _ram_available = state->getAvailableRAMSpace();
         _disk_available = state->getAvailableDiskSpace();
 
-        // Determine the set of relevant images
-        std::set<std::shared_ptr<Image>> relevant_images;
-        for (auto const &inv: schedulable_invocations) {
-            relevant_images.insert(inv->getFunction()->getImage());
-        }
-
         // Initialize and build useful maps
         for (const auto &node : _activated_compute_nodes) {
 

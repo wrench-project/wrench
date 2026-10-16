@@ -323,7 +323,7 @@ namespace wrench {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
 
         // Create a scheduling state
-        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, std::move(schedulable_invocations));
+        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, schedulable_invocations);
 
         // Invoke the invocation failing policy
         auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);
@@ -334,14 +334,17 @@ namespace wrench {
         }
 
         // Filter out the "to fail" invocations from the list of schedulable invocations
-        if (not to_fail.empty()) {
-            std::vector<std::shared_ptr<Invocation>> filtered_invocations;
-            for (auto const &inv : scheduling_state->_schedulable_invocations) {
-                if (to_fail.count(inv) == 0) {
-                    filtered_invocations.push_back(inv);
-                }
-            }
-            scheduling_state->_schedulable_invocations = filtered_invocations;
+        if (!to_fail.empty()) {
+            auto& pending = scheduling_state->_schedulable_invocations;
+
+            pending.erase(
+                std::remove_if(
+                    pending.begin(),
+                    pending.end(),
+                    [&to_fail](const auto& invocation) {
+                        return to_fail.count(invocation) != 0;
+                    }),
+                pending.end());
         }
 
 
@@ -458,6 +461,12 @@ namespace wrench {
                 scheduling_state->_image_layers_on_their_way_to_disk.at(target_node).insert(layer);
                 scheduling_state->_disk_available.at(target_node) -= layer->getDiskFootprint();
             }
+        }
+
+        // Prewarm containers
+        auto to_prewarm = _container_prewarm_policy->prewarmContainers(scheduling_state);
+        for (auto const &[function, node] : to_prewarm) {
+            decisions->container_prewarms.push_back({function, node});
         }
 
         // Set the minimum of the wake-up dates
