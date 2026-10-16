@@ -1,0 +1,8 @@
+.. _ServerlessInvocationFailingPolicy:
+wrench::ServerlessInvocationFailingPolicy
+*****************************************
+
+.. doxygenclass:: wrench::ServerlessInvocationFailingPolicy
+   :project: developer
+   :members:
+

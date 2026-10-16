@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="wrench::ServerlessInvocationOrderingPolicy" href="classwrench_1_1_serverless_invocation_ordering_policy.html" />
-    <link rel="prev" title="wrench::ServerlessComputeServiceProperty" href="classwrench_1_1_serverless_compute_service_property.html" /> 
+    <link rel="next" title="wrench::ServerlessInvocationFailingPolicy" href="classwrench_1_1_serverless_invocation_failing_policy.html" />
+    <link rel="prev" title="wrench::ServerlessContainerPrewarmPolicy" href="classwrench_1_1_serverless_container_prewarm_policy.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -106,6 +106,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service.html">wrench::NetworkProximityService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_never_fail_serverless_invocation_failing_policy.html">wrench::NeverFailServerlessInvocationFailingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_never_prewarm_serverless_container_prewarm_policy.html">wrench::NeverPrewarmServerlessContainerPrewarmPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_invocation_ordering_policy.html">wrench::RandomServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_plan_selection_policy.html">wrench::RandomServerlessPlanSelectionPolicy</a></li>
@@ -113,6 +115,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_container_prewarm_policy.html">wrench::ServerlessContainerPrewarmPolicy</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessEvictionPolicy</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench24ServerlessEvictionPolicyE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessEvictionPolicy</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench24ServerlessEvictionPolicy29pickIdleContainersForEvictionERKNSt3setINSt10shared_ptrI9ContainerEEEER9sg_size_tR9sg_size_t"><code class="docutils literal notranslate"><span class="pre">pickIdleContainersForEviction()</span></code></a></li>
@@ -122,10 +125,12 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_failing_policy.html">wrench::ServerlessInvocationFailingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html">wrench::ServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduling_policy.html">wrench::ServerlessSchedulingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_property.html">wrench::ServiceProperty</a></li>
@@ -218,8 +223,8 @@
 <span id="serverlessevictionpolicy"></span><h1>wrench::ServerlessEvictionPolicy<a class="headerlink" href="#wrench-serverlessevictionpolicy" title="Link to this heading"></a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench24ServerlessEvictionPolicyE">
-<span id="_CPPv3N6wrench24ServerlessEvictionPolicyE"></span><span id="_CPPv2N6wrench24ServerlessEvictionPolicyE"></span><span id="wrench::ServerlessEvictionPolicy"></span><span class="target" id="classwrench_1_1_serverless_eviction_policy"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessEvictionPolicy</span></span></span><br /></dt>
-<dd><p>An abstract class to implement a serverless eviction policy. </p>
+<span id="_CPPv3N6wrench24ServerlessEvictionPolicyE"></span><span id="_CPPv2N6wrench24ServerlessEvictionPolicyE"></span><span id="wrench::ServerlessEvictionPolicy"></span><span class="target" id="classwrench_1_1_serverless_eviction_policy"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ServerlessEvictionPolicy</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_scheduling_policy.html#_CPPv4N6wrench26ServerlessSchedulingPolicyE" title="wrench::ServerlessSchedulingPolicy"><span class="n"><span class="pre">ServerlessSchedulingPolicy</span></span></a><br /></dt>
+<dd><p>An abstract class to implement a serverless scheduling eviction policy. </p>
 <p>Subclassed by <a class="reference internal" href="classwrench_1_1_fewest_serverless_eviction_policy.html#classwrench_1_1_fewest_serverless_eviction_policy"><span class="std std-ref">wrench::FewestServerlessEvictionPolicy</span></a>, <a class="reference internal" href="classwrench_1_1_l_r_u_serverless_eviction_policy.html#classwrench_1_1_l_r_u_serverless_eviction_policy"><span class="std std-ref">wrench::LRUServerlessEvictionPolicy</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
@@ -288,8 +293,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="classwrench_1_1_serverless_compute_service_property.html" class="btn btn-neutral float-left" title="wrench::ServerlessComputeServiceProperty" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="classwrench_1_1_serverless_invocation_ordering_policy.html" class="btn btn-neutral float-right" title="wrench::ServerlessInvocationOrderingPolicy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="classwrench_1_1_serverless_container_prewarm_policy.html" class="btn btn-neutral float-left" title="wrench::ServerlessContainerPrewarmPolicy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_serverless_invocation_failing_policy.html" class="btn btn-neutral float-right" title="wrench::ServerlessInvocationFailingPolicy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

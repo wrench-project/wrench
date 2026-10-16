@@ -1,0 +1,8 @@
+.. _NeverPrewarmServerlessContainerPrewarmPolicy:
+wrench::NeverPrewarmServerlessContainerPrewarmPolicy
+****************************************************
+
+.. doxygenclass:: wrench::NeverPrewarmServerlessContainerPrewarmPolicy
+   :project: internal
+   :members:
+

@@ -153,6 +153,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service.html">wrench::NetworkProximityService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_message_payload.html">wrench::NetworkProximityServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_network_proximity_service_property.html">wrench::NetworkProximityServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_never_fail_serverless_invocation_failing_policy.html">wrench::NeverFailServerlessInvocationFailingPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_never_prewarm_serverless_container_prewarm_policy.html">wrench::NeverPrewarmServerlessContainerPrewarmPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
@@ -173,11 +175,14 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_container_prewarm_policy.html">wrench::ServerlessContainerPrewarmPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_failing_policy.html">wrench::ServerlessInvocationFailingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html">wrench::ServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduling_policy.html">wrench::ServerlessSchedulingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_down.html">wrench::ServiceIsDown</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_is_suspended.html">wrench::ServiceIsSuspended</a></li>
@@ -280,7 +285,7 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench46SelectAllPossibleServerlessNodeSelectionPolicyE">
 <span id="_CPPv3N6wrench46SelectAllPossibleServerlessNodeSelectionPolicyE"></span><span id="_CPPv2N6wrench46SelectAllPossibleServerlessNodeSelectionPolicyE"></span><span id="wrench::SelectAllPossibleServerlessNodeSelectionPolicy"></span><span class="target" id="classwrench_1_1_select_all_possible_serverless_node_selection_policy"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SelectAllPossibleServerlessNodeSelectionPolicy</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html#_CPPv4N6wrench29ServerlessNodeSelectionPolicyE" title="wrench::ServerlessNodeSelectionPolicy"><span class="n"><span class="pre">ServerlessNodeSelectionPolicy</span></span></a><a class="headerlink" href="#_CPPv4N6wrench46SelectAllPossibleServerlessNodeSelectionPolicyE" title="Link to this definition"></a><br /></dt>
-<dd><p>An class to implement a serverless node evaluation policy. </p>
+<dd><p>A class that implements a serverless scheduling node selection policy that returns all compute nodes on which an invocation could be executed. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">

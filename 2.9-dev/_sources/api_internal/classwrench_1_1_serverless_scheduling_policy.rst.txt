@@ -1,0 +1,8 @@
+.. _ServerlessSchedulingPolicy:
+wrench::ServerlessSchedulingPolicy
+**********************************
+
+.. doxygenclass:: wrench::ServerlessSchedulingPolicy
+   :project: internal
+   :members:
+

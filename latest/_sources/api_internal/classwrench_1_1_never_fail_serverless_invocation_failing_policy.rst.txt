@@ -1,0 +1,8 @@
+.. _NeverFailServerlessInvocationFailingPolicy:
+wrench::NeverFailServerlessInvocationFailingPolicy
+**************************************************
+
+.. doxygenclass:: wrench::NeverFailServerlessInvocationFailingPolicy
+   :project: internal
+   :members:
+
