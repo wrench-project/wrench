@@ -31,6 +31,9 @@ namespace wrench {
 
         ~ServerlessSchedulingState() = default;
 
+    	/** @brief The schedulable invocations (a copy, can be modified at will) */
+    	std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
+
 	    /** @brief The activated compute nodes */
         std::vector<std::shared_ptr<ServerlessComputeNode>> _activated_compute_nodes;
 

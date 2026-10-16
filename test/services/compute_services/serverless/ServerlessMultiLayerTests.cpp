@@ -16,13 +16,13 @@
 #include "wrench/failure_causes/OperationTimeout.h"
 #include "wrench/failure_causes/FunctionNotFound.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/FewestServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/RandomServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/node_selection_policies/SelectAllPossibleServerlessNodeSelectionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/LRUServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies/SelectAllPossibleServerlessNodeSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -292,12 +292,7 @@ void ServerlessMultiLayerTest::do_FunctionInvocationTest_test() {
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", "/", compute_nodes,
-        std::make_shared<wrench::GreedyServerlessScheduler>(
-            std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-            std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0),
-            std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-            std::make_shared<wrench::FewestServerlessEvictionPolicy>(),
-            std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>()), {}, {}));
+        std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(

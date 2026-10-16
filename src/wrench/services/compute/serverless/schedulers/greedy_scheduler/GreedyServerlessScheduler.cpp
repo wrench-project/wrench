@@ -9,8 +9,11 @@
 
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/ServerlessInvocationOrderingPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/ServerlessInvocationOrderingPolicy.h>
 #include <wrench/logging/TerminalOutput.h>
+
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
 
 WRENCH_LOG_CATEGORY(wrench_greedy_serverless_scheduler, "Log category for GreedyServerlessScheduler");
 
@@ -172,32 +175,23 @@ namespace wrench {
     } // namespace
 
     /**
-     * @brief Constructor
-     * @param node_activation_policy the node activation policy
-     * @param invocation_ordering the invocation ordering policy
-     * @param node_selection the node selection policy
-     * @param eviction the eviction policy
-     * @param plan_selection the plan selection policy
+     * @brief Constructor. Creates a greedy scheduling with the following default policies (use setPolicy() to change them):
+     *   - Invocation ordering policy: FCFSServerlessInvocationOrderingPolicy
+     *   - Node selection policy: SelectAllPossibleServerlessNodeSelectionPolicy
+     *   - Eviction policy: FewestServerlessEvictionPolicy
+     *   - Plan selection policy: EvictionAverseServerlessPlanSelectionPolicy
+     *   - Node activation policy: ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy
+     *   - Container prewarm policy: NeverPrewarmServerlessContainerPrewarmPolicy
+     *   - Invocation failing policy: NeverFailServerlessInvocationFailingPolicy
      */
-    GreedyServerlessScheduler::GreedyServerlessScheduler(
-        std::shared_ptr<ServerlessNodeActivationPolicy> node_activation_policy,
-        std::shared_ptr<ServerlessInvocationOrderingPolicy> invocation_ordering,
-        std::shared_ptr<ServerlessNodeSelectionPolicy> node_selection,
-        std::shared_ptr<ServerlessEvictionPolicy> eviction,
-        std::shared_ptr<ServerlessPlanSelectionPolicy> plan_selection) :
-        _node_activation_policy(std::move(node_activation_policy)),
-        _invocation_ordering_policy(std::move(invocation_ordering)),
-        _node_selection_policy(std::move(node_selection)),
-        _eviction_policy(std::move(eviction)),
-        _plan_selection_policy(std::move(plan_selection)) {
-        if (!_node_activation_policy ||
-            !_invocation_ordering_policy ||
-            !_node_selection_policy ||
-            !_eviction_policy ||
-            !_plan_selection_policy) {
-            throw std::invalid_argument(
-                "GreedyServerlessScheduler requires non-null policies");
-        }
+    GreedyServerlessScheduler::GreedyServerlessScheduler() {
+        _invocation_ordering_policy = std::make_shared<FCFSServerlessInvocationOrderingPolicy>();
+        _node_selection_policy = std::make_shared<SelectAllPossibleServerlessNodeSelectionPolicy>();
+        _eviction_policy = std::make_shared<FewestServerlessEvictionPolicy>();
+        _plan_selection_policy = std::make_shared<EvictionAverseServerlessPlanSelectionPolicy>();
+        _node_activation_policy = std::make_shared<ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy>();
+        _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
+        _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
     }
 
     /**
@@ -225,7 +219,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's eviction policy
+     * @brief Get the scheduler's eviction policy (at your own risk once the simulation has started)
      * @return the policy
      */
     ServerlessEvictionPolicy* GreedyServerlessScheduler::getEvictionPolicy() const {
@@ -233,7 +227,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's plan selection policy
+     * @brief Get the scheduler's plan selection policy (at your own risk once the simulation has started)
      * @return the policy
      */
     ServerlessPlanSelectionPolicy* GreedyServerlessScheduler::getPlanSelectionPolicy() const {
@@ -241,14 +235,98 @@ namespace wrench {
     }
 
     /**
-     * @brief Given the list of schedulable invocations and the current system state, decide on which
-     *        compute node each invocation should go and then encode what needs to be done to make
-     *        it happen.
+     * @brief Get the scheduler's container prewarm policy (at your own risk once the simulation has started)
+     * @return the policy
+     */
+    ServerlessContainerPrewarmPolicy* GreedyServerlessScheduler::getContainerPrewarmPolicy() const {
+        return _container_prewarm_policy.get();
+    }
+
+    /**
+     * @brief Get the scheduler's invocation failing policy (at your own risk once the simulation has started)
+     * @return the policy
+     */
+    ServerlessInvocationFailingPolicy* GreedyServerlessScheduler::getInvocationFailingPolicy() const {
+        return _invocation_failing_policy.get();
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy A node activation policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy) {
+        _node_activation_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy An invocation ordering policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessInvocationOrderingPolicy> policy) {
+        _invocation_ordering_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy A node selection policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessNodeSelectionPolicy> policy) {
+        _node_selection_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy A serverless eviction policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessEvictionPolicy> policy) {
+        _eviction_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy A plan selection policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessPlanSelectionPolicy> policy) {
+        _plan_selection_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy A container prewarm policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessContainerPrewarmPolicy> policy) {
+        _container_prewarm_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy A invocation failing policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy) {
+        _invocation_failing_policy = std::move(policy);
+    }
+
+
+    /**
+     * @brief Construct one batch of serverless scheduling decisions.
      *
-     * @param schedulable_invocations A list of schedulable (i.e., with image on the head node's disk) invocations
-     * @param state the current system state
+     * Uses a fresh mutable planning state to select invocation failures,
+     * request node activation, order and greedily plan the retained invocations,
+     * and select prewarms from the remaining planning resources. Finally,
+     * combines the policies' requested wakeup dates.
      *
-     * @return A SchedulingDecisions object
+     * The supplied invocation vector is not modified. Decisions are returned
+     * for the compute service to apply; this method does not execute them.
+     * See the class documentation for policy precedence, placement passes,
+     * and planning-state semantics.
+     *
+     * @param schedulable_invocations Pending invocations whose required image
+     *        layers are available at the head node. May be empty.
+     * @param state Current system state from which to build the planning state.
+     * @return A newly constructed ServerlessSchedulingDecisions object,
+     *         potentially containing no operations and no wakeup request.
+     *
+     * @see GreedyServerlessScheduler
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::schedule(
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
@@ -258,15 +336,37 @@ namespace wrench {
         // Create a scheduling state
         auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, schedulable_invocations);
 
-        // In invoke the node activation policy
+        // Invoke the invocation failing policy
+        auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);
+
+        // Encode the "to fail" decisions
+        for (auto const &inv : to_fail) {
+            decisions->invocation_fails.push_back({inv});
+        }
+
+        // Filter out the "to fail" invocations from the list of schedulable invocations
+        if (!to_fail.empty()) {
+            auto& pending = scheduling_state->_schedulable_invocations;
+
+            pending.erase(
+                std::remove_if(
+                    pending.begin(),
+                    pending.end(),
+                    [&to_fail](const auto& invocation) {
+                        return to_fail.count(invocation) != 0;
+                    }),
+                pending.end());
+        }
+
+
+        // Invoke the node activation policy
         auto num_nodes_to_activate = _node_activation_policy->selectNumNodesToActivate(scheduling_state);
         if (num_nodes_to_activate) {
             decisions->compute_node_activations.push_back({num_nodes_to_activate});
         }
 
-        // Sort the schedulable invocations
-        auto sorted_schedulable_invocations = _invocation_ordering_policy->sortSchedulableInvocations(
-            scheduling_state, schedulable_invocations);
+        // Sort the schedulable invocations in place
+        _invocation_ordering_policy->sortSchedulableInvocations(scheduling_state);
 
         // Determine the total number of slots available
         unsigned long num_slots_still_available = 0;
@@ -275,7 +375,7 @@ namespace wrench {
         }
 
         // Go through the invocations and pick target compute node
-        for (const auto& inv : sorted_schedulable_invocations) {
+        for (const auto& inv : scheduling_state->_schedulable_invocations) {
             // If all slots are allocated abort
             if (num_slots_still_available == 0) break;
 
@@ -373,6 +473,26 @@ namespace wrench {
                 scheduling_state->_disk_available.at(target_node) -= layer->getDiskFootprint();
             }
         }
+
+        // Prewarm containers
+        auto to_prewarm = _container_prewarm_policy->prewarmContainers(scheduling_state);
+        for (auto const &[function, node] : to_prewarm) {
+            decisions->container_prewarms.push_back({function, node});
+        }
+
+        // Set the minimum of the wake-up dates
+        double earliest_wake_update = DBL_MAX;
+        earliest_wake_update = std::min(earliest_wake_update, _invocation_ordering_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _node_selection_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _eviction_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _plan_selection_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
+        if (earliest_wake_update != DBL_MAX) {
+            decisions->scheduler_wakeup_date = earliest_wake_update;
+        }
+
         return decisions;
     }
 

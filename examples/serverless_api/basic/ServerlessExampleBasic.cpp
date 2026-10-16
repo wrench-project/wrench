@@ -24,10 +24,6 @@
 #include <iostream>
 #include <wrench.h>
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/eviction_policies/LRUServerlessEvictionPolicy.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/invocation_sorting_policies/FCFSServerlessInvocationOrderingPolicy.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h>
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h>
 
 #include "ServerlessExampleExecutionController.h"
 
@@ -144,13 +140,8 @@ int main(int argc, char** argv) {
     unsigned int num_invocations = atoi(argv[1]);
     unsigned int num_compute_nodes = atoi(argv[2]);
 
-    /* Using the built-in greedy scheduler with some policy options */
-    auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>(
-        std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-        std::make_unique<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-        std::make_unique<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>(),
-        std::make_unique<wrench::LRUServerlessEvictionPolicy>(),
-        std::make_unique<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+    /* Using the built-in greedy scheduler with all default policies */
+    auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
 
     /* Create the simulated platform */
     PlatformCreator platform_creator(num_compute_nodes);

@@ -203,7 +203,7 @@ namespace wrench {
      * @param prewarm whether this is a prewarm (i.e., no invocation) or not
      * @return A container
      */
-    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function, bool prewarm) {
+    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function, const bool prewarm) {
         // Create a container object
         auto container = std::shared_ptr<Container>(
             new Container(function,

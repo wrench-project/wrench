@@ -247,7 +247,7 @@ namespace wrench {
          *   A scheduling decision is an intent, not a reservation. The serverless compute service checks
          *   whether the decision can actually be executed when it processes it.
          *
-         * @param schedulable_invocations A list of invocations whose all necessary layers reside on the head node
+         * @param schedulable_invocations A list of invocations for which all necessary layers reside on the head node
          * @param state The current system state
          * @return A SchedulingDecisions object
          */
