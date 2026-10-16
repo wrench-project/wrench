@@ -852,6 +852,8 @@ namespace wrench {
                             invocation,
                             action->getFailureCause(), this->getMessagePayloadValue(
                                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+                    _num_outstanding_invocations--;
+                    _outstanding_invocation_counts.at(invocation->getFunction())--;
                 }
                 _state_of_the_system->_admitted_invocations.at(image).clear();
                 images_to_remove_from_admitted_map.insert(image);
@@ -918,7 +920,7 @@ namespace wrench {
 
         // Update outstanding counts
         _num_outstanding_invocations--;
-        _outstanding_invocation_counts.at(invocation->getFunction())++;
+        _outstanding_invocation_counts.at(invocation->getFunction())--;
 
         // Make container idle
         auto container = invocation->_container;
@@ -1074,6 +1076,8 @@ namespace wrench {
                                         _state_of_the_system->_admitted_invocations.at(image).end(), inv);
                     if (it != _state_of_the_system->_admitted_invocations.at(image).end()) {
                         _state_of_the_system->_admitted_invocations.at(image).erase(it);
+                        _outstanding_invocation_counts.at(inv->getFunction())--;
+                        _num_outstanding_invocations--;
                         send_notification_message = true;
                     }
                 }
@@ -1085,6 +1089,8 @@ namespace wrench {
                                     _state_of_the_system->_schedulable_invocations.end(), inv);
                 if (it != _state_of_the_system->_schedulable_invocations.end()) {
                     _state_of_the_system->_schedulable_invocations.erase(it);
+                    _outstanding_invocation_counts.at(inv->getFunction())--;
+                    _num_outstanding_invocations--;
                     send_notification_message = true;
                 }
             }
@@ -1323,6 +1329,9 @@ namespace wrench {
         _state_of_the_system->_admitted_invocations.clear();
         _state_of_the_system->_schedulable_invocations.clear();
         _state_of_the_system->_running_invocations.clear();
+
+        _num_outstanding_invocations = 0;
+        _outstanding_invocation_counts.clear();
     }
 
     /**
