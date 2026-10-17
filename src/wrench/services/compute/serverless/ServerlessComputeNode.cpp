@@ -140,9 +140,6 @@ namespace wrench {
         // Idle containers
         for (auto const& container : _idle_containers) {
             container->shutdown();
-            if (container->_expiration_alarm) {
-                container->_expiration_alarm->kill();
-            }
         }
         // Busy containers
         for (auto const& container : _busy_containers) {
