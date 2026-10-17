@@ -96,6 +96,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the container's expiration date
+     * @return a date
+     */
+    double Container::getExpirationDate() const {
+        return _expiration_date;
+    }
+
+    /**
       * @brief Get the container's function
       * @return a function
       */

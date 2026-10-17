@@ -9,11 +9,10 @@
 
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/ServerlessInvocationOrderingPolicy.h>
 #include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/idle_container_selection_policies/ExpiringLatestServerlessIdleContainerSelectionPolicy.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_greedy_serverless_scheduler, "Log category for GreedyServerlessScheduler");
 
@@ -192,6 +191,7 @@ namespace wrench {
         _node_activation_policy = std::make_shared<ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy>();
         _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
         _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
+        _idle_container_selection_policy = std::make_shared<ExpiringLatestServerlessIdleContainerSelectionPolicy>();
     }
 
     /**
@@ -340,7 +340,7 @@ namespace wrench {
         auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);
 
         // Encode the "to fail" decisions
-        for (auto const &inv : to_fail) {
+        for (auto const& inv : to_fail) {
             decisions->invocation_fails.push_back({inv});
         }
 
@@ -476,7 +476,7 @@ namespace wrench {
 
         // Prewarm containers
         auto to_prewarm = _container_prewarm_policy->prewarmContainers(scheduling_state);
-        for (auto const &[function, node] : to_prewarm) {
+        for (auto const& [function, node] : to_prewarm) {
             decisions->container_prewarms.push_back({function, node});
         }
 
@@ -523,17 +523,15 @@ namespace wrench {
             }
         }
 
-        /* Go through the compute node in multiple passes, each time lowering "standards" */
-
         // Pass #1: Can we reuse an existing idle container?
-        for (auto const& node : candidate_nodes) {
-            for (auto const& idle_container : scheduling_state->_idle_containers.at(node)) {
-                if (idle_container->getFunction() == inv->getFunction().get()) {
-                    auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
-                    decisions->invocation_dispatches.push_back({inv, node, idle_container});
-                    return {node, decisions};
-                }
-            }
+        auto [target_node, target_idle_container] = _idle_container_selection_policy->selectIdleContainer(
+            scheduling_state,
+            inv,
+            candidate_nodes);
+        if (target_idle_container) {
+            auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
+            decisions->invocation_dispatches.push_back({inv, target_node, target_idle_container});
+            return {target_node, decisions};
         }
 
         auto image = inv->getFunction()->getImage();

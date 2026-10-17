@@ -932,10 +932,11 @@ namespace wrench {
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
-            // Start the timeout alarm
-            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
+            // Start the expiration alarm
+            container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
+            container->_expiration_alarm = Alarm::createAndStartAlarm(
                 this->simulation_,
-                S4U_Simulation::getClock() + idle_timeout,
+                container->_expiration_date,
                 _hostname,
                 _commport,
                 new
@@ -1002,6 +1003,8 @@ namespace wrench {
         }
         // Shutdown the container
         container->getComputeNode()->shutdownContainer(container);
+        container->_expiration_alarm = nullptr;
+        container->_expiration_date = DBL_MAX;
     }
 
     /**

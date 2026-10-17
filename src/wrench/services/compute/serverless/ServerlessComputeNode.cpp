@@ -13,6 +13,7 @@
 #include <wrench/function/ImageLayer.h>
 #include <wrench/services/compute/serverless/Container.h>
 #include <wrench/services/storage/simple/SimpleStorageService.h>
+#include <wrench/services/helper_services/alarm/Alarm.h>
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
@@ -139,6 +140,9 @@ namespace wrench {
         // Idle containers
         for (auto const& container : _idle_containers) {
             container->shutdown();
+            if (container->_expiration_alarm) {
+                container->_expiration_alarm->kill();
+            }
         }
         // Busy containers
         for (auto const& container : _busy_containers) {

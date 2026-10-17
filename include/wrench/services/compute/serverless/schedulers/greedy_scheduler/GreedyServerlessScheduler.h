@@ -6,6 +6,7 @@
 
 
 namespace wrench {
+    class ServerlessIdleContainerSelectionPolicy;
     class ServerlessInvocationFailingPolicy;
     class ServerlessContainerPrewarmPolicy;
     class ServerlessPlanSelectionPolicy;
@@ -245,6 +246,8 @@ namespace wrench {
         std::shared_ptr<ServerlessContainerPrewarmPolicy> _container_prewarm_policy;
         /** @brief The invocation failing policy **/
         std::shared_ptr<ServerlessInvocationFailingPolicy> _invocation_failing_policy;
+        /** @brief The idle container selection policy **/
+        std::shared_ptr<ServerlessIdleContainerSelectionPolicy> _idle_container_selection_policy;
 
         /***********************/
         /** \endcond          **/
