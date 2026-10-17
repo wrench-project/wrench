@@ -6,6 +6,7 @@
 
 
 namespace wrench {
+    class ServerlessIdleContainerSelectionPolicy;
     class ServerlessInvocationFailingPolicy;
     class ServerlessContainerPrewarmPolicy;
     class ServerlessPlanSelectionPolicy;
@@ -102,7 +103,9 @@ namespace wrench {
      * 6. Plan the missing disk copies, with resource reclamation if necessary.
      *
      * The first pass that selects a node determines the invocation's plan.
-     * The warm-reuse and wait-for-preparation passes select the first match.
+     * The warm-reuse pass delegates container selection to the
+     * idle-container-selection policy. The wait-for-preparation passes
+     * select the first qualifying node without selecting a container.
      * The new-container, RAM-load, and disk-copy passes generate candidate plans
      * and delegate their selection to the plan-selection policy. That policy
      * compares alternatives within those passes; it does not override the pass
@@ -198,6 +201,7 @@ namespace wrench {
         [[nodiscard]] ServerlessPlanSelectionPolicy* getPlanSelectionPolicy() const;
         [[nodiscard]] ServerlessContainerPrewarmPolicy* getContainerPrewarmPolicy() const;
         [[nodiscard]] ServerlessInvocationFailingPolicy* getInvocationFailingPolicy() const;
+        [[nodiscard]] ServerlessIdleContainerSelectionPolicy* getIdleContainerPolicy() const;
 
          void setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationOrderingPolicy> policy);
@@ -206,6 +210,7 @@ namespace wrench {
          void setPolicy(std::shared_ptr<ServerlessPlanSelectionPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessContainerPrewarmPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessIdleContainerSelectionPolicy> policy);
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -245,6 +250,8 @@ namespace wrench {
         std::shared_ptr<ServerlessContainerPrewarmPolicy> _container_prewarm_policy;
         /** @brief The invocation failing policy **/
         std::shared_ptr<ServerlessInvocationFailingPolicy> _invocation_failing_policy;
+        /** @brief The idle container selection policy **/
+        std::shared_ptr<ServerlessIdleContainerSelectionPolicy> _idle_container_selection_policy;
 
         /***********************/
         /** \endcond          **/

@@ -9,11 +9,10 @@
 
 #include <wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/ServerlessInvocationOrderingPolicy.h>
 #include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/idle_container_selection_policies/ExpiringLatestServerlessIdleContainerSelectionPolicy.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_greedy_serverless_scheduler, "Log category for GreedyServerlessScheduler");
 
@@ -192,6 +191,7 @@ namespace wrench {
         _node_activation_policy = std::make_shared<ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy>();
         _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
         _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
+        _idle_container_selection_policy = std::make_shared<ExpiringLatestServerlessIdleContainerSelectionPolicy>();
     }
 
     /**
@@ -219,7 +219,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's eviction policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's eviction policy
      * @return the policy
      */
     ServerlessEvictionPolicy* GreedyServerlessScheduler::getEvictionPolicy() const {
@@ -227,7 +227,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's plan selection policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's plan selection policy
      * @return the policy
      */
     ServerlessPlanSelectionPolicy* GreedyServerlessScheduler::getPlanSelectionPolicy() const {
@@ -235,7 +235,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's container prewarm policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's container prewarm policy
      * @return the policy
      */
     ServerlessContainerPrewarmPolicy* GreedyServerlessScheduler::getContainerPrewarmPolicy() const {
@@ -243,11 +243,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's invocation failing policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's invocation failing policy
      * @return the policy
      */
     ServerlessInvocationFailingPolicy* GreedyServerlessScheduler::getInvocationFailingPolicy() const {
         return _invocation_failing_policy.get();
+    }
+
+    /**
+     * @brief Get the scheduler's idle container selection policy
+     * @return the policy
+     */
+    ServerlessIdleContainerSelectionPolicy* GreedyServerlessScheduler::getIdleContainerPolicy() const {
+        return _idle_container_selection_policy.get();
     }
 
     /**
@@ -300,10 +308,18 @@ namespace wrench {
 
     /**
      * @brief Policy setter
-     * @param policy A invocation failing policy (at your own risk once the simulation has started)
+     * @param policy An invocation failing policy (at your own risk once the simulation has started)
      */
     void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy) {
         _invocation_failing_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy An idle container selection policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessIdleContainerSelectionPolicy> policy) {
+        _idle_container_selection_policy = std::move(policy);
     }
 
 
@@ -340,7 +356,7 @@ namespace wrench {
         auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);
 
         // Encode the "to fail" decisions
-        for (auto const &inv : to_fail) {
+        for (auto const& inv : to_fail) {
             decisions->invocation_fails.push_back({inv});
         }
 
@@ -476,7 +492,7 @@ namespace wrench {
 
         // Prewarm containers
         auto to_prewarm = _container_prewarm_policy->prewarmContainers(scheduling_state);
-        for (auto const &[function, node] : to_prewarm) {
+        for (auto const& [function, node] : to_prewarm) {
             decisions->container_prewarms.push_back({function, node});
         }
 
@@ -489,6 +505,7 @@ namespace wrench {
         earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _idle_container_selection_policy->getNextWakeupDate());
         if (earliest_wake_update != DBL_MAX) {
             decisions->scheduler_wakeup_date = earliest_wake_update;
         }
@@ -523,17 +540,15 @@ namespace wrench {
             }
         }
 
-        /* Go through the compute node in multiple passes, each time lowering "standards" */
-
         // Pass #1: Can we reuse an existing idle container?
-        for (auto const& node : candidate_nodes) {
-            for (auto const& idle_container : scheduling_state->_idle_containers.at(node)) {
-                if (idle_container->getFunction() == inv->getFunction().get()) {
-                    auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
-                    decisions->invocation_dispatches.push_back({inv, node, idle_container});
-                    return {node, decisions};
-                }
-            }
+        auto [target_node, target_idle_container] = _idle_container_selection_policy->selectIdleContainer(
+            scheduling_state,
+            inv,
+            candidate_nodes);
+        if (target_idle_container) {
+            auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
+            decisions->invocation_dispatches.push_back({inv, target_node, target_idle_container});
+            return {target_node, decisions};
         }
 
         auto image = inv->getFunction()->getImage();

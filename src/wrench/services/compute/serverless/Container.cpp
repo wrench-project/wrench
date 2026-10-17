@@ -9,6 +9,7 @@
 
 #include <fsmod/File.hpp>
 #include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/helper_services/alarm/Alarm.h>
 #include <wrench/failure_causes/NotEnoughResources.h>
 #include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
 #include <wrench/services/compute/serverless/Container.h>
@@ -96,6 +97,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the container's expiration date
+     * @return a date
+     */
+    double Container::getExpirationDate() const {
+        return _expiration_date;
+    }
+
+    /**
       * @brief Get the container's function
       * @return a function
       */
@@ -134,6 +143,12 @@ namespace wrench {
         _state = State::BUSY;
         _idle_date = DBL_MAX;
         _idle_sequence += 1;
+
+        if (_expiration_alarm) {
+            _expiration_alarm->kill();
+        }
+        _expiration_alarm.reset();
+        _expiration_date = DBL_MAX;
 
         // A warm invocation uses these layers too. Refresh their recency
         // using the same zero-time touch as on a cold container start.
@@ -279,6 +294,13 @@ namespace wrench {
     void Container::shutdown() {
         _idle_sequence += 1; // to invalidate any future timeouts
         _idle_date = DBL_MAX;
+
+        if (_expiration_alarm) {
+            _expiration_alarm->kill();
+        }
+        _expiration_alarm.reset();
+        _expiration_date = DBL_MAX;
+
         this->freeDiskAndMemoryResources();
     }
 

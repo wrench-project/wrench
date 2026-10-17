@@ -13,6 +13,7 @@
 #include <wrench/function/ImageLayer.h>
 #include <wrench/services/compute/serverless/Container.h>
 #include <wrench/services/storage/simple/SimpleStorageService.h>
+#include <wrench/services/helper_services/alarm/Alarm.h>
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>

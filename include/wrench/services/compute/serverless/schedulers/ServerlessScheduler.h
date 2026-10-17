@@ -132,7 +132,6 @@ namespace wrench {
         std::shared_ptr<ServerlessComputeNode> compute_node;
     };
 
-
     /**
      * @brief A data structure that stores all scheduling decisions made by a serverless scheduler:
      *        - How many compute nodes to activate

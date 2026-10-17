@@ -13,7 +13,7 @@ namespace wrench {
     class ServerlessComputeNode;
 
     /**
-     * @brief An abstract class to implement a serverless invocation failing policy
+     * @brief An abstract class to implement a serverless container prewarm policy
      */
     class ServerlessContainerPrewarmPolicy : public ServerlessSchedulingPolicy {
     public:

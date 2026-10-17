@@ -932,10 +932,11 @@ namespace wrench {
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
-            // Start the timeout alarm
-            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
+            // Start the expiration alarm
+            container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
+            container->_expiration_alarm = Alarm::createAndStartAlarm(
                 this->simulation_,
-                S4U_Simulation::getClock() + idle_timeout,
+                container->_expiration_date,
                 _hostname,
                 _commport,
                 new
@@ -964,11 +965,14 @@ namespace wrench {
         WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
 
         auto compute_node = container->getComputeNode();
+
         // Free up the slot
         compute_node->_num_free_slots++;
 
         // Make container idle
         compute_node->makeContainerIdle(container);
+
+
 
         // Should the container be terminated or left idling?
         double idle_timeout = this->getPropertyValueAsTimeInSecond(
@@ -976,16 +980,18 @@ namespace wrench {
         if (idle_timeout <= 0) {
             compute_node->shutdownContainer(container);
         } else {
+            auto expiration_date = S4U_Simulation::getClock() + idle_timeout;
             // Start the timeout alarm
-            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(
+            container->_expiration_alarm = Alarm::createAndStartAlarm(
                 this->simulation_,
-                S4U_Simulation::getClock() + idle_timeout,
+                expiration_date,
                 _hostname,
                 _commport,
                 new
                 ServerlessComputeServiceContainerIdleTimeoutMessage(
                     container, container->getIdleSequence()),
                 "container_idle_timout");
+            container->_expiration_date = expiration_date;
         }
     }
 
@@ -1002,6 +1008,8 @@ namespace wrench {
         }
         // Shutdown the container
         container->getComputeNode()->shutdownContainer(container);
+        container->_expiration_alarm = nullptr;
+        container->_expiration_date = DBL_MAX;
     }
 
     /**

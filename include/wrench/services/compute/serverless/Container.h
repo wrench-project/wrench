@@ -17,6 +17,7 @@
 #include <wrench/function/Function.h>
 
 namespace wrench {
+    class Alarm;
     class ServerlessComputeNode;
     class Invocation;
     class StorageService;
@@ -47,6 +48,7 @@ namespace wrench {
         [[nodiscard]] bool isPrewarming() const;
         [[nodiscard]] unsigned long getIdleSequence() const;
         [[nodiscard]] double getIdleDate() const;
+        [[nodiscard]] double getExpirationDate() const;
         [[nodiscard]] const Function *getFunction() const;
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const;
         [[nodiscard]] ServerlessComputeNode* getComputeNode() const;
@@ -55,6 +57,7 @@ namespace wrench {
 
     private:
         friend class ServerlessComputeNode;
+        friend class ServerlessComputeService;
 
         Container(const Function* function,
                            const ServerlessComputeNode* compute_node,
@@ -87,6 +90,8 @@ namespace wrench {
         unsigned long _creation_id; // to break ties
         unsigned long _idle_sequence = 0;
         double _idle_date = DBL_MAX;
+        double _expiration_date = DBL_MAX;
+        std::shared_ptr<Alarm> _expiration_alarm = nullptr;
 
         /***********************/
         /** \endcond          **/
