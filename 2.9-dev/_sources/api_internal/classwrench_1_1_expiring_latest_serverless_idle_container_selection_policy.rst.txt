@@ -1,0 +1,8 @@
+.. _ExpiringLatestServerlessIdleContainerSelectionPolicy:
+wrench::ExpiringLatestServerlessIdleContainerSelectionPolicy
+************************************************************
+
+.. doxygenclass:: wrench::ExpiringLatestServerlessIdleContainerSelectionPolicy
+   :project: internal
+   :members:
+

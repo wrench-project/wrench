@@ -151,6 +151,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container19clearPrivateStorageEv"><code class="docutils literal notranslate"><span class="pre">clearPrivateStorage()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container14getComputeNodeEv"><code class="docutils literal notranslate"><span class="pre">getComputeNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container13getCreationIdEv"><code class="docutils literal notranslate"><span class="pre">getCreationId()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container17getExpirationDateEv"><code class="docutils literal notranslate"><span class="pre">getExpirationDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container11getFunctionEv"><code class="docutils literal notranslate"><span class="pre">getFunction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container11getIdleDateEv"><code class="docutils literal notranslate"><span class="pre">getIdleDate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench9Container15getIdleSequenceEv"><code class="docutils literal notranslate"><span class="pre">getIdleSequence()</span></code></a></li>
@@ -186,6 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_controller_message.html">wrench::ExecutionControllerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_event.html">wrench::ExecutionEvent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_execution_exception.html">wrench::ExecutionException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_expiring_latest_serverless_idle_container_selection_policy.html">wrench::ExpiringLatestServerlessIdleContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_batch_scheduler.html">wrench::FCFSBatchScheduler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_invocation_ordering_policy.html">wrench::FCFSServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_failure_cause.html">wrench::FailureCause</a></li>
@@ -333,6 +335,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_scheduler_wakeup_message.html">wrench::ServerlessComputeServiceSchedulerWakeupMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_container_prewarm_policy.html">wrench::ServerlessContainerPrewarmPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_idle_container_selection_policy.html">wrench::ServerlessIdleContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_failing_policy.html">wrench::ServerlessInvocationFailingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
@@ -538,6 +541,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the id </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench9Container17getExpirationDateEv">
+<span id="_CPPv3NK6wrench9Container17getExpirationDateEv"></span><span id="_CPPv2NK6wrench9Container17getExpirationDateEv"></span><span id="wrench::Container::getExpirationDateC"></span><span class="target" id="classwrench_1_1_container_1a85609e0ebe60c6954c4f21b576258753"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getExpirationDate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench9Container17getExpirationDateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the container’s expiration date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a date </p>
 </dd>
 </dl>
 </dd></dl>

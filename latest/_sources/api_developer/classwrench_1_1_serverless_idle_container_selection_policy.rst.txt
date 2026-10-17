@@ -1,0 +1,8 @@
+.. _ServerlessIdleContainerSelectionPolicy:
+wrench::ServerlessIdleContainerSelectionPolicy
+**********************************************
+
+.. doxygenclass:: wrench::ServerlessIdleContainerSelectionPolicy
+   :project: developer
+   :members:
+
