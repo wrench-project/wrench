@@ -13,7 +13,7 @@ namespace wrench {
     class ServerlessSchedulingState;
 
     /**
-     * @brief An abstract class to implement a serverless idle container selection policy
+     * @brief A "whichever expires the latest" serverless scheduling idle container selection policy
      */
     class ExpiringLatestServerlessIdleContainerSelectionPolicy : public ServerlessIdleContainerSelectionPolicy {
     public:

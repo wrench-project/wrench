@@ -103,8 +103,9 @@ namespace wrench {
      * 6. Plan the missing disk copies, with resource reclamation if necessary.
      *
      * The first pass that selects a node determines the invocation's plan.
-     * The warm-reuse and wait-for-preparation passes select an idle container
-     * based on an idle-container-selection policy.
+     * The warm-reuse pass delegates container selection to the
+     * idle-container-selection policy. The wait-for-preparation passes
+     * select the first qualifying node without selecting a container.
      * The new-container, RAM-load, and disk-copy passes generate candidate plans
      * and delegate their selection to the plan-selection policy. That policy
      * compares alternatives within those passes; it does not override the pass
