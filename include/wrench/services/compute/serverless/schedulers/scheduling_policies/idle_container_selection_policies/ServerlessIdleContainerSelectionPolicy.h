@@ -2,7 +2,9 @@
 #define SERVERLESSIDLECONTAINERSELECTIONPOLICY_H
 
 #include <set>
+#include <utility>
 #include <memory>
+#include <vector>
 
 #include <wrench/services/compute/serverless/schedulers/scheduling_policies/ServerlessSchedulingPolicy.h>
 

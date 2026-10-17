@@ -219,7 +219,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's eviction policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's eviction policy
      * @return the policy
      */
     ServerlessEvictionPolicy* GreedyServerlessScheduler::getEvictionPolicy() const {
@@ -227,7 +227,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's plan selection policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's plan selection policy
      * @return the policy
      */
     ServerlessPlanSelectionPolicy* GreedyServerlessScheduler::getPlanSelectionPolicy() const {
@@ -235,7 +235,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's container prewarm policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's container prewarm policy
      * @return the policy
      */
     ServerlessContainerPrewarmPolicy* GreedyServerlessScheduler::getContainerPrewarmPolicy() const {
@@ -243,11 +243,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the scheduler's invocation failing policy (at your own risk once the simulation has started)
+     * @brief Get the scheduler's invocation failing policy
      * @return the policy
      */
     ServerlessInvocationFailingPolicy* GreedyServerlessScheduler::getInvocationFailingPolicy() const {
         return _invocation_failing_policy.get();
+    }
+
+    /**
+     * @brief Get the scheduler's idle container selection policy
+     * @return the policy
+     */
+    ServerlessIdleContainerSelectionPolicy* GreedyServerlessScheduler::getIdleContainerPolicy() const {
+        return _idle_container_selection_policy.get();
     }
 
     /**
@@ -300,10 +308,18 @@ namespace wrench {
 
     /**
      * @brief Policy setter
-     * @param policy A invocation failing policy (at your own risk once the simulation has started)
+     * @param policy An invocation failing policy (at your own risk once the simulation has started)
      */
     void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy) {
         _invocation_failing_policy = std::move(policy);
+    }
+
+    /**
+     * @brief Policy setter
+     * @param policy An idle container selection policy (at your own risk once the simulation has started)
+     */
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessIdleContainerSelectionPolicy> policy) {
+        _idle_container_selection_policy = std::move(policy);
     }
 
 
@@ -489,6 +505,7 @@ namespace wrench {
         earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _idle_container_selection_policy->getNextWakeupDate());
         if (earliest_wake_update != DBL_MAX) {
             decisions->scheduler_wakeup_date = earliest_wake_update;
         }

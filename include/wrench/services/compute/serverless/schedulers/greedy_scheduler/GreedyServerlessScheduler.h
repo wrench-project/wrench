@@ -199,6 +199,7 @@ namespace wrench {
         [[nodiscard]] ServerlessPlanSelectionPolicy* getPlanSelectionPolicy() const;
         [[nodiscard]] ServerlessContainerPrewarmPolicy* getContainerPrewarmPolicy() const;
         [[nodiscard]] ServerlessInvocationFailingPolicy* getInvocationFailingPolicy() const;
+        [[nodiscard]] ServerlessIdleContainerSelectionPolicy* getIdleContainerPolicy() const;
 
          void setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationOrderingPolicy> policy);
@@ -207,6 +208,7 @@ namespace wrench {
          void setPolicy(std::shared_ptr<ServerlessPlanSelectionPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessContainerPrewarmPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessIdleContainerSelectionPolicy> policy);
 
         /***********************/
         /** \cond INTERNAL    **/

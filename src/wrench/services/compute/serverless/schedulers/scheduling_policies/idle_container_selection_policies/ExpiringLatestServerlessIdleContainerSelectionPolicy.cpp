@@ -25,7 +25,8 @@ namespace wrench {
                 if (idle_container->getFunction() != invocation->getFunction().get()) {
                     continue;
                 }
-                if (picked_container == nullptr or picked_container->getExpirationDate() > picked_expiration_date) {
+                auto expiration_date = idle_container->getExpirationDate();
+                if (picked_container == nullptr or expiration_date > picked_expiration_date) {
                     picked_container = idle_container;
                     picked_node = node;
                     picked_expiration_date = idle_container->getExpirationDate();
