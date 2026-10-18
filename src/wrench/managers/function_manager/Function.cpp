@@ -37,7 +37,7 @@ namespace wrench {
                                            sg_size_t RAM_limit_in_bytes,
                                            sg_size_t ingress_in_bytes, 
                                            sg_size_t egress_in_bytes)
-        : _name(name), _initialization_code(initialization_code), _image(image), _time_limit(time_limit_in_seconds),
+        : _name(name), _initialization_code(initialization_code), _code(code), _image(image), _time_limit(time_limit_in_seconds),
           _disk_space(disk_space_limit_in_bytes), _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
 
     /**
