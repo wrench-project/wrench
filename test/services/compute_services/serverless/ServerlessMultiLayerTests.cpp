@@ -167,10 +167,11 @@ public:
 class ServerlessMultiLayerTestFunctionInvocationController : public wrench::ExecutionController {
 public:
     ServerlessMultiLayerTestFunctionInvocationController(ServerlessMultiLayerTest* test,
-                                                    const std::string& hostname,
-                                                    const std::shared_ptr<wrench::ServerlessComputeService>
-                                                    & compute_service,
-                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                         const std::string& hostname,
+                                                         const std::shared_ptr<wrench::ServerlessComputeService>
+                                                         & compute_service,
+                                                         const std::shared_ptr<wrench::StorageService>&
+                                                         storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -206,12 +207,13 @@ private:
         auto layer2_location = wrench::FileLocation::LOCATION(this->storage_service, layer2_file);
         wrench::StorageService::createFileAtLocation(layer2_location);
         auto layer2 = wrench::FunctionManager::createImageLayer("my_layer2", layer2_location, layer2_file->getSize());
-        
+
         // Create the image
         auto image1 = wrench::FunctionManager::createImage("my_image", {layer1, layer2});
 
         // Registering a function
-        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1, this->compute_service, 10, 2000 * MB,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
+                                                                       this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -230,7 +232,8 @@ private:
         auto image2 = wrench::FunctionManager::createImage("my_image", {layer1, layer3});
 
         // Registering a function
-        auto registered_function2 = function_manager->registerFunction("Function 2", noop_init, lambda, image2, this->compute_service, 10, 2000 * MB,
+        auto registered_function2 = function_manager->registerFunction("Function 2", noop_init, lambda, image2,
+                                                                       this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -250,7 +253,8 @@ private:
         auto image3 = wrench::FunctionManager::createImage("my_image", {layer4});
 
         // Registering a function
-        auto registered_function3 = function_manager->registerFunction("Function 2", noop_init, lambda, image3, this->compute_service, 10, 2000 * MB,
+        auto registered_function3 = function_manager->registerFunction("Function 2", noop_init, lambda, image3,
+                                                                       this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -298,7 +302,8 @@ void ServerlessMultiLayerTest::do_FunctionInvocationTest_test() {
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessMultiLayerTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+        new ServerlessMultiLayerTestFunctionInvocationController(this, user_host, serverless_provider,
+                                                                 storage_service));
 
     simulation->launch();
 
@@ -306,4 +311,3 @@ void ServerlessMultiLayerTest::do_FunctionInvocationTest_test() {
         free(argv[i]);
     free(argv);
 }
-

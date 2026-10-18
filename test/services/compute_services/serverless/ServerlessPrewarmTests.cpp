@@ -234,7 +234,8 @@ private:
         auto elapsed2 = invocation2->getFunctionEndDate() - invocation2->getSubmitDate();
 
         if (std::abs(elapsed2 - 15) > 10.0E-6) {
-            throw std::runtime_error("The second invocation should have taken exactly 15 seconds (5 seconds of overhead only).");
+            throw std::runtime_error(
+                "The second invocation should have taken exactly 15 seconds (5 seconds of overhead only).");
         }
 
         return 0;

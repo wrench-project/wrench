@@ -95,7 +95,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -127,10 +126,11 @@ public:
 class ServerlessNodeActivationTestFunctionInvocationController : public wrench::ExecutionController {
 public:
     ServerlessNodeActivationTestFunctionInvocationController(ServerlessNodeActivationTest* test,
-                                                      const std::string& hostname,
-                                                      const std::shared_ptr<wrench::ServerlessComputeService>
-                                                      & compute_service,
-                                                      const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                             const std::string& hostname,
+                                                             const std::shared_ptr<wrench::ServerlessComputeService>
+                                                             & compute_service,
+                                                             const std::shared_ptr<wrench::StorageService>&
+                                                             storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -223,7 +223,8 @@ void ServerlessNodeActivationTest::do_BasicTest_test() {
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessNodeActivationTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+        new ServerlessNodeActivationTestFunctionInvocationController(this, user_host, serverless_provider,
+                                                                     storage_service));
 
     simulation->launch();
 
