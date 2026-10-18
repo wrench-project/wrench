@@ -306,7 +306,9 @@ namespace wrench {
      * @brief Register a function in the serverless compute service
      *
      * @param name the function's name
-     * @param code the function's code
+    * @param initialization_code the function's initialization code, which is executed only once on each container
+     *        for the function, before any actual function executions can take place.
+     * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
      * @param image the function's image
      * @param time_limit_in_seconds the time limit for execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
@@ -318,6 +320,7 @@ namespace wrench {
      */
     std::shared_ptr<Function> ServerlessComputeService::registerFunction(
         const std::string& name,
+        const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -331,7 +334,8 @@ namespace wrench {
 
         _commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
-                answer_commport, name, code, image, time_limit_in_seconds, disk_space_limit_in_bytes,
+                answer_commport, name, initialization_code, code, image, time_limit_in_seconds,
+                disk_space_limit_in_bytes,
                 RAM_limit_in_bytes,
                 ingress_in_bytes, egress_in_bytes,
                 this->getMessagePayloadValue(
@@ -523,7 +527,8 @@ namespace wrench {
         } else if (const auto scsfrr_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
             processFunctionRegistrationRequest(
-                scsfrr_msg->answer_commport, scsfrr_msg->name, scsfrr_msg->code, scsfrr_msg->image,
+                scsfrr_msg->answer_commport, scsfrr_msg->name,
+                scsfrr_msg->initialization_code, scsfrr_msg->code, scsfrr_msg->image,
                 scsfrr_msg->time_limit_in_seconds,
                 scsfrr_msg->disk_space_limit_in_bytes, scsfrr_msg->ram_limit_in_bytes,
                 scsfrr_msg->ingress_in_bytes, scsfrr_msg->egress_in_bytes);
@@ -663,8 +668,9 @@ namespace wrench {
     *        to a serverless compute service. Typically used before the simulation launch.
     *
     * @param name the name of the function to register
-    * @param code the function's code
-    * @param image the function's image
+    * @param initialization_code the function's initialization code, which is executed only once on each container
+     *        for the function, before any actual function executions can take place.
+     * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
     * @param time_limit_in_seconds the time limit for execution
     * @param disk_space_limit_in_bytes the disk space limit for the function
     * @param RAM_limit_in_bytes the RAM limit for the function
@@ -674,6 +680,7 @@ namespace wrench {
     */
     std::shared_ptr<Function> ServerlessComputeService::addRegisteredFunction(
         const std::string& name,
+        const std::function<void(std::shared_ptr<StorageService>)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -701,6 +708,7 @@ namespace wrench {
         // At this point, we can create a function object
         auto function = std::make_shared<Function>(
             name,
+            initialization_code,
             code,
             image,
             time_limit_in_seconds,
@@ -719,6 +727,7 @@ namespace wrench {
      *
      * @param answer_commport the FunctionManager commport to answer to
      * @param name the name of the function to register
+     * @param initialization_code the function's initialization code
      * @param code the function's code
      * @param image the function's image
      * @param time_limit the time limit for execution
@@ -730,6 +739,7 @@ namespace wrench {
     void ServerlessComputeService::processFunctionRegistrationRequest(
         S4U_CommPort* answer_commport,
         const std::string& name,
+        const std::function<void(std::shared_ptr<StorageService>)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -741,7 +751,8 @@ namespace wrench {
         const sg_size_t egress_in_bytes) {
         std::shared_ptr<Function> new_function;
         try {
-            new_function = this->addRegisteredFunction(name, code, image, time_limit, disk_space_limit_in_bytes,
+            new_function = this->addRegisteredFunction(name, initialization_code, code, image, time_limit,
+                                                       disk_space_limit_in_bytes,
                                                        ram_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
         } catch (ExecutionException& e) {
             const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
@@ -971,7 +982,6 @@ namespace wrench {
 
         // Make container idle
         compute_node->makeContainerIdle(container);
-
 
 
         // Should the container be terminated or left idling?

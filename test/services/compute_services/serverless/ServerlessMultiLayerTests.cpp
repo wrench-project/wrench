@@ -28,6 +28,8 @@
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
 
+#include "ServerlessTestUtil.h"
+
 WRENCH_LOG_CATEGORY(serverless_multi_layer_tests,
                     "Log category for ServerlessMultiLayerTests tests");
 
@@ -209,7 +211,7 @@ private:
         auto image1 = wrench::FunctionManager::createImage("my_image", {layer1, layer2});
 
         // Registering a function
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image1, this->compute_service, 10, 2000 * MB,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -228,7 +230,7 @@ private:
         auto image2 = wrench::FunctionManager::createImage("my_image", {layer1, layer3});
 
         // Registering a function
-        auto registered_function2 = function_manager->registerFunction("Function 2", lambda, image2, this->compute_service, 10, 2000 * MB,
+        auto registered_function2 = function_manager->registerFunction("Function 2", noop_init, lambda, image2, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -248,7 +250,7 @@ private:
         auto image3 = wrench::FunctionManager::createImage("my_image", {layer4});
 
         // Registering a function
-        auto registered_function3 = function_manager->registerFunction("Function 2", lambda, image3, this->compute_service, 10, 2000 * MB,
+        auto registered_function3 = function_manager->registerFunction("Function 2", noop_init, lambda, image3, this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation

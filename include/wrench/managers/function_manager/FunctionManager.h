@@ -55,6 +55,8 @@ namespace wrench {
                                                   const std::set<std::shared_ptr<ImageLayer>>& additional_layers);
 
         std::shared_ptr<Function> registerFunction(const std::string& name,
+                                                   const std::function<void(
+                                                   const std::shared_ptr<StorageService>&)>& initialization_code,
                                                    const std::function<std::shared_ptr<FunctionOutput>(
                                                        const std::shared_ptr<FunctionInput>&,
                                                        const std::shared_ptr<StorageService>&)>& code,

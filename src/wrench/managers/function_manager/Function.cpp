@@ -16,7 +16,9 @@ namespace wrench {
      * @brief Constructor
      *
      * @param name The function's name.
-     * @param code the function's code.
+     * @param initialization_code the function's initialization code, which is executed only once on each container
+     *        for the function, before any actual function executions can take place.
+     * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
      * @param image the function's image.
      * @param time_limit_in_seconds The time limit for the function execution.
      * @param disk_space_limit_in_bytes The disk space limit for the function.
@@ -25,6 +27,7 @@ namespace wrench {
      * @param egress_in_bytes The egress data limit for the function.
      */
     Function::Function(const std::string& name,
+            const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
             const std::function<std::shared_ptr<FunctionOutput>(
                 const std::shared_ptr<FunctionInput>&,
                 const std::shared_ptr<StorageService>&)>& code,
@@ -34,8 +37,8 @@ namespace wrench {
                                            sg_size_t RAM_limit_in_bytes,
                                            sg_size_t ingress_in_bytes, 
                                            sg_size_t egress_in_bytes)
-        : _name(name), _code(code), _image(image), _time_limit(time_limit_in_seconds), _disk_space(disk_space_limit_in_bytes),
-        _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
+        : _name(name), _initialization_code(initialization_code), _image(image), _time_limit(time_limit_in_seconds),
+          _disk_space(disk_space_limit_in_bytes), _ram_limit(RAM_limit_in_bytes), _ingress(ingress_in_bytes), _egress(egress_in_bytes) {}
 
     /**
      * @brief Get the function's image
@@ -44,14 +47,6 @@ namespace wrench {
     std::shared_ptr<Image> Function::getImage() const {
         return _image;
     }
-
-    // /**
-    //  * @brief Get the function's image file
-    //  * @return A file
-    //  */
-    // std::shared_ptr<DataFile> Function::getImageFile() const {
-    //     return _image->getFile();
-    // }
 
     /**
      * @brief Get the function's name

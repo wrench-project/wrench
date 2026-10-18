@@ -29,6 +29,8 @@
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
 
+#include "ServerlessTestUtil.h"
+
 WRENCH_LOG_CATEGORY(serverless_slot_tests,
                     "Log category for ServerlessSlotTests tests");
 
@@ -161,7 +163,7 @@ private:
         auto image1 = wrench::FunctionManager::createImage("my_image", {layer1});
 
         // Registering a function
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image1,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
                                                                        this->compute_service, 3600, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 

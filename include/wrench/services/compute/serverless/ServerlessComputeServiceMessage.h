@@ -38,6 +38,7 @@ namespace wrench {
     public:
         ServerlessComputeServiceFunctionRegisterRequestMessage(S4U_CommPort* answer_commport,
                                                                const std::string& name,
+                                                               const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
                                                                const std::function<std::shared_ptr<FunctionOutput>(
                                                                    const std::shared_ptr<FunctionInput>&,
                                                                    const std::shared_ptr<StorageService>&)>& code,
@@ -51,11 +52,13 @@ namespace wrench {
         S4U_CommPort* answer_commport;
         /** @brief The name of the function to register */
         std::string name;
-        /** @brief The function's code **/
+        /** @brief the function initialization code */
+        std::function<void(const std::shared_ptr<StorageService>&)> initialization_code;
+        /** @brief The function's code */
         std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)> code;
-        /** @brief The function's image **/
+        /** @brief The function's image */
         std::shared_ptr<Image> image;
         /** @brief The time limit for execution */
         double time_limit_in_seconds;
