@@ -79,6 +79,10 @@ namespace wrench {
 
         WRENCH_INFO("Creating a function");
 
+        // Create the initialization code for a function, which must be executed once on a container for the function before
+        // the function code can be executed. In this example, this initialization code is a noop.
+        auto function_initialization_code = [](const std::shared_ptr<StorageService>& my_storage_service) -> void {};
+
         // Create the code for a function. This function sleeps for a number of seconds specified in its
         // input object, and returns an output object that contains a string message.
         auto function_code = [](const std::shared_ptr<FunctionInput>& input,
@@ -108,7 +112,10 @@ namespace wrench {
         sg_size_t egress_in_bytes = 40 * MB;
 
         // Register the function to the serverless compute service, via the function manager
-        auto registered_function = function_manager->registerFunction("my_function", function_code, image, compute_service,
+        auto registered_function = function_manager->registerFunction("my_function",
+            function_initialization_code,
+            function_code,
+            image, compute_service,
                                                                       time_limit,
                                                                       disk_space_limit_in_bytes,
                                                                       RAM_limit_in_bytes,

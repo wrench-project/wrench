@@ -106,6 +106,7 @@ namespace wrench {
 
         std::shared_ptr<Function> addRegisteredFunction(
             const std::string& name,
+            const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
             const std::function<std::shared_ptr<FunctionOutput>(
                 const std::shared_ptr<FunctionInput>&,
                 const std::shared_ptr<StorageService>&)>& code,
@@ -132,6 +133,8 @@ namespace wrench {
                                                    S4U_CommPort* notify_commport) const;
 
         std::shared_ptr<Function> registerFunction(const std::string& name,
+                                                   const std::function<void(const std::shared_ptr<StorageService>&)>&
+                                                   initialization_code,
                                                    const std::function<std::shared_ptr<FunctionOutput>(
                                                        const std::shared_ptr<FunctionInput>&,
                                                        const std::shared_ptr<StorageService>&)>& code,
@@ -160,6 +163,8 @@ namespace wrench {
 
         void processFunctionRegistrationRequest(S4U_CommPort* answer_commport,
                                                 const std::string& name,
+                                                const std::function<void(const std::shared_ptr<StorageService>&)>&
+                                                initialization_code,
                                                 const std::function<std::shared_ptr<FunctionOutput>(
                                                     const std::shared_ptr<FunctionInput>&,
                                                     const std::shared_ptr<StorageService>&)>& code,
@@ -181,7 +186,7 @@ namespace wrench {
         void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation,
                                          const std::shared_ptr<Action>& action);
 
-        void processPrewarmCompletion(const std::shared_ptr<Container>& container);
+        void processPrewarmCompletion(const std::shared_ptr<Container>& container, std::shared_ptr<Action> init_action);
 
         void processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence);
 
@@ -215,7 +220,7 @@ namespace wrench {
         void initiateImageLayerLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
                                                  const std::shared_ptr<ImageLayer>& layer);
         void prewarmContainerAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
-                                                 const std::shared_ptr<Function>& function);
+                                           const std::shared_ptr<Function>& function);
 
         bool dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                 const std::shared_ptr<ServerlessComputeNode>& target_compute_node,

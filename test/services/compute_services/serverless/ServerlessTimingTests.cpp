@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-// #include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -26,6 +26,8 @@
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
+
+#include "ServerlessTestUtil.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -192,7 +194,7 @@ private:
         auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
         auto image = wrench::FunctionManager::createImage("my_image", {layer});
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function = function_manager->registerFunction("Function", lambda, image, this->compute_service, 10, 2000 * MB,
+        auto registered_function = function_manager->registerFunction("Function", noop_init, lambda, image, this->compute_service, 10, 2000 * MB,
                                                                       8000 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -239,7 +241,7 @@ private:
         {
             auto input2 = std::make_shared<MyFunctionInput>(1, 2);
             auto registered_function2 = function_manager->registerFunction(
-                "Function2", lambda, image, this->compute_service, 10, 2000 * MB,
+                "Function2", noop_init, lambda, image, this->compute_service, 10, 2000 * MB,
                 8000 * MB, 10 * MB, 1 * MB);
             auto now = wrench::Simulation::getCurrentSimulatedDate();
             auto invocation = function_manager->invokeFunction(registered_function2, this->compute_service, input2);
@@ -398,7 +400,7 @@ private:
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place 20 invocations, knowing that only 10 can run at a time
@@ -534,7 +536,7 @@ private:
         wrench::StorageService::createFileAtLocation(layer_location_1);
         auto layer_1 = wrench::FunctionManager::createImageLayer("my_layer_1", layer_location_1, layer_file_1->getSize());
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -549,7 +551,7 @@ private:
         auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
+        auto registered_function_2 = function_manager->registerFunction("Function_2", noop_init, lambda, image_2, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         auto invocation_2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
@@ -673,7 +675,7 @@ private:
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // Pick the RAM limit so that only 4 invocations can run at a time
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         2000 * MB, 1 * GB, 10 * MB, 1 * MB);
 
         // Place 10 invocations, knowing that only 4 can run at a time
@@ -806,7 +808,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation
@@ -820,7 +822,7 @@ private:
         auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
+        auto registered_function_2 = function_manager->registerFunction("Function_2", noop_init, lambda, image_2, this->compute_service, 100,
                                                                         2000 * MB, 1 * MB, 10 * MB, 1 * MB);
 
         auto invocation_2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
@@ -938,7 +940,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         12 * GB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place invocations, but only 3 should be able to run at a time
@@ -1070,7 +1072,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         30 * GB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation and wait for it
@@ -1219,7 +1221,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         30 * GB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation to function 1 and wait for it
@@ -1243,7 +1245,7 @@ private:
         auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
+        auto registered_function_2 = function_manager->registerFunction("Function_2", noop_init, lambda, image_2, this->compute_service, 100,
                                                                         30 * GB, 1 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation to function 2 and wait for it
@@ -1400,7 +1402,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
 
         // Place an invocation to function 1 and wait for it
@@ -1417,7 +1419,7 @@ private:
         auto image_2 = wrench::FunctionManager::createImage("my_image_2", {layer_2});
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->compute_service, 100,
+        auto registered_function_2 = function_manager->registerFunction("Function_2", noop_init, lambda, image_2, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
 
         auto inv2 = function_manager->invokeFunction(registered_function_2, this->compute_service, input_2);
@@ -1565,7 +1567,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
 
         // Place two invocation to function 1 and wait for them
@@ -1734,7 +1736,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
 
         // Place one invocation, so that there will be one idle container
@@ -1887,7 +1889,7 @@ private:
         auto image_1 = wrench::FunctionManager::createImage("my_image_1", {layer_1});
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         30 * GB, 10 * MB, 10 * MB, 1 * MB);
 
         // Place one invocation, so that there will be one idle container to reuse
@@ -2043,7 +2045,7 @@ private:
         registered_functions.reserve(function_RAM_sizes.size());
         for (auto ram_size : function_RAM_sizes) {
             registered_functions.push_back(function_manager->registerFunction(
-                "function_code", lambda, image, this->compute_service, 100,
+                "function_code", noop_init, lambda, image, this->compute_service, 100,
                 1 * MB, ram_size * GB, 10 * MB, 1 * MB));
         }
 
@@ -2060,7 +2062,7 @@ private:
         // At this point, place one invocation for yet another function that needs 11 GB of RAM
         {
             auto rf = function_manager->registerFunction(
-                "other_function", lambda, image, this->compute_service, 100,
+                "other_function", noop_init, lambda, image, this->compute_service, 100,
                 1 * MB, 11 * GB, 10 * MB, 1 * MB);
             auto inv = function_manager->invokeFunction(rf, this->compute_service, input);
             function_manager->wait_one(inv);
@@ -2221,7 +2223,7 @@ private:
 
         auto input_1 = std::make_shared<MyFunctionInput>(1, 2);
         // 1 GB Container RAM SPACE
-        auto registered_function_1 = function_manager->registerFunction("Function_1", lambda, image_1, this->compute_service, 100,
+        auto registered_function_1 = function_manager->registerFunction("Function_1", noop_init, lambda, image_1, this->compute_service, 100,
                                                                         1 * GB, 1 * GB, 10 * MB, 1 * MB);
 
         // Register a function_2 with a 30GB image file, and a 1GB container RAM space
@@ -2233,7 +2235,7 @@ private:
 
         auto input_2 = std::make_shared<MyFunctionInput>(1, 2);
         // 1 GB Container RAM SPACE
-        auto registered_function_2 = function_manager->registerFunction("Function_2", lambda, image_2, this->other_compute_service, 100,
+        auto registered_function_2 = function_manager->registerFunction("Function_2", noop_init, lambda, image_2, this->other_compute_service, 100,
                                                                         1 * GB, 1 * GB, 10 * MB, 1 * MB);
 
 
@@ -2375,7 +2377,7 @@ private:
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         // 1 GB Container RAM SPACE
-        auto registered_function = function_manager->registerFunction("Function", lambda, image, this->compute_service, 100,
+        auto registered_function = function_manager->registerFunction("Function", noop_init, lambda, image, this->compute_service, 100,
                                                                         1 * GB, 1 * GB, 10 * MB, 1 * MB);
 
 

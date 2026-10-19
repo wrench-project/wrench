@@ -306,7 +306,9 @@ namespace wrench {
      * @brief Register a function in the serverless compute service
      *
      * @param name the function's name
-     * @param code the function's code
+    * @param initialization_code the function's initialization code, which is executed only once on each container
+     *        for the function, before any actual function executions can take place.
+     * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
      * @param image the function's image
      * @param time_limit_in_seconds the time limit for execution
      * @param disk_space_limit_in_bytes the disk space limit for the function
@@ -318,6 +320,7 @@ namespace wrench {
      */
     std::shared_ptr<Function> ServerlessComputeService::registerFunction(
         const std::string& name,
+        const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -331,7 +334,8 @@ namespace wrench {
 
         _commport->putMessage(
             new ServerlessComputeServiceFunctionRegisterRequestMessage(
-                answer_commport, name, code, image, time_limit_in_seconds, disk_space_limit_in_bytes,
+                answer_commport, name, initialization_code, code, image, time_limit_in_seconds,
+                disk_space_limit_in_bytes,
                 RAM_limit_in_bytes,
                 ingress_in_bytes, egress_in_bytes,
                 this->getMessagePayloadValue(
@@ -523,7 +527,8 @@ namespace wrench {
         } else if (const auto scsfrr_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceFunctionRegisterRequestMessage>(message)) {
             processFunctionRegistrationRequest(
-                scsfrr_msg->answer_commport, scsfrr_msg->name, scsfrr_msg->code, scsfrr_msg->image,
+                scsfrr_msg->answer_commport, scsfrr_msg->name,
+                scsfrr_msg->initialization_code, scsfrr_msg->code, scsfrr_msg->image,
                 scsfrr_msg->time_limit_in_seconds,
                 scsfrr_msg->disk_space_limit_in_bytes, scsfrr_msg->ram_limit_in_bytes,
                 scsfrr_msg->ingress_in_bytes, scsfrr_msg->egress_in_bytes);
@@ -543,7 +548,7 @@ namespace wrench {
             return true;
         } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
-            processPrewarmCompletion(scscpc_msg->_container);
+            processPrewarmCompletion(scscpc_msg->_container, scscpc_msg->_action);
             return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
@@ -663,8 +668,9 @@ namespace wrench {
     *        to a serverless compute service. Typically used before the simulation launch.
     *
     * @param name the name of the function to register
-    * @param code the function's code
-    * @param image the function's image
+    * @param initialization_code the function's initialization code, which is executed only once on each container
+     *        for the function, before any actual function executions can take place.
+     * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
     * @param time_limit_in_seconds the time limit for execution
     * @param disk_space_limit_in_bytes the disk space limit for the function
     * @param RAM_limit_in_bytes the RAM limit for the function
@@ -674,6 +680,7 @@ namespace wrench {
     */
     std::shared_ptr<Function> ServerlessComputeService::addRegisteredFunction(
         const std::string& name,
+        const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -701,6 +708,7 @@ namespace wrench {
         // At this point, we can create a function object
         auto function = std::make_shared<Function>(
             name,
+            initialization_code,
             code,
             image,
             time_limit_in_seconds,
@@ -719,6 +727,7 @@ namespace wrench {
      *
      * @param answer_commport the FunctionManager commport to answer to
      * @param name the name of the function to register
+     * @param initialization_code the function's initialization code
      * @param code the function's code
      * @param image the function's image
      * @param time_limit the time limit for execution
@@ -730,6 +739,7 @@ namespace wrench {
     void ServerlessComputeService::processFunctionRegistrationRequest(
         S4U_CommPort* answer_commport,
         const std::string& name,
+        const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -741,7 +751,8 @@ namespace wrench {
         const sg_size_t egress_in_bytes) {
         std::shared_ptr<Function> new_function;
         try {
-            new_function = this->addRegisteredFunction(name, code, image, time_limit, disk_space_limit_in_bytes,
+            new_function = this->addRegisteredFunction(name, initialization_code, code, image, time_limit,
+                                                       disk_space_limit_in_bytes,
                                                        ram_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
         } catch (ExecutionException& e) {
             const auto answerMessage = new ServerlessComputeServiceFunctionRegisterAnswerMessage(
@@ -924,25 +935,31 @@ namespace wrench {
 
         // Make container idle
         auto container = invocation->_container;
-        compute_node->makeContainerIdle(container);
-
-        // Should the container be terminated or left idling?
-        double idle_timeout = this->getPropertyValueAsTimeInSecond(
-            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
-        if (idle_timeout <= 0) {
-            compute_node->shutdownContainer(container);
+        if (!container->_initialized) {
+            // Proposed new helper: the action has ended, but setup failed.
+            compute_node->_busy_containers.erase(container);
+            container->shutdown();
         } else {
-            // Start the expiration alarm
-            container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
-            container->_expiration_alarm = Alarm::createAndStartAlarm(
-                this->simulation_,
-                container->_expiration_date,
-                _hostname,
-                _commport,
-                new
-                ServerlessComputeServiceContainerIdleTimeoutMessage(
-                    container, container->getIdleSequence()),
-                "container_idle_timout");
+            compute_node->makeContainerIdle(container);
+
+            // Should the container be terminated or left idling?
+            double idle_timeout = this->getPropertyValueAsTimeInSecond(
+                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+            if (idle_timeout <= 0) {
+                compute_node->shutdownContainer(container);
+            } else {
+                // Start the expiration alarm
+                container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
+                container->_expiration_alarm = Alarm::createAndStartAlarm(
+                    this->simulation_,
+                    container->_expiration_date,
+                    _hostname,
+                    _commport,
+                    new
+                    ServerlessComputeServiceContainerIdleTimeoutMessage(
+                        container, container->getIdleSequence()),
+                    "container_idle_timout");
+            }
         }
 
         bool success = action->getState() == Action::State::COMPLETED;
@@ -961,18 +978,31 @@ namespace wrench {
      * @brief Process a container pre-warm
      * @param container The container
      */
-    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container) {
-        WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
-
+    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container,
+                                                            std::shared_ptr<Action> init_action) {
+        bool success = init_action->getState() == Action::State::COMPLETED;
         auto compute_node = container->getComputeNode();
+
+        if (not success) {
+            WRENCH_INFO("A container pre-warm has failed [%s] (%s)",
+                        container->getFunction()->getName().c_str(),
+                        init_action->getFailureCause()->toString().c_str());
+
+            // Free up the slot
+            compute_node->_num_free_slots++;
+            // Remove container from the pre-warming list
+            compute_node->_prewarming_containers.erase(container);
+            container->shutdown();
+            return;
+        }
+
+        WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
 
         // Free up the slot
         compute_node->_num_free_slots++;
 
         // Make container idle
         compute_node->makeContainerIdle(container);
-
-
 
         // Should the container be terminated or left idling?
         double idle_timeout = this->getPropertyValueAsTimeInSecond(
@@ -1197,21 +1227,32 @@ namespace wrench {
 
         // Declare the function invocation's necessary lambdas
         const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
-            // Clear up all files from the tmp storage service, if any, so that if a next
-            // invocation reuses this container, it won't "see" the previous invocation's data, if any
-            invocation->_container->clearPrivateStorage();
+            // noop
         };
 
         const std::function lambda_execute = [invocation](
             const std::shared_ptr<ActionExecutor>& action_executor) {
+            auto container = invocation->_container;
+            auto private_storage_service = container->getPrivateStorageService();
+
+            if (not container->_initialized) {
+                // Invoke the user's initialization function
+                try {
+                    invocation->_function->_initialization_code(private_storage_service);
+                    container->_initialized = true;
+                } catch (ExecutionException& e) {
+                    throw;
+                }
+            }
+
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
             try {
-                invocation->_function_output = invocation->_function->_code(invocation->_function_input,
-                                                                            invocation->_container->
-                                                                            getPrivateStorageService());
+                invocation->_function_output =
+                    invocation->_function->_code(invocation->_function_input,
+                                                 private_storage_service);
             } catch (ExecutionException&) {
-                invocation->_container->clearPrivateStorage();
+                // invocation->_container->clearPrivateStorage();
                 invocation->_function_end_date = S4U_Simulation::getClock();
                 throw;
             }
@@ -1922,15 +1963,26 @@ namespace wrench {
         // Update the slot count of the compute node
         compute_node->_num_free_slots -= 1;
 
-        // Declare the function invocation's necessary lambdas
+        // The prewarm runs the initialization step!
+        const std::function initialization_code = [container, function
+            ](const std::shared_ptr<ActionExecutor>& action_executor) {
+            auto private_storage_service = container->getPrivateStorageService();
+            try {
+                function->_initialization_code(private_storage_service);
+            } catch (ExecutionException& e) {
+                throw;
+            }
+            container->_initialized = true;
+        };
         const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
 
+
         // Create the action and create a corresponding action executor
         auto action = std::shared_ptr<CustomAction>(
-            new CustomAction("run_invocation_noop", 0, 0, noop, noop));
+            new CustomAction("run_invocation_noop", 0, 0, initialization_code, noop));
 
-        auto custom_message = new ServerlessComputeServiceContainerPrewarmCompleteMessage(container);
+        auto custom_message = new ServerlessComputeServiceContainerPrewarmCompleteMessage(container, action);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             compute_node->hostname, 1, 0,
@@ -1941,6 +1993,7 @@ namespace wrench {
             action,
             nullptr);
 
+        action_executor->setActionTimeout(function->getTimeLimit());
         action_executor->setSimulation(this->simulation_);
         // Start the action executor object
         try {

@@ -29,6 +29,8 @@
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
 
+#include "ServerlessTestUtil.h"
+
 WRENCH_LOG_CATEGORY(serverless_node_activation_tests,
                     "Log category for ServerlessNodeActivationTests tests");
 
@@ -93,7 +95,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -125,10 +126,11 @@ public:
 class ServerlessNodeActivationTestFunctionInvocationController : public wrench::ExecutionController {
 public:
     ServerlessNodeActivationTestFunctionInvocationController(ServerlessNodeActivationTest* test,
-                                                      const std::string& hostname,
-                                                      const std::shared_ptr<wrench::ServerlessComputeService>
-                                                      & compute_service,
-                                                      const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                             const std::string& hostname,
+                                                             const std::shared_ptr<wrench::ServerlessComputeService>
+                                                             & compute_service,
+                                                             const std::shared_ptr<wrench::StorageService>&
+                                                             storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -161,7 +163,7 @@ private:
         auto image1 = wrench::FunctionManager::createImage("my_image", {layer1});
 
         // Registering a function
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image1,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
                                                                        this->compute_service, 3600, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
@@ -221,7 +223,8 @@ void ServerlessNodeActivationTest::do_BasicTest_test() {
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessNodeActivationTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+        new ServerlessNodeActivationTestFunctionInvocationController(this, user_host, serverless_provider,
+                                                                     storage_service));
 
     simulation->launch();
 

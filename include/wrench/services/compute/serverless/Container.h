@@ -90,6 +90,9 @@ namespace wrench {
         unsigned long _creation_id; // to break ties
         unsigned long _idle_sequence = 0;
         double _idle_date = DBL_MAX;
+
+        bool _initialized = false;
+
         double _expiration_date = DBL_MAX;
         std::shared_ptr<Alarm> _expiration_alarm = nullptr;
 

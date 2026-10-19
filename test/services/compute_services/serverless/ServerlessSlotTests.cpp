@@ -29,6 +29,8 @@
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
 
+#include "ServerlessTestUtil.h"
+
 WRENCH_LOG_CATEGORY(serverless_slot_tests,
                     "Log category for ServerlessSlotTests tests");
 
@@ -93,7 +95,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -125,10 +126,10 @@ public:
 class ServerlessSlotTestFunctionInvocationController : public wrench::ExecutionController {
 public:
     ServerlessSlotTestFunctionInvocationController(ServerlessSlotTest* test,
-                                                      const std::string& hostname,
-                                                      const std::shared_ptr<wrench::ServerlessComputeService>
-                                                      & compute_service,
-                                                      const std::shared_ptr<wrench::StorageService>& storage_service) :
+                                                   const std::string& hostname,
+                                                   const std::shared_ptr<wrench::ServerlessComputeService>
+                                                   & compute_service,
+                                                   const std::shared_ptr<wrench::StorageService>& storage_service) :
         wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->compute_service = compute_service;
@@ -161,7 +162,7 @@ private:
         auto image1 = wrench::FunctionManager::createImage("my_image", {layer1});
 
         // Registering a function
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image1,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
                                                                        this->compute_service, 3600, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
@@ -192,8 +193,8 @@ private:
 
         for (int i = 0; i < 4; i++) {
             if (std::abs(elapsed[i] - expected_elapsed[i]) > 10.0E-6) {
-                throw std::runtime_error("The " + std::to_string(i+2) + "-th invocation should have taken exactly " +
-                                       std::to_string(expected_elapsed[i]) + " seconds (it took " + std::to_string(elapsed[i]) + ")");
+                throw std::runtime_error("The " + std::to_string(i + 2) + "-th invocation should have taken exactly " +
+                    std::to_string(expected_elapsed[i]) + " seconds (it took " + std::to_string(elapsed[i]) + ")");
             }
         }
 
@@ -209,7 +210,7 @@ void ServerlessSlotTest::do_BasicTest_test() {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);

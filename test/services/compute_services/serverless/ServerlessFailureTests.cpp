@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -26,6 +26,8 @@
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
+
+#include "ServerlessTestUtil.h"
 
 WRENCH_LOG_CATEGORY(serverless_failure_tests,
                     "Log category for ServerlessFailureTests tests");
@@ -174,7 +176,8 @@ private:
 
         // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image,
+                                                                       this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
         // Place a couple of invocations
@@ -197,7 +200,8 @@ private:
             }
             auto failure_cause = invocation->getFailureCause();
             if (not std::dynamic_pointer_cast<wrench::NetworkError>(failure_cause)) {
-                throw std::runtime_error("Failure cause should be a NetworkError, instead we got: " + failure_cause->toString());
+                throw std::runtime_error(
+                    "Failure cause should be a NetworkError, instead we got: " + failure_cause->toString());
             }
         }
 

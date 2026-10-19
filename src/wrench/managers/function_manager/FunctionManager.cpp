@@ -46,7 +46,8 @@ namespace wrench {
     *
     */
     void FunctionManager::stop() {
-        this->_commport->putMessage(new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+        this->_commport->putMessage(
+            new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
     }
 
     /**
@@ -77,7 +78,8 @@ namespace wrench {
      * @return An image layer
      */
     std::shared_ptr<ImageLayer> FunctionManager::createImageLayer(const std::string& name,
-                                                                  const std::shared_ptr<FileLocation>& location, sg_size_t ram_foot_print) {
+                                                                  const std::shared_ptr<FileLocation>& location,
+                                                                  sg_size_t ram_foot_print) {
         return std::shared_ptr<ImageLayer>(new ImageLayer(name, location, ram_foot_print));
     }
 
@@ -101,7 +103,8 @@ namespace wrench {
      */
     std::shared_ptr<Image> FunctionManager::createImage(const std::string& name,
                                                         const std::shared_ptr<Image>& parent_image,
-                                                        const std::set<std::shared_ptr<ImageLayer>>& additional_layers) {
+                                                        const std::set<std::shared_ptr<ImageLayer>>&
+                                                        additional_layers) {
         return std::shared_ptr<Image>(new Image(name, parent_image, additional_layers));
     }
 
@@ -110,7 +113,11 @@ namespace wrench {
      * @brief Registers a function with the ServerlessComputeService
      *
      * @param name the function's name
-     * @param code the function's code
+     * @param initialization_code the function's initialization code, which is executed only once on each container
+     *        for the function, before any actual function executions can take place.
+     * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
+     *             Note that if this function creates files on the container's storage, these files will remain and will be seen by
+     *             subsequent function executions on that container. A function may thus want to clean up after itself.
      * @param image the function's image
      * @param sl_compute_service the ServerlessComputeService to register the function on
      * @param time_limit_in_seconds the time limit for the function execution
@@ -123,6 +130,7 @@ namespace wrench {
      */
     std::shared_ptr<Function> FunctionManager::registerFunction(
         const std::string& name,
+        const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
         const std::function<std::shared_ptr<
             FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
@@ -136,11 +144,11 @@ namespace wrench {
         sg_size_t RAM_limit_in_bytes,
         sg_size_t ingress_in_bytes,
         sg_size_t egress_in_bytes) {
-
         sl_compute_service->assertServiceIsUp();
 
-        return sl_compute_service->registerFunction(name, code, image, time_limit_in_seconds, disk_space_limit_in_bytes,
-                                                    RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
+        return sl_compute_service->registerFunction(
+            name, initialization_code, code, image, time_limit_in_seconds, disk_space_limit_in_bytes,
+            RAM_limit_in_bytes, ingress_in_bytes, egress_in_bytes);
     }
 
     /**

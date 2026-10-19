@@ -28,6 +28,8 @@
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
 
+#include "ServerlessTestUtil.h"
+
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
@@ -36,6 +38,7 @@ WRENCH_LOG_CATEGORY(serverless_basic_tests,
                     "Log category for ServerlessBasicTests tests");
 
 class ServerlessBasicTest : public ::testing::Test {
+
 public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
@@ -258,7 +261,7 @@ private:
         auto image = wrench::FunctionManager::createImage("image", {layer});
         wrench::StorageService::createFileAtLocation(layer_location);
         try {
-            function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB,
+            function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10, 2000 * MB,
                                                8000 * MB, 10 * MB,
                                                1 * MB);
             throw std::runtime_error("Function registration should have failed due to RAM space");
@@ -266,7 +269,7 @@ private:
         }
 
         try {
-            function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 20000 * GB,
+            function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10, 20000 * GB,
                                                8000 * MB, 10 * MB,
                                                1 * MB);
             throw std::runtime_error("Function registration should have failed due to disk space");
@@ -390,10 +393,10 @@ private:
         auto image = wrench::FunctionManager::createImage("my_image", {layer});
         wrench::StorageService::createFileAtLocation(layer_location);
 
-        function_manager->registerFunction("Function 1", lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB,
+        function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB,
                                            10 * MB, 1 * MB);
 
-        auto registered_function2 = function_manager->registerFunction("Function 2", lambda, image,
+        auto registered_function2 = function_manager->registerFunction("Function 2", noop_init, lambda, image,
                                                                        this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
         if (registered_function2->getImage() != image) {
@@ -482,7 +485,7 @@ private:
 
         // Registering a function
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image,
                                                                        this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
@@ -734,7 +737,7 @@ void ServerlessBasicTest::do_PreRegisteredFunctionInvocationTest_test() {
 
     // Registering a function
     auto function = serverless_provider->addRegisteredFunction(
-        "Function 1", lambda, image, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
+        "Function 1", noop_init, lambda, image, 10, 2000 * MB, 8000 * MB, 10 * MB, 1 * MB);
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
@@ -790,7 +793,7 @@ private:
         auto image = wrench::FunctionManager::createImage("my_image", {layer});
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image,
                                                                        this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
@@ -933,7 +936,7 @@ private:
 
         // Registering a function with one of the two compute services
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image,
                                                                        this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 
@@ -1065,7 +1068,7 @@ private:
 
         // Registering a function with one of the two compute services
         auto input = std::make_shared<MyFunctionInput>(1, 2);
-        auto registered_function1 = function_manager->registerFunction("Function 1", lambda, image,
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image,
                                                                        this->compute_service, 10, 2000 * MB,
                                                                        8000 * MB, 10 * MB, 1 * MB);
 

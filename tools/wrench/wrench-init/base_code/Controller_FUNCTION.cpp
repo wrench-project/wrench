@@ -56,6 +56,9 @@ namespace wrench {
         wrench::StorageService::createFileAtLocation(layer_file_location);
         auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_file_location, layer_file->getSize() / 2);
 
+        // Create the initialization code for a function, which must be executed once on a container for the function before
+        // the function code can be executed. In this example, this initialization code is a noop.
+        auto function_initialization_code = [](const std::shared_ptr<StorageService>& my_storage_service) -> void {};
 
         // Create the code for a function. This function computes a fixed amount of flops.
         //  It has absolutely generic Input and Output
@@ -80,7 +83,8 @@ namespace wrench {
         sg_size_t egress_in_bytes = 40 * MB;
 
         // Register the function to the serverless compute service, via the function manager
-        auto registered_function = function_manager->registerFunction("my_function", function_code, image, serverless_compute_service,
+        auto registered_function = function_manager->registerFunction("my_function", function_initialization_code, function_code,
+                                                                      image, serverless_compute_service,
                                                                       time_limit,
                                                                       disk_space_limit_in_bytes,
                                                                       RAM_limit_in_bytes,
