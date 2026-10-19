@@ -548,7 +548,7 @@ namespace wrench {
             return true;
         } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
-            processPrewarmCompletion(scscpc_msg->_container);
+            processPrewarmCompletion(scscpc_msg->_container, scscpc_msg->_action);
             return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
@@ -972,17 +972,31 @@ namespace wrench {
      * @brief Process a container pre-warm
      * @param container The container
      */
-    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container) {
-        WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
+    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container, std::shared_ptr<Action> init_action) {
 
+        bool success = init_action->getState() == Action::State::COMPLETED;
         auto compute_node = container->getComputeNode();
+
+        if (not success) {
+            WRENCH_INFO("A container pre-warm has failed [%s] (%s)",
+                container->getFunction()->getName().c_str(),
+                init_action->getFailureCause()->toString().c_str());
+
+            // Free up the slot
+            compute_node->_num_free_slots++;
+
+            // Shutdown container
+            compute_node->shutdownContainer(container);
+            return;
+        }
+
+        WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
 
         // Free up the slot
         compute_node->_num_free_slots++;
 
         // Make container idle
         compute_node->makeContainerIdle(container);
-
 
         // Should the container be terminated or left idling?
         double idle_timeout = this->getPropertyValueAsTimeInSecond(
@@ -1214,14 +1228,28 @@ namespace wrench {
 
         const std::function lambda_execute = [invocation](
             const std::shared_ptr<ActionExecutor>& action_executor) {
+            auto container = invocation->_container;
+            auto private_storage_service = container->getPrivateStorageService();
+
+            if (not container->_initialized) {
+                // Invoke the user's initialization function
+                try {
+                    invocation->_function->_initialization_code(private_storage_service);
+                } catch (ExecutionException& e) {
+                    invocation->_function_end_date = S4U_Simulation::getClock();
+                    throw;
+                }
+                container->_initialized = true;
+            }
+
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
             try {
-                invocation->_function_output = invocation->_function->_code(invocation->_function_input,
-                                                                            invocation->_container->
-                                                                            getPrivateStorageService());
+                invocation->_function_output =
+                    invocation->_function->_code(invocation->_function_input,
+                                                 private_storage_service);
             } catch (ExecutionException&) {
-                invocation->_container->clearPrivateStorage();
+                // invocation->_container->clearPrivateStorage();
                 invocation->_function_end_date = S4U_Simulation::getClock();
                 throw;
             }
@@ -1932,15 +1960,24 @@ namespace wrench {
         // Update the slot count of the compute node
         compute_node->_num_free_slots -= 1;
 
-        // Declare the function invocation's necessary lambdas
-        const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {
+        // The prewarm runs the initialization step!
+        const std::function initialization_code = [container, function](const std::shared_ptr<ActionExecutor>& action_executor) {
+            auto private_storage_service = container->getPrivateStorageService();
+            try {
+                function->_initialization_code(private_storage_service);
+            } catch (ExecutionException& e) {
+                throw;
+            }
+            container->_initialized = true;
         };
+        const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {};
+
 
         // Create the action and create a corresponding action executor
         auto action = std::shared_ptr<CustomAction>(
-            new CustomAction("run_invocation_noop", 0, 0, noop, noop));
+            new CustomAction("run_invocation_noop", 0, 0, initialization_code, noop));
 
-        auto custom_message = new ServerlessComputeServiceContainerPrewarmCompleteMessage(container);
+        auto custom_message = new ServerlessComputeServiceContainerPrewarmCompleteMessage(container, action);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             compute_node->hostname, 1, 0,

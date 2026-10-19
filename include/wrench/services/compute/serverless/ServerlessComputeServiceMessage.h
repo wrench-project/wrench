@@ -228,10 +228,13 @@ namespace wrench {
      */
     class ServerlessComputeServiceContainerPrewarmCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        explicit ServerlessComputeServiceContainerPrewarmCompleteMessage(std::shared_ptr<Container> container);
+        explicit ServerlessComputeServiceContainerPrewarmCompleteMessage(std::shared_ptr<Container> container,
+                                                                         std::shared_ptr<Action> action);
 
         /** @brief The container that was pre-warmed */
         std::shared_ptr<Container> _container;
+        /** @brief The action that initialized the container (to check status) */
+        std::shared_ptr<Action> _action;
     };
 
     /**

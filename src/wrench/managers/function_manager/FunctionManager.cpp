@@ -116,6 +116,8 @@ namespace wrench {
      * @param initialization_code the function's initialization code, which is executed only once on each container
      *        for the function, before any actual function executions can take place.
      * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
+     *             Note that if this function creates files on the container's storage, these files will remain and will be seen by
+     *             subsequent function executions on that container. A function may thus want to clean up after itself.
      * @param image the function's image
      * @param sl_compute_service the ServerlessComputeService to register the function on
      * @param time_limit_in_seconds the time limit for the function execution
