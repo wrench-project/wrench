@@ -126,6 +126,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Gets the invocation "hot start" status
+     * @return True if the invocation was hot-started
+     */
+    bool Invocation::wasHoststart() const {
+        return _was_hot_start;
+    }
+
+    /**
      * @brief Gets the function for this invocation
      * @return A function
      */

@@ -1212,6 +1212,7 @@ namespace wrench {
         }
 
         // Bookkeeping
+        invocation->_was_hot_start = hot_start;
         invocation->_container = target_container;
         invocation->_compute_node = target_compute_node;
         invocation->_dispatch_date = Simulation::getCurrentSimulatedDate();

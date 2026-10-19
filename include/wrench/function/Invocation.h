@@ -34,6 +34,7 @@ namespace wrench {
         [[nodiscard]] bool isDispatched() const;
         [[nodiscard]] bool isDone() const;
         [[nodiscard]] bool hasSucceeded() const;
+        [[nodiscard]] bool wasHoststart() const;
         [[nodiscard]] std::shared_ptr<Function> getFunction() const;
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
@@ -68,6 +69,8 @@ namespace wrench {
         double _dispatch_date = -1.0;
         double _function_start_date = -1.0;
         double _function_end_date = -1.0;
+
+        bool _was_hot_start = false;
 
         unsigned long long _id = 0;
 
