@@ -739,7 +739,7 @@ namespace wrench {
     void ServerlessComputeService::processFunctionRegistrationRequest(
         S4U_CommPort* answer_commport,
         const std::string& name,
-        const std::function<void(std::shared_ptr<StorageService>)>& initialization_code,
+        const std::function<const void(std::shared_ptr<StorageService>&)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -938,6 +938,7 @@ namespace wrench {
         if (!container->_initialized) {
             // Proposed new helper: the action has ended, but setup failed.
             compute_node->_busy_containers.erase(container);
+            container->shutdown();
         } else {
             compute_node->makeContainerIdle(container);
 
@@ -977,20 +978,21 @@ namespace wrench {
      * @brief Process a container pre-warm
      * @param container The container
      */
-    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container, std::shared_ptr<Action> init_action) {
-
+    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container,
+                                                            std::shared_ptr<Action> init_action) {
         bool success = init_action->getState() == Action::State::COMPLETED;
         auto compute_node = container->getComputeNode();
 
         if (not success) {
             WRENCH_INFO("A container pre-warm has failed [%s] (%s)",
-                container->getFunction()->getName().c_str(),
-                init_action->getFailureCause()->toString().c_str());
+                        container->getFunction()->getName().c_str(),
+                        init_action->getFailureCause()->toString().c_str());
 
             // Free up the slot
             compute_node->_num_free_slots++;
             // Remove container from the pre-warming list
             compute_node->_prewarming_containers.erase(container);
+            container->shutdown();
             return;
         }
 
@@ -1237,11 +1239,10 @@ namespace wrench {
                 // Invoke the user's initialization function
                 try {
                     invocation->_function->_initialization_code(private_storage_service);
+                    container->_initialized = true;
                 } catch (ExecutionException& e) {
-                    invocation->_function_end_date = S4U_Simulation::getClock();
                     throw;
                 }
-                container->_initialized = true;
             }
 
             // Invoke the user's lambda function
@@ -1963,7 +1964,8 @@ namespace wrench {
         compute_node->_num_free_slots -= 1;
 
         // The prewarm runs the initialization step!
-        const std::function initialization_code = [container, function](const std::shared_ptr<ActionExecutor>& action_executor) {
+        const std::function initialization_code = [container, function
+            ](const std::shared_ptr<ActionExecutor>& action_executor) {
             auto private_storage_service = container->getPrivateStorageService();
             try {
                 function->_initialization_code(private_storage_service);
@@ -1972,7 +1974,8 @@ namespace wrench {
             }
             container->_initialized = true;
         };
-        const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {};
+        const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {
+        };
 
 
         // Create the action and create a corresponding action executor
@@ -1990,6 +1993,7 @@ namespace wrench {
             action,
             nullptr);
 
+        action_executor->setActionTimeout(function->getTimeLimit());
         action_executor->setSimulation(this->simulation_);
         // Start the action executor object
         try {
