@@ -106,7 +106,7 @@ namespace wrench {
 
         std::shared_ptr<Function> addRegisteredFunction(
             const std::string& name,
-            const std::function<void(std::shared_ptr<StorageService>)>& initialization_code,
+            const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
             const std::function<std::shared_ptr<FunctionOutput>(
                 const std::shared_ptr<FunctionInput>&,
                 const std::shared_ptr<StorageService>&)>& code,

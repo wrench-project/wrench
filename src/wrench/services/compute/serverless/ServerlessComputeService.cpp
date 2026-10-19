@@ -680,7 +680,7 @@ namespace wrench {
     */
     std::shared_ptr<Function> ServerlessComputeService::addRegisteredFunction(
         const std::string& name,
-        const std::function<void(std::shared_ptr<StorageService>)>& initialization_code,
+        const std::function<void(const std::shared_ptr<StorageService>&)>& initialization_code,
         const std::function<std::shared_ptr<FunctionOutput>(
             const std::shared_ptr<FunctionInput>&,
             const std::shared_ptr<StorageService>&)>& code,
@@ -935,25 +935,30 @@ namespace wrench {
 
         // Make container idle
         auto container = invocation->_container;
-        compute_node->makeContainerIdle(container);
-
-        // Should the container be terminated or left idling?
-        double idle_timeout = this->getPropertyValueAsTimeInSecond(
-            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
-        if (idle_timeout <= 0) {
-            compute_node->shutdownContainer(container);
+        if (!container->_initialized) {
+            // Proposed new helper: the action has ended, but setup failed.
+            compute_node->_busy_containers.erase(container);
         } else {
-            // Start the expiration alarm
-            container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
-            container->_expiration_alarm = Alarm::createAndStartAlarm(
-                this->simulation_,
-                container->_expiration_date,
-                _hostname,
-                _commport,
-                new
-                ServerlessComputeServiceContainerIdleTimeoutMessage(
-                    container, container->getIdleSequence()),
-                "container_idle_timout");
+            compute_node->makeContainerIdle(container);
+
+            // Should the container be terminated or left idling?
+            double idle_timeout = this->getPropertyValueAsTimeInSecond(
+                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+            if (idle_timeout <= 0) {
+                compute_node->shutdownContainer(container);
+            } else {
+                // Start the expiration alarm
+                container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
+                container->_expiration_alarm = Alarm::createAndStartAlarm(
+                    this->simulation_,
+                    container->_expiration_date,
+                    _hostname,
+                    _commport,
+                    new
+                    ServerlessComputeServiceContainerIdleTimeoutMessage(
+                        container, container->getIdleSequence()),
+                    "container_idle_timout");
+            }
         }
 
         bool success = action->getState() == Action::State::COMPLETED;
@@ -984,9 +989,8 @@ namespace wrench {
 
             // Free up the slot
             compute_node->_num_free_slots++;
-
-            // Shutdown container
-            compute_node->shutdownContainer(container);
+            // Remove container from the pre-warming list
+            compute_node->_prewarming_containers.erase(container);
             return;
         }
 
@@ -1221,9 +1225,7 @@ namespace wrench {
 
         // Declare the function invocation's necessary lambdas
         const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
-            // Clear up all files from the tmp storage service, if any, so that if a next
-            // invocation reuses this container, it won't "see" the previous invocation's data, if any
-            invocation->_container->clearPrivateStorage();
+            // noop
         };
 
         const std::function lambda_execute = [invocation](
