@@ -1,4 +1,5 @@
 
+#include <wrench/services/compute/serverless/ServerlessComputeNode.h>
 #include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies/SelectAllPossibleServerlessNodeSelectionPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 namespace wrench {
@@ -15,9 +16,13 @@ namespace wrench {
                 /* Just filter out all compute nodes that have no available slots */
                 std::set<std::shared_ptr<ServerlessComputeNode>> not_fully_busy_compute_nodes;
                 for (auto const& node : scheduling_state->_activated_compute_nodes) {
-                        if (scheduling_state->_slots_available.at(node) > 0) {
-                                not_fully_busy_compute_nodes.insert(node);
+                        if (node->isAtPerNodeInvocationLimit()) {
+                                continue;
                         }
+                        if (node->isAtPerNodeContainerLimit() and node->areAllContainersAtInvocationLimit()) {
+                                continue;
+                        }
+                        not_fully_busy_compute_nodes.insert(node);
                 }
                 return not_fully_busy_compute_nodes;
         }

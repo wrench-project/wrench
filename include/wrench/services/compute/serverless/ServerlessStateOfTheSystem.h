@@ -70,7 +70,7 @@ namespace wrench
         // queue of function invocations whose images have been downloaded
         std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
         // set of function invocations currently running
-        std::unordered_set<std::shared_ptr<Invocation>> _running_invocations;
+        std::unordered_set<std::shared_ptr<Invocation>> _dispatched_invocations;
 
         std::string _head_storage_service_mount_point;
         std::shared_ptr<StorageService> _head_storage_service;

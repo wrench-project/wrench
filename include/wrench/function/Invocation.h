@@ -55,6 +55,7 @@ namespace wrench {
     private:
         friend class FunctionManager;
         friend class ServerlessComputeService;
+        friend class ServerlessComputeNode;
 
         const std::shared_ptr<Function> _function; // the function to be invoked
         std::shared_ptr<FunctionInput> _function_input; // the input for the function

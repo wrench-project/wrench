@@ -31,10 +31,8 @@ namespace wrench {
         auto compute_nodes_initially_activated =
             service->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED);
         for (const auto& hostname : compute_hosts) {
-            auto num_slots = service->getPropertyValueAsUnsignedLong(
-                ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE);
             auto compute_node = std::make_shared<
-                ServerlessComputeNode>(hostname, num_slots, service);
+                ServerlessComputeNode>(hostname, service);
             if (compute_nodes_initially_activated) {
                 _activated_compute_nodes.push_back(compute_node);
             } else {
@@ -69,20 +67,6 @@ namespace wrench {
      */
     unsigned long ServerlessStateOfTheSystem::getNumBeingActivatedComputeNodes() const {
         return _being_activated_compute_nodes.size();
-    }
-
-    /**
-     * @brief Getter for the map of available slots on activated nodes
-     *
-     * @return The free slot availability map
-     */
-    std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long>
-    ServerlessStateOfTheSystem::getNumFreeSlots() const {
-        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> to_return;
-        for (const auto& compute_node : _activated_compute_nodes) {
-            to_return[compute_node] = compute_node->getNumFreeSlots();
-        }
-        return to_return;
     }
 
     /**

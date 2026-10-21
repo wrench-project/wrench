@@ -384,17 +384,8 @@ namespace wrench {
         // Sort the schedulable invocations in place
         _invocation_ordering_policy->sortSchedulableInvocations(scheduling_state);
 
-        // Determine the total number of slots available
-        unsigned long num_slots_still_available = 0;
-        for (auto const& [node, count] : scheduling_state->_slots_available) {
-            num_slots_still_available += count;
-        }
-
         // Go through the invocations and pick target compute node
         for (const auto& inv : scheduling_state->_schedulable_invocations) {
-            // If all slots are allocated abort
-            if (num_slots_still_available == 0) break;
-
             // Pick a target compute node
             auto [target_node, node_decisions] = this->pickComputeNode(scheduling_state, inv);
 
@@ -402,10 +393,6 @@ namespace wrench {
             if (!target_node) {
                 continue;
             }
-
-            // At this point, a slot is to be reserved at the target_node
-            scheduling_state->_slots_available.at(target_node)--;
-            num_slots_still_available--;
 
             // Make the layers of this invocation protected to avoid eviction by subsequence scheduling decisions
             const auto& layers = inv->getFunction()->getImage()->getLayers();
@@ -423,7 +410,6 @@ namespace wrench {
             // Idle container terminations
             for (const auto& [container] : node_decisions->idle_container_terminations) {
                 decisions->idle_container_terminations.push_back({container});
-                scheduling_state->_idle_containers.at(target_node).erase(container);
                 scheduling_state->_ram_available.at(target_node) += container->getFunction()->getRAMSpaceLimit();
                 scheduling_state->_disk_available.at(target_node) += container->getFunction()->getDiskSpaceLimit();
             }
@@ -468,7 +454,7 @@ namespace wrench {
             for (const auto& [_ignore1, _ignore2, container] : node_decisions->invocation_dispatches) {
                 decisions->invocation_dispatches.push_back({inv, target_node, container});
                 if (container) {
-                    scheduling_state->_idle_containers.at(target_node).erase(container);
+                    scheduling_state->_initializing_containers.at(target_node).erase(container);
                 } else {
                     scheduling_state->_ram_available.at(target_node) -= inv->getFunction()->getRAMSpaceLimit();
                     scheduling_state->_disk_available.at(target_node) -= inv->getFunction()->getDiskSpaceLimit();
@@ -535,9 +521,13 @@ namespace wrench {
          * selection policy didn't! (and preserve a deterministic order) */
         std::vector<std::shared_ptr<ServerlessComputeNode>> candidate_nodes;
         for (const auto& node : scheduling_state->_activated_compute_nodes) {
-            if (selected_nodes.count(node) && scheduling_state->_slots_available.at(node) > 0) {
-                candidate_nodes.push_back(node);
+            if (node->isAtPerNodeInvocationLimit()) {
+                continue;
             }
+            if (node->isAtPerNodeContainerLimit() and node->areAllContainersAtInvocationLimit()) {
+                continue;
+            }
+            candidate_nodes.push_back(node);
         }
 
         // Pass #1: Can we reuse an existing idle container?
@@ -730,7 +720,8 @@ namespace wrench {
         {
             // Pick candidate to evict
             auto to_evict =
-                _eviction_policy->pickIdleContainersForEviction(scheduling_state->_idle_containers.at(node), needed_ram,
+                _eviction_policy->pickIdleContainersForEviction(scheduling_state->getIdleContainersAtComputeNode(node),
+                                                                needed_ram,
                                                                 needed_disk);
 
             // Encode scheduling decisions
@@ -767,7 +758,7 @@ namespace wrench {
 
                 // Perhaps it's being used by an idle container that's not marked for eviction?
                 bool is_victim_layer_evictable = true;
-                for (auto& container : scheduling_state->_idle_containers.at(node)) {
+                for (auto& container : scheduling_state->getIdleContainersAtComputeNode(node)) {
                     bool is_container_to_be_evicted = false;
                     for (auto const& [container_to_be_evicted] : eviction_decisions->idle_container_terminations) {
                         if (container_to_be_evicted == container) {
@@ -791,22 +782,17 @@ namespace wrench {
                     continue;
                 }
 
-                // Perhaps it's being used by a busy container?
+                // Perhaps it's being used by an initializing container?
                 is_victim_layer_evictable = true;
-                for (auto& container : scheduling_state->_busy_containers.at(node)) {
+                for (auto& container : scheduling_state->_initializing_containers.at(node)) {
                     // If the container uses the layer, then the layer cannot be evicted
                     if (container->getFunction()->getImage()->getLayers().count(candidate)) {
                         is_victim_layer_evictable = false;
                         break;
                     }
                 }
-                if (not is_victim_layer_evictable) {
-                    continue;
-                }
-
-                // Perhaps it's being used by a pre-warming container?
-                is_victim_layer_evictable = true;
-                for (auto& container : scheduling_state->_prewarming_containers.at(node)) {
+                // Perhaps it's being used by an initialized container?
+                for (auto& container : scheduling_state->_initialized_containers.at(node)) {
                     // If the container uses the layer, then the layer cannot be evicted
                     if (container->getFunction()->getImage()->getLayers().count(candidate)) {
                         is_victim_layer_evictable = false;
@@ -858,7 +844,7 @@ namespace wrench {
 
                 // Perhaps it's being used by an idle container that's not marked for eviction?
                 bool is_victim_layer_evictable = true;
-                for (auto& container : scheduling_state->_idle_containers.at(node)) {
+                for (auto& container : scheduling_state->getIdleContainersAtComputeNode(node)) {
                     bool is_container_to_be_evicted = false;
                     for (auto const& [container_to_be_evicted] : eviction_decisions->idle_container_terminations) {
                         if (container_to_be_evicted == container) {
@@ -884,20 +870,14 @@ namespace wrench {
 
                 // Perhaps it's being used by a busy container that's not marked for eviction?
                 is_victim_layer_evictable = true;
-                for (auto& container : scheduling_state->_busy_containers.at(node)) {
+                for (auto& container : scheduling_state->_initializing_containers.at(node)) {
                     // If the container uses the layer, then the layer cannot be evicted
                     if (container->getFunction()->getImage()->getLayers().count(candidate)) {
                         is_victim_layer_evictable = false;
                         break;
                     }
                 }
-                if (not is_victim_layer_evictable) {
-                    continue;
-                }
-
-                // Perhaps it's being used by a pre-warming container?
-                is_victim_layer_evictable = true;
-                for (auto& container : scheduling_state->_prewarming_containers.at(node)) {
+                for (auto& container : scheduling_state->_initialized_containers.at(node)) {
                     // If the container uses the layer, then the layer cannot be evicted
                     if (container->getFunction()->getImage()->getLayers().count(candidate)) {
                         is_victim_layer_evictable = false;

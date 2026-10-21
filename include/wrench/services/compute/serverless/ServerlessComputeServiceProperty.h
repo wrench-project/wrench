@@ -34,11 +34,20 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(COMPUTE_NODE_ACTIVATION_OVERHEAD);
 
-
-        /** @brief The maximum number of containers that can be started/running per compute node
-         * (default value: same as number of cores per compute node)
+        /** @brief The maximum number of function executions that can be started/running per compute node
+         * (default value: "0", which means: same as number of cores per compute node)
          **/
-        DECLARE_PROPERTY_NAME(NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE);
+        DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE);
+
+        /** @brief The maximum number of containers that can be starting/running/idling per compute node
+         * (default value: "0", which means: same as number of cores per compute node)
+         **/
+        DECLARE_PROPERTY_NAME(MAX_NUM_CONTAINERS_PER_NODE);
+
+        /** @brief The maximum number of function executions that can execute concurrently in a container
+         * (default value: 1)
+         **/
+        DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER);
 
         /** @brief The maximum number of outstanding invocations, i.e., invocations that have not yet completed or failed, including
          *         those waiting for image preparation or execution. (default value: "infinity")

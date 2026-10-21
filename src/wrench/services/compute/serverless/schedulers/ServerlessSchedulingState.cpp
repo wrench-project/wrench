@@ -24,7 +24,6 @@ namespace wrench {
         _activated_compute_nodes = state->getActivatedComputeNodes();
         _num_deactivated_compute_nodes = state->getNumDeactivatedComputeNodes();
         _num_being_activated_compute_nodes = state->getNumBeingActivatedComputeNodes();
-        _slots_available = state->getNumFreeSlots();
         _ram_available = state->getAvailableRAMSpace();
         _disk_available = state->getAvailableDiskSpace();
 
@@ -46,19 +45,14 @@ namespace wrench {
             const auto& layers_being_loaded =_image_layers_on_their_way_to_ram.at(node);
             protected_layers.insert(layers_being_loaded.begin(),layers_being_loaded.end());
 
-            _idle_containers[node] = {};
-            for (auto const &container : node->getIdleContainers()) {
-                _idle_containers.at(node).insert(container);
+            _initializing_containers[node] = {};
+            for (auto const &container : node->getInitializingContainers()) {
+                _initializing_containers.at(node).insert(container);
             }
 
-            _busy_containers[node] = {};
-            for (auto const &container : node->getBusyContainers()) {
-                _busy_containers.at(node).insert(container);
-            }
-
-            _prewarming_containers[node] = {};
-            for (auto const &container : node->getPrewarmingContainers()) {
-                _prewarming_containers.at(node).insert(container);
+            _initialized_containers[node] = {};
+            for (auto const &container : node->getInitializedContainers()) {
+                _initialized_containers.at(node).insert(container);
             }
         }
 
@@ -146,4 +140,19 @@ namespace wrench {
         return true;
     }
 
+    /**
+     * @brief Get the set of idle containers at a compute node
+     * @param node the compute node
+     * @return a set of idle containers
+     */
+    std::set<std::shared_ptr<Container>> ServerlessSchedulingState::getIdleContainersAtComputeNode(
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
+        std::set<std::shared_ptr<Container>> idle_containers;
+        for (auto const& container : node->getInitializedContainers()) {
+            if (container->getNumInflightInvocations() == 0) {
+                idle_containers.insert(container);
+            }
+        }
+        return idle_containers;
+    }
 }

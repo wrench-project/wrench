@@ -18,6 +18,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/function/Image.h>
 #include <wrench/function/ImageLayer.h>
+#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
 
 #include "wrench/failure_causes/FatalFailure.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -46,6 +47,8 @@ namespace wrench {
         _compute_node = compute_node;
         _serverless_compute_service = serverless_compute_service;
         _state = initial_state;
+        _max_num_in_flight_invocations = _serverless_compute_service->getPropertyValueAsUnsignedLong(
+            ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER);
     }
 
     /**
@@ -57,27 +60,35 @@ namespace wrench {
     }
 
     /**
-     * @brief Determine whether the container is idle or not
-     * @return true if idle, false otherwise
+     * @brief Return the number of "in flight" invocations on the container
+     * @return the number of running invocations
      */
-    bool Container::isIdle() const {
-        return _state == State::IDLE;
+    unsigned long Container::getNumInflightInvocations() const {
+        return _in_flight_invocations.size();
     }
 
     /**
-     * @brief Determine whether the container is busy or not
-     * @return true if busy, false otherwise
+     * @brief Determine whether the container is initializing or not
+     * @return true if initializing, false otherwise
      */
-    bool Container::isBusy() const {
-        return _state == State::BUSY;
+    bool Container::isInitializing() const {
+        return _state == State::INITIALIZING;
     }
 
     /**
-     * @brief Determine whether the container is pre-warming or not
-     * @return true if pre-warming, false otherwise
+     * @brief Determine whether the container is initialized or not
+     * @return true if initialized, false otherwise
      */
-    bool Container::isPrewarming() const {
-        return _state == State::PREWARMING;
+    bool Container::isInitialized() const {
+        return _state == State::INITIALIZED;
+    }
+
+    /**
+     * @brief Determine whether the container is at its number of invocations limit
+     * @return true if at invocation limit, false if below the limit
+     */
+    bool Container::isAtInvocationLimit() const {
+        return _in_flight_invocations.size() >= _max_num_in_flight_invocations;
     }
 
     /**
@@ -128,37 +139,7 @@ namespace wrench {
         return const_cast<ServerlessComputeNode*>(_compute_node);
     }
 
-    /**
-     * @brief Make the container idle
-     */
-    void Container::makeIdle() {
-        _state = State::IDLE;
-        _idle_date = S4U_Simulation::getClock();
-    }
 
-    /**
-     * @brief Make the container busy
-     */
-    void Container::makeBusy() {
-        _state = State::BUSY;
-        _idle_date = DBL_MAX;
-        _idle_sequence += 1;
-
-        if (_expiration_alarm) {
-            _expiration_alarm->kill();
-        }
-        _expiration_alarm.reset();
-        _expiration_date = DBL_MAX;
-
-        // A warm invocation uses these layers too. Refresh their recency
-        // using the same zero-time touch as on a cold container start.
-        for (const auto& file : _opened_image_layer_disk_files) {
-            file->read(1, false);
-        }
-        for (const auto& file : _opened_image_layer_ram_files) {
-            file->read(1, false);
-        }
-    }
 
 
     /**
@@ -294,6 +275,10 @@ namespace wrench {
     void Container::shutdown() {
         _idle_sequence += 1; // to invalidate any future timeouts
         _idle_date = DBL_MAX;
+
+        if (not _in_flight_invocations.empty()) {
+            throw std::runtime_error("Container::shutdown(): Cannot shutdown a container that has in-flight invocations");
+        }
 
         if (_expiration_alarm) {
             _expiration_alarm->kill();

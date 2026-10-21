@@ -17,6 +17,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/serverless/ServerlessComputeService.h>
+#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
 
 #include "wrench/exceptions/ExecutionException.h"
 #include "wrench/failure_causes/NotEnoughResources.h"
@@ -27,67 +28,38 @@ namespace wrench {
     /**
     *  @brief Constructor
     *  @param h: hostname
-    *  @param num_slots: number of container slots at the compute node
     *  @param service: the ServerlessComputeService that owns this compute node
     */
     ServerlessComputeNode::ServerlessComputeNode(std::string h,
-                                                 const unsigned long num_slots,
                                                  ServerlessComputeService* service) :
         hostname(std::move(h)),
-        _serverless_compute_service(service),
-        _num_slots(num_slots),
-        _num_free_slots(num_slots) {
+        _serverless_compute_service(service) {
+        _max_num_containers_per_compute_node =
+            service->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE);
+        _max_num_invocations_per_compute_node =
+            service->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE);
+        _max_num_invocations_per_container =
+            service->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER);
     }
 
 
-    /**
-     * @brief Make a container idle
-     * @param container a container
-     */
-    void ServerlessComputeNode::makeContainerIdle(const std::shared_ptr<Container>& container) {
-        bool is_busy = _busy_containers.count(container) > 0;
-        bool is_prewarming = _prewarming_containers.count(container) > 0;
-
-        if (not is_busy and not is_prewarming) {
-            throw std::runtime_error("Trying to make a non-busy/non-prewarming container idle");
-        }
-        if (is_busy) {
-            _busy_containers.erase(container);
-        } else if (is_prewarming) {
-            _prewarming_containers.erase(container);
-        }
-
-        container->makeIdle();
-        _idle_containers.insert(container);
-    }
-
-    /**
-     * @brief Make a container busy
-     * @param container a container
-     */
-    void ServerlessComputeNode::makeContainerBusy(const std::shared_ptr<Container>& container) {
-        if (_idle_containers.find(container) == _idle_containers.end()) {
-            throw std::runtime_error("Trying to make a non-idle container busy");
-        }
-        _idle_containers.erase(container);
-        container->makeBusy();
-        _busy_containers.insert(container);
-    }
 
     /**
      * @brief Shutdown a container
      * @param container a container
      */
     void ServerlessComputeNode::shutdownContainer(const std::shared_ptr<Container>& container) {
-        if (_busy_containers.find(container) != _busy_containers.end()) {
-            throw std::runtime_error("Trying to shutdown a busy container");
+        if (_initializing_containers.find(container) != _initializing_containers.end()) {
+            throw std::runtime_error("Trying to shutdown a container that's initializing [not implemented for now]");
         }
-        if (_idle_containers.find(container) == _idle_containers.end()) {
-            throw std::runtime_error("Trying to shutdown a container that's not in the idle list?");
+        if (_initialized_containers.find(container) == _initialized_containers.end()) {
+            throw std::runtime_error("Trying to shutdown some unknown container");
         }
-        _idle_containers.erase(container);
-        WRENCH_INFO("Shutting down an idle container for function [%s]",
-                    container->getFunction()->getName().c_str());
+        if (not container->_in_flight_invocations.empty()) {
+            throw std::runtime_error("Trying to shutdown a container that has in-flight invocations [not implemented for now]");
+        }
+        _initialized_containers.erase(container);
+        WRENCH_INFO("Shutting down a container for function [%s]", container->getFunction()->getName().c_str());
         container->shutdown();
     }
 
@@ -134,110 +106,187 @@ namespace wrench {
     }
 
     /**
+     * @brief Determine whether the compute node is at its container limit
+     * @return true if no container could be started on this node, false otherwise
+     */
+    bool ServerlessComputeNode::isAtPerNodeContainerLimit() const {
+        return (_initializing_containers.size() + _initialized_containers.size() >= _max_num_containers_per_compute_node);
+    }
+
+    /**
+     * @brief Determine whether the compute node is at its invocation limit
+     * @return true if no new invocation could be started on this node, false otherwise
+     */
+    bool ServerlessComputeNode::isAtPerNodeInvocationLimit() const {
+        auto num_invocations = 0UL;
+        for (auto const &container : _initialized_containers) {
+            num_invocations += container->_in_flight_invocations.size();
+        }
+        return (num_invocations >= _max_num_invocations_per_compute_node);
+
+    }
+
+    /**
+     * @brief Determine whether all containers on the compute node are at their invocation limit
+     * @return true if no new invocation could be started on any container on this node, false otherwise
+     */
+    bool ServerlessComputeNode::areAllContainersAtInvocationLimit() const {
+        for (auto const &container : _initialized_containers) {
+            if (container->_in_flight_invocations.size() < _max_num_invocations_per_container) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * @brief Method to kill all containers (brutally)
      */
     void ServerlessComputeNode::killAllContainers() {
-        // Idle containers
-        for (auto const& container : _idle_containers) {
+        // Initializing containers
+        for (auto const& container : _initializing_containers) {
             container->shutdown();
         }
-        // Busy containers
-        for (auto const& container : _busy_containers) {
-            container->makeIdle();
-            container->shutdown();
-        }
-        // Prewarming containers
-        for (auto const& container : _prewarming_containers) {
-            container->makeIdle();
+        // Ready containers
+        for (auto const& container : _initialized_containers) {
             container->shutdown();
         }
     }
 
+    // /**
+    //  * @brief Method to see if there is an appropriate idle container
+    //  * @param function the target function
+    //  * @param excluded_container set containers to ignore
+    //  * @return A container, if found, or nullptr
+    //  */
+    // std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(
+    //     const Function* function,
+    //     const std::set<std::shared_ptr<Container>>& excluded_container) const {
+    //     for (auto const& idle_container : _idle_containers) {
+    //         if (excluded_container.find(idle_container) != excluded_container.end()) {
+    //             continue;
+    //         }
+    //         if (idle_container->getFunction() == function) {
+    //             return idle_container;
+    //         }
+    //     }
+    //     return nullptr;
+    // }
+
+    // /**
+    //  * @brief Retrieve the set of idle containers
+    //  * @return A set of containers
+    //  */
+    // std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getIdleContainers() {
+    //     return _idle_containers;
+    // }
+    //
+    // /**
+    //  * @brief Retrieve the set of busy containers
+    //  * @return A set of containers
+    //  */
+    // std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getBusyContainers() {
+    //     return _busy_containers;
+    // }
+
     /**
-     * @brief Method to see if there is an appropriate idle container
-     * @param function the target function
-     * @param excluded_container set containers to ignore
-     * @return A container, if found, or nullptr
+     * @brief Retrieve the set of initializing containers
+     * @return A set of containers
      */
-    std::shared_ptr<Container> ServerlessComputeNode::findIdleContainer(
-        const Function* function,
-        const std::set<std::shared_ptr<Container>>& excluded_container) const {
-        for (auto const& idle_container : _idle_containers) {
-            if (excluded_container.find(idle_container) != excluded_container.end()) {
-                continue;
-            }
-            if (idle_container->getFunction() == function) {
-                return idle_container;
-            }
-        }
-        return nullptr;
+    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getInitializingContainers() {
+        return _initializing_containers;
     }
 
     /**
-     * @brief Retrieve the set of idle containers
+     * @brief Retrieve the set of initialized containers
      * @return A set of containers
      */
-    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getIdleContainers() {
-        return _idle_containers;
-    }
-
-    /**
-     * @brief Retrieve the set of busy containers
-     * @return A set of containers
-     */
-    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getBusyContainers() {
-        return _busy_containers;
-    }
-
-    /**
-     * @brief Retrieve the set of prewarming containers
-     * @return A set of containers
-     */
-    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getPrewarmingContainers() {
-        return _prewarming_containers;
+    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getInitializedContainers() {
+        return _initialized_containers;
     }
 
 
     /**
      * @brief Spawn a container (and try to kill idle containers if it helps)
      * @param function a function
-     * @param prewarm whether this is a prewarm (i.e., no invocation) or not
      * @return A container
      */
-    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function, const bool prewarm) {
+    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function) {
+
+        if (_initialized_containers.size() + _initializing_containers.size() >= _max_num_containers_per_compute_node) {
+            throw std::runtime_error("ServerlessComputeNode::spawnContainer(): Cannot overcome the per-compute node number of containers limit");
+        }
+
         // Create a container object
         auto container = std::shared_ptr<Container>(
             new Container(function,
                           this,
                           _serverless_compute_service,
-                          (prewarm ? Container::State::PREWARMING : Container::State::BUSY)));
+                          Container::State::INITIALIZING));
         try {
             container->spawn();
         } catch (ExecutionException& e) {
             throw;
         }
-        if (prewarm) {
-            _prewarming_containers.insert(container);
-        } else {
-            _busy_containers.insert(container);
-        }
+
+        _initializing_containers.insert(container);
         return container;
     }
 
     /**
-     * @brief Get the compute node's total number of slots
-     * @return a number of slots
+     * @brief Make the compute node aware that an invocation has started
+     * @param invocation An invocation
      */
-    unsigned long ServerlessComputeNode::getNumSlots() const {
-        return _num_slots;
+    void ServerlessComputeNode::acknowledgeInvocationStart(const std::shared_ptr<Invocation>& invocation) {
+        auto container = invocation->_container;
+        container->_in_flight_invocations.insert(invocation);
+        container->_idle_date = DBL_MAX;
+        if (container->_expiration_alarm) {
+            container->_expiration_alarm->kill();
+        }
+        container->_expiration_alarm.reset();
+        container->_expiration_date = DBL_MAX;
+
+        // A warm invocation uses these layers too. Refresh their recency
+        // using the same zero-time touch as on a cold container start.
+        for (const auto& file : container->_opened_image_layer_disk_files) {
+            file->read(1, false);
+        }
+        for (const auto& file : container->_opened_image_layer_ram_files) {
+            file->read(1, false);
+        }
     }
 
     /**
-     * @brief Get the compute node's number of free slots
-     * @return a number of slots
+     * @brief Make the compute node aware that an invocation has completed
+     * @param invocation An invocation
      */
-    unsigned long ServerlessComputeNode::getNumFreeSlots() const {
-        return _num_free_slots;
+    void ServerlessComputeNode::acknowledgeInvocationCompletion(const std::shared_ptr<Invocation>& invocation) {
+        auto container = invocation->_container;
+        container->_in_flight_invocations.erase(invocation);
+
+        // Start the idle timer?
+        if (container->_in_flight_invocations.empty()) {
+            double idle_timeout = _serverless_compute_service->getPropertyValueAsTimeInSecond(
+                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+            if (idle_timeout <= 0) {
+                this->shutdownContainer(container);
+            } else {
+                // Start the expiration alarm
+                container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
+                container->_idle_date = S4U_Simulation::getClock();
+                container->_idle_sequence++;
+                container->_expiration_alarm = Alarm::createAndStartAlarm(
+                    _serverless_compute_service->getSimulation(),
+                    container->_expiration_date,
+                    _serverless_compute_service->_hostname,
+                    _serverless_compute_service->getCommPort(),
+                    new
+                    ServerlessComputeServiceContainerIdleTimeoutMessage(
+                        container, container->getIdleSequence()),
+                    "container_idle_timout");
+            }
+        }
     }
 
     /**
@@ -281,7 +330,7 @@ namespace wrench {
      * @param target_container: the target container (nullptr if none)
      * @return true if the invocation can be dispatched, false otherwise
      */
-    bool ServerlessComputeNode::isInvocationFeasible(
+    bool ServerlessComputeNode::couldInvocationRunRightNow(
         const std::shared_ptr<Invocation>& invocation,
         const std::shared_ptr<Container>& target_container) const {
         // Sanity checks
@@ -294,25 +343,18 @@ namespace wrench {
                 throw std::runtime_error(
                     "ServerlessComputeNode::isInvocationFeasible(): The container isn't for the right function!");
             }
-            if (_idle_containers.find(target_container) == _idle_containers.end()) {
+            if (_initialized_containers.find(target_container) == _initialized_containers.end()) {
                 // The container could have been evicted due to another invocation dispatch
                 return false;
             }
-            if (not target_container->isIdle()) {
+            if (target_container->isAtInvocationLimit()) {
                 throw std::runtime_error(
-                    "ServerlessComputeNode::isInvocationFeasible: Internal error - Scheduled invocation cannot be started because the target container is not idle");
+                    "ServerlessComputeNode::isInvocationFeasible: Internal error - Scheduled invocation cannot be started because the target container is at the invocation limit");
             }
         }
 
-        // The node has available slots?
-        if (this->_num_free_slots < 1) {
-            WRENCH_INFO("Scheduled invocation cannot be started because there is no free slot");
-            return false;
-        }
-
-        auto image = invocation->getFunction()->getImage();
-
         // The image is on disk?
+        auto image = invocation->getFunction()->getImage();
         bool all_layers_on_disk = true;
         for (auto const& layer : image->getLayers()) {
             if (not this->_disk->hasFile(layer->getFile())) {
@@ -343,7 +385,32 @@ namespace wrench {
             return false;
         }
 
-        // Is there enough space
+        // Are we within compute node limits in terms of number of invocations
+        auto num_in_flight_invocations = 0UL;
+        for (auto const &container : _initializing_containers) {
+            num_in_flight_invocations += container->_in_flight_invocations.size();
+        }
+        for (auto const &container : _initialized_containers) {
+            num_in_flight_invocations += container->_in_flight_invocations.size();
+        }
+        if (num_in_flight_invocations >= _max_num_invocations_per_compute_node) {
+            return false;
+        }
+
+        // Are we within compute node limits in terms of number of containers
+        if (target_container) {
+            if (_initializing_containers.size() + _initialized_containers.size()
+                >= _max_num_containers_per_compute_node) {
+                return false;
+            }
+        }
+
+        // Are we within container limits in terms of number of invocations
+        if (target_container) {
+            if (target_container->_in_flight_invocations.size() >= _max_num_invocations_per_container) {
+                return false;
+            }
+        }
 
         return true;
     }

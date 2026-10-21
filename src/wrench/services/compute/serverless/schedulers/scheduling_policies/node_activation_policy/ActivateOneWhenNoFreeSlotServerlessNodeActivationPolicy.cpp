@@ -21,9 +21,11 @@ namespace wrench {
             return 0;
         }
 
-        // Activate one node only if there are no free slots in the system
+        // Activate one node only if all limits on current nodes are reached
         for (auto const& activated_node : scheduling_state->_activated_compute_nodes) {
-            if (activated_node->getNumFreeSlots() > 0) {
+            if (not activated_node->isAtPerNodeContainerLimit() or
+                not activated_node->isAtPerNodeInvocationLimit() or
+                not activated_node->areAllContainersAtInvocationLimit()) {
                 return 0;
             }
         }

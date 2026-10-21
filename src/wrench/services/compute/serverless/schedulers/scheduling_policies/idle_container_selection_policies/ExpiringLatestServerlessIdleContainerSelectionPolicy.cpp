@@ -21,15 +21,20 @@ namespace wrench {
         double picked_expiration_date = 0;
 
         for (const auto& node: candidate_nodes) {
-            for (auto const& idle_container : scheduling_state->_idle_containers.at(node)) {
-                if (idle_container->getFunction() != invocation->getFunction().get()) {
+            for (auto const& container : scheduling_state->_initializing_containers.at(node)) {
+                // Container for the correct function?
+                if (container->getFunction() != invocation->getFunction().get()) {
                     continue;
                 }
-                auto expiration_date = idle_container->getExpirationDate();
+                // Container idle?
+                if (container->getNumInflightInvocations() > 0) {
+                    continue;
+                }
+                auto expiration_date = container->getExpirationDate();
                 if (picked_container == nullptr or expiration_date > picked_expiration_date) {
-                    picked_container = idle_container;
+                    picked_container = container;
                     picked_node = node;
-                    picked_expiration_date = idle_container->getExpirationDate();
+                    picked_expiration_date = container->getExpirationDate();
                 }
             }
         }
