@@ -6,7 +6,7 @@
 
 
 namespace wrench {
-    class ServerlessIdleContainerSelectionPolicy;
+    class ServerlessReusableContainerSelectionPolicy;
     class ServerlessInvocationFailingPolicy;
     class ServerlessContainerPrewarmPolicy;
     class ServerlessPlanSelectionPolicy;
@@ -201,7 +201,7 @@ namespace wrench {
         [[nodiscard]] ServerlessPlanSelectionPolicy* getPlanSelectionPolicy() const;
         [[nodiscard]] ServerlessContainerPrewarmPolicy* getContainerPrewarmPolicy() const;
         [[nodiscard]] ServerlessInvocationFailingPolicy* getInvocationFailingPolicy() const;
-        [[nodiscard]] ServerlessIdleContainerSelectionPolicy* getIdleContainerPolicy() const;
+        [[nodiscard]] ServerlessReusableContainerSelectionPolicy* getReusableContainerSelectionPolicy() const;
 
          void setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationOrderingPolicy> policy);
@@ -210,7 +210,7 @@ namespace wrench {
          void setPolicy(std::shared_ptr<ServerlessPlanSelectionPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessContainerPrewarmPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy);
-         void setPolicy(std::shared_ptr<ServerlessIdleContainerSelectionPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessReusableContainerSelectionPolicy> policy);
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -250,8 +250,8 @@ namespace wrench {
         std::shared_ptr<ServerlessContainerPrewarmPolicy> _container_prewarm_policy;
         /** @brief The invocation failing policy **/
         std::shared_ptr<ServerlessInvocationFailingPolicy> _invocation_failing_policy;
-        /** @brief The idle container selection policy **/
-        std::shared_ptr<ServerlessIdleContainerSelectionPolicy> _idle_container_selection_policy;
+        /** @brief The reusable container selection policy **/
+        std::shared_ptr<ServerlessReusableContainerSelectionPolicy> _reusable_container_selection_policy;
 
         /***********************/
         /** \endcond          **/

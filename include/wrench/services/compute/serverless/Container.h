@@ -21,6 +21,7 @@ namespace wrench {
     class ServerlessComputeNode;
     class Invocation;
     class StorageService;
+    class FailureCause;
 
     /***********************/
     /** \cond INTERNAL    **/
@@ -43,6 +44,7 @@ namespace wrench {
 
         [[nodiscard]] unsigned long getCreationId() const;
         [[nodiscard]] unsigned long getNumInflightInvocations() const;
+        [[nodiscard]] unsigned long getMaxNumInflightInvocations() const;
         [[nodiscard]] bool isInitializing() const;
         [[nodiscard]] bool isInitialized() const;
         [[nodiscard]] bool isAtInvocationLimit() const;
@@ -75,6 +77,7 @@ namespace wrench {
         const ServerlessComputeNode *_compute_node;
         const ServerlessComputeService* _serverless_compute_service;
         State _state;
+        std::shared_ptr<FailureCause> _init_failure_cause;
 
         std::set<std::shared_ptr<Invocation>> _in_flight_invocations;
 

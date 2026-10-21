@@ -13,15 +13,17 @@ namespace wrench {
     class ServerlessSchedulingState;
 
     /**
-     * @brief A "whichever expires the latest" serverless scheduling idle container selection policy
+     * @brief A "whichever expires the latest" serverless scheduling reusable container selection policy
+     *           - If there is a non-idle container, pick the one with the fewest remaining "slots"
+     *           - Among full idle containers, pick the one that will expire the latest
      */
-    class ExpiringLatestServerlessIdleContainerSelectionPolicy : public ServerlessIdleContainerSelectionPolicy {
+    class ExpiringLatestServerlessReusableContainerSelectionPolicy : public ServerlessReusableContainerSelectionPolicy {
     public:
-        ExpiringLatestServerlessIdleContainerSelectionPolicy() = default;
+        ExpiringLatestServerlessReusableContainerSelectionPolicy() = default;
 
-        ~ExpiringLatestServerlessIdleContainerSelectionPolicy() override = default;
+        ~ExpiringLatestServerlessReusableContainerSelectionPolicy() override = default;
 
-        std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<Container>> selectIdleContainer(
+        std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<Container>> selectReusableContainer(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
             const std::shared_ptr<Invocation>& invocation,
             const std::vector<std::shared_ptr<ServerlessComputeNode>>& candidate_nodes) override;

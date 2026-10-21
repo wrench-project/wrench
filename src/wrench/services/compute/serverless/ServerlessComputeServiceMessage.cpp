@@ -241,10 +241,9 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param container The container
-     * @param success Whether the initialization succeeded or not
      */
     ServerlessComputeServiceContainerInitializationCompleteMessage::ServerlessComputeServiceContainerInitializationCompleteMessage(
-        std::shared_ptr<Container> container, bool success) : ServerlessComputeServiceMessage(0),
-                                                              _container(std::move(container)), _success(success) {
+        std::shared_ptr<Container> container) : ServerlessComputeServiceMessage(0),
+                                                              _container(std::move(container)) {
     }
 } // namespace wrench

@@ -251,16 +251,16 @@ namespace wrench {
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_activated_compute_nodes) {
                 auto num_in_flight_invocations = 0UL;
-                for (auto const &container : compute_node->_initializing_containers) {
+                for (auto const& container : compute_node->_initializing_containers) {
                     num_in_flight_invocations += container->_in_flight_invocations.size();
                 }
-                for (auto const &container : compute_node->_initialized_containers) {
+                for (auto const& container : compute_node->_initialized_containers) {
                     num_in_flight_invocations += container->_in_flight_invocations.size();
                 }
                 unsigned long idle_cores = (num_in_flight_invocations < _compute_node_num_cores
-                                           ? _compute_node_num_cores - num_in_flight_invocations
-                                           : 0);
-                num_idle_cores[compute_node->hostname] = static_cast<double>(num_in_flight_invocations);
+                                                ? _compute_node_num_cores - num_in_flight_invocations
+                                                : 0);
+                num_idle_cores[compute_node->hostname] = static_cast<double>(idle_cores);
             }
             for (const auto& compute_node : _state_of_the_system->_being_activated_compute_nodes) {
                 num_idle_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
@@ -558,10 +558,10 @@ namespace wrench {
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             processInvocationCompletion(scsiec_msg->_invocation, scsiec_msg->_action);
             return true;
-        // } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
-        //     ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
-        //     processPrewarmCompletion(scscpc_msg->_container, scscpc_msg->_action);
-        //     return true;
+            // } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
+            //     ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
+            //     processPrewarmCompletion(scscpc_msg->_container, scscpc_msg->_action);
+            //     return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
             _state_of_the_system->_image_layers_being_copied_to_disk.at(scsncc_msg->_compute_node).erase(
@@ -613,10 +613,10 @@ namespace wrench {
             // Look at activated compute nodes first
             for (const auto& node : _state_of_the_system->_activated_compute_nodes) {
                 auto num_inflight_invocations = 0UL;
-                for (auto const &container : node->_initializing_containers) {
+                for (auto const& container : node->_initializing_containers) {
                     num_inflight_invocations += container->_in_flight_invocations.size();
                 }
-                for (auto const &container : node->_initialized_containers) {
+                for (auto const& container : node->_initialized_containers) {
                     num_inflight_invocations += container->_in_flight_invocations.size();
                 }
                 unsigned long num_idle_cores = (num_inflight_invocations < _compute_node_num_cores
@@ -677,7 +677,7 @@ namespace wrench {
             return true;
         } else if (const auto scscic_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerInitializationCompleteMessage>(message)) {
-            processContainerInitializationCompletion(scscic_msg->_container, scscic_msg->_success);
+            processContainerInitializationCompletion(scscic_msg->_container);
             return true;
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -970,17 +970,23 @@ namespace wrench {
     /**
      * @brief Process a container initialization completion
      * @param container The container
-     * @param success whether the initialization succeeded or not
      */
-    void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
-                                                                            bool success) {
+    void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container) {
         auto compute_node = container->getComputeNode();
-        if (not success) {
+
+        // Did this fail?
+        if (container->_state != Container::State::INITIALIZED) {
             // TODO: Should we notify anybody? perhaps just print a log message?
+            WRENCH_INFO("Container initialization for function [%f] failed: %s",
+                container->getFunction()->getName().c_str(),
+                container->_init_failure_cause->toString().c_str());
+
             compute_node->_initializing_containers.erase(container);
             container->shutdown();
             return;
         }
+        compute_node->_initialized_containers.insert(container);
+        container->_state = Container::State::INITIALIZED;
         compute_node->_initialized_containers.insert(container);
 
         // What about an alarm?
@@ -1220,12 +1226,8 @@ namespace wrench {
                 try {
                     invocation->_function->_initialization_code(private_storage_service);
                     container->_initialized = true;
-                    this->getCommPort()->dputMessage(
-                        new ServerlessComputeServiceContainerInitializationCompleteMessage(container, true));
                 } catch (ExecutionException& e) {
-                    this->getCommPort()->dputMessage(
-                        new ServerlessComputeServiceContainerInitializationCompleteMessage(container, false));
-                    throw;
+                    container->_init_failure_cause = e.getCause();
                 }
             }
 
@@ -1249,9 +1251,7 @@ namespace wrench {
                 "run_invocation_" + invocation->_function->getName(),
                 0, 0, lambda_execute, lambda_terminate));
 
-        auto custom_message = new ServerlessComputeServiceInvocationExecutionCompleteMessage(
-            action,
-            invocation, 0);
+        auto custom_message = new ServerlessComputeServiceContainerInitializationCompleteMessage(target_container);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             target_compute_node->hostname,
@@ -1938,19 +1938,15 @@ namespace wrench {
         }
 
         // The prewarm runs the initialization step!
-        const std::function initialization_code = [container, function, this
-            ](const std::shared_ptr<ActionExecutor>& action_executor) {
+        const std::function initialization_code = [container, function]
+        (const std::shared_ptr<ActionExecutor>& action_executor) {
             auto private_storage_service = container->getPrivateStorageService();
             if (not container->_initialized) {
                 // Invoke the user's initialization function
                 try {
                     function->_initialization_code(private_storage_service);
                     container->_initialized = true;
-                    this->getCommPort()->dputMessage(
-                        new ServerlessComputeServiceContainerInitializationCompleteMessage(container, true));
                 } catch (ExecutionException& e) {
-                    this->getCommPort()->dputMessage(
-                        new ServerlessComputeServiceContainerInitializationCompleteMessage(container, false));
                     throw;
                 }
             }
@@ -1963,7 +1959,7 @@ namespace wrench {
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction("run_invocation_noop", 0, 0, initialization_code, noop));
 
-        auto custom_message = new ServerlessComputeServiceContainerPrewarmCompleteMessage(container, action);
+        auto custom_message = new ServerlessComputeServiceContainerInitializationCompleteMessage(container);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             compute_node->hostname, 1, 0,

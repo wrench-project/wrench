@@ -47,12 +47,13 @@ namespace wrench {
         void acknowledgeInvocationCompletion(const std::shared_ptr<Invocation>& invocation);
         void shutdownContainer(const std::shared_ptr<Container>& container);
 
+        [[nodiscard]] unsigned long getMaxNumInvocations() const;
+        [[nodiscard]] unsigned long getMaxNumContainers() const;
+        [[nodiscard]] unsigned long getTotalNumContainers() const;
+
         [[nodiscard]] sg_size_t getFreeDiskSpace() const;
         [[nodiscard]] sg_size_t getFreeRAMSpace() const;
 
-        std::shared_ptr<Container> findIdleContainer(
-            const Function* function,
-            const std::set<std::shared_ptr<Container>>& excluded_container) const;
         [[nodiscard]] std::set<std::shared_ptr<Container>>& getInitializingContainers();
         [[nodiscard]] std::set<std::shared_ptr<Container>>& getInitializedContainers();
 

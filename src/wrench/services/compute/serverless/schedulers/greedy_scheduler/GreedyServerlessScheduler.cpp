@@ -11,7 +11,6 @@
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 #include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/idle_container_selection_policies/ExpiringLatestServerlessIdleContainerSelectionPolicy.h"
 
 
 WRENCH_LOG_CATEGORY(wrench_greedy_serverless_scheduler, "Log category for GreedyServerlessScheduler");
@@ -188,10 +187,10 @@ namespace wrench {
         _node_selection_policy = std::make_shared<SelectAllPossibleServerlessNodeSelectionPolicy>();
         _eviction_policy = std::make_shared<FewestServerlessEvictionPolicy>();
         _plan_selection_policy = std::make_shared<EvictionAverseServerlessPlanSelectionPolicy>();
-        _node_activation_policy = std::make_shared<ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy>();
+        _node_activation_policy = std::make_shared<ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy>();
         _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
         _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
-        _idle_container_selection_policy = std::make_shared<ExpiringLatestServerlessIdleContainerSelectionPolicy>();
+        _reusable_container_selection_policy = std::make_shared<ExpiringLatestServerlessReusableContainerSelectionPolicy>();
     }
 
     /**
@@ -254,8 +253,8 @@ namespace wrench {
      * @brief Get the scheduler's idle container selection policy
      * @return the policy
      */
-    ServerlessIdleContainerSelectionPolicy* GreedyServerlessScheduler::getIdleContainerPolicy() const {
-        return _idle_container_selection_policy.get();
+    ServerlessReusableContainerSelectionPolicy* GreedyServerlessScheduler::getReusableContainerSelectionPolicy() const {
+        return _reusable_container_selection_policy.get();
     }
 
     /**
@@ -316,10 +315,10 @@ namespace wrench {
 
     /**
      * @brief Policy setter
-     * @param policy An idle container selection policy (at your own risk once the simulation has started)
+     * @param policy A reusable container selection policy (at your own risk once the simulation has started)
      */
-    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessIdleContainerSelectionPolicy> policy) {
-        _idle_container_selection_policy = std::move(policy);
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessReusableContainerSelectionPolicy> policy) {
+        _reusable_container_selection_policy = std::move(policy);
     }
 
 
@@ -412,6 +411,8 @@ namespace wrench {
                 decisions->idle_container_terminations.push_back({container});
                 scheduling_state->_ram_available.at(target_node) += container->getFunction()->getRAMSpaceLimit();
                 scheduling_state->_disk_available.at(target_node) += container->getFunction()->getDiskSpaceLimit();
+                scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) += 1;
+                scheduling_state->_num_possible_new_invocations_on_container.erase(container);
             }
 
             // Layer evictions from RAM
@@ -454,11 +455,13 @@ namespace wrench {
             for (const auto& [_ignore1, _ignore2, container] : node_decisions->invocation_dispatches) {
                 decisions->invocation_dispatches.push_back({inv, target_node, container});
                 if (container) {
-                    scheduling_state->_initializing_containers.at(target_node).erase(container);
+                    scheduling_state->_num_possible_new_invocations_on_container.at(container) -= 1;
                 } else {
                     scheduling_state->_ram_available.at(target_node) -= inv->getFunction()->getRAMSpaceLimit();
                     scheduling_state->_disk_available.at(target_node) -= inv->getFunction()->getDiskSpaceLimit();
                 }
+                scheduling_state->_num_possible_new_invocations_on_compute_node.at(target_node) -= 1;
+
             }
 
             // Image layer loads
@@ -480,6 +483,7 @@ namespace wrench {
         auto to_prewarm = _container_prewarm_policy->prewarmContainers(scheduling_state);
         for (auto const& [function, node] : to_prewarm) {
             decisions->container_prewarms.push_back({function, node});
+            scheduling_state->_num_possible_new_containers_on_compute_node.at(node) -= 1;
         }
 
         // Set the minimum of the wake-up dates
@@ -491,7 +495,7 @@ namespace wrench {
         earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _idle_container_selection_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update, _reusable_container_selection_policy->getNextWakeupDate());
         if (earliest_wake_update != DBL_MAX) {
             decisions->scheduler_wakeup_date = earliest_wake_update;
         }
@@ -530,8 +534,8 @@ namespace wrench {
             candidate_nodes.push_back(node);
         }
 
-        // Pass #1: Can we reuse an existing idle container?
-        auto [target_node, target_idle_container] = _idle_container_selection_policy->selectIdleContainer(
+        // Pass #1: Can we reuse an existing container?
+        auto [target_node, target_idle_container] = _reusable_container_selection_policy->selectReusableContainer(
             scheduling_state,
             inv,
             candidate_nodes);
@@ -793,6 +797,17 @@ namespace wrench {
                 }
                 // Perhaps it's being used by an initialized container?
                 for (auto& container : scheduling_state->_initialized_containers.at(node)) {
+                    // If the container is to be evicted, we're always fine
+                    bool is_container_to_be_evicted = false;
+                    for (auto const& [container_to_be_evicted] : eviction_decisions->idle_container_terminations) {
+                        if (container_to_be_evicted == container) {
+                            is_container_to_be_evicted = true;
+                            break;
+                        }
+                    }
+                    if (is_container_to_be_evicted) {
+                        continue;
+                    }
                     // If the container uses the layer, then the layer cannot be evicted
                     if (container->getFunction()->getImage()->getLayers().count(candidate)) {
                         is_victim_layer_evictable = false;
@@ -878,6 +893,17 @@ namespace wrench {
                     }
                 }
                 for (auto& container : scheduling_state->_initialized_containers.at(node)) {
+                    // If the container is to be evicted, we're always fine
+                    bool is_container_to_be_evicted = false;
+                    for (auto const& [container_to_be_evicted] : eviction_decisions->idle_container_terminations) {
+                        if (container_to_be_evicted == container) {
+                            is_container_to_be_evicted = true;
+                            break;
+                        }
+                    }
+                    if (is_container_to_be_evicted) {
+                        continue;
+                    }
                     // If the container uses the layer, then the layer cannot be evicted
                     if (container->getFunction()->getImage()->getLayers().count(candidate)) {
                         is_victim_layer_evictable = false;

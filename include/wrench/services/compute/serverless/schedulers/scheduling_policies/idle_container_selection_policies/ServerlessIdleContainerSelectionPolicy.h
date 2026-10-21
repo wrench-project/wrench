@@ -15,23 +15,23 @@ namespace wrench {
     class ServerlessSchedulingState;
 
     /**
-     * @brief An abstract class to implement a serverless idle container selection policy
+     * @brief An abstract class to implement a serverless reusable container selection policy
      */
-    class ServerlessIdleContainerSelectionPolicy : public ServerlessSchedulingPolicy {
+    class ServerlessReusableContainerSelectionPolicy : public ServerlessSchedulingPolicy {
     public:
 
-        ServerlessIdleContainerSelectionPolicy() = default;
+        ServerlessReusableContainerSelectionPolicy() = default;
 
-        ~ServerlessIdleContainerSelectionPolicy() override = default;
+        ~ServerlessReusableContainerSelectionPolicy() override = default;
 
         /**
-         * @brief Method to selection an idle container to (re)use
+         * @brief Method to selection a container to (re)use
          * @param scheduling_state the scheduling state
          * @param invocation the invocation to execute
          * @param candidate_nodes the nodes that can be considered
          * @return a ServerlessComputeNode/Container pair
          */
-        virtual std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<Container>> selectIdleContainer(
+        virtual std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<Container>> selectReusableContainer(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
             const std::shared_ptr<Invocation>& invocation,
             const std::vector<std::shared_ptr<ServerlessComputeNode>>& candidate_nodes) = 0;

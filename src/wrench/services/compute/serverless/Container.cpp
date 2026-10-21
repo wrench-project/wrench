@@ -68,6 +68,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Return the maximum number of "in flight" invocations on the container
+     * @return the max number of running invocations
+     */
+    unsigned long Container::getMaxNumInflightInvocations() const {
+        return _max_num_in_flight_invocations;
+    }
+
+    /**
      * @brief Determine whether the container is initializing or not
      * @return true if initializing, false otherwise
      */
@@ -138,8 +146,6 @@ namespace wrench {
     ServerlessComputeNode* Container::getComputeNode() const {
         return const_cast<ServerlessComputeNode*>(_compute_node);
     }
-
-
 
 
     /**
@@ -277,6 +283,7 @@ namespace wrench {
         _idle_date = DBL_MAX;
 
         if (not _in_flight_invocations.empty()) {
+            // TODO: DO SOMETHING BETTER HERE
             throw std::runtime_error("Container::shutdown(): Cannot shutdown a container that has in-flight invocations");
         }
 

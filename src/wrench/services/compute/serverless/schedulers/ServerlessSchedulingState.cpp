@@ -27,8 +27,22 @@ namespace wrench {
         _ram_available = state->getAvailableRAMSpace();
         _disk_available = state->getAvailableDiskSpace();
 
+        // std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_invocations_on_compute_node;
+        // std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_containers_on_compute_node;
+        // std::map<std::shared_ptr<Container>, unsigned long> _num_possible_new_invocations_on_container;
+
         // Initialize and build useful maps
         for (const auto &node : _activated_compute_nodes) {
+
+            _num_possible_new_containers_on_compute_node[node] = node->getMaxNumContainers() - node->getTotalNumContainers();
+            auto num_total_ongoing_invocations = 0UL;
+            for (auto const &container : node->getInitializedContainers()) {
+                auto num_in_flight_invocations = container->getNumInflightInvocations();
+                num_total_ongoing_invocations += num_in_flight_invocations;
+                _num_possible_new_invocations_on_container[container] =
+                    container->getMaxNumInflightInvocations() - num_in_flight_invocations;
+            }
+            _num_possible_new_invocations_on_compute_node[node] = node->getMaxNumInvocations() - num_total_ongoing_invocations;
 
             _image_layers_on_disk[node] = state->getImageLayersOnDiskAtNode(node);
             _image_layers_on_their_way_to_disk[node] = state->getImageLayersBeingCopiedToNode(node);

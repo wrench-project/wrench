@@ -1,4 +1,4 @@
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
 
@@ -8,7 +8,7 @@ namespace wrench {
     * @param scheduling_state the scheduling state
     * @return a set of compute nodes
     */
-    unsigned long ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy::selectNumNodesToActivate(
+    unsigned long ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy::selectNumNodesToActivate(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
 
         // If no node to activate, nevermind
@@ -23,9 +23,12 @@ namespace wrench {
 
         // Activate one node only if all limits on current nodes are reached
         for (auto const& activated_node : scheduling_state->_activated_compute_nodes) {
-            if (not activated_node->isAtPerNodeContainerLimit() or
-                not activated_node->isAtPerNodeInvocationLimit() or
-                not activated_node->areAllContainersAtInvocationLimit()) {
+            // If we're note at the per node invocation limit and a container can have one more invocation, we're good
+            if (not activated_node->isAtPerNodeInvocationLimit() and not activated_node->areAllContainersAtInvocationLimit()) {
+                return 0;
+            }
+            // If we're note at the per node invocation limit and a new container could be started, we're good
+            if (not activated_node->isAtPerNodeInvocationLimit() and not activated_node->isAtPerNodeContainerLimit()) {
                 return 0;
             }
         }
