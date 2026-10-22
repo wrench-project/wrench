@@ -412,6 +412,7 @@ namespace wrench {
                 scheduling_state->_ram_available.at(target_node) += container->getFunction()->getRAMSpaceLimit();
                 scheduling_state->_disk_available.at(target_node) += container->getFunction()->getDiskSpaceLimit();
                 scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) += 1;
+                scheduling_state->_initialized_containers.at(target_node).erase(container);
                 scheduling_state->_num_possible_new_invocations_on_container.erase(container);
             }
 
@@ -521,14 +522,14 @@ namespace wrench {
         /* Invoke the node selection policy */
         auto selected_nodes = _node_selection_policy->selectCandidateNodes(scheduling_state, inv);
 
-        /* Filter out all compute nodes that have no available slots, just in case the node
-         * selection policy didn't! (and preserve a deterministic order) */
+        /* Filter out all compute nodes that cannot possibly run that invocation */
         std::vector<std::shared_ptr<ServerlessComputeNode>> candidate_nodes;
         for (const auto& node : scheduling_state->_activated_compute_nodes) {
-            if (node->isAtPerNodeInvocationLimit()) {
+            if (selected_nodes.count(node) == 0) {
                 continue;
             }
-            if (node->isAtPerNodeContainerLimit() and node->areAllContainersAtInvocationLimit()) {
+
+            if (scheduling_state->_num_possible_new_invocations_on_compute_node.at(node) == 0) {
                 continue;
             }
             candidate_nodes.push_back(node);
@@ -556,6 +557,7 @@ namespace wrench {
 
             auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
             decisions->invocation_dispatches.push_back({inv, node, nullptr});
+            scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) -=1 ;
 
             std::shared_ptr<ServerlessSchedulingDecisions> eviction_plan = makeEvictionPlan(node,
                 scheduling_state,
@@ -567,6 +569,7 @@ namespace wrench {
             }
 
             decisions->idle_container_terminations = eviction_plan->idle_container_terminations;
+            scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) +=  decisions->idle_container_terminations.size();
             decisions->layer_evictions_from_ram = eviction_plan->layer_evictions_from_ram;
             decisions->layer_evictions_from_disk = eviction_plan->layer_evictions_from_disk;
             invocation_plan.emplace(node, decisions);

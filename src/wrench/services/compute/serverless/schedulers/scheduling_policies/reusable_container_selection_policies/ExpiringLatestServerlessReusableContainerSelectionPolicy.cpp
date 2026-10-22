@@ -21,7 +21,7 @@ namespace wrench {
         std::shared_ptr<ServerlessComputeNode> picked_node = nullptr;
         std::shared_ptr<Container> picked_container = nullptr;
         double picked_expiration_date = 0;
-        unsigned long picked_num_free_slots = 0;
+        unsigned long picked_remaining_invocation_slots = 0;
 
         for (const auto& node: candidate_nodes) {
             for (auto const& container : scheduling_state->_initialized_containers.at(node)) {
@@ -29,14 +29,20 @@ namespace wrench {
                 if (container->getFunction() != invocation->getFunction().get()) {
                     continue;
                 }
-                auto num_free_slots = container->getMaxNumInflightInvocations()  - container->getNumInflightInvocations();
+                // If the container is already fully planned, nevermind
+                auto remaining_invocation_slots = scheduling_state->_num_possible_new_invocations_on_container.at(container);
+                if (remaining_invocation_slots == 0) {
+                    continue;
+                }
+
                 auto expiration_date = container->getExpirationDate();
 
-                if (picked_container == nullptr or (num_free_slots < picked_num_free_slots) or (expiration_date > picked_expiration_date)) {
+                if (not picked_container or (remaining_invocation_slots < picked_remaining_invocation_slots) or
+                    ((remaining_invocation_slots == picked_remaining_invocation_slots) and (expiration_date > picked_expiration_date))) {
                     picked_container = container;
                     picked_node = node;
                     picked_expiration_date = expiration_date;
-                    picked_num_free_slots = num_free_slots;
+                    picked_remaining_invocation_slots = remaining_invocation_slots;
                 }
             }
         }

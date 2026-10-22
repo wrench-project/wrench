@@ -985,7 +985,7 @@ namespace wrench {
             container->shutdown();
             return;
         }
-        compute_node->_initialized_containers.insert(container);
+        compute_node->_initializing_containers.erase(container);
         container->_state = Container::State::INITIALIZED;
         compute_node->_initialized_containers.insert(container);
 
@@ -1226,8 +1226,12 @@ namespace wrench {
                 try {
                     invocation->_function->_initialization_code(private_storage_service);
                     container->_initialized = true;
+                    this->getCommPort()->dputMessage(new ServerlessComputeServiceContainerInitializationCompleteMessage(container));
                 } catch (ExecutionException& e) {
                     container->_init_failure_cause = e.getCause();
+                    this->getCommPort()->dputMessage(new ServerlessComputeServiceContainerInitializationCompleteMessage(container));
+                    // the throw below will then cause the "invocation failed" message
+                    throw;
                 }
             }
 
@@ -1251,7 +1255,7 @@ namespace wrench {
                 "run_invocation_" + invocation->_function->getName(),
                 0, 0, lambda_execute, lambda_terminate));
 
-        auto custom_message = new ServerlessComputeServiceContainerInitializationCompleteMessage(target_container);
+        auto custom_message = new ServerlessComputeServiceInvocationExecutionCompleteMessage(action, invocation, 0);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             target_compute_node->hostname,

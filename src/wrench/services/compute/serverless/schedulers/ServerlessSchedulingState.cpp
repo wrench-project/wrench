@@ -162,8 +162,8 @@ namespace wrench {
     std::set<std::shared_ptr<Container>> ServerlessSchedulingState::getIdleContainersAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
         std::set<std::shared_ptr<Container>> idle_containers;
-        for (auto const& container : node->getInitializedContainers()) {
-            if (container->getNumInflightInvocations() == 0) {
+        for (auto const& container : _initialized_containers.at(node)) {
+            if (_num_possible_new_invocations_on_container.at(container) == container->getMaxNumInflightInvocations()) {
                 idle_containers.insert(container);
             }
         }

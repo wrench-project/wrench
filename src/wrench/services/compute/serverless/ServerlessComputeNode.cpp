@@ -141,11 +141,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Determine whether the compute node is at its invocation limit
+     * @brief Determine whether the compute node is at its invocation limit (this counts invocations
+     *        assigned to initializing containers)
      * @return true if no new invocation could be started on this node, false otherwise
      */
     bool ServerlessComputeNode::isAtPerNodeInvocationLimit() const {
         auto num_invocations = 0UL;
+
+        // We have to count initializing containers because some of them could have
+        // already an invocation assigned to them
+        for (auto const& container : _initializing_containers) {
+            num_invocations += container->_in_flight_invocations.size();
+        }
         for (auto const& container : _initialized_containers) {
             num_invocations += container->_in_flight_invocations.size();
         }
@@ -153,7 +160,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Determine whether all containers on the compute node are at their invocation limit
+     * @brief Determine whether all initialized containers on the compute node are at their invocation limit
      * @return true if no new invocation could be started on any container on this node, false otherwise
      */
     bool ServerlessComputeNode::areAllContainersAtInvocationLimit() const {
@@ -408,21 +415,6 @@ namespace wrench {
         }
         if (num_in_flight_invocations >= _max_num_invocations_per_compute_node) {
             return false;
-        }
-
-        // Are we within compute node limits in terms of number of containers
-        if (target_container) {
-            if (_initializing_containers.size() + _initialized_containers.size()
-                >= _max_num_containers_per_compute_node) {
-                return false;
-            }
-        }
-
-        // Are we within container limits in terms of number of invocations
-        if (target_container) {
-            if (target_container->_in_flight_invocations.size() >= _max_num_invocations_per_container) {
-                return false;
-            }
         }
 
         return true;
