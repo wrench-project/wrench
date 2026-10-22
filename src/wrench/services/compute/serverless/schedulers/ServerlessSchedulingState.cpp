@@ -42,6 +42,10 @@ namespace wrench {
                 _num_possible_new_invocations_on_container[container] =
                     container->getMaxNumInflightInvocations() - num_in_flight_invocations;
             }
+            for (const auto& container : node->getInitializingContainers()) {
+                num_total_ongoing_invocations +=
+                    container->getNumInflightInvocations();
+            }
             _num_possible_new_invocations_on_compute_node[node] = node->getMaxNumInvocations() - num_total_ongoing_invocations;
 
             _image_layers_on_disk[node] = state->getImageLayersOnDiskAtNode(node);

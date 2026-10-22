@@ -953,7 +953,15 @@ namespace wrench {
         _outstanding_invocation_counts.at(invocation->getFunction())--;
 
         // Update container
-        compute_node->acknowledgeInvocationCompletion(invocation);
+        auto container = invocation->_container;
+
+        if (!container->_initialized) {
+            container->_in_flight_invocations.erase(invocation);
+            compute_node->_initializing_containers.erase(container);
+            container->shutdown();
+        } else {
+            compute_node->acknowledgeInvocationCompletion(invocation);
+        }
 
         bool success = action->getState() == Action::State::COMPLETED;
 
@@ -975,13 +983,23 @@ namespace wrench {
         auto compute_node = container->getComputeNode();
 
         // Did this fail?
-        if (container->_state != Container::State::INITIALIZED) {
-            // TODO: Should we notify anybody? perhaps just print a log message?
-            WRENCH_INFO("Container initialization for function [%f] failed: %s",
+        if (not container->_initialized) {
+            WRENCH_INFO("Container initialization for function [%s] failed: %s",
                 container->getFunction()->getName().c_str(),
                 container->_init_failure_cause->toString().c_str());
 
             compute_node->_initializing_containers.erase(container);
+            for (auto const &inv : container->_in_flight_invocations) {
+                inv->_notify_commport->dputMessage(
+                                new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+                                    false,
+                                    inv,
+                                    container->_init_failure_cause,
+                                    this->getMessagePayloadValue(
+                                        ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+                _state_of_the_system->_dispatched_invocations.erase(inv);
+            }
+            container->_in_flight_invocations.clear();
             container->shutdown();
             return;
         }
@@ -1226,14 +1244,13 @@ namespace wrench {
                 try {
                     invocation->_function->_initialization_code(private_storage_service);
                     container->_initialized = true;
-                    this->getCommPort()->dputMessage(new ServerlessComputeServiceContainerInitializationCompleteMessage(container));
                 } catch (ExecutionException& e) {
                     container->_init_failure_cause = e.getCause();
-                    this->getCommPort()->dputMessage(new ServerlessComputeServiceContainerInitializationCompleteMessage(container));
-                    // the throw below will then cause the "invocation failed" message
                     throw;
                 }
             }
+
+            this->getCommPort()->dputMessage(new ServerlessComputeServiceContainerInitializationCompleteMessage(container));
 
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
@@ -1897,7 +1914,6 @@ namespace wrench {
     void ServerlessComputeService::prewarmContainerAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<Function>& function) {
-        // TODO: to implement
 
         // Check that pre-warming can even do anything
         double idle_timeout = this->getPropertyValueAsTimeInSecond(
@@ -1906,6 +1922,14 @@ namespace wrench {
             WRENCH_INFO(
                 "Ignoring container pre-warm scheduling decision because the "
                 "CONTAINER_IDLE_TIMEOUT value is set to 0.0");
+            return;
+        }
+
+        // Check that limits are ok
+        if (compute_node->isAtPerNodeContainerLimit()) {
+            WRENCH_INFO(
+                    "Couldn't pre-warm container for function %s at node %s because we've reached the number of containers limit",
+                    function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
 
@@ -1951,6 +1975,7 @@ namespace wrench {
                     function->_initialization_code(private_storage_service);
                     container->_initialized = true;
                 } catch (ExecutionException& e) {
+                    container->_init_failure_cause = e.getCause();
                     throw;
                 }
             }

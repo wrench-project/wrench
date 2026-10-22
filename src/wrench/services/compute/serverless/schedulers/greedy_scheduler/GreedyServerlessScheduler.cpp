@@ -397,7 +397,7 @@ namespace wrench {
             const auto& layers = inv->getFunction()->getImage()->getLayers();
             scheduling_state->_protected_layers.at(target_node).insert(layers.begin(), layers.end());
 
-            // If no node-level decisions, move on (it was just a reservation of a slot)
+            // If no node-level decisions, move on (it was just a reservation)
             if (!node_decisions) {
                 continue;
             }
@@ -458,6 +458,8 @@ namespace wrench {
                 if (container) {
                     scheduling_state->_num_possible_new_invocations_on_container.at(container) -= 1;
                 } else {
+                    // The selected plan's container terminations have already been credited.
+                    scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) -= 1;
                     scheduling_state->_ram_available.at(target_node) -= inv->getFunction()->getRAMSpaceLimit();
                     scheduling_state->_disk_available.at(target_node) -= inv->getFunction()->getDiskSpaceLimit();
                 }
@@ -557,19 +559,24 @@ namespace wrench {
 
             auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
             decisions->invocation_dispatches.push_back({inv, node, nullptr});
-            scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) -=1 ;
 
             std::shared_ptr<ServerlessSchedulingDecisions> eviction_plan = makeEvictionPlan(node,
                 scheduling_state,
                 inv->getFunction()->getRAMSpaceLimit(),
                 inv->getFunction()->getDiskSpaceLimit(),
                 image->getLayers());
+
             if (not eviction_plan) {
                 continue;
             }
 
+            const auto available_container_positions = scheduling_state->_num_possible_new_containers_on_compute_node.at(node);
+
+            if (available_container_positions == 0 && eviction_plan->idle_container_terminations.empty()) {
+                continue;
+            }
+
             decisions->idle_container_terminations = eviction_plan->idle_container_terminations;
-            scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) +=  decisions->idle_container_terminations.size();
             decisions->layer_evictions_from_ram = eviction_plan->layer_evictions_from_ram;
             decisions->layer_evictions_from_disk = eviction_plan->layer_evictions_from_disk;
             invocation_plan.emplace(node, decisions);
