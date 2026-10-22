@@ -241,6 +241,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param container The container
+     * @param init_action The init action (or nullptr)
      */
     ServerlessComputeServiceContainerInitializationCompleteMessage::ServerlessComputeServiceContainerInitializationCompleteMessage(
         std::shared_ptr<Container> container, std::shared_ptr<Action> init_action) : ServerlessComputeServiceMessage(0),

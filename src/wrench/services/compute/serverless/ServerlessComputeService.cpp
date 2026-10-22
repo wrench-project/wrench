@@ -991,9 +991,10 @@ namespace wrench {
         // Did this fail?
         if (init_action && init_action->getState() != Action::State::COMPLETED) {
             const auto cause = init_action->getFailureCause();
+            const std::string reason =
+                cause ? cause->toString() : "No failure cause recorded";
             WRENCH_INFO("Container initialization for function [%s] failed: %s",
-                        container->getFunction()->getName().c_str(),
-                        container->_init_failure_cause->toString().c_str());
+                        container->getFunction()->getName().c_str(), reason.c_str());
 
             compute_node->_initializing_containers.erase(container);
             if (not container->_in_flight_invocations.empty()) {
@@ -1018,7 +1019,7 @@ namespace wrench {
         compute_node->_initializing_containers.erase(container);
         container->_state = Container::State::INITIALIZED;
         compute_node->_initialized_containers.insert(container);
-        
+
 
         // What about an alarm?
         if (container->_in_flight_invocations.empty()) {
@@ -1259,13 +1260,13 @@ namespace wrench {
                 try {
                     invocation->_function->_initialization_code(private_storage_service);
                     container->_initialized = true;
+                    this->getCommPort()->dputMessage(
+                        new ServerlessComputeServiceContainerInitializationCompleteMessage(
+                            container, nullptr));
                 } catch (ExecutionException& e) {
                     container->_init_failure_cause = e.getCause();
                     throw;
                 }
-                this->getCommPort()->dputMessage(
-                    new ServerlessComputeServiceContainerInitializationCompleteMessage(
-                        container, action_executor->getAction()));
             }
 
 

@@ -265,7 +265,7 @@ namespace wrench {
             std::shared_ptr<Container> container, std::shared_ptr<Action> init_action);
         /** @brief The container */
         std::shared_ptr<Container> _container;
-        /** @brief The init action */
+        /** @brief The init action (or nullptr) */
         std::shared_ptr<Action> _init_action;
     };
 
