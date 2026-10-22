@@ -261,9 +261,12 @@ namespace wrench {
      */
     class ServerlessComputeServiceContainerInitializationCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceContainerInitializationCompleteMessage(std::shared_ptr<Container> container);
+        ServerlessComputeServiceContainerInitializationCompleteMessage(
+            std::shared_ptr<Container> container, std::shared_ptr<Action> init_action);
         /** @brief The container */
         std::shared_ptr<Container> _container;
+        /** @brief The init action */
+        std::shared_ptr<Action> _init_action;
     };
 
     /***********************/

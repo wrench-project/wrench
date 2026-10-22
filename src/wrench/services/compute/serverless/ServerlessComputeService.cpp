@@ -677,7 +677,7 @@ namespace wrench {
             return true;
         } else if (const auto scscic_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerInitializationCompleteMessage>(message)) {
-            processContainerInitializationCompletion(scscic_msg->_container);
+            processContainerInitializationCompletion(scscic_msg->_container, scscic_msg->_init_action);
             return true;
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -979,33 +979,46 @@ namespace wrench {
      * @brief Process a container initialization completion
      * @param container The container
      */
-    void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container) {
+    void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
+                                                                            const std::shared_ptr<Action>& init_action) {
         auto compute_node = container->getComputeNode();
 
+        if (compute_node->_initializing_containers.count(container) == 0) {
+            // Some stale message?
+            return;
+        }
+
         // Did this fail?
-        if (not container->_initialized) {
+        if (init_action && init_action->getState() != Action::State::COMPLETED) {
+            const auto cause = init_action->getFailureCause();
             WRENCH_INFO("Container initialization for function [%s] failed: %s",
-                container->getFunction()->getName().c_str(),
-                container->_init_failure_cause->toString().c_str());
+                        container->getFunction()->getName().c_str(),
+                        container->_init_failure_cause->toString().c_str());
 
             compute_node->_initializing_containers.erase(container);
-            for (auto const &inv : container->_in_flight_invocations) {
-                inv->_notify_commport->dputMessage(
-                                new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-                                    false,
-                                    inv,
-                                    container->_init_failure_cause,
-                                    this->getMessagePayloadValue(
-                                        ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-                _state_of_the_system->_dispatched_invocations.erase(inv);
+            if (not container->_in_flight_invocations.empty()) {
+                throw std::runtime_error("A container that failed to initialized should not have any attached invocation");
             }
-            container->_in_flight_invocations.clear();
+            // for (auto const& inv : container->_in_flight_invocations) {
+            //     inv->_notify_commport->dputMessage(
+            //         new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+            //             false,
+            //             inv,
+            //             container->_init_failure_cause,
+            //             this->getMessagePayloadValue(
+            //                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+            //     _state_of_the_system->_dispatched_invocations.erase(inv);
+            //     _num_outstanding_invocations -= 1;
+            //     _outstanding_invocation_counts.at(inv->getFunction()) -= 1;
+            // }
+            // container->_in_flight_invocations.clear();
             container->shutdown();
             return;
         }
         compute_node->_initializing_containers.erase(container);
         container->_state = Container::State::INITIALIZED;
         compute_node->_initialized_containers.insert(container);
+        
 
         // What about an alarm?
         if (container->_in_flight_invocations.empty()) {
@@ -1014,7 +1027,8 @@ namespace wrench {
             if (idle_timeout <= 0) {
                 compute_node->shutdownContainer(container);
             } else {
-                auto expiration_date = S4U_Simulation::getClock() + idle_timeout;
+                auto now = S4U_Simulation::getClock();
+                auto expiration_date = now + idle_timeout;
                 // Start the timeout alarm
                 container->_expiration_alarm = Alarm::createAndStartAlarm(
                     this->simulation_,
@@ -1026,6 +1040,7 @@ namespace wrench {
                         container, container->getIdleSequence()),
                     "container_idle_timout");
                 container->_expiration_date = expiration_date;
+                container->_idle_date = now;
             }
         }
 
@@ -1248,9 +1263,11 @@ namespace wrench {
                     container->_init_failure_cause = e.getCause();
                     throw;
                 }
+                this->getCommPort()->dputMessage(
+                    new ServerlessComputeServiceContainerInitializationCompleteMessage(
+                        container, action_executor->getAction()));
             }
 
-            this->getCommPort()->dputMessage(new ServerlessComputeServiceContainerInitializationCompleteMessage(container));
 
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
@@ -1914,7 +1931,6 @@ namespace wrench {
     void ServerlessComputeService::prewarmContainerAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<Function>& function) {
-
         // Check that pre-warming can even do anything
         double idle_timeout = this->getPropertyValueAsTimeInSecond(
             ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
@@ -1928,8 +1944,8 @@ namespace wrench {
         // Check that limits are ok
         if (compute_node->isAtPerNodeContainerLimit()) {
             WRENCH_INFO(
-                    "Couldn't pre-warm container for function %s at node %s because we've reached the number of containers limit",
-                    function->getName().c_str(), compute_node->hostname.c_str());
+                "Couldn't pre-warm container for function %s at node %s because we've reached the number of containers limit",
+                function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
 
@@ -1988,7 +2004,7 @@ namespace wrench {
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction("run_invocation_noop", 0, 0, initialization_code, noop));
 
-        auto custom_message = new ServerlessComputeServiceContainerInitializationCompleteMessage(container);
+        auto custom_message = new ServerlessComputeServiceContainerInitializationCompleteMessage(container, action);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             compute_node->hostname, 1, 0,

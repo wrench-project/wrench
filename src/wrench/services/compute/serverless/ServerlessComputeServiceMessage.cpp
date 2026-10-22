@@ -243,7 +243,8 @@ namespace wrench {
      * @param container The container
      */
     ServerlessComputeServiceContainerInitializationCompleteMessage::ServerlessComputeServiceContainerInitializationCompleteMessage(
-        std::shared_ptr<Container> container) : ServerlessComputeServiceMessage(0),
-                                                              _container(std::move(container)) {
+        std::shared_ptr<Container> container, std::shared_ptr<Action> init_action) : ServerlessComputeServiceMessage(0),
+        _container(std::move(container)),
+        _init_action(std::move(init_action)) {
     }
 } // namespace wrench

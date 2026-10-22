@@ -192,7 +192,8 @@ namespace wrench {
 
         void processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence);
 
-        void processContainerInitializationCompletion(const std::shared_ptr<Container>& container);
+        void processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
+                                                      const std::shared_ptr<Action>& init_action);
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
