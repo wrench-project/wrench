@@ -54,8 +54,8 @@ namespace wrench {
         [[nodiscard]] sg_size_t getFreeDiskSpace() const;
         [[nodiscard]] sg_size_t getFreeRAMSpace() const;
 
-        [[nodiscard]] std::set<std::shared_ptr<Container>>& getInitializingContainers();
-        [[nodiscard]] std::set<std::shared_ptr<Container>>& getInitializedContainers();
+        [[nodiscard]] const std::set<std::shared_ptr<Container>>& getInitializingContainers() const;
+        [[nodiscard]] const std::set<std::shared_ptr<Container>>& getInitializedContainers() const;
 
         [[nodiscard]] bool isImageLayerOnDisk(const std::shared_ptr<ImageLayer>& layer) const;
 

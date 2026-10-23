@@ -31,12 +31,14 @@ namespace wrench {
          * @param idle_containers List of (idle) containers to sort
          * @param ram_space_to_free_up Amount of RAM to free up
          * @param disk_space_to_free_up Amount of disk to free up
+         * @param min_num_to_evict The minimum number of container to evict
          * @return A sorted list of (idle) containers
          */
         virtual std::set<std::shared_ptr<Container>> pickIdleContainersForEviction(
             const std::set<std::shared_ptr<Container>>& idle_containers,
             sg_size_t& ram_space_to_free_up,
-            sg_size_t& disk_space_to_free_up) = 0;
+            sg_size_t& disk_space_to_free_up,
+            unsigned long min_num_to_evict) = 0;
 
         /**
          * @brief Method to pick layers to evict from RAM using the "Fewest" policy
@@ -44,13 +46,15 @@ namespace wrench {
          * @param layers candidate victim layers
          * @param ram_space_to_free_up Amount of RAM to free up
          * @param disk_space_to_free_up Amount of disk to free up
+         * @param min_num_to_evict Minimum number of containers to evict
          * @return
          */
         virtual std::set<std::shared_ptr<ImageLayer>> pickImageLayersForRAMEviction(
             const std::shared_ptr<ServerlessComputeNode>& node,
             const std::set<std::shared_ptr<ImageLayer>>& layers,
             sg_size_t& ram_space_to_free_up,
-            sg_size_t& disk_space_to_free_up) = 0;
+            sg_size_t& disk_space_to_free_up,
+            unsigned long min_num_to_evict) = 0;
 
         /**
          * @brief Method to pick layers to evict from disk using the "Fewest" policy
@@ -58,13 +62,15 @@ namespace wrench {
          * @param layers candidate victim layers
          * @param ram_space_to_free_up Amount of Disk to free up
          * @param disk_space_to_free_up Amount of disk to free up
+         * @param min_num_to_evict Minimum number of containers to evict
          * @return
          */
         virtual std::set<std::shared_ptr<ImageLayer>> pickImageLayersForDiskEviction(
             const std::shared_ptr<ServerlessComputeNode>& node,
             const std::set<std::shared_ptr<ImageLayer>>& layers,
             sg_size_t& ram_space_to_free_up,
-            sg_size_t& disk_space_to_free_up) = 0;
+            sg_size_t& disk_space_to_free_up,
+            unsigned long min_num_to_evict) = 0;
     };
 }
 

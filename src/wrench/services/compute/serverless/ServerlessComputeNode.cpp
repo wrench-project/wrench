@@ -192,7 +192,7 @@ namespace wrench {
      * @brief Retrieve the set of initializing containers
      * @return A set of containers
      */
-    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getInitializingContainers() {
+    const std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getInitializingContainers() const {
         return _initializing_containers;
     }
 
@@ -200,7 +200,7 @@ namespace wrench {
      * @brief Retrieve the set of initialized containers
      * @return A set of containers
      */
-    std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getInitializedContainers() {
+    const std::set<std::shared_ptr<Container>>& ServerlessComputeNode::getInitializedContainers() const {
         return _initialized_containers;
     }
 

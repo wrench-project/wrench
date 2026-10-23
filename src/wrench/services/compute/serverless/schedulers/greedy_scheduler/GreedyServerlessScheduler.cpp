@@ -564,6 +564,7 @@ namespace wrench {
                 scheduling_state,
                 inv->getFunction()->getRAMSpaceLimit(),
                 inv->getFunction()->getDiskSpaceLimit(),
+                1,
                 image->getLayers());
 
             if (not eviction_plan) {
@@ -621,6 +622,7 @@ namespace wrench {
                 scheduling_state,
                 ram_needed,
                 0,
+                0,
                 image->getLayers());
             if (not eviction_plan) {
                 continue;
@@ -673,6 +675,7 @@ namespace wrench {
                 scheduling_state,
                 0,
                 disk_needed,
+                0,
                 image->getLayers());
             if (not eviction_plan) {
                 continue;
@@ -700,14 +703,16 @@ namespace wrench {
      * @param scheduling_state The current scheduling state (with protected layers)
      * @param needed_ram The RAM needed
      * @param needed_disk The disk needed
+     * @param num_needed_containers The number of needed containers
      * @param invocation_layers_to_protect The invocation's layer (that should be protected)
-     * @return A set of eviction scheduling decisions
+     * @return A set of eviction scheduling decisions (or nullptr)
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::makeEvictionPlan(
         const std::shared_ptr<ServerlessComputeNode>& node,
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
         sg_size_t needed_ram,
         sg_size_t needed_disk,
+        unsigned long num_needed_containers,
         const std::set<std::shared_ptr<ImageLayer>>& invocation_layers_to_protect) const {
         auto eviction_decisions = std::make_shared<ServerlessSchedulingDecisions>();
 
@@ -718,7 +723,7 @@ namespace wrench {
         needed_disk = needed_disk > available_disk ? needed_disk - available_disk : 0;
 
         // Are we done?
-        if (needed_ram == 0 && needed_disk == 0) {
+        if (needed_ram == 0 && needed_disk == 0 && num_needed_containers == 0) {
             return eviction_decisions;
         }
 
@@ -733,15 +738,24 @@ namespace wrench {
 
         {
             // Pick candidate to evict
-            auto to_evict =
-                _eviction_policy->pickIdleContainersForEviction(scheduling_state->getIdleContainersAtComputeNode(node),
-                                                                needed_ram,
-                                                                needed_disk);
+            unsigned long minimum_num_containers_to_evict = (num_needed_containers > scheduling_state->_num_possible_new_containers_on_compute_node.at(node) ?
+            num_needed_containers - scheduling_state->_num_possible_new_containers_on_compute_node.at(node) : 0);
+
+            auto to_evict = _eviction_policy->pickIdleContainersForEviction(scheduling_state->getIdleContainersAtComputeNode(node),
+                                                            needed_ram,
+                                                            needed_disk,
+                                                            minimum_num_containers_to_evict);
+
+            // If we can't make space for the needed number of containers, we're cooked
+            if (to_evict.size() < minimum_num_containers_to_evict) {
+                return nullptr;
+            }
 
             // Encode scheduling decisions
             for (auto const& idle_container : to_evict) {
                 // Mark this layer for eviction
                 eviction_decisions->idle_container_terminations.push_back({idle_container});
+                num_needed_containers--;
             }
         }
 
@@ -833,7 +847,7 @@ namespace wrench {
 
             // Pick candidates to evict
             auto to_evict =
-                _eviction_policy->pickImageLayersForRAMEviction(node, candidate_victims, needed_ram, needed_disk);
+                _eviction_policy->pickImageLayersForRAMEviction(node, candidate_victims, needed_ram, needed_disk, 0);
 
             // Encode scheduling decisions
             for (auto const& victim : to_evict) {
@@ -929,7 +943,7 @@ namespace wrench {
 
             // Pick candidates to evict
             auto to_evict =
-                _eviction_policy->pickImageLayersForDiskEviction(node, candidate_victims, needed_ram, needed_disk);
+                _eviction_policy->pickImageLayersForDiskEviction(node, candidate_victims, needed_ram, needed_disk, 0);
 
             // Encode scheduling decisions
             for (auto const& victim : to_evict) {
@@ -955,8 +969,8 @@ namespace wrench {
             }
         }
 
-        // The proposed reclamation must satisfy BOTH resource requirements.
-        if (needed_ram != 0 || needed_disk != 0) {
+        // The proposed reclamation must satisfy ALL resource requirements.
+        if (needed_ram != 0 || needed_disk != 0 || num_needed_containers != 0) {
             return nullptr;
         }
 

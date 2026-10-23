@@ -576,6 +576,7 @@ namespace wrench {
             return true;
         } else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
+            processNodeLoadCompletion(scsnlc_msg->_layer, scsnlc_msg->_compute_node, scsnlc_msg->_action);
             do_scheduling = true;
             return true;
         } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
@@ -1637,7 +1638,7 @@ namespace wrench {
         auto decisions =
             _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
                                  _state_of_the_system.get());
-#if 0
+#if 1
         decisions->print();
 #endif
         return decisions;

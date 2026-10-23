@@ -233,6 +233,7 @@ namespace wrench {
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
             sg_size_t needed_ram,
             sg_size_t needed_disk,
+            unsigned long num_needed_containers,
             const std::set<std::shared_ptr<ImageLayer>>& invocation_layers_to_protect) const;
 
 
