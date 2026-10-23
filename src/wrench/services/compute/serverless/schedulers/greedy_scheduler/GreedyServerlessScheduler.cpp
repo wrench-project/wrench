@@ -12,7 +12,6 @@
 #include <wrench/logging/TerminalOutput.h>
 
 
-
 WRENCH_LOG_CATEGORY(wrench_greedy_serverless_scheduler, "Log category for GreedyServerlessScheduler");
 
 namespace wrench {
@@ -190,7 +189,8 @@ namespace wrench {
         _node_activation_policy = std::make_shared<ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy>();
         _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
         _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
-        _reusable_container_selection_policy = std::make_shared<ExpiringLatestServerlessReusableContainerSelectionPolicy>();
+        _reusable_container_selection_policy = std::make_shared<
+            ExpiringLatestServerlessReusableContainerSelectionPolicy>();
     }
 
     /**
@@ -323,25 +323,31 @@ namespace wrench {
 
 
     /**
-     * @brief Construct one batch of serverless scheduling decisions.
+     * @brief Build one batch of scheduling decisions using a mutable planning
+     *        snapshot without modifying the supplied invocation vector.
      *
-     * Uses a fresh mutable planning state to select invocation failures,
-     * request node activation, order and greedily plan the retained invocations,
-     * and select prewarms from the remaining planning resources. Finally,
-     * combines the policies' requested wakeup dates.
+     * Records selected invocation failures, filters and orders the local
+     * worklist, requests worker activation, and greedily considers the remaining
+     * requests. For each selected dispatch or preparation plan, updates the
+     * working resource counts, residency information, and protected layers.
+     * Finally evaluates prewarming against that working state and combines
+     * the installed policies' requested wakeup dates.
      *
-     * The supplied invocation vector is not modified. Decisions are returned
-     * for the compute service to apply; this method does not execute them.
-     * See the class documentation for policy precedence, placement passes,
-     * and planning-state semantics.
+     * A pending invocation need not receive an operation in this round. In
+     * particular, choosing to wait for an existing transfer protects its layers
+     * but does not reserve invocation capacity or bind it to that node. Copies
+     * and loads do not become completed residency changes during planning.
      *
-     * @param schedulable_invocations Pending invocations whose required image
-     *        layers are available at the head node. May be empty.
-     * @param state Current system state from which to build the planning state.
-     * @return A newly constructed ServerlessSchedulingDecisions object,
-     *         potentially containing no operations and no wakeup request.
+     * The returned operations are intentions for the service to apply, not
+     * executed actions or an atomic reservation. See the class documentation
+     * for phase precedence, reusable-container capacity, and planning semantics.
      *
-     * @see GreedyServerlessScheduler
+     * @param schedulable_invocations Pending invocations whose image layers are
+     *        available at the head node; worker-side preparation may still be
+     *        required. May be empty.
+     * @param state Current system state from which the planning snapshot is built.
+     * @return A new ServerlessSchedulingDecisions object. Its operation lists may
+     *         all be empty, independently of whether a future wakeup is requested.
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::schedule(
         const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
@@ -464,7 +470,6 @@ namespace wrench {
                     scheduling_state->_disk_available.at(target_node) -= inv->getFunction()->getDiskSpaceLimit();
                 }
                 scheduling_state->_num_possible_new_invocations_on_compute_node.at(target_node) -= 1;
-
             }
 
             // Image layer loads
@@ -498,7 +503,8 @@ namespace wrench {
         earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
         earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _reusable_container_selection_policy->getNextWakeupDate());
+        earliest_wake_update = std::min(earliest_wake_update,
+                                        _reusable_container_selection_policy->getNextWakeupDate());
         if (earliest_wake_update != DBL_MAX) {
             decisions->scheduler_wakeup_date = earliest_wake_update;
         }
@@ -507,13 +513,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Given an invocation, pick a compute node
-     * @param scheduling_state the scheduling state
-     * @param inv an invocation
-     * @return a compute node and a set of scheduling decisions that would need to be made for this node to be used
-     *     {nullptr, nullptr}	No placement selected; do not claim a slot
-     *     {node, nullptr}	    Claim one slot on this node for this round; wait for preparation
-     *     {node, decisions}	Claim one slot on this node for this round; commit the specified work
+     * @brief Select a node and an optional dispatch/preparation plan for one
+     *        invocation, using the current working state.
+     *
+     * Candidate alternatives are evaluated without committing their resource
+     * changes. The caller applies the chosen plan to the working state and
+     * protects the invocation's required layers on a selected node.
+     *
+     * @param scheduling_state Current mutable planning snapshot.
+     * @param inv Invocation being considered.
+     * @return {nullptr, nullptr} if no node is selected; {node, nullptr} to wait
+     *         for image preparation already in progress; or {node, decisions}
+     *         for a selected dispatch/preparation plan. Selecting a waiting node
+     *         does not reserve invocation capacity or a future container position.
      */
     std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>
     GreedyServerlessScheduler::pickComputeNode(
@@ -571,7 +583,8 @@ namespace wrench {
                 continue;
             }
 
-            const auto available_container_positions = scheduling_state->_num_possible_new_containers_on_compute_node.at(node);
+            const auto available_container_positions = scheduling_state->_num_possible_new_containers_on_compute_node.
+                                                                         at(node);
 
             if (available_container_positions == 0 && eviction_plan->idle_container_terminations.empty()) {
                 continue;
@@ -722,8 +735,18 @@ namespace wrench {
         needed_ram = needed_ram > available_ram ? needed_ram - available_ram : 0;
         needed_disk = needed_disk > available_disk ? needed_disk - available_disk : 0;
 
-        // Are we done?
-        if (needed_ram == 0 && needed_disk == 0 && num_needed_containers == 0) {
+        const auto available_container_positions = scheduling_state->_num_possible_new_containers_on_compute_node.
+                                                                     at(node);
+
+        const auto minimum_num_containers_to_evict =
+            num_needed_containers > available_container_positions
+                ? num_needed_containers - available_container_positions
+                : 0UL;
+
+        // Nothing needs to be reclaimed.
+        if (needed_ram == 0 &&
+            needed_disk == 0 &&
+            minimum_num_containers_to_evict == 0) {
             return eviction_decisions;
         }
 
@@ -738,24 +761,21 @@ namespace wrench {
 
         {
             // Pick candidate to evict
-            unsigned long minimum_num_containers_to_evict = (num_needed_containers > scheduling_state->_num_possible_new_containers_on_compute_node.at(node) ?
-            num_needed_containers - scheduling_state->_num_possible_new_containers_on_compute_node.at(node) : 0);
+            auto to_evict =
+                _eviction_policy->pickIdleContainersForEviction(
+                    scheduling_state->getIdleContainersAtComputeNode(node),
+                    needed_ram,
+                    needed_disk,
+                    minimum_num_containers_to_evict);
 
-            auto to_evict = _eviction_policy->pickIdleContainersForEviction(scheduling_state->getIdleContainersAtComputeNode(node),
-                                                            needed_ram,
-                                                            needed_disk,
-                                                            minimum_num_containers_to_evict);
-
-            // If we can't make space for the needed number of containers, we're cooked
+            // Layer eviction cannot compensate for too few container positions.
             if (to_evict.size() < minimum_num_containers_to_evict) {
                 return nullptr;
             }
 
-            // Encode scheduling decisions
-            for (auto const& idle_container : to_evict) {
-                // Mark this layer for eviction
-                eviction_decisions->idle_container_terminations.push_back({idle_container});
-                num_needed_containers--;
+            for (const auto& idle_container : to_evict) {
+                eviction_decisions->idle_container_terminations.push_back(
+                    {idle_container});
             }
         }
 
@@ -969,11 +989,13 @@ namespace wrench {
             }
         }
 
-        // The proposed reclamation must satisfy ALL resource requirements.
-        if (needed_ram != 0 || needed_disk != 0 || num_needed_containers != 0) {
+        // Container-position feasibility was checked after choosing
+        // the container victims. All remaining byte deficits must be met.
+        if (needed_ram != 0 || needed_disk != 0) {
             return nullptr;
         }
 
-        return eviction_decisions;
+
+        return nullptr;
     }
 } // namespace wrench
