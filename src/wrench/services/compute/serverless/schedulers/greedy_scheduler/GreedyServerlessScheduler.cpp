@@ -995,7 +995,6 @@ namespace wrench {
             return nullptr;
         }
 
-
-        return nullptr;
+        return eviction_decisions;
     }
 } // namespace wrench

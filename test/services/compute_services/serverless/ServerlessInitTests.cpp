@@ -143,6 +143,7 @@ private:
 
     int main() override {
         auto function_manager = this->createFunctionManager();
+
         // Register a function with a broken init
         std::function lambda_init = [this](const std::shared_ptr<wrench::StorageService>& service) -> void {
             auto file = wrench::Simulation::addFile("bogus", 1);
@@ -180,8 +181,6 @@ private:
         if (invocation1->hasSucceeded()) {
             throw std::runtime_error("Invocation should have failed");
         }
-
-        std::cerr << invocation1->getFailureCause()->toString() << std::endl;
 
         return 0;
     }
