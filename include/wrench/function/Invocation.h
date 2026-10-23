@@ -34,7 +34,7 @@ namespace wrench {
         [[nodiscard]] bool isDispatched() const;
         [[nodiscard]] bool isDone() const;
         [[nodiscard]] bool hasSucceeded() const;
-        [[nodiscard]] bool wasHoststart() const;
+        [[nodiscard]] bool wasHotStart() const;
         [[nodiscard]] std::shared_ptr<Function> getFunction() const;
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;

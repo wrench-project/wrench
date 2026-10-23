@@ -36,9 +36,10 @@ namespace wrench {
                 }
 
                 auto expiration_date = container->getExpirationDate();
-
                 if (not picked_container or (remaining_invocation_slots < picked_remaining_invocation_slots) or
-                    ((remaining_invocation_slots == picked_remaining_invocation_slots) and (expiration_date > picked_expiration_date))) {
+                    ((remaining_invocation_slots == picked_remaining_invocation_slots) and (expiration_date > picked_expiration_date)) or
+                    ((remaining_invocation_slots == picked_remaining_invocation_slots) and (expiration_date == picked_expiration_date) and
+                        container->getCreationId() < picked_container->getCreationId())) {
                     picked_container = container;
                     picked_node = node;
                     picked_expiration_date = expiration_date;

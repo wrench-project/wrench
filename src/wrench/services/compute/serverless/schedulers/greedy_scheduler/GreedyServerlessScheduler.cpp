@@ -496,15 +496,25 @@ namespace wrench {
 
         // Set the minimum of the wake-up dates
         double earliest_wake_update = DBL_MAX;
-        earliest_wake_update = std::min(earliest_wake_update, _invocation_ordering_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _node_selection_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _eviction_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _plan_selection_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _node_activation_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _container_prewarm_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update, _invocation_failing_policy->getNextWakeupDate());
-        earliest_wake_update = std::min(earliest_wake_update,
-                                        _reusable_container_selection_policy->getNextWakeupDate());
+        double now = S4U_Simulation::getClock();
+        for (auto const& policy :
+             {
+                 _invocation_ordering_policy,
+                 _node_selection_policy,
+                 _eviction_policy,
+                 _plan_selection_policy,
+                 _node_activation_policy,
+                 _container_prewarm_policy,
+                 _invocation_failing_policy,
+                 _reusable_container_selection_policy
+             }) {
+            double policy_wakeup_date = _invocation_ordering_policy->getNextWakeupDate();
+            if (policy_wakeup_date < now) {
+                throw std::runtime_error("A policy should always return a wake-up date in the future");
+            }
+            earliest_wake_update = std::min(earliest_wake_update, policy->getNextWakeupDate());
+        }
+
         if (earliest_wake_update != DBL_MAX) {
             decisions->scheduler_wakeup_date = earliest_wake_update;
         }

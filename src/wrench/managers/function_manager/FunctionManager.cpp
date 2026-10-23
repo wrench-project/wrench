@@ -60,7 +60,6 @@ namespace wrench {
             _functions_to_invoke.pop();
         }
         _pending_invocations.clear();
-        _finished_invocations.clear();
         _invocations_being_waited_for.clear();
     }
 
@@ -178,10 +177,7 @@ namespace wrench {
      * @return false if the invocation is not done
      */
     bool FunctionManager::isDone(const std::shared_ptr<Invocation>& invocation) {
-        if (_finished_invocations.find(invocation) != _finished_invocations.end()) {
-            return true;
-        }
-        return false;
+        return invocation->isDone();
     }
 
     /**
@@ -319,7 +315,6 @@ namespace wrench {
         invocation->_success = success;
         invocation->_failure_cause = failure_cause;
         // _pending_invocations.erase(invocation);
-        _finished_invocations.insert(invocation);
     }
 
     /**
@@ -361,7 +356,7 @@ namespace wrench {
         auto it = _invocations_being_waited_for.begin();
         while (it != _invocations_being_waited_for.end()) {
             // check if the invocation is finished
-            if (_finished_invocations.find(it->first) != _finished_invocations.end()) {
+            if (it->first->isDone()) {
                 // Preserve the request's reply destination before removing this record.
                 auto* answer_commport = it->second;
                 it = _invocations_being_waited_for.erase(it);
