@@ -53,6 +53,7 @@
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/ServerlessInvocationFailingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/SchedulableQueueSizeLimitServerlessInvocationFailingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/idle_container_selection_policies/ServerlessIdleContainerSelectionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/idle_container_selection_policies/ExpiringLatestServerlessReusableContainerSelectionPolicy.h"
 
