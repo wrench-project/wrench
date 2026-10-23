@@ -150,9 +150,8 @@ namespace wrench {
      * After policy evaluation, the scheduler takes the minimum reported wakeup
      * date. DBL_MAX means no request; if all policies return it, the output's
      * optional wakeup date remains unset. Other dates must be finite absolute
-     * simulated dates strictly later than the current time. Maintaining valid,
-     * nonstale deadlines is part of each policy's contract; this aggregation
-     * does not itself validate every contribution.
+     * simulated dates strictly later than the current time. Deadlines
+     * are validated (i.e., an exception is thrown if stale), when taking the minimum.
      *
      * The result describes operations for ServerlessComputeService to apply.
      * schedule() neither executes them nor waits for completion. The service

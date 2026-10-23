@@ -509,7 +509,7 @@ namespace wrench {
         };
         for (auto const& policy : policies) {
             double policy_wakeup_date = policy->getNextWakeupDate();
-            if (policy_wakeup_date < now) {
+            if (policy_wakeup_date <= now) {
                 throw std::runtime_error("A policy should always return a wake-up date in the future");
             }
             earliest_wake_update = std::min(earliest_wake_update, policy->getNextWakeupDate());
