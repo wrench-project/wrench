@@ -1056,6 +1056,7 @@ namespace wrench {
      */
     void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container,
                                                                const std::uint64_t idle_sequence) {
+       WRENCH_INFO("WE GOT A CONTAINER TIME OUT");
         // If this isn't a stale/no-longer-valid message, nevermind
         if (container->getIdleSequence() != idle_sequence) {
             return;
@@ -1219,6 +1220,7 @@ namespace wrench {
                                                       std::shared_ptr<Container> target_container) {
         // Check that things can work at all
         if (not target_compute_node->couldInvocationRunRightNow(invocation, target_container)) {
+            WRENCH_INFO("Cannot dispatch invocation.... ignoring scheduling decision");
             return false;
         }
 
@@ -1308,8 +1310,9 @@ namespace wrench {
         action_executor->setActionTimeout(invocation->getFunction()->getTimeLimit());
         action_executor->setSimulation(this->simulation_);
 
-        WRENCH_INFO("Dispatched an invocation for function %s",
-                    invocation->getFunction()->getName().c_str());
+        WRENCH_INFO("Dispatched an invocation for [%s] to [%s]",
+                    invocation->getFunction()->getName().c_str(),
+                    target_compute_node->hostname.c_str());
 
         // Start the action executor object
         try {

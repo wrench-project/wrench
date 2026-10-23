@@ -2211,7 +2211,7 @@ private:
                                   const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
             wrench::FunctionOutput> {
             auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
-            wrench::Simulation::sleep(10);
+            wrench::Simulation::sleep(250);
             return std::make_shared<MyFunctionOutput>("output");
         };
 
@@ -2224,7 +2224,7 @@ private:
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
         // 1 GB Container RAM SPACE
-        auto registered_function = function_manager->registerFunction("Function", noop_init, lambda, image, this->compute_service, 100,
+        auto registered_function = function_manager->registerFunction("Function", noop_init, lambda, image, this->compute_service, 300,
                                                                         1 * GB, 1 * GB, 10 * MB, 1 * MB);
 
 

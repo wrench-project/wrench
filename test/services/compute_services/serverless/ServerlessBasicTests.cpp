@@ -22,7 +22,7 @@
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSServerlessInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/RandomServerlessPlanSelectionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
@@ -555,7 +555,7 @@ private:
 TEST_F(ServerlessBasicTest, FunctionInvocation) {
     std::vector<std::shared_ptr<wrench::ServerlessNodeActivationPolicy>> node_activation_policies = {
         std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-        std::make_shared<wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy>()
+        std::make_shared<wrench::ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy>()
     };
     std::vector<std::shared_ptr<wrench::ServerlessInvocationOrderingPolicy>> ordering_policies = {
         std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),

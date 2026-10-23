@@ -210,7 +210,7 @@ void ServerlessSlotTest::do_BasicTest_test() {
     int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    //    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
@@ -225,7 +225,9 @@ void ServerlessSlotTest::do_BasicTest_test() {
         "ServerlessHeadNode", "/", compute_nodes,
         std::make_shared<wrench::GreedyServerlessScheduler>(),
         {
-            {wrench::ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "2"}
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "2"},
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE, "1"},
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER, "2"},
         }, {}));
 
     std::string user_host = "UserHost";

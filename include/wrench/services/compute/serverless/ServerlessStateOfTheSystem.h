@@ -39,7 +39,6 @@ namespace wrench
         [[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
         [[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
 
-        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> getNumFreeSlots() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
