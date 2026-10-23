@@ -40,6 +40,8 @@ public:
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
 
     void do_InitFail_test();
+    void do_InitFailsThenWorks_test();
+    void do_ConcurrentReuseAfterInitialization_test();
 
 protected:
     ~ServerlessInitTest() override {
@@ -120,12 +122,12 @@ public:
 
 
 /**********************************************************************/
-/**  FUNCTION INVOCATION TEST                                       **/
+/**  INIT FAIL TEST                                                  **/
 /**********************************************************************/
 
-class ServerlessInitTestFunctionInvocationController : public wrench::ExecutionController {
+class ServerlessInitFailTestFunctionInvocationController : public wrench::ExecutionController {
 public:
-    ServerlessInitTestFunctionInvocationController(ServerlessInitTest* test,
+    ServerlessInitFailTestFunctionInvocationController(ServerlessInitTest* test,
                                                    const std::string& hostname,
                                                    const std::shared_ptr<wrench::ServerlessComputeService>
                                                    & compute_service,
@@ -217,7 +219,242 @@ void ServerlessInitTest::do_InitFail_test() {
 
     std::string user_host = "UserHost";
     auto wms = simulation->add(
-        new ServerlessInitTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+        new ServerlessInitFailTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**  INIT FAILS THEN WORKS TEST                                      **/
+/**********************************************************************/
+
+class ServerlessInitFailsThenWorksTestFunctionInvocationController : public wrench::ExecutionController {
+public:
+    ServerlessInitFailsThenWorksTestFunctionInvocationController(ServerlessInitTest* test,
+                                                   const std::string& hostname,
+                                                   const std::shared_ptr<wrench::ServerlessComputeService>
+                                                   & compute_service,
+                                                   const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessInitTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Register a function with a broken init
+        std::function lambda_init = [this](const std::shared_ptr<wrench::StorageService>& service) -> void {
+            static bool should_work = false;
+            if (not should_work) {
+                should_work = true;
+                auto file = wrench::Simulation::addFile("bogus", 1);
+                this->storage_service->readFile(wrench::FileLocation::LOCATION(this->storage_service, file));
+            }
+            wrench::S4U_Simulation::sleep(60);
+        };
+
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::compute(10);
+            return std::make_shared<MyFunctionOutput>("DONE");
+        };
+
+        // Create layer 1
+        auto layer1_file = wrench::Simulation::addFile("layer1_file", 100 * MB);
+        auto layer1_location = wrench::FileLocation::LOCATION(this->storage_service, layer1_file);
+        wrench::StorageService::createFileAtLocation(layer1_location);
+        auto layer1 = wrench::FunctionManager::createImageLayer("my_layer1", layer1_location, layer1_file->getSize());
+
+        // Create the image
+        auto image1 = wrench::FunctionManager::createImage("my_image", {layer1});
+
+        // Registering a function
+        auto registered_function1 = function_manager->registerFunction("Function 1", lambda_init, lambda, image1,
+                                                                       this->compute_service, 3600, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
+
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+
+        // Place an invocation and wait for it
+        auto inv1 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+        function_manager->wait_one(inv1);
+        if (inv1->hasSucceeded()) {
+            throw std::runtime_error("Invocation #1 should have failed");
+        }
+        if (not std::dynamic_pointer_cast<wrench::FileNotFound>(inv1->getFailureCause())) {
+            throw std::runtime_error("Invocation #1's failure cause should have been FileNotFound");
+        };
+
+        // Place another invocation and wait for it
+        auto inv2 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+        function_manager->wait_one(inv2);
+        if (not inv2->hasSucceeded()) {
+            throw std::runtime_error("Invocation #2 should have succeeded: " + inv2->getFailureCause()->toString());
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessInitTest, InitFailsThenWorksTest) {
+    DO_TEST_WITH_FORK(do_InitFailsThenWorks_test);
+}
+
+void ServerlessInitTest::do_InitFailsThenWorks_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes,
+        std::make_shared<wrench::GreedyServerlessScheduler>(),
+        {
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "2"},
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE, "1"},
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER, "2"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "3600"},
+        }, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessInitFailsThenWorksTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  CONTAINER REUSE AFTER INIT                                      **/
+/**********************************************************************/
+
+class ServerlessConcurrentReuseAfterInitializationTestFunctionInvocationController : public wrench::ExecutionController {
+public:
+    ServerlessConcurrentReuseAfterInitializationTestFunctionInvocationController(ServerlessInitTest* test,
+                                                   const std::string& hostname,
+                                                   const std::shared_ptr<wrench::ServerlessComputeService>
+                                                   & compute_service,
+                                                   const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessInitTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        auto function_manager = this->createFunctionManager();
+
+        // Register a function with a broken init
+        std::function lambda_init = [](const std::shared_ptr<wrench::StorageService>& service) -> void {
+            wrench::S4U_Simulation::sleep(5);
+        };
+
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(real_input->x1_);
+            return std::make_shared<MyFunctionOutput>("DONE");
+        };
+
+        // Create layer 1
+        auto layer1_file = wrench::Simulation::addFile("layer1_file", 100 * MB);
+        auto layer1_location = wrench::FileLocation::LOCATION(this->storage_service, layer1_file);
+        wrench::StorageService::createFileAtLocation(layer1_location);
+        auto layer1 = wrench::FunctionManager::createImageLayer("my_layer1", layer1_location, layer1_file->getSize());
+
+        // Create the image
+        auto image1 = wrench::FunctionManager::createImage("my_image", {layer1});
+
+        // Registering a function
+        auto registered_function1 = function_manager->registerFunction("Function 1", lambda_init, lambda, image1,
+                                                                       this->compute_service, 3600, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
+
+        auto input1 = std::make_shared<MyFunctionInput>(5, 2);
+        auto input2 = std::make_shared<MyFunctionInput>(25, 2);
+
+        // Place Two invocations (one "sleep 5", the other "sleep 25");
+        auto inv1 = function_manager->invokeFunction(registered_function1, this->compute_service, input1);
+        auto inv2 = function_manager->invokeFunction(registered_function1, this->compute_service, input2);
+        function_manager->wait_all({inv1, inv2});
+
+        auto elapsed1 = inv1->getFunctionEndDate() - inv1->getSubmitDate();
+        auto elapsed2 = inv2->getFunctionEndDate() - inv2->getSubmitDate();
+
+        if (std::abs((elapsed2 - elapsed1) - 20) > 0.0001) {
+            throw std::runtime_error("Unexpected differences in elapsed times: elapsed1=" +
+                std::to_string(elapsed1) + "  elapsed2=" + std::to_string(elapsed1));
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessInitTest, ConcurrentReuseAfterInitialization) {
+    DO_TEST_WITH_FORK(do_ConcurrentReuseAfterInitialization_test);
+}
+
+void ServerlessInitTest::do_ConcurrentReuseAfterInitialization_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes,
+        std::make_shared<wrench::GreedyServerlessScheduler>(),
+        {
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "2"},
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE, "1"},
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER, "2"},
+            {wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "3600"},
+        }, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessConcurrentReuseAfterInitializationTestFunctionInvocationController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 
