@@ -195,6 +195,13 @@ namespace wrench {
         void processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
                                                       const std::shared_ptr<Action>& init_action);
 
+        void processNodeCopyCompletion(const std::shared_ptr<ImageLayer>& layer,
+            const std::shared_ptr<ServerlessComputeNode>& node,
+            const std::shared_ptr<Action>& action);
+        void processNodeLoadCompletion(const std::shared_ptr<ImageLayer>& layer,
+            const std::shared_ptr<ServerlessComputeNode>& node,
+            const std::shared_ptr<Action>& action);
+
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
         void activateComputeNodes(const std::vector<ActivateComputeNodes>& decisions);

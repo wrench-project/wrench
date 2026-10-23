@@ -106,6 +106,12 @@ namespace wrench {
                               std::to_string(_compute_node_num_cores));
         }
 
+        // Validate MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER
+        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER) == 0) {
+            throw std::invalid_argument("The ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER property value must be >0");
+        }
+
+
         // Create the state of the system object
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
             new ServerlessStateOfTheSystem(compute_nodes, this));
@@ -424,6 +430,7 @@ namespace wrench {
                         if (node->isImageLayerInRAM(layer) and (not node->isImageLayerOnDisk(layer))) {
                             StorageService::removeFileAtLocation(
                                 FileLocation::LOCATION(node->_memory, layer->getRAMFile()));
+                            _state_of_the_system->_image_layers_in_ram.at(node).erase(layer);
                         }
                     }
                 }
@@ -564,31 +571,12 @@ namespace wrench {
             //     return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
-            _state_of_the_system->_image_layers_being_copied_to_disk.at(scsncc_msg->_compute_node).erase(
-                scsncc_msg->_layer);
-            if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("An image layer copy has failed (due to disk pressure) for image layer [%s]... oh well",
-                            scsncc_msg->_layer->getName().c_str());
-                do_scheduling = false;
-            } else {
-                WRENCH_INFO("Image layer [%s] was stored on disk at [%s]",
-                            scsncc_msg->_layer->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
-                _state_of_the_system->_image_layers_on_disk.at(scsncc_msg->_compute_node).insert(scsncc_msg->_layer);
-            }
+            processNodeCopyCompletion(scsncc_msg->_layer, scsncc_msg->_compute_node, scsncc_msg->_action);
+            do_scheduling = true;
             return true;
         } else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
-            _state_of_the_system->_image_layers_being_loaded_in_ram.at(scsnlc_msg->_compute_node).erase(
-                scsnlc_msg->_layer);
-            if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("A memory load has failed (due to memory pressure) for image layer [%s]... oh well",
-                            scsnlc_msg->_layer->getName().c_str());
-                do_scheduling = false;
-            } else {
-                WRENCH_INFO("Image layer [%s] was loaded in RAM at [%s]",
-                            scsnlc_msg->_layer->getName().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
-                _state_of_the_system->_image_layers_in_ram.at(scsnlc_msg->_compute_node).insert(scsnlc_msg->_layer);
-            }
+            do_scheduling = true;
             return true;
         } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerIdleTimeoutMessage>(message)) {
@@ -1044,8 +1032,45 @@ namespace wrench {
                 container->_idle_date = now;
             }
         }
+    }
 
-        return;
+    /**
+     * @brief Process the completion of a layer copy to a node
+     * @param layer The image layer that was to be copied
+     * @param node The compute node where it was to be copied to
+     * @param action The copying action
+     */
+    void ServerlessComputeService::processNodeCopyCompletion(const std::shared_ptr<ImageLayer>& layer,
+                                                             const std::shared_ptr<ServerlessComputeNode>& node,
+                                                             const std::shared_ptr<Action>& action) {
+        _state_of_the_system->_image_layers_being_copied_to_disk.at(node).erase(layer);
+        if (action->getState() != Action::State::COMPLETED) {
+            WRENCH_INFO("An image layer copy has failed for image layer [%s] (%s)",
+                       layer->getName().c_str(), action->getFailureCause()->toString().c_str());
+        } else {
+            WRENCH_INFO("Image layer [%s] was stored on disk at [%s]",
+                        layer->getName().c_str(), node->hostname.c_str());
+            _state_of_the_system->_image_layers_on_disk.at(node).insert(layer);
+        }
+    }
+
+    /**
+     * @brief Process the completion of a layer load to a node
+     * @param layer The image layer that was to be loaded
+     * @param node The compute node where it was to be loaded to
+     * @param action The loading action
+     */
+    void ServerlessComputeService::processNodeLoadCompletion(const std::shared_ptr<ImageLayer>& layer,
+        const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Action>& action) {
+        _state_of_the_system->_image_layers_being_loaded_in_ram.at(node).erase(layer);
+        if (action->getState() != Action::State::COMPLETED) {
+            WRENCH_INFO("A memory load has failed for image layer [%s] (%s)",
+                        layer->getName().c_str(), action->getFailureCause()->toString().c_str());
+        } else {
+            WRENCH_INFO("Image layer [%s] was loaded in RAM at [%s]",
+                        layer->getName().c_str(), node->hostname.c_str());
+            _state_of_the_system->_image_layers_in_ram.at(node).insert(layer);
+        }
     }
 
 
@@ -1765,12 +1790,19 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLayerCopyToComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<ImageLayer>& layer) {
-        // Sanity checks
+
+        // Sanity check: Is the image layer already there?
         if (compute_node->isImageLayerOnDisk(layer)) {
-            throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLayerCopyToComputeNode(): Being told to copy image layer [" +
-                layer->getName() + "] to node [" + compute_node->hostname +
-                "], but the image layer is already on disk!");
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerCopyToComputeNode(): Being told to copy image layer [%s] to node [%s], but it's already there - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
+        }
+
+        // Sanity check: Is the image layer being copied there?
+        if (_state_of_the_system->_image_layers_being_copied_to_disk.at(compute_node).count(layer) > 0) {
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerCopyToComputeNode(): Being told to copy image layer [%s] to node [%s], but it's already being copied - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
         }
 
         const std::function lambda_terminate = lambda_noop;
@@ -1835,12 +1867,18 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLayerLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<ImageLayer>& layer) {
-        // Sanity check
+        // Sanity check: Is the image layer already there?
         if (compute_node->isImageLayerInRAM(layer)) {
-            throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image layer [" +
-                layer->getName() + "] at node [" + compute_node->hostname +
-                "], but the image layer is already in RAM!");
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerLoadAtComputeNode(): Being told to load image layer [%s] at node [%s], but it's already loaded - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
+        }
+
+        // Sanity check: Is the image layer being loaded there?
+        if (_state_of_the_system->_image_layers_being_loaded_in_ram.at(compute_node).count(layer) > 0) {
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerLoadAtComputeNode(): Being told to load image layer [%s] to node [%s], but it's already being loaded - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
         }
 
         // Initiate an asynchronous action that simply read the image file from disk

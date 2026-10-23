@@ -50,7 +50,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER);
 
         /** @brief The maximum number of outstanding invocations, i.e., invocations that have not yet completed or failed, including
-         *         those waiting for image preparation or execution. (default value: "infinity")
+         *         those waiting for image preparation or execution. (must be > 0; default value: "infinity")
          **/
         DECLARE_PROPERTY_NAME(MAX_OUTSTANDING_INVOCATIONS);
 
