@@ -93,12 +93,24 @@ namespace wrench {
         // Set default and specified properties
         this->setProperties(this->default_property_values, property_list);
 
-        // Deal with the 0-value default number of slots
-        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE)
+        // Deal with the 0-value defaults
+        if (this->getPropertyValueAsUnsignedLong(
+                ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE)
             == 0) {
-            this->setProperty(ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE,
+            this->setProperty(ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE,
                               std::to_string(_compute_node_num_cores));
         }
+        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE)
+            == 0) {
+            this->setProperty(ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE,
+                              std::to_string(_compute_node_num_cores));
+        }
+
+        // Validate MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER
+        if (this->getPropertyValueAsUnsignedLong(ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER) == 0) {
+            throw std::invalid_argument("The ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER property value must be >0");
+        }
+
 
         // Create the state of the system object
         _state_of_the_system = std::shared_ptr<ServerlessStateOfTheSystem>(
@@ -244,11 +256,17 @@ namespace wrench {
             // Num idle cores per host
             std::map<std::string, double> num_idle_cores;
             for (const auto& compute_node : _state_of_the_system->_activated_compute_nodes) {
-                unsigned long num_used_slots = compute_node->getNumSlots() - compute_node->getNumFreeSlots();
-                unsigned long count = (num_used_slots < _compute_node_num_cores
-                                           ? _compute_node_num_cores - num_used_slots
-                                           : 0);
-                num_idle_cores[compute_node->hostname] = static_cast<double>(count);
+                auto num_in_flight_invocations = 0UL;
+                for (auto const& container : compute_node->_initializing_containers) {
+                    num_in_flight_invocations += container->_in_flight_invocations.size();
+                }
+                for (auto const& container : compute_node->_initialized_containers) {
+                    num_in_flight_invocations += container->_in_flight_invocations.size();
+                }
+                unsigned long idle_cores = (num_in_flight_invocations < _compute_node_num_cores
+                                                ? _compute_node_num_cores - num_in_flight_invocations
+                                                : 0);
+                num_idle_cores[compute_node->hostname] = static_cast<double>(idle_cores);
             }
             for (const auto& compute_node : _state_of_the_system->_being_activated_compute_nodes) {
                 num_idle_cores[compute_node->hostname] = static_cast<double>(_compute_node_num_cores);
@@ -412,6 +430,7 @@ namespace wrench {
                         if (node->isImageLayerInRAM(layer) and (not node->isImageLayerOnDisk(layer))) {
                             StorageService::removeFileAtLocation(
                                 FileLocation::LOCATION(node->_memory, layer->getRAMFile()));
+                            _state_of_the_system->_image_layers_in_ram.at(node).erase(layer);
                         }
                     }
                 }
@@ -546,37 +565,19 @@ namespace wrench {
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             processInvocationCompletion(scsiec_msg->_invocation, scsiec_msg->_action);
             return true;
-        } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
-            ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
-            processPrewarmCompletion(scscpc_msg->_container, scscpc_msg->_action);
-            return true;
+            // } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
+            //     ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
+            //     processPrewarmCompletion(scscpc_msg->_container, scscpc_msg->_action);
+            //     return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
-            _state_of_the_system->_image_layers_being_copied_to_disk.at(scsncc_msg->_compute_node).erase(
-                scsncc_msg->_layer);
-            if (scsncc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("An image layer copy has failed (due to disk pressure) for image layer [%s]... oh well",
-                            scsncc_msg->_layer->getName().c_str());
-                do_scheduling = false;
-            } else {
-                WRENCH_INFO("Image layer [%s] was stored on disk at [%s]",
-                            scsncc_msg->_layer->getName().c_str(), scsncc_msg->_compute_node->hostname.c_str());
-                _state_of_the_system->_image_layers_on_disk.at(scsncc_msg->_compute_node).insert(scsncc_msg->_layer);
-            }
+            processNodeCopyCompletion(scsncc_msg->_layer, scsncc_msg->_compute_node, scsncc_msg->_action);
+            do_scheduling = true;
             return true;
         } else if (const auto scsnlc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeLoadCompleteMessage>(message)) {
-            _state_of_the_system->_image_layers_being_loaded_in_ram.at(scsnlc_msg->_compute_node).erase(
-                scsnlc_msg->_layer);
-            if (scsnlc_msg->_action->getState() != Action::State::COMPLETED) {
-                WRENCH_INFO("A memory load has failed (due to memory pressure) for image layer [%s]... oh well",
-                            scsnlc_msg->_layer->getName().c_str());
-                do_scheduling = false;
-            } else {
-                WRENCH_INFO("Image layer [%s] was loaded in RAM at [%s]",
-                            scsnlc_msg->_layer->getName().c_str(), scsnlc_msg->_compute_node->hostname.c_str());
-                _state_of_the_system->_image_layers_in_ram.at(scsnlc_msg->_compute_node).insert(scsnlc_msg->_layer);
-            }
+            processNodeLoadCompletion(scsnlc_msg->_layer, scsnlc_msg->_compute_node, scsnlc_msg->_action);
+            do_scheduling = true;
             return true;
         } else if (const auto sclcit_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceContainerIdleTimeoutMessage>(message)) {
@@ -600,10 +601,15 @@ namespace wrench {
 
             // Look at activated compute nodes first
             for (const auto& node : _state_of_the_system->_activated_compute_nodes) {
-                // Both requirements must be satisfied on the same node.
-                unsigned long num_used_slots = node->getNumSlots() - node->getNumFreeSlots();
-                unsigned long num_idle_cores = (num_used_slots < _compute_node_num_cores
-                                                    ? _compute_node_num_cores - num_used_slots
+                auto num_inflight_invocations = 0UL;
+                for (auto const& container : node->_initializing_containers) {
+                    num_inflight_invocations += container->_in_flight_invocations.size();
+                }
+                for (auto const& container : node->_initialized_containers) {
+                    num_inflight_invocations += container->_in_flight_invocations.size();
+                }
+                unsigned long num_idle_cores = (num_inflight_invocations < _compute_node_num_cores
+                                                    ? _compute_node_num_cores - num_inflight_invocations
                                                     : 0);
                 if (num_idle_cores >= csitalohwarr_msg->num_cores &&
                     node->_memory->getTotalFreeSpaceZeroTime() >= csitalohwarr_msg->ram) {
@@ -657,6 +663,10 @@ namespace wrench {
             if (_state_of_the_system->_being_activated_compute_nodes.empty()) {
                 _node_activation_alarms.clear();
             }
+            return true;
+        } else if (const auto scscic_msg = std::dynamic_pointer_cast<
+            ServerlessComputeServiceContainerInitializationCompleteMessage>(message)) {
+            processContainerInitializationCompletion(scscic_msg->_container, scscic_msg->_init_action);
             return true;
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -926,45 +936,25 @@ namespace wrench {
                     (failure_cause ? "FAILURE" : "SUCCESS"));
 
         auto compute_node = invocation->_compute_node;
-        // Free up the slot
-        compute_node->_num_free_slots++;
 
         // Update outstanding counts
         _num_outstanding_invocations--;
         _outstanding_invocation_counts.at(invocation->getFunction())--;
 
-        // Make container idle
+        // Update container
         auto container = invocation->_container;
+
         if (!container->_initialized) {
-            // Proposed new helper: the action has ended, but setup failed.
-            compute_node->_busy_containers.erase(container);
+            container->_in_flight_invocations.erase(invocation);
+            compute_node->_initializing_containers.erase(container);
             container->shutdown();
         } else {
-            compute_node->makeContainerIdle(container);
-
-            // Should the container be terminated or left idling?
-            double idle_timeout = this->getPropertyValueAsTimeInSecond(
-                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
-            if (idle_timeout <= 0) {
-                compute_node->shutdownContainer(container);
-            } else {
-                // Start the expiration alarm
-                container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
-                container->_expiration_alarm = Alarm::createAndStartAlarm(
-                    this->simulation_,
-                    container->_expiration_date,
-                    _hostname,
-                    _commport,
-                    new
-                    ServerlessComputeServiceContainerIdleTimeoutMessage(
-                        container, container->getIdleSequence()),
-                    "container_idle_timout");
-            }
+            compute_node->acknowledgeInvocationCompletion(invocation);
         }
 
         bool success = action->getState() == Action::State::COMPLETED;
 
-        _state_of_the_system->_running_invocations.erase(invocation);
+        _state_of_the_system->_dispatched_invocations.erase(invocation);
 
         invocation->_notify_commport->dputMessage(
             new ServerlessComputeServiceFunctionInvocationCompleteMessage(
@@ -975,55 +965,115 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a container pre-warm
+     * @brief Process a container initialization completion
      * @param container The container
      */
-    void ServerlessComputeService::processPrewarmCompletion(const std::shared_ptr<Container>& container,
-                                                            std::shared_ptr<Action> init_action) {
-        bool success = init_action->getState() == Action::State::COMPLETED;
+    void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
+                                                                            const std::shared_ptr<Action>& init_action) {
         auto compute_node = container->getComputeNode();
 
-        if (not success) {
-            WRENCH_INFO("A container pre-warm has failed [%s] (%s)",
-                        container->getFunction()->getName().c_str(),
-                        init_action->getFailureCause()->toString().c_str());
-
-            // Free up the slot
-            compute_node->_num_free_slots++;
-            // Remove container from the pre-warming list
-            compute_node->_prewarming_containers.erase(container);
-            container->shutdown();
+        if (compute_node->_initializing_containers.count(container) == 0) {
+            // Some stale message?
             return;
         }
 
-        WRENCH_INFO("A container pre-warm has completed [%s]", container->getFunction()->getName().c_str());
+        // Did this fail?
+        if (init_action && init_action->getState() != Action::State::COMPLETED) {
+            const auto cause = init_action->getFailureCause();
+            const std::string reason =
+                cause ? cause->toString() : "No failure cause recorded";
+            WRENCH_INFO("Container initialization for function [%s] failed: %s",
+                        container->getFunction()->getName().c_str(), reason.c_str());
 
-        // Free up the slot
-        compute_node->_num_free_slots++;
+            compute_node->_initializing_containers.erase(container);
+            if (not container->_in_flight_invocations.empty()) {
+                throw std::runtime_error("A container that failed to initialized should not have any attached invocation");
+            }
+            // for (auto const& inv : container->_in_flight_invocations) {
+            //     inv->_notify_commport->dputMessage(
+            //         new ServerlessComputeServiceFunctionInvocationCompleteMessage(
+            //             false,
+            //             inv,
+            //             container->_init_failure_cause,
+            //             this->getMessagePayloadValue(
+            //                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
+            //     _state_of_the_system->_dispatched_invocations.erase(inv);
+            //     _num_outstanding_invocations -= 1;
+            //     _outstanding_invocation_counts.at(inv->getFunction()) -= 1;
+            // }
+            // container->_in_flight_invocations.clear();
+            container->shutdown();
+            return;
+        }
+        compute_node->_initializing_containers.erase(container);
+        container->_state = Container::State::INITIALIZED;
+        compute_node->_initialized_containers.insert(container);
 
-        // Make container idle
-        compute_node->makeContainerIdle(container);
 
-        // Should the container be terminated or left idling?
-        double idle_timeout = this->getPropertyValueAsTimeInSecond(
-            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
-        if (idle_timeout <= 0) {
-            compute_node->shutdownContainer(container);
-        } else {
-            auto expiration_date = S4U_Simulation::getClock() + idle_timeout;
-            // Start the timeout alarm
-            container->_expiration_alarm = Alarm::createAndStartAlarm(
-                this->simulation_,
-                expiration_date,
-                _hostname,
-                _commport,
-                new
-                ServerlessComputeServiceContainerIdleTimeoutMessage(
-                    container, container->getIdleSequence()),
-                "container_idle_timout");
-            container->_expiration_date = expiration_date;
+        // What about an alarm?
+        if (container->_in_flight_invocations.empty()) {
+            double idle_timeout = this->getPropertyValueAsTimeInSecond(
+                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+            if (idle_timeout <= 0) {
+                compute_node->shutdownContainer(container);
+            } else {
+                auto now = S4U_Simulation::getClock();
+                auto expiration_date = now + idle_timeout;
+                // Start the timeout alarm
+                container->_expiration_alarm = Alarm::createAndStartAlarm(
+                    this->simulation_,
+                    expiration_date,
+                    _hostname,
+                    _commport,
+                    new
+                    ServerlessComputeServiceContainerIdleTimeoutMessage(
+                        container, container->getIdleSequence()),
+                    "container_idle_timout");
+                container->_expiration_date = expiration_date;
+                container->_idle_date = now;
+            }
         }
     }
+
+    /**
+     * @brief Process the completion of a layer copy to a node
+     * @param layer The image layer that was to be copied
+     * @param node The compute node where it was to be copied to
+     * @param action The copying action
+     */
+    void ServerlessComputeService::processNodeCopyCompletion(const std::shared_ptr<ImageLayer>& layer,
+                                                             const std::shared_ptr<ServerlessComputeNode>& node,
+                                                             const std::shared_ptr<Action>& action) {
+        _state_of_the_system->_image_layers_being_copied_to_disk.at(node).erase(layer);
+        if (action->getState() != Action::State::COMPLETED) {
+            WRENCH_INFO("An image layer copy has failed for image layer [%s] (%s)",
+                       layer->getName().c_str(), action->getFailureCause()->toString().c_str());
+        } else {
+            WRENCH_INFO("Image layer [%s] was stored on disk at [%s]",
+                        layer->getName().c_str(), node->hostname.c_str());
+            _state_of_the_system->_image_layers_on_disk.at(node).insert(layer);
+        }
+    }
+
+    /**
+     * @brief Process the completion of a layer load to a node
+     * @param layer The image layer that was to be loaded
+     * @param node The compute node where it was to be loaded to
+     * @param action The loading action
+     */
+    void ServerlessComputeService::processNodeLoadCompletion(const std::shared_ptr<ImageLayer>& layer,
+        const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Action>& action) {
+        _state_of_the_system->_image_layers_being_loaded_in_ram.at(node).erase(layer);
+        if (action->getState() != Action::State::COMPLETED) {
+            WRENCH_INFO("A memory load has failed for image layer [%s] (%s)",
+                        layer->getName().c_str(), action->getFailureCause()->toString().c_str());
+        } else {
+            WRENCH_INFO("Image layer [%s] was loaded in RAM at [%s]",
+                        layer->getName().c_str(), node->hostname.c_str());
+            _state_of_the_system->_image_layers_in_ram.at(node).insert(layer);
+        }
+    }
+
 
     /**
      * @brief Helper method to process a container idle timeout
@@ -1032,6 +1082,7 @@ namespace wrench {
      */
     void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container,
                                                                const std::uint64_t idle_sequence) {
+       WRENCH_INFO("WE GOT A CONTAINER TIME OUT");
         // If this isn't a stale/no-longer-valid message, nevermind
         if (container->getIdleSequence() != idle_sequence) {
             return;
@@ -1070,7 +1121,7 @@ namespace wrench {
             }
 
             if (dispatchInvocation(invocation, compute_node, container)) {
-                _state_of_the_system->_running_invocations.insert(invocation);
+                _state_of_the_system->_dispatched_invocations.insert(invocation);
                 dispatched_invocations.insert(invocation);
             }
         }
@@ -1098,7 +1149,7 @@ namespace wrench {
         // Fail invocations
         for (const auto& [inv] : decisions) {
             // Is the invocation running?
-            if (_state_of_the_system->_running_invocations.count(inv) > 0) {
+            if (_state_of_the_system->_dispatched_invocations.count(inv) > 0) {
                 WRENCH_INFO("Cannot forcefully termine a running invocation - ignoring scheduling decision");
                 continue;
             }
@@ -1187,13 +1238,15 @@ namespace wrench {
      * @param invocation invocation to dispatch
      * @param target_compute_node the target compute node
      * @param target_container the target container (if nullptr, create a new container)
+     *
      * @return true on success, false on failure
      */
     bool ServerlessComputeService::dispatchInvocation(const std::shared_ptr<Invocation>& invocation,
                                                       const std::shared_ptr<ServerlessComputeNode>& target_compute_node,
                                                       std::shared_ptr<Container> target_container) {
         // Check that things can work at all
-        if (not target_compute_node->isInvocationFeasible(invocation, target_container)) {
+        if (not target_compute_node->couldInvocationRunRightNow(invocation, target_container)) {
+            WRENCH_INFO("Cannot dispatch invocation.... ignoring scheduling decision");
             return false;
         }
 
@@ -1202,7 +1255,7 @@ namespace wrench {
         if (not hot_start) {
             // Try to spawn a container
             try {
-                target_container = target_compute_node->spawnContainer(invocation->getFunction().get(), false);
+                target_container = target_compute_node->spawnContainer(invocation->getFunction().get());
             } catch (ExecutionException& e) {
                 WRENCH_INFO("Couldn't spawn a container for an invocation for function %s: %s",
                             invocation->_function->getName().c_str(),
@@ -1218,20 +1271,14 @@ namespace wrench {
         invocation->_dispatch_date = Simulation::getCurrentSimulatedDate();
         invocation->_dispatched = true;
 
-        // Update the slot count of the compute node
-        target_compute_node->_num_free_slots -= 1;
-
-        // Make the container busy if it was idling
-        if (hot_start) {
-            target_compute_node->makeContainerBusy(target_container);
-        }
+        target_compute_node->acknowledgeInvocationStart(invocation);
 
         // Declare the function invocation's necessary lambdas
         const std::function lambda_terminate = [invocation](const std::shared_ptr<ActionExecutor>& action_executor) {
             // noop
         };
 
-        const std::function lambda_execute = [invocation](
+        const std::function lambda_execute = [invocation, this](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             auto container = invocation->_container;
             auto private_storage_service = container->getPrivateStorageService();
@@ -1241,10 +1288,15 @@ namespace wrench {
                 try {
                     invocation->_function->_initialization_code(private_storage_service);
                     container->_initialized = true;
+                    this->getCommPort()->dputMessage(
+                        new ServerlessComputeServiceContainerInitializationCompleteMessage(
+                            container, nullptr));
                 } catch (ExecutionException& e) {
+                    container->_init_failure_cause = e.getCause();
                     throw;
                 }
             }
+
 
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
@@ -1266,9 +1318,7 @@ namespace wrench {
                 "run_invocation_" + invocation->_function->getName(),
                 0, 0, lambda_execute, lambda_terminate));
 
-        auto custom_message = new ServerlessComputeServiceInvocationExecutionCompleteMessage(
-            action,
-            invocation, 0);
+        auto custom_message = new ServerlessComputeServiceInvocationExecutionCompleteMessage(action, invocation, 0);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             target_compute_node->hostname,
@@ -1286,8 +1336,9 @@ namespace wrench {
         action_executor->setActionTimeout(invocation->getFunction()->getTimeLimit());
         action_executor->setSimulation(this->simulation_);
 
-        WRENCH_INFO("Dispatched an invocation for function %s",
-                    invocation->getFunction()->getName().c_str());
+        WRENCH_INFO("Dispatched an invocation for [%s] to [%s]",
+                    invocation->getFunction()->getName().c_str(),
+                    target_compute_node->hostname.c_str());
 
         // Start the action executor object
         try {
@@ -1366,7 +1417,7 @@ namespace wrench {
                     this->getMessagePayloadValue(
                         ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
         }
-        for (auto const& inv : _state_of_the_system->_running_invocations) {
+        for (auto const& inv : _state_of_the_system->_dispatched_invocations) {
             inv->_notify_commport->dputMessage(
                 new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                     false,
@@ -1378,7 +1429,7 @@ namespace wrench {
 
         _state_of_the_system->_admitted_invocations.clear();
         _state_of_the_system->_schedulable_invocations.clear();
-        _state_of_the_system->_running_invocations.clear();
+        _state_of_the_system->_dispatched_invocations.clear();
 
         _num_outstanding_invocations = 0;
         _outstanding_invocation_counts.clear();
@@ -1740,12 +1791,19 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLayerCopyToComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<ImageLayer>& layer) {
-        // Sanity checks
+
+        // Sanity check: Is the image layer already there?
         if (compute_node->isImageLayerOnDisk(layer)) {
-            throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLayerCopyToComputeNode(): Being told to copy image layer [" +
-                layer->getName() + "] to node [" + compute_node->hostname +
-                "], but the image layer is already on disk!");
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerCopyToComputeNode(): Being told to copy image layer [%s] to node [%s], but it's already there - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
+        }
+
+        // Sanity check: Is the image layer being copied there?
+        if (_state_of_the_system->_image_layers_being_copied_to_disk.at(compute_node).count(layer) > 0) {
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerCopyToComputeNode(): Being told to copy image layer [%s] to node [%s], but it's already being copied - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
         }
 
         const std::function lambda_terminate = lambda_noop;
@@ -1810,12 +1868,18 @@ namespace wrench {
     void ServerlessComputeService::initiateImageLayerLoadAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<ImageLayer>& layer) {
-        // Sanity check
+        // Sanity check: Is the image layer already there?
         if (compute_node->isImageLayerInRAM(layer)) {
-            throw std::runtime_error(
-                "ServerlessComputeService::initiateImageLoadAtComputeNode(): Being told to load image layer [" +
-                layer->getName() + "] at node [" + compute_node->hostname +
-                "], but the image layer is already in RAM!");
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerLoadAtComputeNode(): Being told to load image layer [%s] at node [%s], but it's already loaded - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
+        }
+
+        // Sanity check: Is the image layer being loaded there?
+        if (_state_of_the_system->_image_layers_being_loaded_in_ram.at(compute_node).count(layer) > 0) {
+            WRENCH_INFO("ServerlessComputeService::initiateImageLayerLoadAtComputeNode(): Being told to load image layer [%s] to node [%s], but it's already being loaded - ignoring",
+                layer->getName().c_str(), compute_node->hostname.c_str());
+            return;
         }
 
         // Initiate an asynchronous action that simply read the image file from disk
@@ -1910,22 +1974,21 @@ namespace wrench {
     void ServerlessComputeService::prewarmContainerAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& compute_node,
         const std::shared_ptr<Function>& function) {
-        // TODO: to implement
-
         // Check that pre-warming can even do anything
         double idle_timeout = this->getPropertyValueAsTimeInSecond(
             ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
         if (idle_timeout <= 0.0) {
             WRENCH_INFO(
-                "Ignoring container pre-warm scheduling decision because the CONTAINER_IDLE_TIMEOUT value is set to 0.0")
-;
+                "Ignoring container pre-warm scheduling decision because the "
+                "CONTAINER_IDLE_TIMEOUT value is set to 0.0");
             return;
         }
 
-        // Check that there is one slot available (which will be freed as soon as the container idles)
-        if (compute_node->_num_free_slots == 0) {
-            WRENCH_INFO("Couldn't pre-warm container for function %s at node %s because no slot is available",
-                        function->getName().c_str(), compute_node->hostname.c_str());
+        // Check that limits are ok
+        if (compute_node->isAtPerNodeContainerLimit()) {
+            WRENCH_INFO(
+                "Couldn't pre-warm container for function %s at node %s because we've reached the number of containers limit",
+                function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
 
@@ -1952,7 +2015,7 @@ namespace wrench {
         // At this point, we can start the container
         std::shared_ptr<Container> container;
         try {
-            container = compute_node->spawnContainer(function.get(), true);
+            container = compute_node->spawnContainer(function.get());
         } catch (ExecutionException& e) {
             WRENCH_INFO("Couldn't pre-warm a container for function %s at node %s: %s",
                         function->getName().c_str(),
@@ -1961,19 +2024,20 @@ namespace wrench {
             return;
         }
 
-        // Update the slot count of the compute node
-        compute_node->_num_free_slots -= 1;
-
         // The prewarm runs the initialization step!
-        const std::function initialization_code = [container, function
-            ](const std::shared_ptr<ActionExecutor>& action_executor) {
+        const std::function initialization_code = [container, function]
+        (const std::shared_ptr<ActionExecutor>& action_executor) {
             auto private_storage_service = container->getPrivateStorageService();
-            try {
-                function->_initialization_code(private_storage_service);
-            } catch (ExecutionException& e) {
-                throw;
+            if (not container->_initialized) {
+                // Invoke the user's initialization function
+                try {
+                    function->_initialization_code(private_storage_service);
+                    container->_initialized = true;
+                } catch (ExecutionException& e) {
+                    container->_init_failure_cause = e.getCause();
+                    throw;
+                }
             }
-            container->_initialized = true;
         };
         const std::function noop = [](const std::shared_ptr<ActionExecutor>& action_executor) {
         };
@@ -1983,7 +2047,7 @@ namespace wrench {
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction("run_invocation_noop", 0, 0, initialization_code, noop));
 
-        auto custom_message = new ServerlessComputeServiceContainerPrewarmCompleteMessage(container, action);
+        auto custom_message = new ServerlessComputeServiceContainerInitializationCompleteMessage(container, action);
 
         const auto action_executor = std::make_shared<ActionExecutor>(
             compute_node->hostname, 1, 0,

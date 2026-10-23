@@ -34,7 +34,7 @@ namespace wrench {
         [[nodiscard]] bool isDispatched() const;
         [[nodiscard]] bool isDone() const;
         [[nodiscard]] bool hasSucceeded() const;
-        [[nodiscard]] bool wasHoststart() const;
+        [[nodiscard]] bool wasHotStart() const;
         [[nodiscard]] std::shared_ptr<Function> getFunction() const;
         [[nodiscard]] std::shared_ptr<FailureCause> getFailureCause() const;
         [[nodiscard]] std::shared_ptr<FunctionOutput> getOutput() const;
@@ -55,6 +55,7 @@ namespace wrench {
     private:
         friend class FunctionManager;
         friend class ServerlessComputeService;
+        friend class ServerlessComputeNode;
 
         const std::shared_ptr<Function> _function; // the function to be invoked
         std::shared_ptr<FunctionInput> _function_input; // the input for the function

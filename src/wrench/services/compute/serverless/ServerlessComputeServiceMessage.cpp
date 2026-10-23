@@ -218,7 +218,8 @@ namespace wrench {
      */
     ServerlessComputeServiceContainerPrewarmCompleteMessage::ServerlessComputeServiceContainerPrewarmCompleteMessage(
         std::shared_ptr<Container> container,
-        std::shared_ptr<Action> action) : ServerlessComputeServiceMessage(0), _container(std::move(container)), _action(std::move(action)) {
+        std::shared_ptr<Action> action) : ServerlessComputeServiceMessage(0), _container(std::move(container)),
+                                          _action(std::move(action)) {
     }
 
     /**
@@ -235,5 +236,16 @@ namespace wrench {
     ServerlessComputeServiceNodesActivatedMessage::ServerlessComputeServiceNodesActivatedMessage(
         std::vector<std::shared_ptr<ServerlessComputeNode>> nodes) : ServerlessComputeServiceMessage(0),
                                                                      _nodes(std::move(nodes)) {
+    }
+
+    /**
+     * @brief Constructor
+     * @param container The container
+     * @param init_action The init action (or nullptr)
+     */
+    ServerlessComputeServiceContainerInitializationCompleteMessage::ServerlessComputeServiceContainerInitializationCompleteMessage(
+        std::shared_ptr<Container> container, std::shared_ptr<Action> init_action) : ServerlessComputeServiceMessage(0),
+        _container(std::move(container)),
+        _init_action(std::move(init_action)) {
     }
 } // namespace wrench

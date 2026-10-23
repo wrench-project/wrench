@@ -216,7 +216,7 @@ void ServerlessNodeActivationTest::do_BasicTest_test() {
         "ServerlessHeadNode", "/", compute_nodes,
         std::make_shared<wrench::GreedyServerlessScheduler>(),
         {
-            {wrench::ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "2"},
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "2"},
             {wrench::ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "10000ms"},
             {wrench::ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED, "false"},
         }, {}));

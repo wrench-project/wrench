@@ -43,8 +43,14 @@ namespace wrench {
     	/** @brief The number of compute nodes in the process of being activated */
     	unsigned long _num_being_activated_compute_nodes;
 
-	    /** @brief Map of slot availability */
-        std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _slots_available;
+    	/** @brief Number of possible new invocations that could be started on compute node */
+    	std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_invocations_on_compute_node;
+
+    	/** @brief Number of possible new containers that could be started on compute node */
+    	std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_containers_on_compute_node;
+
+    	/** @brief Number of possible new invocations that could be started on a current container */
+    	std::map<std::shared_ptr<Container>, unsigned long> _num_possible_new_invocations_on_container;
 
         /** @brief Map of RAM availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _ram_available;
@@ -52,14 +58,11 @@ namespace wrench {
         /** @brief Map of disk availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _disk_available;
 
-	    /** @brief Map of idle containers */
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _idle_containers;
+	    /** @brief Map of initializing containers */
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _initializing_containers;
 
-        /** @brief Map of running containers */
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _busy_containers;
-
-    	/** @brief Map of pre-warming containers */
-    	std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _prewarming_containers;
+        /** @brief Map of initialized containers */
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _initialized_containers;
 
 	    /** @brief Map of on-disk image layers */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_disk;
@@ -77,11 +80,13 @@ namespace wrench {
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _protected_layers;
 
         // HELPER FUNCTIONS
-        bool areAllImageLayersInRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool areAllImageLayersInRAMOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool areAllImageLayersOnDiskOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool areAllImageLayersOnDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        bool areAllImageLayersOnDiskOrOnTheirWayToDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool areAllImageLayersInRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool areAllImageLayersInRAMOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool areAllImageLayersOnDiskOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool areAllImageLayersOnDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+        [[nodiscard]] bool areAllImageLayersOnDiskOrOnTheirWayToDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+
+    	[[nodiscard]] std::set<std::shared_ptr<Container>> getIdleContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
     };
 
         /***********************/

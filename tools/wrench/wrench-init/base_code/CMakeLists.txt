@@ -3,6 +3,11 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 
 project(my-wrench-simulator CXX)
 
+# Make Release the default build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 # Disable annoying warnings
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 #add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")

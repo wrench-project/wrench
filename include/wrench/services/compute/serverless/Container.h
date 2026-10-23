@@ -21,6 +21,7 @@ namespace wrench {
     class ServerlessComputeNode;
     class Invocation;
     class StorageService;
+    class FailureCause;
 
     /***********************/
     /** \cond INTERNAL    **/
@@ -37,15 +38,16 @@ namespace wrench {
 	 * @brief Enum to describe a container's state
 	 */
         enum class State {
-            BUSY,
-            IDLE,
-            PREWARMING
+            INITIALIZING,
+            INITIALIZED,
         };
 
         [[nodiscard]] unsigned long getCreationId() const;
-        [[nodiscard]] bool isIdle() const;
-        [[nodiscard]] bool isBusy() const;
-        [[nodiscard]] bool isPrewarming() const;
+        [[nodiscard]] unsigned long getNumInflightInvocations() const;
+        [[nodiscard]] unsigned long getMaxNumInflightInvocations() const;
+        [[nodiscard]] bool isInitializing() const;
+        [[nodiscard]] bool isInitialized() const;
+        [[nodiscard]] bool isAtInvocationLimit() const;
         [[nodiscard]] unsigned long getIdleSequence() const;
         [[nodiscard]] double getIdleDate() const;
         [[nodiscard]] double getExpirationDate() const;
@@ -75,6 +77,9 @@ namespace wrench {
         const ServerlessComputeNode *_compute_node;
         const ServerlessComputeService* _serverless_compute_service;
         State _state;
+        std::shared_ptr<FailureCause> _init_failure_cause;
+
+        std::set<std::shared_ptr<Invocation>> _in_flight_invocations;
 
         std::shared_ptr<FileLocation> _tmp_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_file;
@@ -85,6 +90,8 @@ namespace wrench {
 
         std::shared_ptr<FileLocation> _tmp_ram_file_location;
         std::shared_ptr<simgrid::fsmod::File> _opened_tmp_ram_file;
+
+        unsigned long _max_num_in_flight_invocations;
 
         static unsigned long _creation_id_counter;
         unsigned long _creation_id; // to break ties

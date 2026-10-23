@@ -20,7 +20,6 @@ namespace wrench {
                 return std::make_tuple(a->getSubmitDate(), a->getId()) <
                     std::make_tuple(b->getSubmitDate(), b->getId());
             });
-        return;
     }
 
 }

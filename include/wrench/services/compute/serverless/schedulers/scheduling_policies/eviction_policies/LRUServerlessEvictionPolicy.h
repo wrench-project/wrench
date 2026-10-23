@@ -30,19 +30,22 @@ namespace wrench {
         std::set<std::shared_ptr<Container>> pickIdleContainersForEviction(
             const std::set<std::shared_ptr<Container>>& idle_containers,
             sg_size_t& ram_space_to_free_up,
-            sg_size_t& disk_space_to_free_up) override;
+            sg_size_t& disk_space_to_free_up,
+            unsigned long min_num_to_evict) override;
 
         std::set<std::shared_ptr<ImageLayer>> pickImageLayersForRAMEviction(
             const std::shared_ptr<ServerlessComputeNode>& node,
             const std::set<std::shared_ptr<ImageLayer>>& layers,
             sg_size_t& ram_space_to_free_up,
-            sg_size_t& disk_space_to_free_up) override;
+            sg_size_t& disk_space_to_free_up,
+            unsigned long min_num_to_evict) override;
 
         std::set<std::shared_ptr<ImageLayer>> pickImageLayersForDiskEviction(
             const std::shared_ptr<ServerlessComputeNode>& node,
             const std::set<std::shared_ptr<ImageLayer>>& layers,
             sg_size_t& ram_space_to_free_up,
-            sg_size_t& disk_space_to_free_up) override;
+            sg_size_t& disk_space_to_free_up,
+            unsigned long min_num_to_evict) override;
     };
 }
 

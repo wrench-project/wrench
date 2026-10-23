@@ -17,12 +17,13 @@ namespace wrench {
     class ServerlessComputeNode;
 
     /**
-     * @brief A serverless scheduling node activation policy that activates one node each time no free container slot is available
+     * @brief A serverless scheduling node activation policy that activates one node each time no new invocation
+     *        could be placed anywhere
      */
-    class ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy : public ServerlessNodeActivationPolicy {
+    class ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy : public ServerlessNodeActivationPolicy {
     public:
 
-        ~ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy() override = default;
+        ~ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy() override = default;
 
         unsigned long selectNumNodesToActivate(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
 

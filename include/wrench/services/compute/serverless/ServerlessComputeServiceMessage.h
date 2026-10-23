@@ -256,6 +256,19 @@ namespace wrench {
         std::vector<std::shared_ptr<ServerlessComputeNode>> _nodes;
     };
 
+    /**
+     * @brief a message sent to a ServerlessComputeService to notify that some container has finished/failed initializing
+     */
+    class ServerlessComputeServiceContainerInitializationCompleteMessage : public ServerlessComputeServiceMessage {
+    public:
+        ServerlessComputeServiceContainerInitializationCompleteMessage(
+            std::shared_ptr<Container> container, std::shared_ptr<Action> init_action);
+        /** @brief The container */
+        std::shared_ptr<Container> _container;
+        /** @brief The init action (or nullptr) */
+        std::shared_ptr<Action> _init_action;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

@@ -130,16 +130,24 @@ protected:
                 decisions->invocation_dispatches.push_back({inv, compute_node});
                 break;
             case 7:
-                break;
             case 8:
-                decisions->container_prewarms.push_back({function, compute_node});
                 break;
             case 9:
+                decisions->container_prewarms.push_back({function, compute_node});
                 break;
             case 10:
-                container = *(state->getActivatedComputeNodes().front()->getIdleContainers().begin());
-                decisions->invocation_dispatches.push_back({inv, compute_node, container});
                 break;
+            case 11:
+                {
+                    auto node = *(state->getActivatedComputeNodes().front());
+                    auto containers = node.getInitializedContainers();
+                    container = *(containers.begin());
+                    if (container->getNumInflightInvocations() != 0) {
+                        throw std::runtime_error("Invocation count not zero");
+                    }
+                    decisions->invocation_dispatches.push_back({inv, compute_node, container});
+                    break;
+                }
             default:
                 break;
             }

@@ -19,12 +19,13 @@ namespace {
             const std::set<std::shared_ptr<T>>& candidates,
             sg_size_t& ram_space_to_free_up,
             sg_size_t& disk_space_to_free_up,
+            unsigned long min_num_to_evict,
             GetRAM get_ram,
             GetDisk get_disk,
             GetId get_id) {
             std::set<std::shared_ptr<T>> to_evict;
 
-            if (ram_space_to_free_up == 0 && disk_space_to_free_up == 0) {
+            if (ram_space_to_free_up == 0 && disk_space_to_free_up == 0 && min_num_to_evict == 0) {
                 return to_evict;
             }
 
@@ -51,7 +52,7 @@ namespace {
             // TODO: Below is a heuristic. Dynamic programming could likely get us something better,
             // TODO: since it all resembles a knapsack, etc. totally overkill most likely.
             while (!remaining.empty() &&
-                (ram_space_to_free_up != 0 || disk_space_to_free_up != 0)) {
+                (ram_space_to_free_up != 0 || disk_space_to_free_up != 0 || min_num_to_evict != 0)) {
                 // Prefer the first sufficient candidate in the ascending ordering.
                 // If none suffices, take the last (largest) remaining candidate.
                 auto victim = remaining.end() - 1;
@@ -79,6 +80,11 @@ namespace {
                         ? 0
                         : disk_space_to_free_up - disk_freed;
 
+                min_num_to_evict =
+                    min_num_to_evict > 0
+                        ? min_num_to_evict -1
+                        : 0;
+
                 remaining.erase(victim);
             }
 
@@ -91,16 +97,19 @@ namespace {
     * @param idle_containers List of (idle) containers to sort
     * @param ram_space_to_free_up Amount of RAM to free up
     * @param disk_space_to_free_up Amount of disk to free up
+    * @param min_num_to_evict The minimum number of container to evict
     * @return A sorted list of (idle) containers
     */
     std::set<std::shared_ptr<Container>> FewestServerlessEvictionPolicy::pickIdleContainersForEviction(
         const std::set<std::shared_ptr<Container>>& idle_containers,
         sg_size_t& ram_space_to_free_up,
-        sg_size_t& disk_space_to_free_up) {
+        sg_size_t& disk_space_to_free_up,
+        unsigned long min_num_to_evict) {
     return pickVictimsFewest(
         idle_containers,
         ram_space_to_free_up,
         disk_space_to_free_up,
+        min_num_to_evict,
         [](const auto& container) {
             return container->getFunction()->getRAMSpaceLimit();
         },
@@ -118,6 +127,7 @@ namespace {
      * @param layers candidate victim layers
      * @param ram_space_to_free_up Amount of RAM to free up
      * @param disk_space_to_free_up Amount of disk to free up
+     * @param min_num_to_evict Minimum number of containers to evict
      * @return
     */
     std::set<std::shared_ptr<ImageLayer>>
@@ -125,7 +135,8 @@ namespace {
         const std::shared_ptr<ServerlessComputeNode>& node,
         const std::set<std::shared_ptr<ImageLayer>>& layers,
         sg_size_t& ram_space_to_free_up,
-        sg_size_t& disk_space_to_free_up) {
+        sg_size_t& disk_space_to_free_up,
+        unsigned long min_num_to_evict) {
     // RAM eviction neither requires nor frees disk space.
     sg_size_t ignored_disk_deficit = 0;
 
@@ -133,6 +144,7 @@ namespace {
         layers,
         ram_space_to_free_up,
         ignored_disk_deficit,
+        min_num_to_evict,
         [](const auto& layer) {
             return layer->getRAMFootprint();
         },
@@ -150,13 +162,15 @@ namespace {
      * @param layers candidate victim layers
      * @param ram_space_to_free_up Amount of Disk to free up
      * @param disk_space_to_free_up Amount of disk to free up
+     * @param min_num_to_evict Minimum number of containers to evict
      * @return
      */
     std::set<std::shared_ptr<ImageLayer>> FewestServerlessEvictionPolicy::pickImageLayersForDiskEviction(
         const std::shared_ptr<ServerlessComputeNode>& node,
         const std::set<std::shared_ptr<ImageLayer>>& layers,
         sg_size_t& ram_space_to_free_up,
-        sg_size_t& disk_space_to_free_up) {
+        sg_size_t& disk_space_to_free_up,
+        unsigned long min_num_to_evict) {
     // Any prerequisite RAM eviction is accounted for by makeEvictionPlan().
     sg_size_t ignored_ram_deficit = 0;
 
@@ -164,6 +178,7 @@ namespace {
         layers,
         ignored_ram_deficit,
         disk_space_to_free_up,
+        min_num_to_evict,
         [](const auto&) -> sg_size_t {
             return 0;
         },

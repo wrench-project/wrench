@@ -30,7 +30,9 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
             {ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED, "true"},
             {ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "0s"},
-            {ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE, "0"},
+            {ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "0"},
+            {ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE, "0"},
+            {ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER, "1"},
             {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS, "infinity"},
             {ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION, "infinity"},
             {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0s"},
@@ -186,9 +188,19 @@ namespace wrench {
         void processInvocationCompletion(const std::shared_ptr<Invocation>& invocation,
                                          const std::shared_ptr<Action>& action);
 
-        void processPrewarmCompletion(const std::shared_ptr<Container>& container, std::shared_ptr<Action> init_action);
+        // void processPrewarmCompletion(const std::shared_ptr<Container>& container, std::shared_ptr<Action> init_action);
 
         void processContainerIdleTimeout(const std::shared_ptr<Container>& container, std::uint64_t idle_sequence);
+
+        void processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
+                                                      const std::shared_ptr<Action>& init_action);
+
+        void processNodeCopyCompletion(const std::shared_ptr<ImageLayer>& layer,
+            const std::shared_ptr<ServerlessComputeNode>& node,
+            const std::shared_ptr<Action>& action);
+        void processNodeLoadCompletion(const std::shared_ptr<ImageLayer>& layer,
+            const std::shared_ptr<ServerlessComputeNode>& node,
+            const std::shared_ptr<Action>& action);
 
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
