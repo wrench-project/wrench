@@ -337,18 +337,18 @@ namespace wrench {
 
         scheduling_state->_disk_available.erase(node);
         scheduling_state->_ram_available.erase(node);
-        scheduling_state->_initialized_containers.erase(node);
         scheduling_state->_image_layers_on_disk.erase(node);
         scheduling_state->_image_layers_on_their_way_to_disk.erase(node);
         scheduling_state->_image_layers_in_ram.erase(node);
         scheduling_state->_image_layers_on_their_way_to_ram.erase(node);
         scheduling_state->_protected_layers.erase(node);
 
+        scheduling_state->_initializing_containers.erase(node);
         for (const auto& container :
              scheduling_state->_initialized_containers.at(node)) {
             scheduling_state->_num_possible_new_invocations_on_container.erase(container);
         }
-        scheduling_state->_initializing_containers.erase(node);
+        scheduling_state->_initialized_containers.erase(node);
 
         scheduling_state->_num_possible_new_invocations_on_compute_node.erase(node);
         scheduling_state->_num_possible_new_containers_on_compute_node.erase(node);
