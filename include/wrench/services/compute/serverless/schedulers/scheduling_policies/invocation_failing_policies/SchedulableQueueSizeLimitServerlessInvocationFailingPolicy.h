@@ -16,7 +16,7 @@ namespace wrench {
     class SchedulableQueueSizeLimitServerlessInvocationFailingPolicy : public ServerlessInvocationFailingPolicy {
     public:
 
-        SchedulableQueueSizeLimitServerlessInvocationFailingPolicy(unsigned long queue_limit);
+        explicit SchedulableQueueSizeLimitServerlessInvocationFailingPolicy(unsigned long queue_limit);
 
         ~SchedulableQueueSizeLimitServerlessInvocationFailingPolicy() override = default;
 

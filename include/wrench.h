@@ -36,7 +36,7 @@
 #include "wrench/services/compute/serverless/ServerlessComputeService.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ServerlessNodeActivationPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ServerlessNodeScalingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/ServerlessInvocationOrderingPolicy.h"

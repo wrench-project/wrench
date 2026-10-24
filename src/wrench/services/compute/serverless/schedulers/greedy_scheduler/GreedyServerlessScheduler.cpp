@@ -177,7 +177,7 @@ namespace wrench {
      *   - Node selection policy: SelectAllPossibleServerlessNodeSelectionPolicy
      *   - Eviction policy: FewestServerlessEvictionPolicy
      *   - Plan selection policy: EvictionAverseServerlessPlanSelectionPolicy
-     *   - Node activation policy: ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy
+     *   - Node scaling policy: ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy
      *   - Container prewarm policy: NeverPrewarmServerlessContainerPrewarmPolicy
      *   - Invocation failing policy: NeverFailServerlessInvocationFailingPolicy
      */
@@ -186,7 +186,7 @@ namespace wrench {
         _node_selection_policy = std::make_shared<SelectAllPossibleServerlessNodeSelectionPolicy>();
         _eviction_policy = std::make_shared<FewestServerlessEvictionPolicy>();
         _plan_selection_policy = std::make_shared<EvictionAverseServerlessPlanSelectionPolicy>();
-        _node_activation_policy = std::make_shared<ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy>();
+        _node_scaling_policy = std::make_shared<ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy>();
         _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
         _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
         _reusable_container_selection_policy = std::make_shared<
@@ -197,8 +197,8 @@ namespace wrench {
      * @brief Get the scheduler's node activation policy
      * @return the policy
      */
-    ServerlessNodeActivationPolicy* GreedyServerlessScheduler::getNodeActivationPolicy() const {
-        return _node_activation_policy.get();
+    ServerlessNodeScalingPolicy* GreedyServerlessScheduler::getNodeScalingPolicy() const {
+        return _node_scaling_policy.get();
     }
 
     /**
@@ -261,8 +261,8 @@ namespace wrench {
      * @brief Policy setter
      * @param policy A node activation policy (at your own risk once the simulation has started)
      */
-    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy) {
-        _node_activation_policy = std::move(policy);
+    void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessNodeScalingPolicy> policy) {
+        _node_scaling_policy = std::move(policy);
     }
 
     /**
@@ -319,6 +319,39 @@ namespace wrench {
      */
     void GreedyServerlessScheduler::setPolicy(std::shared_ptr<ServerlessReusableContainerSelectionPolicy> policy) {
         _reusable_container_selection_policy = std::move(policy);
+    }
+
+
+    void GreedyServerlessScheduler::excludeNodeFromPlanning(
+        const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+
+        auto& active_nodes = scheduling_state->_activated_compute_nodes;
+        const auto node_it =
+            std::find(active_nodes.begin(), active_nodes.end(), node);
+        if (node_it == active_nodes.end()) {
+            return;
+        }
+        active_nodes.erase(node_it);
+        scheduling_state->_num_deactivated_compute_nodes += 1;
+
+        scheduling_state->_disk_available.erase(node);
+        scheduling_state->_ram_available.erase(node);
+        scheduling_state->_initializing_containers.erase(node);
+        scheduling_state->_initialized_containers.erase(node);
+        scheduling_state->_image_layers_on_disk.erase(node);
+        scheduling_state->_image_layers_on_their_way_to_disk.erase(node);
+        scheduling_state->_image_layers_in_ram.erase(node);
+        scheduling_state->_image_layers_on_their_way_to_ram.erase(node);
+        scheduling_state->_protected_layers.erase(node);
+
+        for (const auto& container :
+             scheduling_state->_initialized_containers.at(node)) {
+            scheduling_state->_num_possible_new_invocations_on_container.erase(container);
+        }
+
+        scheduling_state->_num_possible_new_invocations_on_compute_node.erase(node);
+        scheduling_state->_num_possible_new_containers_on_compute_node.erase(node);
     }
 
 
@@ -381,10 +414,18 @@ namespace wrench {
 
 
         // Invoke the node activation policy
-        auto num_nodes_to_activate = _node_activation_policy->selectNumNodesToActivate(scheduling_state);
+        auto [num_nodes_to_activate, nodes_to_deactivate] = _node_scaling_policy->makeNodeScalingPlan(scheduling_state);
+        // Implement node activations
         if (num_nodes_to_activate) {
             decisions->compute_node_activations.push_back({num_nodes_to_activate});
         }
+
+        // Implement node de-activations and update the bookkeeping
+        for (auto const& node : nodes_to_deactivate) {
+            decisions->compute_node_deactivations.push_back({node});
+            excludeNodeFromPlanning(scheduling_state, node);
+        }
+
 
         // Sort the schedulable invocations in place
         _invocation_ordering_policy->sortSchedulableInvocations(scheduling_state);
@@ -502,7 +543,7 @@ namespace wrench {
             _node_selection_policy,
             _eviction_policy,
             _plan_selection_policy,
-            _node_activation_policy,
+            _node_scaling_policy,
             _container_prewarm_policy,
             _invocation_failing_policy,
             _reusable_container_selection_policy

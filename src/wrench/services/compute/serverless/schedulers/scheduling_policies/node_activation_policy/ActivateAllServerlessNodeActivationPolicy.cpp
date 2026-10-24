@@ -8,8 +8,9 @@ namespace wrench {
     * @param scheduling_state the scheduling state
     * @return a set of compute nodes
     */
-    unsigned long ActivateAllServerlessNodeActivationPolicy::selectNumNodesToActivate(
+    std::pair<unsigned long, std::set<std::shared_ptr<ServerlessComputeNode>>> ActivateAllServerlessNodeActivationPolicy::makeNodeScalingPlan(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
-        return scheduling_state->_num_deactivated_compute_nodes;
+        std::set<std::shared_ptr<ServerlessComputeNode>> none = {};
+        return {scheduling_state->_num_deactivated_compute_nodes, none};
     }
 }

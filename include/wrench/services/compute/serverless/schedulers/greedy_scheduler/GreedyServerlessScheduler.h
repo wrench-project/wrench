@@ -13,7 +13,7 @@ namespace wrench {
     class ServerlessEvictionPolicy;
     class ServerlessNodeSelectionPolicy;
     class ServerlessSchedulingState;
-    class ServerlessNodeActivationPolicy;
+    class ServerlessNodeScalingPolicy;
     class ServerlessInvocationOrderingPolicy;
 
 
@@ -22,7 +22,7 @@ namespace wrench {
      *        resource reclamation, and image-preparation planning.
      *
      * @details
-     * This scheduler combines policies for invocation failure, worker activation,
+     * This scheduler combines policies for invocation failure, node activation/deactivation,
      * invocation ordering, node eligibility, reusable-container selection,
      * eviction, plan selection, and prewarming. Default implementations are
      * installed by the constructor and can be replaced with setPolicy().
@@ -38,8 +38,10 @@ namespace wrench {
      *
      * 1. Records the failure policy's decisions and removes those invocations
      *    from the local worklist.
-     * 2. Requests the number of additional workers selected by the activation
-     *    policy. Requested workers do not become usable within this round.
+     * 2. Obtains the node-scaling policy's activation and deactivation requests.
+     *    Nodes selected for deactivation are excluded from subsequent planning
+     *    in this round. Requested activations do not become usable until the
+     *    compute service processes their completion.
      * 3. Orders the surviving worklist in place using the ordering policy.
      * 4. Considers each invocation, selects a dispatch or image-preparation plan
      *    when possible, and applies the selected plan's accounting changes to
@@ -171,7 +173,7 @@ namespace wrench {
 
         GreedyServerlessScheduler();
 
-        [[nodiscard]] ServerlessNodeActivationPolicy* getNodeActivationPolicy() const;
+        [[nodiscard]] ServerlessNodeScalingPolicy* getNodeScalingPolicy() const;
         [[nodiscard]] ServerlessInvocationOrderingPolicy* getInvocationOrderingPolicy() const;
         [[nodiscard]] ServerlessNodeSelectionPolicy* getNodeSelectionPolicy() const;
         [[nodiscard]] ServerlessEvictionPolicy* getEvictionPolicy() const;
@@ -180,7 +182,7 @@ namespace wrench {
         [[nodiscard]] ServerlessInvocationFailingPolicy* getInvocationFailingPolicy() const;
         [[nodiscard]] ServerlessReusableContainerSelectionPolicy* getReusableContainerSelectionPolicy() const;
 
-         void setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessNodeScalingPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationOrderingPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessNodeSelectionPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessEvictionPolicy> policy);
@@ -215,7 +217,7 @@ namespace wrench {
 
 
         /** @brief The node activation policy **/
-        std::shared_ptr<ServerlessNodeActivationPolicy> _node_activation_policy;
+        std::shared_ptr<ServerlessNodeScalingPolicy> _node_scaling_policy;
 	    /** @brief The invocation ordering policy **/
         std::shared_ptr<ServerlessInvocationOrderingPolicy> _invocation_ordering_policy;
         /** @brief The node selection policy **/
@@ -230,6 +232,11 @@ namespace wrench {
         std::shared_ptr<ServerlessInvocationFailingPolicy> _invocation_failing_policy;
         /** @brief The reusable container selection policy **/
         std::shared_ptr<ServerlessReusableContainerSelectionPolicy> _reusable_container_selection_policy;
+
+
+    private:
+        void excludeNodeFromPlanning(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
+            const std::shared_ptr<ServerlessComputeNode>& node);
 
         /***********************/
         /** \endcond          **/

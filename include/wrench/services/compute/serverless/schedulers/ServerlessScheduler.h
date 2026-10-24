@@ -15,13 +15,23 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A structure to encode a compute node activations decision
+     * @brief A structure to encode a compute node activation decision
      */
     struct ActivateComputeNodes {
 	/**
 	 * @brief The number of compute nodes to activate
 	 */
         unsigned long num_compute_nodes;
+    };
+
+    /**
+     * @brief A structure to encode a compute node deactivation decision
+     */
+    struct DeactivateComputeNodes {
+        /**
+         * @brief The compute node to deactivate
+         */
+        std::shared_ptr<ServerlessComputeNode> compute_node;
     };
 
     /**
@@ -147,6 +157,8 @@ namespace wrench {
     public:
         /** @brief The list of compute node activations  */
         std::vector<ActivateComputeNodes> compute_node_activations;
+        /** @brief The list of compute node deactivations  */
+        std::vector<DeactivateComputeNodes> compute_node_deactivations;
         /** @brief The list of invocations to fail  */
         std::vector<FailInvocation> invocation_fails;
         /** @brief The list of idle container terminations  */
@@ -172,6 +184,7 @@ namespace wrench {
          */
         void print() {
             if (compute_node_activations.empty() and
+                compute_node_deactivations.empty() and
                 invocation_fails.empty() and
                 idle_container_terminations.empty() and
                 layer_evictions_from_ram.empty() and
@@ -187,6 +200,9 @@ namespace wrench {
             std::cerr << "** SCHEDULING DECISIONS **" << std::endl;
             for (const auto& [num_compute_nodes] : compute_node_activations) {
                 std::cerr << "  Compute node activations: " << num_compute_nodes <<  " compute nodes activated" << std::endl;
+            }
+            for (const auto& [node] : compute_node_deactivations) {
+                std::cerr << "  Compute node deactivation: " << node->hostname << std::endl;
             }
             for (const auto& [invocation] : invocation_fails) {
                 std::cerr << "  Forceful invocation fail: for function " << invocation->getFunction()->getName() << std::endl;
@@ -234,6 +250,7 @@ namespace wrench {
         /**
          * @brief Given the list of schedulable invocations and the current system state, decide:
          *   - how many compute nodes to activate
+         *   - which compute nodes to deactivate
          *   - which invocations to forcefully fail
          *   - which idle containers to terminate
          *   - which layers to evict from RAM

@@ -450,6 +450,8 @@ namespace wrench {
 
                 // Activate compute nodes, if any
                 activateComputeNodes(decisions->compute_node_activations);
+                // Deactivate compute nodes, if any
+                deactivateComputeNodes(decisions->compute_node_deactivations);
                 // Fail invocations if any
                 failInvocations(decisions->invocation_fails);
                 // Terminate idle containers if any
@@ -1694,6 +1696,78 @@ namespace wrench {
                                                 new ServerlessComputeServiceNodesActivatedMessage(to_activate),
                                                 "nodes_activated");
         _node_activation_alarms.insert(alarm);
+    }
+
+    /**
+     * @brief Helper method to initiate compute node deactivations
+     * @param decisions
+     */
+    void ServerlessComputeService::deactivateComputeNodes(const std::vector<DeactivateComputeNodes>& decisions) {
+
+        for (const auto& [node] : decisions) {
+
+            const bool active = std::find(_state_of_the_system->_activated_compute_nodes.begin(),
+                _state_of_the_system->_activated_compute_nodes.end(), node) != _state_of_the_system->_activated_compute_nodes.end();
+
+            if (not active) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but node is not activated - ignoring", node->hostname.c_str());
+                continue;
+            }
+
+            if (!_state_of_the_system->_image_layers_being_copied_to_disk.at(node).empty() ||
+                !_state_of_the_system->_image_layers_being_loaded_in_ram.at(node).empty()) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but a layers are being copied/loaded on that node", node->hostname.c_str());
+                continue;
+            }
+
+            if (not node->getInitializingContainers().empty()) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but a container is initializing on that node - ignoring", node->hostname.c_str());
+                continue;
+            }
+            bool in_flight_invocations = false;
+            for (auto &container : node->getInitializedContainers()) {
+                if (container->getNumInflightInvocations() > 0) {
+                    in_flight_invocations = true;
+                    break;
+                }
+            }
+            if (in_flight_invocations) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but some invocation is running on that node - ignoring", node->hostname.c_str());
+                continue;
+            }
+
+            // Shutdown all containers
+            while (!node->getInitializedContainers().empty()) {
+                // Copy the shared_ptr: shutdownContainer() erases its set entry.
+                const auto container = *node->getInitializedContainers().begin();
+                node->shutdownContainer(container);
+            }
+
+            // Remove all the layers from RAM
+            auto& ram_layers = _state_of_the_system->_image_layers_in_ram.at(node);
+            while (!ram_layers.empty()) {
+                // Copy the handle because the eviction helper removes its set entry.
+                const auto layer = *ram_layers.begin();
+                evictLayersFromRAM({{layer, node}});
+            }
+
+            // Remove all the layers from Disk
+            auto& disk_layers = _state_of_the_system->_image_layers_on_disk.at(node);
+            while (!disk_layers.empty()) {
+                const auto layer = *disk_layers.begin();
+                evictLayersFromDisk({{layer, node}});
+            }
+
+            // Update the bookkeeping
+            _state_of_the_system->_activated_compute_nodes.erase(std::remove(_state_of_the_system->_activated_compute_nodes.begin(),
+                _state_of_the_system->_activated_compute_nodes.end(), node), _state_of_the_system->_activated_compute_nodes.end());
+            _state_of_the_system->_deactivated_compute_nodes.push_back(node);
+
+        }
     }
 
     /**
