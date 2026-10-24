@@ -1,5 +1,7 @@
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/SchedulableQueueSizeLimitServerlessInvocationFailingPolicy.h>
 
+#include <stdexcept>
+
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/SchedulableQueueSizeLimitServerlessInvocationFailingPolicy.h>
 #include "wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h"
 
 namespace wrench {
