@@ -322,6 +322,27 @@ namespace wrench {
     }
 
 
+    void GreedyServerlessScheduler::excludeNodeFromPlanning(
+        const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+
+        auto& active_nodes = scheduling_state->_activated_compute_nodes;
+        scheduling_state->_activated_compute_nodes.erase(std::remove(scheduling_state->_activated_compute_nodes.begin(),
+                scheduling_state->_activated_compute_nodes.end(), node), scheduling_state->_activated_compute_nodes.end());
+        scheduling_state->_num_deactivated_compute_nodes += 1;
+
+        scheduling_state->_disk_available.erase(node);
+        scheduling_state->_ram_available.erase(node);
+        scheduling_state->_initializing_containers.erase(node);
+        scheduling_state->_initialized_containers.erase(node);
+        scheduling_state->_image_layers_on_disk.erase(node);
+        scheduling_state->_image_layers_on_their_way_to_disk.erase(node);
+        scheduling_state->_image_layers_in_ram.erase(node);
+        scheduling_state->_image_layers_on_their_way_to_ram.erase(node);
+        scheduling_state->_protected_layers.erase(node);
+    }
+
+
     /**
      * @brief Build one batch of scheduling decisions using a mutable planning
      *        snapshot without modifying the supplied invocation vector.
@@ -386,10 +407,13 @@ namespace wrench {
         if (num_nodes_to_activate) {
             decisions->compute_node_activations.push_back({num_nodes_to_activate});
         }
-        // Implement node de-activations
+
+        // Implement node de-activations and update the bookkeeping
         for (auto const &node : nodes_to_deactivate) {
             decisions->compute_node_deactivations.push_back({node});
+            excludeNodeFromPlanning(scheduling_state, node);
         }
+
 
         // Sort the schedulable invocations in place
         _invocation_ordering_policy->sortSchedulableInvocations(scheduling_state);

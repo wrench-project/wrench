@@ -1705,6 +1705,23 @@ namespace wrench {
     void ServerlessComputeService::deactivateComputeNodes(const std::vector<DeactivateComputeNodes>& decisions) {
 
         for (const auto& [node] : decisions) {
+
+            const bool active = std::find(_state_of_the_system->_activated_compute_nodes.begin(),
+                _state_of_the_system->_activated_compute_nodes.end(), node) != _state_of_the_system->_activated_compute_nodes.end();
+
+            if (not active) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but node is not activated - ignoring", node->hostname.c_str());
+                continue;
+            }
+
+            if (!_state_of_the_system->_image_layers_being_copied_to_disk.at(node).empty() ||
+                !_state_of_the_system->_image_layers_being_loaded_in_ram.at(node).empty()) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but a layers are being copied/loaded on that node", node->hostname.c_str());
+                continue;
+            }
+
             if (not node->getInitializingContainers().empty()) {
                 WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
                             "but a container is initializing on that node - ignoring", node->hostname.c_str());
@@ -1720,17 +1737,37 @@ namespace wrench {
             if (in_flight_invocations) {
                 WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
                             "but some invocation is running on that node - ignoring", node->hostname.c_str());
+                continue;
             }
 
             // Shutdown all containers
-            for (auto &container : node->getInitializedContainers()) {
-                container->shutdown();
-                node->_initialized_containers.erase(container);
+            while (!node->getInitializedContainers().empty()) {
+                // Copy the shared_ptr: shutdownContainer() erases its set entry.
+                const auto container = *node->getInitializedContainers().begin();
+                node->shutdownContainer(container);
             }
+            node->_initialized_containers.clear();
+
+            // Remove all the layers from RAM
+            auto& ram_layers = _state_of_the_system->_image_layers_in_ram.at(node);
+            while (!ram_layers.empty()) {
+                // Copy the handle because the eviction helper removes its set entry.
+                const auto layer = *ram_layers.begin();
+                evictLayersFromRAM({{layer, node}});
+            }
+
+            // Remove all the layers from Disk
+            auto& disk_layers = _state_of_the_system->_image_layers_on_disk.at(node);
+            while (!disk_layers.empty()) {
+                const auto layer = *disk_layers.begin();
+                evictLayersFromDisk({{layer, node}});
+            }
+
             // Update the bookkeeping
             _state_of_the_system->_activated_compute_nodes.erase(std::remove(_state_of_the_system->_activated_compute_nodes.begin(),
                 _state_of_the_system->_activated_compute_nodes.end(), node), _state_of_the_system->_activated_compute_nodes.end());
             _state_of_the_system->_deactivated_compute_nodes.push_back(node);
+
         }
     }
 

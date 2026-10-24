@@ -231,6 +231,11 @@ namespace wrench {
         /** @brief The reusable container selection policy **/
         std::shared_ptr<ServerlessReusableContainerSelectionPolicy> _reusable_container_selection_policy;
 
+
+    private:
+        void excludeNodeFromPlanning(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
+            const std::shared_ptr<ServerlessComputeNode>& node);
+
         /***********************/
         /** \endcond          **/
         /***********************/
