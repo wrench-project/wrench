@@ -205,6 +205,7 @@ namespace wrench {
         void admitInvocations();
         std::shared_ptr<ServerlessSchedulingDecisions> invokeScheduler() const;
         void activateComputeNodes(const std::vector<ActivateComputeNodes>& decisions);
+        void deactivateComputeNodes(const std::vector<DeactivateComputeNodes>& decisions);
         void failInvocations(const std::vector<FailInvocation>& decisions);
         void terminateIdleContainers(const std::vector<TerminateIdleContainer>& decisions) const;
         void evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const;
@@ -258,6 +259,8 @@ namespace wrench {
         /** \endcond          **/
         /***********************/
     };
+
+
 };
 
 #endif //SERVERLESSCOMPUTESERVICE_H

@@ -450,6 +450,8 @@ namespace wrench {
 
                 // Activate compute nodes, if any
                 activateComputeNodes(decisions->compute_node_activations);
+                // Deactivate compute nodes, if any
+                deactivateComputeNodes(decisions->compute_node_deactivations);
                 // Fail invocations if any
                 failInvocations(decisions->invocation_fails);
                 // Terminate idle containers if any
@@ -1694,6 +1696,42 @@ namespace wrench {
                                                 new ServerlessComputeServiceNodesActivatedMessage(to_activate),
                                                 "nodes_activated");
         _node_activation_alarms.insert(alarm);
+    }
+
+    /**
+     * @brief Helper method to initiate compute node deactivations
+     * @param decisions
+     */
+    void ServerlessComputeService::deactivateComputeNodes(const std::vector<DeactivateComputeNodes>& decisions) {
+
+        for (const auto& [node] : decisions) {
+            if (not node->getInitializingContainers().empty()) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but a container is initializing on that node - ignoring", node->hostname.c_str());
+                continue;
+            }
+            bool in_flight_invocations = false;
+            for (auto &container : node->getInitializedContainers()) {
+                if (container->getNumInflightInvocations() > 0) {
+                    in_flight_invocations = true;
+                    break;
+                }
+            }
+            if (in_flight_invocations) {
+                WRENCH_INFO("Scheduling decision to deactivate compute node %s, "
+                            "but some invocation is running on that node - ignoring", node->hostname.c_str());
+            }
+
+            // Shutdown all containers
+            for (auto &container : node->getInitializedContainers()) {
+                container->shutdown();
+                node->_initialized_containers.erase(container);
+            }
+            // Update the bookkeeping
+            _state_of_the_system->_activated_compute_nodes.erase(std::remove(_state_of_the_system->_activated_compute_nodes.begin(),
+                _state_of_the_system->_activated_compute_nodes.end(), node), _state_of_the_system->_activated_compute_nodes.end());
+            _state_of_the_system->_deactivated_compute_nodes.push_back(node);
+        }
     }
 
     /**

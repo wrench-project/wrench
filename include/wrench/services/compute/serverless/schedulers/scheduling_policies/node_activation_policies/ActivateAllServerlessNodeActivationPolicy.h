@@ -7,7 +7,7 @@
 
 #include <simgrid/forward.h>
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ServerlessNodeActivationPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ServerlessNodeScalingPolicy.h>
 
 
 namespace wrench {
@@ -19,13 +19,14 @@ namespace wrench {
     /**
      * @brief A serverless scheduling node activation policy that activates all compute nodes
      */
-    class ActivateAllServerlessNodeActivationPolicy : public ServerlessNodeActivationPolicy {
+    class ActivateAllServerlessNodeActivationPolicy : public ServerlessNodeScalingPolicy {
     public:
 
         ~ActivateAllServerlessNodeActivationPolicy() override = default;
 
 
-        unsigned long selectNumNodesToActivate(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
+        std::pair<unsigned long, std::set<std::shared_ptr<ServerlessComputeNode>>> makeNodeScalingPlan(
+            const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
 
 };
 

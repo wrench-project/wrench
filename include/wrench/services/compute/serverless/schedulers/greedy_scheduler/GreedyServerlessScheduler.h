@@ -13,7 +13,7 @@ namespace wrench {
     class ServerlessEvictionPolicy;
     class ServerlessNodeSelectionPolicy;
     class ServerlessSchedulingState;
-    class ServerlessNodeActivationPolicy;
+    class ServerlessNodeScalingPolicy;
     class ServerlessInvocationOrderingPolicy;
 
 
@@ -171,7 +171,7 @@ namespace wrench {
 
         GreedyServerlessScheduler();
 
-        [[nodiscard]] ServerlessNodeActivationPolicy* getNodeActivationPolicy() const;
+        [[nodiscard]] ServerlessNodeScalingPolicy* getNodeScalingPolicy() const;
         [[nodiscard]] ServerlessInvocationOrderingPolicy* getInvocationOrderingPolicy() const;
         [[nodiscard]] ServerlessNodeSelectionPolicy* getNodeSelectionPolicy() const;
         [[nodiscard]] ServerlessEvictionPolicy* getEvictionPolicy() const;
@@ -180,7 +180,7 @@ namespace wrench {
         [[nodiscard]] ServerlessInvocationFailingPolicy* getInvocationFailingPolicy() const;
         [[nodiscard]] ServerlessReusableContainerSelectionPolicy* getReusableContainerSelectionPolicy() const;
 
-         void setPolicy(std::shared_ptr<ServerlessNodeActivationPolicy> policy);
+         void setPolicy(std::shared_ptr<ServerlessNodeScalingPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessInvocationOrderingPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessNodeSelectionPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessEvictionPolicy> policy);
@@ -215,7 +215,7 @@ namespace wrench {
 
 
         /** @brief The node activation policy **/
-        std::shared_ptr<ServerlessNodeActivationPolicy> _node_activation_policy;
+        std::shared_ptr<ServerlessNodeScalingPolicy> _node_scaling_policy;
 	    /** @brief The invocation ordering policy **/
         std::shared_ptr<ServerlessInvocationOrderingPolicy> _invocation_ordering_policy;
         /** @brief The node selection policy **/
