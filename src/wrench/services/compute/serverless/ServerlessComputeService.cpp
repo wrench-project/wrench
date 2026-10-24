@@ -1746,7 +1746,6 @@ namespace wrench {
                 const auto container = *node->getInitializedContainers().begin();
                 node->shutdownContainer(container);
             }
-            node->_initialized_containers.clear();
 
             // Remove all the layers from RAM
             auto& ram_layers = _state_of_the_system->_image_layers_in_ram.at(node);

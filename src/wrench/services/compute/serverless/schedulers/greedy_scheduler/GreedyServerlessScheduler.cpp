@@ -327,8 +327,12 @@ namespace wrench {
         const std::shared_ptr<ServerlessComputeNode>& node) {
 
         auto& active_nodes = scheduling_state->_activated_compute_nodes;
-        scheduling_state->_activated_compute_nodes.erase(std::remove(scheduling_state->_activated_compute_nodes.begin(),
-                scheduling_state->_activated_compute_nodes.end(), node), scheduling_state->_activated_compute_nodes.end());
+        const auto node_it =
+            std::find(active_nodes.begin(), active_nodes.end(), node);
+        if (node_it == active_nodes.end()) {
+            return;
+        }
+        active_nodes.erase(node_it);
         scheduling_state->_num_deactivated_compute_nodes += 1;
 
         scheduling_state->_disk_available.erase(node);
@@ -340,6 +344,14 @@ namespace wrench {
         scheduling_state->_image_layers_in_ram.erase(node);
         scheduling_state->_image_layers_on_their_way_to_ram.erase(node);
         scheduling_state->_protected_layers.erase(node);
+
+        for (const auto& container :
+             scheduling_state->_initialized_containers.at(node)) {
+            scheduling_state->_num_possible_new_invocations_on_container.erase(container);
+        }
+
+        scheduling_state->_num_possible_new_invocations_on_compute_node.erase(node);
+        scheduling_state->_num_possible_new_containers_on_compute_node.erase(node);
     }
 
 
@@ -409,7 +421,7 @@ namespace wrench {
         }
 
         // Implement node de-activations and update the bookkeeping
-        for (auto const &node : nodes_to_deactivate) {
+        for (auto const& node : nodes_to_deactivate) {
             decisions->compute_node_deactivations.push_back({node});
             excludeNodeFromPlanning(scheduling_state, node);
         }
