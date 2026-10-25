@@ -347,6 +347,7 @@ namespace wrench {
         for (const auto& container :
              scheduling_state->_initialized_containers.at(node)) {
             scheduling_state->_num_possible_new_invocations_on_container.erase(container);
+            scheduling_state->_num_in_flight_invocations_on_container.erase(container);
         }
         scheduling_state->_initialized_containers.erase(node);
 
@@ -461,6 +462,7 @@ namespace wrench {
                 scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) += 1;
                 scheduling_state->_initialized_containers.at(target_node).erase(container);
                 scheduling_state->_num_possible_new_invocations_on_container.erase(container);
+                scheduling_state->_num_in_flight_invocations_on_container.erase(container);
             }
 
             // Layer evictions from RAM

@@ -13,7 +13,7 @@ namespace wrench {
 
         std::set<std::shared_ptr<ServerlessComputeNode>> none = {};
 
-        bool should_activate_one_node = true;
+        bool should_activate_one_node = not scheduling_state->_schedulable_invocations.empty();
 
         // If no node to activate, nevermind
         if (scheduling_state->_num_deactivated_compute_nodes == 0) {
@@ -36,7 +36,7 @@ namespace wrench {
             }
         }
 
-        std::shared_ptr<ServerlessComputeNode> node_to_deactivate = nullptr;
+        std::set<std::shared_ptr<ServerlessComputeNode>> to_deactivate = {};
         if (not scheduling_state->_schedulable_invocations.empty()) {
             // nevermind
         } else {
@@ -47,33 +47,36 @@ namespace wrench {
                 if (not scheduling_state->_image_layers_on_their_way_to_ram.at(node).empty()) {
                     continue;
                 }
-                if (scheduling_state->_initializing_containers.at(node).empty()) {
+                if (not scheduling_state->_initializing_containers.at(node).empty()) {
                     continue;
                 }
-                bool all_containers_idle = false;
+                bool all_containers_idle = true;
                 for (auto const &container : scheduling_state->_initialized_containers.at(node)) {
                     if (scheduling_state->_num_in_flight_invocations_on_container.at(container) != 0) {
-                        all_containers_idle = true;
+                        all_containers_idle = false;
                         break;
                     }
                 }
                 if (not all_containers_idle) {
                     continue;
                 }
-                node_to_deactivate = node;
-                break;
+                to_deactivate.insert(node);
             }
         }
 
-        if (should_activate_one_node and (node_to_deactivate != nullptr)) {
+        if (should_activate_one_node and (not to_deactivate.empty())) {
             throw std::runtime_error("ReactiveScaleUpScaleDownNodeActivationPolicy(): should not activate and de-active at the same time!");
         }
 
         if (should_activate_one_node) {
-            return {1, none};
-        } else {
-            return {0, {node_to_deactivate}};
+            return {1, {}};
         }
+
+        if (not to_deactivate.empty()) {
+            return {0, to_deactivate};
+        }
+
+        return {0, {}};
 
     }
 }

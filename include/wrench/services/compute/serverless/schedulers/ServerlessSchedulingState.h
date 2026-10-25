@@ -52,7 +52,14 @@ namespace wrench {
     	/** @brief Number of possible new invocations that could be started on a current container */
     	std::map<std::shared_ptr<Container>, unsigned long> _num_possible_new_invocations_on_container;
 
-    	/** @brief Number of in-flight-invocations on container */
+    	/**
+		 * @brief Planned in-flight invocation counts for existing initialized
+		 *        containers. Includes observed invocations and dispatches selected
+		 *        earlier in this scheduling round.
+		 *
+		 * Does not contain initializing containers or containers whose creation
+		 * has only been proposed in this round.
+		 */
     	std::map<std::shared_ptr<Container>, unsigned long> _num_in_flight_invocations_on_container;
 
         /** @brief Map of RAM availability */

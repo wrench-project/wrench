@@ -18,7 +18,7 @@ namespace wrench {
 
     /**
      * @brief A serverless scheduling node activation policy that activates one node each time no new invocation
-     *        could be placed anywhere, and de-active an idle node whenever there are no schedulable invocations
+     *        could be placed anywhere, or de-actives all idle nodes whenever there are no schedulable invocations
      */
     class ReactiveScaleUpScaleDownNodeActivationPolicy : public ServerlessNodeScalingPolicy {
     public:
