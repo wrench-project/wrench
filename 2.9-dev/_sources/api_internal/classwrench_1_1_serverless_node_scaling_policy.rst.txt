@@ -1,0 +1,8 @@
+.. _ServerlessNodeScalingPolicy:
+wrench::ServerlessNodeScalingPolicy
+***********************************
+
+.. doxygenclass:: wrench::ServerlessNodeScalingPolicy
+   :project: internal
+   :members:
+

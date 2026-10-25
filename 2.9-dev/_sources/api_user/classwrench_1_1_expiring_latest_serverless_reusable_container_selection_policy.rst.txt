@@ -1,0 +1,8 @@
+.. _ExpiringLatestServerlessReusableContainerSelectionPolicy:
+wrench::ExpiringLatestServerlessReusableContainerSelectionPolicy
+****************************************************************
+
+.. doxygenclass:: wrench::ExpiringLatestServerlessReusableContainerSelectionPolicy
+   :project: user
+   :members:
+

@@ -60,7 +60,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_all_serverless_node_activation_policy.html">wrench::ActivateAllServerlessNodeActivationPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy.html">wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_new_invocation_possible_node_activation_policy.html">wrench::ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
@@ -84,7 +84,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_eviction_averse_serverless_plan_selection_policy.html">wrench::EvictionAverseServerlessPlanSelectionPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_expiring_latest_serverless_idle_container_selection_policy.html">wrench::ExpiringLatestServerlessIdleContainerSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_expiring_latest_serverless_reusable_container_selection_policy.html">wrench::ExpiringLatestServerlessReusableContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_invocation_ordering_policy.html">wrench::FCFSServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fewest_serverless_eviction_policy.html">wrench::FewestServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
@@ -98,20 +98,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler25GreedyServerlessSchedulerEv"><code class="docutils literal notranslate"><span class="pre">GreedyServerlessScheduler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler25getContainerPrewarmPolicyEv"><code class="docutils literal notranslate"><span class="pre">getContainerPrewarmPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler17getEvictionPolicyEv"><code class="docutils literal notranslate"><span class="pre">getEvictionPolicy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler22getIdleContainerPolicyEv"><code class="docutils literal notranslate"><span class="pre">getIdleContainerPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler26getInvocationFailingPolicyEv"><code class="docutils literal notranslate"><span class="pre">getInvocationFailingPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler27getInvocationOrderingPolicyEv"><code class="docutils literal notranslate"><span class="pre">getInvocationOrderingPolicy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler23getNodeActivationPolicyEv"><code class="docutils literal notranslate"><span class="pre">getNodeActivationPolicy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler20getNodeScalingPolicyEv"><code class="docutils literal notranslate"><span class="pre">getNodeScalingPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler22getNodeSelectionPolicyEv"><code class="docutils literal notranslate"><span class="pre">getNodeSelectionPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler22getPlanSelectionPolicyEv"><code class="docutils literal notranslate"><span class="pre">getPlanSelectionPolicy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler35getReusableContainerSelectionPolicyEv"><code class="docutils literal notranslate"><span class="pre">getReusableContainerSelectionPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI32ServerlessContainerPrewarmPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI24ServerlessEvictionPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI38ServerlessIdleContainerSelectionPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI33ServerlessInvocationFailingPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI34ServerlessInvocationOrderingPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI30ServerlessNodeActivationPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI27ServerlessNodeScalingPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI29ServerlessNodeSelectionPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI29ServerlessPlanSelectionPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI42ServerlessReusableContainerSelectionPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -134,18 +134,19 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_invocation_ordering_policy.html">wrench::RandomServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_plan_selection_policy.html">wrench::RandomServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_schedulable_queue_size_limit_serverless_invocation_failing_policy.html">wrench::SchedulableQueueSizeLimitServerlessInvocationFailingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_select_all_possible_serverless_node_selection_policy.html">wrench::SelectAllPossibleServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_container_prewarm_policy.html">wrench::ServerlessContainerPrewarmPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_idle_container_selection_policy.html">wrench::ServerlessIdleContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_failing_policy.html">wrench::ServerlessInvocationFailingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_scaling_policy.html">wrench::ServerlessNodeScalingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html">wrench::ServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_reusable_container_selection_policy.html">wrench::ServerlessReusableContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduling_policy.html">wrench::ServerlessSchedulingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
@@ -240,70 +241,61 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessSchedulerE">
 <span id="_CPPv3N6wrench25GreedyServerlessSchedulerE"></span><span id="_CPPv2N6wrench25GreedyServerlessSchedulerE"></span><span id="wrench::GreedyServerlessScheduler"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GreedyServerlessScheduler</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../api_internal/classwrench_1_1_serverless_scheduler.html#_CPPv4N6wrench19ServerlessSchedulerE" title="wrench::ServerlessScheduler"><span class="n"><span class="pre">ServerlessScheduler</span></span></a><br /></dt>
-<dd><p>Configurable serverless scheduler with greedy invocation placement and image-preparation planning. </p>
-<p>This scheduler combines replaceable policies within a fixed planning algorithm. Policies control invocation failure, compute-node activation, invocation ordering, node eligibility, resource eviction, plan selection, and container pre-warming. The constructor installs default policies; individual policy categories can be replaced using <a class="reference internal" href="#classwrench_1_1_greedy_serverless_scheduler_1a9fb0134374ccd1faf298fd6f3b5cc047"><span class="std std-ref">setPolicy()</span></a>.</p>
-<p>The algorithm is greedy in how it constructs a plan: invocations are considered sequentially, earlier choices constrain later choices, and accepted choices are not revisited to optimize the batch globally. Replacing a policy changes decisions within this structure, but does not change the ordering of the scheduling phases or the placement passes.</p>
-<p>
-As invocation plans are selected, the scheduler updates tentative slot, RAM, disk, container-availability, and image-layer bookkeeping. Subsequent decisions use this updated planning state rather than independently consuming resources from the original snapshot. The planning state is not a deep copy of the runtime objects and must not be used to modify those objects in place of returning scheduling decisions.<dl class="simple">
-<dt><strong>Planning state</strong></dt><dd><p>Each call to schedule() creates a fresh ServerlessSchedulingState containing a mutable invocation worklist and resource-planning data. The worklist copies shared pointers, not <a class="reference internal" href="classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> objects. Filtering and ordering it therefore do not modify the compute service’s invocation collection.</p>
-</dd>
-</dl>
-</p>
+<dd><p>Policy-configurable serverless scheduler with greedy placement, resource reclamation, and image-preparation planning. </p>
+<p>This scheduler combines policies for invocation failure, node activation/deactivation, invocation ordering, node eligibility, reusable-container selection, eviction, plan selection, and prewarming. Default implementations are installed by the constructor and can be replaced with <a class="reference internal" href="#classwrench_1_1_greedy_serverless_scheduler_1a10fb62049974354a98e87ce71607ab46"><span class="std std-ref">setPolicy()</span></a>.</p>
+<p>Policies operate within a fixed orchestration and placement algorithm. Invocations are considered sequentially; each selected plan changes the working resources available to later invocations. Earlier choices are not revisited to optimize the complete batch. Policy replacement therefore does not change the precedence of the scheduling phases or placement passes.</p>
 <p><ol class="loweralpha simple">
-<li><p>Invoke the invocation-failing policy. Record its failure decisions and remove the selected invocations from the working invocation list, so subsequent policies do not plan work for them.</p></li>
-<li><p>Invoke the node-activation policy and record the requested number of additional compute nodes. Requested activations do not add usable capacity to the current planning state; the compute service handles activation and its completion separately.</p></li>
-<li><p>Invoke the invocation-ordering policy to reorder the remaining invocation worklist in place.</p></li>
-<li><p>Consider invocations in that order. For each invocation, attempt to select a compute node and an execution or image-preparation plan. Record the selected decisions and update the planning state. If no node is selected, leave the invocation pending and consider the next invocation. Stop this phase when all planning slots have been claimed. <a class="reference internal" href="classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> ordering is therefore a consideration order, not a strict head-of-line blocking discipline.</p></li>
-<li><p>Invoke the container-prewarming policy using the post-placement planning state, and append its requests to the returned decisions. This gives current invocations and their preparation plans precedence over new prewarming requests within this scheduling round.</p></li>
-<li><p>Query every installed policy’s getNextWakeupDate() and return the earliest requested date, unless all policies return DBL_MAX.</p></li>
+<li><p>Records the failure policy’s decisions and removes those invocations from the local worklist.</p></li>
+<li><p>Obtains the node-scaling policy’s activation and deactivation requests. Nodes selected for deactivation are excluded from subsequent planning in this round. Requested activations do not become usable until the compute service processes their completion.</p></li>
+<li><p>Orders the surviving worklist in place using the ordering policy.</p></li>
+<li><p>Considers each invocation, selects a dispatch or image-preparation plan when possible, and applies the selected plan’s accounting changes to the working state. An invocation for which no plan is selected remains pending; it does not prevent consideration of later invocations.</p></li>
+<li><p>Evaluates prewarming against the post-placement working state and appends the resulting container-creation requests.</p></li>
+<li><p>Collects the installed policies’ requested wakeup dates.</p></li>
 </ol>
 <dl class="simple">
-<dt><strong>Scheduling phases</strong></dt><dd><p>A scheduling round proceeds in the following order:</p>
+<dt><strong>Scheduling round</strong></dt><dd><p>Each schedule() call constructs a fresh ServerlessSchedulingState and:</p>
 </dd>
 </dl>
 </p>
-<p>Failure selection, activation, ordering, prewarming, and wakeup collection are outside the invocation-placement loop. An empty invocation worklist or a lack of available slots does not skip these phases. Node selection, eviction, and plan selection are invoked as needed during placement.</p>
-<p>
-Candidate nodes are examined in the following sequence of passes:<dl class="simple">
-<dt><strong>Invocation placement</strong></dt><dd><p>For each invocation, the node-selection policy supplies an eligibility set, not a preference ranking. The scheduler considers only selected nodes that are already activated and have an available planning slot, preserving their order in the planning state’s activated-node collection.</p>
-</dd>
-</dl>
-</p>
+<p>Failure selection, worker activation, ordering, prewarming, and wakeup collection are outside the per-invocation placement loop. They are evaluated even when the worklist is empty. Node selection, reusable-container selection, eviction, and plan selection are evaluated as placement needs them. <a class="reference internal" href="classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> ordering is not strict head-of-line blocking.</p>
 <p><ol class="loweralpha simple">
-<li><p>Reuse an idle container associated with the same <a class="reference internal" href="classwrench_1_1_function.html#classwrench_1_1_function"><span class="std std-ref">Function</span></a>.</p></li>
-<li><p>Plan creation of a new container where all required layers are already resident on disk and in RAM, with resource reclamation if necessary.</p></li>
-<li><p>Wait for RAM preparation where every required layer is either resident in RAM or already on its way there.</p></li>
-<li><p>Plan the missing RAM loads where all required layers are on disk, with resource reclamation if necessary.</p></li>
-<li><p>Wait for disk preparation where every required layer is either on disk or already on its way there.</p></li>
-<li><p>Plan the missing disk copies, with resource reclamation if necessary.</p></li>
+<li><p>Ask the reusable-container policy for an initialized, compatible container with remaining invocation capacity. The container need not be idle: an occupied container may accept more work up to its limit.</p></li>
+<li><p>Construct cold-dispatch alternatives on nodes where every required image layer is resident on disk and in RAM. Reclamation may be needed for private RAM, private disk space, or a container position.</p></li>
+<li><p>Select the first node where some required RAM residency is still missing, but every missing layer is already being loaded.</p></li>
+<li><p>Construct alternatives that initiate the remaining RAM loads on nodes where every required layer is already on disk.</p></li>
+<li><p>Select the first node where some required disk residency is still missing, but every missing layer is already being copied.</p></li>
+<li><p>Construct alternatives that initiate the remaining disk copies.</p></li>
 </ol>
-</p>
-<p>The first pass that selects a node determines the invocation’s plan. The warm-reuse pass delegates container selection to the idle-container-selection policy. The wait-for-preparation passes select the first qualifying node without selecting a container. The new-container, RAM-load, and disk-copy passes generate candidate plans and delegate their selection to the plan-selection policy. That policy compares alternatives within those passes; it does not override the pass ordering or compare every possible action across all readiness levels.</p>
-<p>When reclamation is necessary, the planner considers idle-container termination, then RAM-layer eviction, then disk-layer eviction. The eviction policy selects victims from the eligible candidates. Layers needed by retained containers, current preparation, or earlier selected plans are excluded as appropriate.</p>
-<p>
-Such a slot claim applies only to this scheduling round. It is not a compute-service reservation or a persistent invocation-to-node binding. A later round constructs a new planning state from the observed system.<dl class="simple">
-<dt><strong>Tentative reservations and asynchronous preparation</strong></dt><dd><p>Selecting a target node claims one slot in the planning state, even when the invocation cannot yet be dispatched because image preparation is pending. Its required image layers are also protected against subsequent eviction planning on that node.</p>
+<dl class="simple">
+<dt><strong>Placement precedence</strong></dt><dd><p>For an invocation, the node-selection policy supplies an eligibility set, not a ranking. The scheduler retains selected, already-activated nodes with remaining node-wide invocation capacity, preserving their traversal order. It then tries these passes in order:</p>
 </dd>
 </dl>
 </p>
-<p>Requested copies and loads are recorded as in progress, not as completed. Starting preparation therefore does not make an invocation immediately dispatchable. Likewise, a RAM-load or disk-copy plan is not a reservation of every resource that a future container may require. Later rounds reassess placement and resource feasibility after the system changes.</p>
+<p>The first pass that selects a node determines the outcome for this invocation. The plan-selection policy compares alternatives within the cold-dispatch, RAM-load, and disk-copy passes; it does not compare plans across readiness levels or override the reusable-container decision.</p>
 <p>
-The prewarming policy is responsible for returning requests that collectively fit the remaining slot, RAM, and disk budgets on activated nodes. All required image layers must already be resident on disk and in RAM in the supplied planning state. Layers merely being copied or loaded do not satisfy this requirement.<dl class="simple">
-<dt><strong>Prewarming policy contract</strong></dt><dd><p>Prewarming uses the resources left by invocation planning, including its tentative reservations for invocations awaiting image preparation.</p>
+The working state distinguishes three count constraints: remaining invocations per node, remaining container positions per node, and remaining invocations per existing initialized container. These counts are separate from RAM/disk availability and physical CPU capacity.<dl class="simple">
+<dt><strong>Working state and capacity accounting</strong></dt><dd><p>The worklist is a copy of invocation references, not <a class="reference internal" href="classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> objects. Filtering and ordering it do not change the service’s pending collection. Runtime containers and invocations remain shared objects; planning must not mutate them to simulate application of a returned decision.</p>
 </dd>
 </dl>
 </p>
-<p>This phase does not generate additional eviction, copy, or load plans to make a proposed prewarm feasible. The returned requests are appended without another resource-planning pass. Each request denotes creation of one additional container; repeated requests for the same function/node pair denote distinct container creations and must be budgeted accordingly.</p>
-<p>Prewarming is lower priority only when constructing the current batch. Once started by the service, a prewarm occupies resources and may affect invocations arriving in later scheduling rounds.</p>
+<p>A selected dispatch consumes one unit of node invocation capacity. Reuse also consumes one unit of the existing container’s invocation capacity. Cold dispatch instead consumes a container position and its private RAM and disk allocations. A selected idle-container termination returns its private resources and container position and removes the container from the working collection. Selected transfers reserve their destination space and mark their layers as in progress, not resident.</p>
+<p>Alternative plans are evaluated before committing their changes to the working state. Only the chosen alternative’s changes constrain subsequent placement. This bookkeeping is local to the round: it is not a persistent service-side reservation or invocation-to-node binding.</p>
+<p>In particular, selecting a node to wait for image preparation does not consume invocation capacity or reserve a future container position. It protects the invocation’s required layers on that node for the remainder of this round but emits no operation. Starting a transfer likewise does not reserve all resources needed for a later container. Future rounds reassess feasibility from the observed system state.</p>
 <p>
-Wakeup dates are collected after the scheduling phases, so they reflect policy evaluations performed during this call. If all policies return DBL_MAX, scheduler_wakeup_date is left unset. Wakeups supplement ordinary event-driven scheduling; they do not postpone the decisions returned now or commit operations to be performed unconditionally at a future date.<dl class="simple">
-<dt><strong>Wakeup requests</strong></dt><dd><p>Policy wakeup dates are absolute simulated dates. DBL_MAX means that a policy requests no timer-driven scheduling round. Other dates must be finite and strictly in the future. Policies are responsible for maintaining their deadlines, including retiring deadlines that have been handled.</p>
+Layers needed by the invocation, earlier chosen plans, ongoing transfers, or containers retained by the tentative plan are excluded as appropriate. Evicting a disk layer also requires removal of its RAM copy when present. Reclamation is feasible only if it satisfies the required byte deficits and frees enough container positions.<dl class="simple">
+<dt><strong>Reclamation</strong></dt><dd><p>Reclamation considers idle containers first, then RAM layers, then disk layers. The eviction policy selects victims from eligible candidates. Required resources are compared with currently available resources to obtain deficits; needing one new container does not necessarily require terminating an existing container. Only container termination can free a container position; layer eviction addresses byte deficits.</p>
 </dd>
 </dl>
 </p>
 <p>
-Policies that require a different orchestration or placement structure can be implemented through another ServerlessScheduler subclass.<dl class="simple">
-<dt><strong>Decision execution</strong></dt><dd><p>schedule() constructs a batch of intentions; it does not execute the requested operations or wait for their completion. <a class="reference internal" href="classwrench_1_1_serverless_compute_service.html#classwrench_1_1_serverless_compute_service"><span class="std std-ref">ServerlessComputeService</span></a> applies the batch in its own decision-processing order and checks whether individual operations can be performed. The batch is not an atomic transaction, and tentative planning reservations are not service-side guarantees.</p>
+The scheduler appends the proposals and accounts for their container positions; it does not perform another RAM/disk planning pass over them. Each proposal creates one environment, so repeated function/node pairs request distinct containers. Prewarming has no assigned client invocation and does not consume invocation-concurrency capacity, but retains its container resources. Its lower precedence applies to this scheduling round, not to requests that arrive after prewarming has started.<dl class="simple">
+<dt><strong>Prewarming</strong></dt><dd><p>Prewarming is considered after current requests and their image-preparation plans. The policy must select a jointly feasible batch using the remaining container positions, RAM, and disk, with required layers already resident on activated workers. This phase does not plan additional evictions or transfers to make its proposals feasible.</p>
+</dd>
+</dl>
+</p>
+<p>
+The result describes operations for <a class="reference internal" href="classwrench_1_1_serverless_compute_service.html#classwrench_1_1_serverless_compute_service"><span class="std std-ref">ServerlessComputeService</span></a> to apply. schedule() neither executes them nor waits for completion. The service applies decision categories in its own order and performs its runtime checks. The batch is not an atomic transaction. Dependencies on operation completion are handled through later scheduling rounds, not by assuming that a requested copy, load, initialization, or activation is complete.<dl class="simple">
+<dt><strong>Wakeups and execution</strong></dt><dd><p>After policy evaluation, the scheduler takes the minimum reported wakeup date. DBL_MAX means no request; if all policies return it, the output’s optional wakeup date remains unset. Other dates must be finite absolute simulated dates strictly later than the current time. Deadlines are validated (i.e., an exception is thrown if stale), when taking the minimum.</p>
 </dd>
 </dl>
 </p>
@@ -326,20 +318,20 @@ Policies that require a different orchestration or placement structure can be im
 </p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The post-placement planning state is not a complete projected runtime state. In particular, the invocation worklist still includes invocations selected for dispatch, and planned new containers have not been materialized as Container objects. Policies must not interpret the worklist size as the number of invocations left without a dispatch plan, or the container collections as a complete post-execution inventory.</p>
+<p>The working state is not a complete projected runtime state. The invocation worklist still contains requests selected for dispatch, and newly planned containers do not yet exist as selectable Container objects. Policies must not infer the undispatched backlog from worklist size alone or treat the container collections as a complete post-batch inventory.</p>
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessScheduler25GreedyServerlessSchedulerEv">
 <span id="_CPPv3N6wrench25GreedyServerlessScheduler25GreedyServerlessSchedulerEv"></span><span id="_CPPv2N6wrench25GreedyServerlessScheduler25GreedyServerlessSchedulerEv"></span><span id="wrench::GreedyServerlessScheduler::GreedyServerlessScheduler"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a43e425f9a86ca8fd951fb22e51efd375"></span><span class="sig-name descname"><span class="n"><span class="pre">GreedyServerlessScheduler</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Constructor. Creates a greedy scheduling with the following default policies (use <a class="reference internal" href="#classwrench_1_1_greedy_serverless_scheduler_1a9fb0134374ccd1faf298fd6f3b5cc047"><span class="std std-ref">setPolicy()</span></a> to change them): </p>
+<dd><p>Constructor. Creates a greedy scheduling with the following default policies (use <a class="reference internal" href="#classwrench_1_1_greedy_serverless_scheduler_1a10fb62049974354a98e87ce71607ab46"><span class="std std-ref">setPolicy()</span></a> to change them): </p>
 <p><ul class="simple">
 <li><p><a class="reference internal" href="classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> ordering policy: <a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_invocation_ordering_policy.html#classwrench_1_1_f_c_f_s_serverless_invocation_ordering_policy"><span class="std std-ref">FCFSServerlessInvocationOrderingPolicy</span></a></p></li>
 <li><p>Node selection policy: <a class="reference internal" href="classwrench_1_1_select_all_possible_serverless_node_selection_policy.html#classwrench_1_1_select_all_possible_serverless_node_selection_policy"><span class="std std-ref">SelectAllPossibleServerlessNodeSelectionPolicy</span></a></p></li>
 <li><p>Eviction policy: <a class="reference internal" href="classwrench_1_1_fewest_serverless_eviction_policy.html#classwrench_1_1_fewest_serverless_eviction_policy"><span class="std std-ref">FewestServerlessEvictionPolicy</span></a></p></li>
 <li><p>Plan selection policy: <a class="reference internal" href="classwrench_1_1_eviction_averse_serverless_plan_selection_policy.html#classwrench_1_1_eviction_averse_serverless_plan_selection_policy"><span class="std std-ref">EvictionAverseServerlessPlanSelectionPolicy</span></a></p></li>
-<li><p>Node activation policy: <a class="reference internal" href="classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy.html#classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy"><span class="std std-ref">ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</span></a></p></li>
+<li><p>Node scaling policy: ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</p></li>
 <li><p>Container prewarm policy: <a class="reference internal" href="classwrench_1_1_never_prewarm_serverless_container_prewarm_policy.html#classwrench_1_1_never_prewarm_serverless_container_prewarm_policy"><span class="std std-ref">NeverPrewarmServerlessContainerPrewarmPolicy</span></a></p></li>
 <li><p><a class="reference internal" href="classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> failing policy: <a class="reference internal" href="classwrench_1_1_never_fail_serverless_invocation_failing_policy.html#classwrench_1_1_never_fail_serverless_invocation_failing_policy"><span class="std std-ref">NeverFailServerlessInvocationFailingPolicy</span></a></p></li>
 </ul>
@@ -361,17 +353,6 @@ Policies that require a different orchestration or placement structure can be im
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench25GreedyServerlessScheduler17getEvictionPolicyEv">
 <span id="_CPPv3NK6wrench25GreedyServerlessScheduler17getEvictionPolicyEv"></span><span id="_CPPv2NK6wrench25GreedyServerlessScheduler17getEvictionPolicyEv"></span><span id="wrench::GreedyServerlessScheduler::getEvictionPolicyC"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1ab775ef35df90d03b88cd5c70e629b3e5"></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_eviction_policy.html#_CPPv4N6wrench24ServerlessEvictionPolicyE" title="wrench::ServerlessEvictionPolicy"><span class="n"><span class="pre">ServerlessEvictionPolicy</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getEvictionPolicy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Get the scheduler’s eviction policy. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the policy </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench25GreedyServerlessScheduler22getIdleContainerPolicyEv">
-<span id="_CPPv3NK6wrench25GreedyServerlessScheduler22getIdleContainerPolicyEv"></span><span id="_CPPv2NK6wrench25GreedyServerlessScheduler22getIdleContainerPolicyEv"></span><span id="wrench::GreedyServerlessScheduler::getIdleContainerPolicyC"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1ad871a11b13d4905d2bdbfd8efc48b912"></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_idle_container_selection_policy.html#_CPPv4N6wrench38ServerlessIdleContainerSelectionPolicyE" title="wrench::ServerlessIdleContainerSelectionPolicy"><span class="n"><span class="pre">ServerlessIdleContainerSelectionPolicy</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getIdleContainerPolicy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
-<dd><p>Get the scheduler’s idle container selection policy. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the policy </p>
@@ -402,8 +383,8 @@ Policies that require a different orchestration or placement structure can be im
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK6wrench25GreedyServerlessScheduler23getNodeActivationPolicyEv">
-<span id="_CPPv3NK6wrench25GreedyServerlessScheduler23getNodeActivationPolicyEv"></span><span id="_CPPv2NK6wrench25GreedyServerlessScheduler23getNodeActivationPolicyEv"></span><span id="wrench::GreedyServerlessScheduler::getNodeActivationPolicyC"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a73db4e94b6df8d6c030b19cba8262345"></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_node_activation_policy.html#_CPPv4N6wrench30ServerlessNodeActivationPolicyE" title="wrench::ServerlessNodeActivationPolicy"><span class="n"><span class="pre">ServerlessNodeActivationPolicy</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getNodeActivationPolicy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench25GreedyServerlessScheduler20getNodeScalingPolicyEv">
+<span id="_CPPv3NK6wrench25GreedyServerlessScheduler20getNodeScalingPolicyEv"></span><span id="_CPPv2NK6wrench25GreedyServerlessScheduler20getNodeScalingPolicyEv"></span><span id="wrench::GreedyServerlessScheduler::getNodeScalingPolicyC"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a397e301f7f6021bfb2d270127a41e233"></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_node_scaling_policy.html#_CPPv4N6wrench27ServerlessNodeScalingPolicyE" title="wrench::ServerlessNodeScalingPolicy"><span class="n"><span class="pre">ServerlessNodeScalingPolicy</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getNodeScalingPolicy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
 <dd><p>Get the scheduler’s node activation policy. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -435,6 +416,17 @@ Policies that require a different orchestration or placement structure can be im
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench25GreedyServerlessScheduler35getReusableContainerSelectionPolicyEv">
+<span id="_CPPv3NK6wrench25GreedyServerlessScheduler35getReusableContainerSelectionPolicyEv"></span><span id="_CPPv2NK6wrench25GreedyServerlessScheduler35getReusableContainerSelectionPolicyEv"></span><span id="wrench::GreedyServerlessScheduler::getReusableContainerSelectionPolicyC"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a5d464fba3551568c948ff3602fab339a"></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_reusable_container_selection_policy.html#_CPPv4N6wrench42ServerlessReusableContainerSelectionPolicyE" title="wrench::ServerlessReusableContainerSelectionPolicy"><span class="n"><span class="pre">ServerlessReusableContainerSelectionPolicy</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getReusableContainerSelectionPolicy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Get the scheduler’s idle container selection policy. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the policy </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI32ServerlessContainerPrewarmPolicyEE">
 <span id="_CPPv3N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI32ServerlessContainerPrewarmPolicyEE"></span><span id="_CPPv2N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI32ServerlessContainerPrewarmPolicyEE"></span><span id="wrench::GreedyServerlessScheduler::setPolicy__std::shared_ptr:ServerlessContainerPrewarmPolicy:"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1ab129ac9aa9aadd5229d999a502115a4f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPolicy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_container_prewarm_policy.html#_CPPv4N6wrench32ServerlessContainerPrewarmPolicyE" title="wrench::ServerlessContainerPrewarmPolicy"><span class="n"><span class="pre">ServerlessContainerPrewarmPolicy</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">policy</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Policy setter. </p>
@@ -452,17 +444,6 @@ Policies that require a different orchestration or placement structure can be im
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>policy</strong> – A serverless eviction policy (at your own risk once the simulation has started) </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI38ServerlessIdleContainerSelectionPolicyEE">
-<span id="_CPPv3N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI38ServerlessIdleContainerSelectionPolicyEE"></span><span id="_CPPv2N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI38ServerlessIdleContainerSelectionPolicyEE"></span><span id="wrench::GreedyServerlessScheduler::setPolicy__std::shared_ptr:ServerlessIdleContainerSelectionPolicy:"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a1ef5896f363f674c0aefdcca9c31d0a2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPolicy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_idle_container_selection_policy.html#_CPPv4N6wrench38ServerlessIdleContainerSelectionPolicyE" title="wrench::ServerlessIdleContainerSelectionPolicy"><span class="n"><span class="pre">ServerlessIdleContainerSelectionPolicy</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">policy</span></span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Policy setter. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>policy</strong> – An idle container selection policy (at your own risk once the simulation has started) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -490,8 +471,8 @@ Policies that require a different orchestration or placement structure can be im
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI30ServerlessNodeActivationPolicyEE">
-<span id="_CPPv3N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI30ServerlessNodeActivationPolicyEE"></span><span id="_CPPv2N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI30ServerlessNodeActivationPolicyEE"></span><span id="wrench::GreedyServerlessScheduler::setPolicy__std::shared_ptr:ServerlessNodeActivationPolicy:"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a9fb0134374ccd1faf298fd6f3b5cc047"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPolicy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_node_activation_policy.html#_CPPv4N6wrench30ServerlessNodeActivationPolicyE" title="wrench::ServerlessNodeActivationPolicy"><span class="n"><span class="pre">ServerlessNodeActivationPolicy</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">policy</span></span><span class="sig-paren">)</span><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI27ServerlessNodeScalingPolicyEE">
+<span id="_CPPv3N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI27ServerlessNodeScalingPolicyEE"></span><span id="_CPPv2N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI27ServerlessNodeScalingPolicyEE"></span><span id="wrench::GreedyServerlessScheduler::setPolicy__std::shared_ptr:ServerlessNodeScalingPolicy:"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a10fb62049974354a98e87ce71607ab46"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPolicy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_node_scaling_policy.html#_CPPv4N6wrench27ServerlessNodeScalingPolicyE" title="wrench::ServerlessNodeScalingPolicy"><span class="n"><span class="pre">ServerlessNodeScalingPolicy</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">policy</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Policy setter. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -518,6 +499,17 @@ Policies that require a different orchestration or placement structure can be im
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>policy</strong> – A plan selection policy (at your own risk once the simulation has started) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI42ServerlessReusableContainerSelectionPolicyEE">
+<span id="_CPPv3N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI42ServerlessReusableContainerSelectionPolicyEE"></span><span id="_CPPv2N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI42ServerlessReusableContainerSelectionPolicyEE"></span><span id="wrench::GreedyServerlessScheduler::setPolicy__std::shared_ptr:ServerlessReusableContainerSelectionPolicy:"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a686eb0583e48ca373998dddd758bf7e2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setPolicy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_serverless_reusable_container_selection_policy.html#_CPPv4N6wrench42ServerlessReusableContainerSelectionPolicyE" title="wrench::ServerlessReusableContainerSelectionPolicy"><span class="n"><span class="pre">ServerlessReusableContainerSelectionPolicy</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">policy</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Policy setter. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>policy</strong> – A reusable container selection policy (at your own risk once the simulation has started) </p>
 </dd>
 </dl>
 </dd></dl>

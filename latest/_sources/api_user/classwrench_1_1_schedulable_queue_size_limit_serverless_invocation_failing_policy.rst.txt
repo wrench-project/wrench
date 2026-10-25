@@ -1,0 +1,8 @@
+.. _SchedulableQueueSizeLimitServerlessInvocationFailingPolicy:
+wrench::SchedulableQueueSizeLimitServerlessInvocationFailingPolicy
+******************************************************************
+
+.. doxygenclass:: wrench::SchedulableQueueSizeLimitServerlessInvocationFailingPolicy
+   :project: user
+   :members:
+

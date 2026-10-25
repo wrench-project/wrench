@@ -60,7 +60,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../api_user.html">WRENCH User C++ API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_all_serverless_node_activation_policy.html">wrench::ActivateAllServerlessNodeActivationPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_free_slot_serverless_node_activation_policy.html">wrench::ActivateOneWhenNoFreeSlotServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_new_invocation_possible_node_activation_policy.html">wrench::ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bandwidth_meter_service.html">wrench::BandwidthMeterService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_bare_metal_compute_service.html">wrench::BareMetalComputeService</a></li>
@@ -84,7 +84,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_data_file.html">wrench::DataFile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_energy_meter_service.html">wrench::EnergyMeterService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_eviction_averse_serverless_plan_selection_policy.html">wrench::EvictionAverseServerlessPlanSelectionPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_expiring_latest_serverless_idle_container_selection_policy.html">wrench::ExpiringLatestServerlessIdleContainerSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_expiring_latest_serverless_reusable_container_selection_policy.html">wrench::ExpiringLatestServerlessReusableContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_f_c_f_s_serverless_invocation_ordering_policy.html">wrench::FCFSServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_fewest_serverless_eviction_policy.html">wrench::FewestServerlessEvictionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_file_registry_service.html">wrench::FileRegistryService</a></li>
@@ -112,6 +112,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_invocation_ordering_policy.html">wrench::RandomServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_plan_selection_policy.html">wrench::RandomServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_schedulable_queue_size_limit_serverless_invocation_failing_policy.html">wrench::SchedulableQueueSizeLimitServerlessInvocationFailingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_select_all_possible_serverless_node_selection_policy.html">wrench::SelectAllPossibleServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service.html">wrench::ServerlessComputeService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
@@ -122,9 +123,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">INVOCATION_PROCESSING_OVERHEAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty44MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINERE"><code class="docutils literal notranslate"><span class="pre">MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty39MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODEE"><code class="docutils literal notranslate"><span class="pre">MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty27MAX_NUM_CONTAINERS_PER_NODEE"><code class="docutils literal notranslate"><span class="pre">MAX_NUM_CONTAINERS_PER_NODE</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty27MAX_OUTSTANDING_INVOCATIONSE"><code class="docutils literal notranslate"><span class="pre">MAX_OUTSTANDING_INVOCATIONS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE"><code class="docutils literal notranslate"><span class="pre">MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty36NUM_CONTAINER_SLOTS_PER_COMPUTE_NODEE"><code class="docutils literal notranslate"><span class="pre">NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty31SIMULATE_REMOTE_IMAGE_DOWNLOADSE"><code class="docutils literal notranslate"><span class="pre">SIMULATE_REMOTE_IMAGE_DOWNLOADS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE"><code class="docutils literal notranslate"><span class="pre">STORAGE_SERVICES_BUFFER_SIZE</span></code></a></li>
 </ul>
@@ -133,12 +136,12 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_container_prewarm_policy.html">wrench::ServerlessContainerPrewarmPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_eviction_policy.html">wrench::ServerlessEvictionPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_idle_container_selection_policy.html">wrench::ServerlessIdleContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_failing_policy.html">wrench::ServerlessInvocationFailingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_invocation_ordering_policy.html">wrench::ServerlessInvocationOrderingPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_activation_policy.html">wrench::ServerlessNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_scaling_policy.html">wrench::ServerlessNodeScalingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_node_selection_policy.html">wrench::ServerlessNodeSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_plan_selection_policy.html">wrench::ServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_reusable_container_selection_policy.html">wrench::ServerlessReusableContainerSelectionPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_scheduling_policy.html">wrench::ServerlessSchedulingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service.html">wrench::Service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_service_message_payload.html">wrench::ServiceMessagePayload</a></li>
@@ -267,21 +270,33 @@
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty44MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINERE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty44MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINERE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty44MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINERE"></span><span id="wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1af9ee9e61c7b076224fab268c070f11af"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER</span></span></span><br /></dt>
+<dd><p>The maximum number of function executions that can execute concurrently in a container (default value: 1) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty39MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODEE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty39MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODEE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty39MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODEE"></span><span id="wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a2d804da1ebbe0dfda0a1ada3c9bbb5e1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE</span></span></span><br /></dt>
+<dd><p>The maximum number of function executions that can be started/running per compute node (default value: “0”, which means: same as number of cores per compute node) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty27MAX_NUM_CONTAINERS_PER_NODEE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty27MAX_NUM_CONTAINERS_PER_NODEE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty27MAX_NUM_CONTAINERS_PER_NODEE"></span><span id="wrench::ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a2fc93699e967bc8fbf9f57ab67c6fd72"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_NUM_CONTAINERS_PER_NODE</span></span></span><br /></dt>
+<dd><p>The maximum number of containers that can be starting/running/idling per compute node (default value: “0”, which means: same as number of cores per compute node) </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty27MAX_OUTSTANDING_INVOCATIONSE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty27MAX_OUTSTANDING_INVOCATIONSE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty27MAX_OUTSTANDING_INVOCATIONSE"></span><span id="wrench::ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a9db934fac657c79dacfc314ce50eda14"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_OUTSTANDING_INVOCATIONS</span></span></span><br /></dt>
-<dd><p>The maximum number of outstanding invocations, i.e., invocations that have not yet completed or failed, including those waiting for image preparation or execution. (default value: “infinity”) </p>
+<dd><p>The maximum number of outstanding invocations, i.e., invocations that have not yet completed or failed, including those waiting for image preparation or execution. (must be &gt; 0; default value: “infinity”) </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE"></span><span id="wrench::ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a8ade8b52626790b58d98a79887d9dfad"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION</span></span></span><br /></dt>
 <dd><p>The maximum number of outstanding per-function invocations, i.e., invocations that have not yet completed or failed, including those waiting for image preparation or execution for a particular function. (default value: “infinity”) </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty36NUM_CONTAINER_SLOTS_PER_COMPUTE_NODEE">
-<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty36NUM_CONTAINER_SLOTS_PER_COMPUTE_NODEE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty36NUM_CONTAINER_SLOTS_PER_COMPUTE_NODEE"></span><span id="wrench::ServerlessComputeServiceProperty::NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a6a817e4141a93a6a17c5de94f1fa5266"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_CONTAINER_SLOTS_PER_COMPUTE_NODE</span></span></span><br /></dt>
-<dd><p>The maximum number of containers that can be started/running per compute node (default value: same as number of cores per compute node) </p>
 </dd></dl>
 
 <dl class="cpp var">

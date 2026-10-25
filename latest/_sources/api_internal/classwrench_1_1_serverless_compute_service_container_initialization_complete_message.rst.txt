@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceContainerInitializationCompleteMessage:
+wrench::ServerlessComputeServiceContainerInitializationCompleteMessage
+**********************************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceContainerInitializationCompleteMessage
+   :project: internal
+   :members:
+

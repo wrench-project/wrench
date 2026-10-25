@@ -1,0 +1,8 @@
+.. _ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy:
+wrench::ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy
+******************************************************************
+
+.. doxygenclass:: wrench::ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy
+   :project: developer
+   :members:
+
