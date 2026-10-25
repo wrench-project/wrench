@@ -52,6 +52,9 @@ namespace wrench {
     	/** @brief Number of possible new invocations that could be started on a current container */
     	std::map<std::shared_ptr<Container>, unsigned long> _num_possible_new_invocations_on_container;
 
+    	/** @brief Number of in-flight-invocations on container */
+    	std::map<std::shared_ptr<Container>, unsigned long> _num_in_flight_invocations_on_container;
+
         /** @brief Map of RAM availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _ram_available;
 

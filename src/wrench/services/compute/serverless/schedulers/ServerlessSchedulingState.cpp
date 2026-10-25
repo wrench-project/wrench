@@ -38,6 +38,7 @@ namespace wrench {
             auto num_total_ongoing_invocations = 0UL;
             for (auto const &container : node->getInitializedContainers()) {
                 auto num_in_flight_invocations = container->getNumInflightInvocations();
+                _num_in_flight_invocations_on_container[container] = num_in_flight_invocations;
                 num_total_ongoing_invocations += num_in_flight_invocations;
                 _num_possible_new_invocations_on_container[container] =
                     container->getMaxNumInflightInvocations() - num_in_flight_invocations;

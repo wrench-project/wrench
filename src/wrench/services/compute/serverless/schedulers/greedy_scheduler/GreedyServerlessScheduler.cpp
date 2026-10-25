@@ -186,7 +186,7 @@ namespace wrench {
         _node_selection_policy = std::make_shared<SelectAllPossibleServerlessNodeSelectionPolicy>();
         _eviction_policy = std::make_shared<FewestServerlessEvictionPolicy>();
         _plan_selection_policy = std::make_shared<EvictionAverseServerlessPlanSelectionPolicy>();
-        _node_scaling_policy = std::make_shared<ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy>();
+        _node_scaling_policy = std::make_shared<ReactiveScaleUpNodeActivationPolicy>();
         _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
         _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
         _reusable_container_selection_policy = std::make_shared<
@@ -504,6 +504,7 @@ namespace wrench {
                 decisions->invocation_dispatches.push_back({inv, target_node, container});
                 if (container) {
                     scheduling_state->_num_possible_new_invocations_on_container.at(container) -= 1;
+                    scheduling_state->_num_in_flight_invocations_on_container.at(container) += 1;
                 } else {
                     // The selected plan's container terminations have already been credited.
                     scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) -= 1;

@@ -1,5 +1,5 @@
-#ifndef ACTIVATEONEWHENNOFREESLOTSERVERLESSNODEACTIVATIONPOLICY_H
-#define ACTIVATEONEWHENNOFREESLOTSERVERLESSNODEACTIVATIONPOLICY_H
+#ifndef REACTIVESCALEUPSERVERLESSNODEACTIVATIONPOLICY_H
+#define REACTIVESCALEUPSERVERLESSNODEACTIVATIONPOLICY_H
 
 #include <map>
 #include <memory>
@@ -20,10 +20,10 @@ namespace wrench {
      * @brief A serverless scheduling node activation policy that activates one node each time no new invocation
      *        could be placed anywhere
      */
-    class ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy : public ServerlessNodeScalingPolicy {
+    class ReactiveScaleUpNodeActivationPolicy : public ServerlessNodeScalingPolicy {
     public:
 
-        ~ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy() override = default;
+        ~ReactiveScaleUpNodeActivationPolicy() override = default;
 
         std::pair<unsigned long, std::set<std::shared_ptr<ServerlessComputeNode>>> makeNodeScalingPlan(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
@@ -32,4 +32,4 @@ namespace wrench {
 
 }
 
-#endif //ACTIVATEONEWHENNOFREESLOTSERVERLESSNODEACTIVATIONPOLICY_H
+#endif //REACTIVESCALEUPSERVERLESSNODEACTIVATIONPOLICY_H

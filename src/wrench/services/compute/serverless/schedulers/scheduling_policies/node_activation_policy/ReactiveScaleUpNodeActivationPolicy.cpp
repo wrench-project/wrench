@@ -1,4 +1,4 @@
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ReactiveScaleUpNodeActivationPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
 
@@ -8,7 +8,7 @@ namespace wrench {
     * @param scheduling_state the scheduling state
     * @return a set of compute nodes
     */
-    std::pair<unsigned long, std::set<std::shared_ptr<ServerlessComputeNode>>>  ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy::makeNodeScalingPlan(
+    std::pair<unsigned long, std::set<std::shared_ptr<ServerlessComputeNode>>>  ReactiveScaleUpNodeActivationPolicy::makeNodeScalingPlan(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
 
         std::set<std::shared_ptr<ServerlessComputeNode>> none = {};
