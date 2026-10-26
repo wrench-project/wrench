@@ -263,12 +263,10 @@ namespace wrench {
          *   A scheduling decision is an intent, not a reservation. The serverless compute service checks
          *   whether the decision can actually be executed when it processes it.
          *
-         * @param schedulable_invocations A list of invocations for which all necessary layers reside on the head node
          * @param state The current system state
          * @return A SchedulingDecisions object
          */
         virtual std::shared_ptr<ServerlessSchedulingDecisions> schedule(
-            const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
             const ServerlessStateOfTheSystem* state
         ) = 0;
 

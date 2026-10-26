@@ -376,20 +376,16 @@ namespace wrench {
      * executed actions or an atomic reservation. See the class documentation
      * for phase precedence, reusable-container capacity, and planning semantics.
      *
-     * @param schedulable_invocations Pending invocations whose image layers are
-     *        available at the head node; worker-side preparation may still be
-     *        required. May be empty.
      * @param state Current system state from which the planning snapshot is built.
      * @return A new ServerlessSchedulingDecisions object. Its operation lists may
      *         all be empty, independently of whether a future wakeup is requested.
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::schedule(
-        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
         const ServerlessStateOfTheSystem* state) {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
 
         // Create a scheduling state
-        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, schedulable_invocations);
+        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state);
 
         // Invoke the invocation failing policy
         auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);

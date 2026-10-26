@@ -27,12 +27,14 @@ namespace wrench {
     class ServerlessSchedulingState {
 
     public:
-        explicit ServerlessSchedulingState(const ServerlessStateOfTheSystem* state,
-            const std::vector<std::shared_ptr<Invocation>>&schedulable_invocations);
+        explicit ServerlessSchedulingState(const ServerlessStateOfTheSystem* state);
 
         ~ServerlessSchedulingState() = default;
 
-    	/** @brief The schedulable invocations (a copy, can be modified at will) */
+    	/** @brief The admitted invocations, i.e., whose image layers have not all yet been downloaded */
+    	std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> _admitted_invocations;
+
+    	/** @brief The schedulable invocations */
     	std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
 
     	/** @brief Per-function counts of outstanding invocations */

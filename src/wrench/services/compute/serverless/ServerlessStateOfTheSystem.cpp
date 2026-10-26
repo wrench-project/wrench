@@ -195,6 +195,24 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the list of admitted invocations (whose image layers are not all downloaded from remote)
+     *
+     * @return The list of admitted invocations
+     */
+    std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> ServerlessStateOfTheSystem::getAdmittedInvocations() const {
+        return _admitted_invocations;
+    }
+
+    /**
+     * @brief Get the list of schedulable invocations
+     *
+     * @return The list of schedulable invocations
+     */
+    std::vector<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getSchedulableInvocations() const {
+        return _schedulable_invocations;
+    }
+
+    /**
      * @brief Get the current per-function outstanding invocation counts
      * @return a function-count map
      */

@@ -14,12 +14,11 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param state current system state
-     * @param schedulable_invocations the schedulable invocations
      */
-    ServerlessSchedulingState::ServerlessSchedulingState(const ServerlessStateOfTheSystem* state,
-        const std::vector<std::shared_ptr<Invocation>>&schedulable_invocations) {
+    ServerlessSchedulingState::ServerlessSchedulingState(const ServerlessStateOfTheSystem* state) {
 
-        _schedulable_invocations = schedulable_invocations;
+        _admitted_invocations = state->getAdmittedInvocations();
+        _schedulable_invocations = state->getSchedulableInvocations();
         _outstanding_invocation_counts = state->getOutstandingInvocationCounts();
 
         _activated_compute_nodes = state->getActivatedComputeNodes();

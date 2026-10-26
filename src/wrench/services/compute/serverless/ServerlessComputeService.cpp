@@ -1638,8 +1638,7 @@ namespace wrench {
      */
     std::shared_ptr<ServerlessSchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
         auto decisions =
-            _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
-                                 _state_of_the_system.get());
+            _scheduler->schedule(_state_of_the_system.get());
 #if 0
         decisions->print();
 #endif

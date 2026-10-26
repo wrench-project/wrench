@@ -52,6 +52,8 @@ namespace wrench
         [[nodiscard]] bool isImageLayerBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
         [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
 
+        [[nodiscard]] std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> getAdmittedInvocations() const;
+        [[nodiscard]] std::vector<std::shared_ptr<Invocation>> getSchedulableInvocations() const;
         [[nodiscard]] std::map<std::shared_ptr<Function>, unsigned long> getOutstandingInvocationCounts() const;
 
         ~ServerlessStateOfTheSystem() = default;

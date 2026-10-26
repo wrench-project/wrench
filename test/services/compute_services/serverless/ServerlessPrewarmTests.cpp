@@ -99,9 +99,7 @@ protected:
     public:
         CustomTestScheduler() = default;
 
-        std::shared_ptr<wrench::ServerlessSchedulingDecisions> schedule(
-            const std::vector<std::shared_ptr<wrench::Invocation>>& schedulable_invocations,
-            const wrench::ServerlessStateOfTheSystem* state) override {
+        std::shared_ptr<wrench::ServerlessSchedulingDecisions> schedule(const wrench::ServerlessStateOfTheSystem* state) override {
             static int called = 0;
             static std::shared_ptr<wrench::Function> function = nullptr;
             std::shared_ptr<wrench::Container> container;
@@ -110,9 +108,9 @@ protected:
 
             called++;
 
-            std::shared_ptr<wrench::Invocation> inv = (schedulable_invocations.empty()
+            std::shared_ptr<wrench::Invocation> inv = (state->getSchedulableInvocations().empty()
                                                            ? nullptr
-                                                           : schedulable_invocations.front());
+                                                           : state->getSchedulableInvocations().front());
             if (inv) {
                 function = inv->getFunction();
             }
