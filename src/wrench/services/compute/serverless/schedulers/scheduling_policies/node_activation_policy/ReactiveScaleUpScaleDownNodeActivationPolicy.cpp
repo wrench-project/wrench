@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ReactiveScaleUpScaleDownNodeActivationPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>

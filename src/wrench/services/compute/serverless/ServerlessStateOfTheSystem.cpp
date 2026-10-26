@@ -194,4 +194,13 @@ namespace wrench {
         return _image_layers_in_ram.at(node);
     }
 
+    /**
+     * @brief Get the current per-function outstanding invocation counts
+     * @return a function-count map
+     */
+    std::map<std::shared_ptr<Function>, unsigned long> ServerlessStateOfTheSystem::
+    getOutstandingInvocationCounts() const {
+        return _outstanding_invocation_counts;
+    }
+
 } // namespace wrench
