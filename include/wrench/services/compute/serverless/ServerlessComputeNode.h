@@ -42,7 +42,7 @@ namespace wrench {
 
         ServerlessComputeNode(std::string h, ServerlessComputeService* service);
 
-        std::shared_ptr<Container> spawnContainer(const Function* function);
+        std::shared_ptr<Container> spawnContainer(const std::shared_ptr<Function>& function);
         void acknowledgeInvocationStart(const std::shared_ptr<Invocation>& invocation);
         void acknowledgeInvocationCompletion(const std::shared_ptr<Invocation>& invocation);
         void shutdownContainer(const std::shared_ptr<Container>& container);

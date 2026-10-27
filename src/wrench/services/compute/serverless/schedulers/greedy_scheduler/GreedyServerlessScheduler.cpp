@@ -186,7 +186,7 @@ namespace wrench {
         _node_selection_policy = std::make_shared<SelectAllPossibleServerlessNodeSelectionPolicy>();
         _eviction_policy = std::make_shared<FewestServerlessEvictionPolicy>();
         _plan_selection_policy = std::make_shared<EvictionAverseServerlessPlanSelectionPolicy>();
-        _node_scaling_policy = std::make_shared<ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy>();
+        _node_scaling_policy = std::make_shared<ReactiveScaleUpNodeActivationPolicy>();
         _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
         _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
         _reusable_container_selection_policy = std::make_shared<
@@ -347,6 +347,7 @@ namespace wrench {
         for (const auto& container :
              scheduling_state->_initialized_containers.at(node)) {
             scheduling_state->_num_possible_new_invocations_on_container.erase(container);
+            scheduling_state->_num_in_flight_invocations_on_container.erase(container);
         }
         scheduling_state->_initialized_containers.erase(node);
 
@@ -375,20 +376,16 @@ namespace wrench {
      * executed actions or an atomic reservation. See the class documentation
      * for phase precedence, reusable-container capacity, and planning semantics.
      *
-     * @param schedulable_invocations Pending invocations whose image layers are
-     *        available at the head node; worker-side preparation may still be
-     *        required. May be empty.
      * @param state Current system state from which the planning snapshot is built.
      * @return A new ServerlessSchedulingDecisions object. Its operation lists may
      *         all be empty, independently of whether a future wakeup is requested.
      */
     std::shared_ptr<ServerlessSchedulingDecisions> GreedyServerlessScheduler::schedule(
-        const std::vector<std::shared_ptr<Invocation>>& schedulable_invocations,
         const ServerlessStateOfTheSystem* state) {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
 
         // Create a scheduling state
-        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state, schedulable_invocations);
+        auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state);
 
         // Invoke the invocation failing policy
         auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);
@@ -410,6 +407,10 @@ namespace wrench {
                         return to_fail.count(invocation) != 0;
                     }),
                 pending.end());
+        }
+        // Adjust the pending counts
+        for (auto const &inv : to_fail) {
+            scheduling_state->_pending_invocation_counts.at(inv->getFunction())--;
         }
 
 
@@ -461,6 +462,7 @@ namespace wrench {
                 scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) += 1;
                 scheduling_state->_initialized_containers.at(target_node).erase(container);
                 scheduling_state->_num_possible_new_invocations_on_container.erase(container);
+                scheduling_state->_num_in_flight_invocations_on_container.erase(container);
             }
 
             // Layer evictions from RAM
@@ -504,6 +506,7 @@ namespace wrench {
                 decisions->invocation_dispatches.push_back({inv, target_node, container});
                 if (container) {
                     scheduling_state->_num_possible_new_invocations_on_container.at(container) -= 1;
+                    scheduling_state->_num_in_flight_invocations_on_container.at(container) += 1;
                 } else {
                     // The selected plan's container terminations have already been credited.
                     scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) -= 1;
@@ -511,6 +514,13 @@ namespace wrench {
                     scheduling_state->_disk_available.at(target_node) -= inv->getFunction()->getDiskSpaceLimit();
                 }
                 scheduling_state->_num_possible_new_invocations_on_compute_node.at(target_node) -= 1;
+
+                // Update the pending counts
+                auto& num_pending = scheduling_state->_pending_invocation_counts.at(inv->getFunction());
+                if (num_pending == 0) {
+                    throw std::runtime_error("Cannot select a dispatch for a function with zero pending invocations");
+                }
+                --num_pending;
             }
 
             // Image layer loads

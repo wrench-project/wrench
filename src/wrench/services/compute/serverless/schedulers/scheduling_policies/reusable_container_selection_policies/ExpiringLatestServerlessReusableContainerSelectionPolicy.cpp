@@ -26,7 +26,7 @@ namespace wrench {
         for (const auto& node: candidate_nodes) {
             for (auto const& container : scheduling_state->_initialized_containers.at(node)) {
                 // Container for the correct function?
-                if (container->getFunction() != invocation->getFunction().get()) {
+                if (container->getFunction() != invocation->getFunction()) {
                     continue;
                 }
                 // If the container is already fully planned, nevermind

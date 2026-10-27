@@ -11,6 +11,7 @@ namespace wrench {
     class ServerlessStateOfTheSystem;
     class ServerlessComputeNode;
     class Container;
+    class Function;
     class Image;
     class ImageLayer;
     class Invocation;
@@ -26,13 +27,18 @@ namespace wrench {
     class ServerlessSchedulingState {
 
     public:
-        explicit ServerlessSchedulingState(const ServerlessStateOfTheSystem* state,
-            const std::vector<std::shared_ptr<Invocation>>&schedulable_invocations);
+        explicit ServerlessSchedulingState(const ServerlessStateOfTheSystem* state);
 
         ~ServerlessSchedulingState() = default;
 
-    	/** @brief The schedulable invocations (a copy, can be modified at will) */
+    	/** @brief The admitted invocations, i.e., whose image layers have not all yet been downloaded */
+    	std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> _admitted_invocations;
+
+    	/** @brief The schedulable invocations */
     	std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
+
+    	/** @brief The per-function pending invocation counts (outstanding minus assigned to containers) */
+    	std::map<std::shared_ptr<Function>, unsigned long> _pending_invocation_counts;
 
 	    /** @brief The activated compute nodes */
         std::vector<std::shared_ptr<ServerlessComputeNode>> _activated_compute_nodes;
@@ -51,6 +57,16 @@ namespace wrench {
 
     	/** @brief Number of possible new invocations that could be started on a current container */
     	std::map<std::shared_ptr<Container>, unsigned long> _num_possible_new_invocations_on_container;
+
+    	/**
+		 * @brief Planned in-flight invocation counts for existing initialized
+		 *        containers. Includes observed invocations and dispatches selected
+		 *        earlier in this scheduling round.
+		 *
+		 * Does not contain initializing containers or containers whose creation
+		 * has only been proposed in this round.
+		 */
+    	std::map<std::shared_ptr<Container>, unsigned long> _num_in_flight_invocations_on_container;
 
         /** @brief Map of RAM availability */
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _ram_available;

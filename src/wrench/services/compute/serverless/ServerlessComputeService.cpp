@@ -815,7 +815,7 @@ namespace wrench {
             ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS);
         auto max_per_function = this->getPropertyValueAsUnsignedLong(
             ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION);
-        if ((_num_outstanding_invocations >= max_total) or (_outstanding_invocation_counts[function] >=
+        if ((_state_of_the_system->_num_outstanding_invocations >= max_total) or (_state_of_the_system->_outstanding_invocation_counts[function] >=
             max_per_function)) {
             const auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
                 false, nullptr, std::make_shared<NotAllowed>(
@@ -838,8 +838,8 @@ namespace wrench {
             _state_of_the_system->_new_invocations.push(invocation);
         }
 
-        _num_outstanding_invocations++;
-        _outstanding_invocation_counts.at(function)++;
+        _state_of_the_system->_num_outstanding_invocations++;
+        _state_of_the_system->_outstanding_invocation_counts.at(function)++;
 
         auto answerMessage = new ServerlessComputeServiceFunctionInvocationAnswerMessage(
             true, invocation, nullptr, this->getMessagePayloadValue(
@@ -875,8 +875,8 @@ namespace wrench {
                             invocation,
                             action->getFailureCause(), this->getMessagePayloadValue(
                                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-                    _num_outstanding_invocations--;
-                    _outstanding_invocation_counts.at(invocation->getFunction())--;
+                    _state_of_the_system->_num_outstanding_invocations--;
+                    _state_of_the_system->_outstanding_invocation_counts.at(invocation->getFunction())--;
                 }
                 _state_of_the_system->_admitted_invocations.at(image).clear();
                 images_to_remove_from_admitted_map.insert(image);
@@ -940,8 +940,8 @@ namespace wrench {
         auto compute_node = invocation->_compute_node;
 
         // Update outstanding counts
-        _num_outstanding_invocations--;
-        _outstanding_invocation_counts.at(invocation->getFunction())--;
+        _state_of_the_system->_num_outstanding_invocations--;
+        _state_of_the_system->_outstanding_invocation_counts.at(invocation->getFunction())--;
 
         // Update container
         auto container = invocation->_container;
@@ -1167,8 +1167,8 @@ namespace wrench {
                                         _state_of_the_system->_admitted_invocations.at(image).end(), inv);
                     if (it != _state_of_the_system->_admitted_invocations.at(image).end()) {
                         _state_of_the_system->_admitted_invocations.at(image).erase(it);
-                        _outstanding_invocation_counts.at(inv->getFunction())--;
-                        _num_outstanding_invocations--;
+                        _state_of_the_system->_outstanding_invocation_counts.at(inv->getFunction())--;
+                        _state_of_the_system->_num_outstanding_invocations--;
                         send_notification_message = true;
                     }
                 }
@@ -1180,8 +1180,8 @@ namespace wrench {
                                     _state_of_the_system->_schedulable_invocations.end(), inv);
                 if (it != _state_of_the_system->_schedulable_invocations.end()) {
                     _state_of_the_system->_schedulable_invocations.erase(it);
-                    _outstanding_invocation_counts.at(inv->getFunction())--;
-                    _num_outstanding_invocations--;
+                    _state_of_the_system->_outstanding_invocation_counts.at(inv->getFunction())--;
+                    _state_of_the_system->_num_outstanding_invocations--;
                     send_notification_message = true;
                 }
             }
@@ -1257,7 +1257,7 @@ namespace wrench {
         if (not hot_start) {
             // Try to spawn a container
             try {
-                target_container = target_compute_node->spawnContainer(invocation->getFunction().get());
+                target_container = target_compute_node->spawnContainer(invocation->getFunction());
             } catch (ExecutionException& e) {
                 WRENCH_INFO("Couldn't spawn a container for an invocation for function %s: %s",
                             invocation->_function->getName().c_str(),
@@ -1433,8 +1433,8 @@ namespace wrench {
         _state_of_the_system->_schedulable_invocations.clear();
         _state_of_the_system->_dispatched_invocations.clear();
 
-        _num_outstanding_invocations = 0;
-        _outstanding_invocation_counts.clear();
+        _state_of_the_system->_num_outstanding_invocations = 0;
+        _state_of_the_system->_outstanding_invocation_counts.clear();
     }
 
     /**
@@ -1638,8 +1638,7 @@ namespace wrench {
      */
     std::shared_ptr<ServerlessSchedulingDecisions> ServerlessComputeService::invokeScheduler() const {
         auto decisions =
-            _scheduler->schedule(_state_of_the_system->_schedulable_invocations,
-                                 _state_of_the_system.get());
+            _scheduler->schedule(_state_of_the_system.get());
 #if 0
         decisions->print();
 #endif
@@ -2089,7 +2088,7 @@ namespace wrench {
         // At this point, we can start the container
         std::shared_ptr<Container> container;
         try {
-            container = compute_node->spawnContainer(function.get());
+            container = compute_node->spawnContainer(function);
         } catch (ExecutionException& e) {
             WRENCH_INFO("Couldn't pre-warm a container for function %s at node %s: %s",
                         function->getName().c_str(),

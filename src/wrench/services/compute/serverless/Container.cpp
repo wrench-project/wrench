@@ -38,7 +38,7 @@ namespace wrench {
      * @param initial_state
      * @return
      */
-    Container::Container(const Function* function,
+    Container::Container(const std::shared_ptr<Function>& function,
                          const ServerlessComputeNode* compute_node,
                          const ServerlessComputeService* serverless_compute_service,
                          const State initial_state) {
@@ -127,7 +127,7 @@ namespace wrench {
       * @brief Get the container's function
       * @return a function
       */
-    const Function* Container::getFunction() const {
+    const std::shared_ptr<Function> Container::getFunction() const {
         return _function;
     }
 

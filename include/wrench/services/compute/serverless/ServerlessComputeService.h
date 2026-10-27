@@ -252,8 +252,7 @@ namespace wrench {
         std::shared_ptr<Alarm> _scheduler_wakeup_alarm;
         std::set<std::shared_ptr<Alarm>> _node_activation_alarms;
 
-        std::map<std::shared_ptr<Function>, unsigned long> _outstanding_invocation_counts;
-        unsigned long _num_outstanding_invocations = 0;
+
 
         /***********************/
         /** \endcond          **/
