@@ -1,5 +1,5 @@
-#ifndef RANDOMSERVERLESSPLANSELECTIONPOLICY_H
-#define RANDOMSERVERLESSPLANSELECTIONPOLICY_H
+#ifndef SERVERLESSRANDOMPLANSELECTIONPOLICY_H
+#define SERVERLESSRANDOMPLANSELECTIONPOLICY_H
 
 #include <vector>
 #include <memory>
@@ -21,9 +21,9 @@ namespace wrench {
     /**
      * @brief A serverless scheduling plan selection policy that selects the plan randomly
      */
-    class RandomServerlessPlanSelectionPolicy : public ServerlessPlanSelectionPolicy {
+    class RandomPlanSelectionPolicy : public ServerlessPlanSelectionPolicy {
     public:
-        explicit RandomServerlessPlanSelectionPolicy(unsigned int seed);
+        explicit RandomPlanSelectionPolicy(unsigned int seed);
 
         std::shared_ptr<ServerlessComputeNode> pickBestInvocationPlan(
             const std::map<std::shared_ptr<ServerlessComputeNode>,
@@ -44,4 +44,4 @@ namespace wrench {
     };
 }
 
-#endif //RANDOMSERVERLESSPLANSELECTIONPOLICY_H
+#endif //SERVERLESSRANDOMPLANSELECTIONPOLICY_H

@@ -13,12 +13,12 @@ namespace wrench {
     /**
      * @brief A serverless scheduling invocation failing policy that never fails any schedulable invocation
      */
-    class NeverFailServerlessInvocationFailingPolicy : public ServerlessInvocationFailingPolicy {
+    class NeverFailInvocationsPolicy : public ServerlessInvocationFailingPolicy {
     public:
 
-        NeverFailServerlessInvocationFailingPolicy() = default;
+        NeverFailInvocationsPolicy() = default;
 
-        ~NeverFailServerlessInvocationFailingPolicy() override = default;
+        ~NeverFailInvocationsPolicy() override = default;
 
         std::set<std::shared_ptr<Invocation>> failSchedulableInvocations(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;

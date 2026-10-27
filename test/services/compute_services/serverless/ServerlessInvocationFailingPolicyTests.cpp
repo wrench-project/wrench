@@ -20,17 +20,17 @@
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/LRUServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllNodePolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAversePlanSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
 #define GB (1000000000ULL)
 
 #include "ServerlessTestUtil.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/SchedulableQueueSizeLimitServerlessInvocationFailingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/QueueSizeLimitFailingPolicy.h"
 
 WRENCH_LOG_CATEGORY(serverless_invocation_failing_tests,
                     "Log category for ServerlessInvocationFailingPolicy tests");
@@ -211,7 +211,7 @@ void ServerlessInvocationFailingPolicyTest::do_QueueLimit_test() {
 
     std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
     auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-    scheduler->setPolicy(std::make_shared<wrench::SchedulableQueueSizeLimitServerlessInvocationFailingPolicy>(10));
+    scheduler->setPolicy(std::make_shared<wrench::QueueSizeLimitFailingPolicy>(10));
 
     auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
         "ServerlessHeadNode", "/", compute_nodes,

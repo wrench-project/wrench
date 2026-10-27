@@ -1,5 +1,5 @@
-#ifndef RANDOMSERVERLESSINVOCATIONORDERINGPOLICY_H
-#define RANDOMSERVERLESSINVOCATIONORDERINGPOLICY_H
+#ifndef SERVERLESSRANDOMINVOCATIONORDERINGPOLICY_H
+#define SERVERLESSRANDOMINVOCATIONORDERINGPOLICY_H
 
 #include <vector>
 #include <random>
@@ -15,10 +15,10 @@ namespace wrench {
     /**
      * @brief A serverless scheduling invocation ordering policy that orders the (schedulable) invocations in random order
      */
-    class RandomServerlessInvocationOrderingPolicy : public ServerlessInvocationOrderingPolicy {
+    class RandomInvocationOrderingPolicy : public ServerlessInvocationOrderingPolicy {
     public:
-        explicit RandomServerlessInvocationOrderingPolicy(unsigned int seed);
-        ~RandomServerlessInvocationOrderingPolicy() override = default;
+        explicit RandomInvocationOrderingPolicy(unsigned int seed);
+        ~RandomInvocationOrderingPolicy() override = default;
 
         void sortSchedulableInvocations(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
 
@@ -27,4 +27,4 @@ namespace wrench {
     };
 }
 
-#endif //RANDOMSERVERLESSINVOCATIONORDERINGPOLICY_H
+#endif //SERVERLESSRANDOMINVOCATIONORDERINGPOLICY_H

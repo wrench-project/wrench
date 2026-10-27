@@ -182,15 +182,15 @@ namespace wrench {
      *   - Invocation failing policy: NeverFailServerlessInvocationFailingPolicy
      */
     GreedyServerlessScheduler::GreedyServerlessScheduler() {
-        _invocation_ordering_policy = std::make_shared<FCFSServerlessInvocationOrderingPolicy>();
-        _node_selection_policy = std::make_shared<SelectAllPossibleServerlessNodeSelectionPolicy>();
+        _invocation_ordering_policy = std::make_shared<FCFSInvocationOrderingPolicy>();
+        _node_selection_policy = std::make_shared<AllPossibleNodeSelectionPolicy>();
         _eviction_policy = std::make_shared<FewestServerlessEvictionPolicy>();
-        _plan_selection_policy = std::make_shared<EvictionAverseServerlessPlanSelectionPolicy>();
+        _plan_selection_policy = std::make_shared<EvictionAversePlanSelectionPolicy>();
         _node_scaling_policy = std::make_shared<ReactiveScaleUpNodeActivationPolicy>();
-        _container_prewarm_policy = std::make_shared<NeverPrewarmServerlessContainerPrewarmPolicy>();
-        _invocation_failing_policy = std::make_shared<NeverFailServerlessInvocationFailingPolicy>();
+        _container_prewarm_policy = std::make_shared<NeverPrewarmContainerPolicy>();
+        _invocation_failing_policy = std::make_shared<NeverFailInvocationsPolicy>();
         _reusable_container_selection_policy = std::make_shared<
-            ExpiringLatestServerlessReusableContainerSelectionPolicy>();
+            ExpiringLatestReusableContainerSelectionPolicy>();
     }
 
     /**

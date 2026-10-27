@@ -1,7 +1,7 @@
 
 #include <stdexcept>
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/SchedulableQueueSizeLimitServerlessInvocationFailingPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/QueueSizeLimitFailingPolicy.h>
 #include "wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h"
 
 namespace wrench {
@@ -9,8 +9,8 @@ namespace wrench {
      * @brief Constructor
      * @param queue_limit The schedulable queue size limit (>1, up to ULONG_MAX)
      */
-    SchedulableQueueSizeLimitServerlessInvocationFailingPolicy::
-    SchedulableQueueSizeLimitServerlessInvocationFailingPolicy(unsigned long queue_limit) :
+    QueueSizeLimitFailingPolicy::
+    QueueSizeLimitFailingPolicy(unsigned long queue_limit) :
         ServerlessInvocationFailingPolicy() {
         if (queue_limit < 1) {
             throw std::invalid_argument(
@@ -25,7 +25,7 @@ namespace wrench {
      * @return a set of invocations
      */
     std::set<std::shared_ptr<Invocation>>
-    SchedulableQueueSizeLimitServerlessInvocationFailingPolicy::failSchedulableInvocations(
+    QueueSizeLimitFailingPolicy::failSchedulableInvocations(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
         std::size_t num_to_fail = (_queue_limit < scheduling_state->_schedulable_invocations.size()
                                        ? scheduling_state->_schedulable_invocations.size() - _queue_limit

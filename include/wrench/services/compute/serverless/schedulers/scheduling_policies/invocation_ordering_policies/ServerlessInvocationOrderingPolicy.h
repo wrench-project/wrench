@@ -9,7 +9,7 @@
 namespace wrench {
     class Invocation;
     class ServerlessSchedulingState;
-    class FCFSServerlessInvocationOrderingPolicy;
+    class FCFSInvocationOrderingPolicy;
 
     /**
      * @brief An abstract class to implement a serverless scheduling invocation ordering policy

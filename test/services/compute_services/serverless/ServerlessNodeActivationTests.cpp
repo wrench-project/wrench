@@ -20,10 +20,10 @@
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/LRUServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllNodePolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAversePlanSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)

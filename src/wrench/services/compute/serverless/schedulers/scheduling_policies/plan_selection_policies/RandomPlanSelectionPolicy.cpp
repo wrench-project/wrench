@@ -1,4 +1,4 @@
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/RandomServerlessPlanSelectionPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/RandomPlanSelectionPolicy.h>
 
 #include "wrench/services/compute/serverless/schedulers/ServerlessScheduler.h"
 
@@ -8,7 +8,7 @@ namespace wrench {
      * @brief Constructor
      * @param seed The seed of the RNG
      */
-    RandomServerlessPlanSelectionPolicy::RandomServerlessPlanSelectionPolicy(const unsigned int seed) {
+    RandomPlanSelectionPolicy::RandomPlanSelectionPolicy(const unsigned int seed) {
         _rng = std::mt19937(seed);
     }
 
@@ -17,7 +17,7 @@ namespace wrench {
      * @param plans a map of invocation plans
      * @return a compute node
      */
-    std::shared_ptr<ServerlessComputeNode> RandomServerlessPlanSelectionPolicy::pickBestPlan(
+    std::shared_ptr<ServerlessComputeNode> RandomPlanSelectionPolicy::pickBestPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>& plans) {
 
         if (plans.empty()) {
@@ -51,7 +51,7 @@ namespace wrench {
     * @param plans a map of plans
     * @return a compute node
     */
-    std::shared_ptr<ServerlessComputeNode> RandomServerlessPlanSelectionPolicy::pickBestInvocationPlan(
+    std::shared_ptr<ServerlessComputeNode> RandomPlanSelectionPolicy::pickBestInvocationPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);
@@ -62,7 +62,7 @@ namespace wrench {
     * @param plans a map of plans
     * @return a compute node
     */
-    std::shared_ptr<ServerlessComputeNode> RandomServerlessPlanSelectionPolicy::pickBestLayerLoadPlan(
+    std::shared_ptr<ServerlessComputeNode> RandomPlanSelectionPolicy::pickBestLayerLoadPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);
@@ -73,7 +73,7 @@ namespace wrench {
     * @param plans a map of plans
     * @return a compute node
     */
-    std::shared_ptr<ServerlessComputeNode> RandomServerlessPlanSelectionPolicy::pickBestLayerCopyPlan(
+    std::shared_ptr<ServerlessComputeNode> RandomPlanSelectionPolicy::pickBestLayerCopyPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);
