@@ -1,0 +1,8 @@
+.. _ReactiveScaleUpNodeActivationPolicy:
+wrench::ReactiveScaleUpNodeActivationPolicy
+*******************************************
+
+.. doxygenclass:: wrench::ReactiveScaleUpNodeActivationPolicy
+   :project: internal
+   :members:
+

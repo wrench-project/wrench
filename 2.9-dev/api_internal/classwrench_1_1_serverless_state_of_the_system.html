@@ -75,7 +75,6 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_done_message.html">wrench::ActionExecutorDoneMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_action_executor_message.html">wrench::ActionExecutorMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_all_serverless_node_activation_policy.html">wrench::ActivateAllServerlessNodeActivationPolicy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_activate_one_when_no_new_invocation_possible_node_activation_policy.html">wrench::ActivateOneWhenNoNewInvocationPossibleNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm.html">wrench::Alarm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_alarm_job_time_out_message.html">wrench::AlarmJobTimeOutMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_amdahl_parallel_model.html">wrench::AmdahlParallelModel</a></li>
@@ -289,6 +288,8 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_proxy_location.html">wrench::ProxyLocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_invocation_ordering_policy.html">wrench::RandomServerlessInvocationOrderingPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_random_serverless_plan_selection_policy.html">wrench::RandomServerlessPlanSelectionPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_reactive_scale_up_node_activation_policy.html">wrench::ReactiveScaleUpNodeActivationPolicy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_reactive_scale_up_scale_down_node_activation_policy.html">wrench::ReactiveScaleUpScaleDownNodeActivationPolicy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___comm_port.html">wrench::S4U_CommPort</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon.html">wrench::S4U_Daemon</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_s4_u___daemon_1_1_life_saver.html">wrench::S4U_Daemon::LifeSaver</a></li>
@@ -333,6 +334,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessStateOfTheSystem</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench26ServerlessStateOfTheSystemE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessStateOfTheSystem</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem24getActivatedComputeNodesEv"><code class="docutils literal notranslate"><span class="pre">getActivatedComputeNodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem22getAdmittedInvocationsEv"><code class="docutils literal notranslate"><span class="pre">getAdmittedInvocations()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv"><code class="docutils literal notranslate"><span class="pre">getAvailableDiskSpace()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem20getAvailableRAMSpaceEv"><code class="docutils literal notranslate"><span class="pre">getAvailableRAMSpace()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem31getImageLayersBeingCopiedToNodeERKNSt10shared_ptrI21ServerlessComputeNodeEE"><code class="docutils literal notranslate"><span class="pre">getImageLayersBeingCopiedToNode()</span></code></a></li>
@@ -341,6 +343,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem26getImageLayersOnDiskAtNodeERKNSt10shared_ptrI21ServerlessComputeNodeEE"><code class="docutils literal notranslate"><span class="pre">getImageLayersOnDiskAtNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem32getNumBeingActivatedComputeNodesEv"><code class="docutils literal notranslate"><span class="pre">getNumBeingActivatedComputeNodes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem29getNumDeactivatedComputeNodesEv"><code class="docutils literal notranslate"><span class="pre">getNumDeactivatedComputeNodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem30getOutstandingInvocationCountsEv"><code class="docutils literal notranslate"><span class="pre">getOutstandingInvocationCounts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem25getSchedulableInvocationsEv"><code class="docutils literal notranslate"><span class="pre">getSchedulableInvocations()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem29isImageLayerBeingCopiedToNodeERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">isImageLayerBeingCopiedToNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem29isImageLayerBeingLoadedAtNodeERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">isImageLayerBeingLoadedAtNode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem23isImageLayerInRAMAtNodeERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">isImageLayerInRAMAtNode()</span></code></a></li>
@@ -507,6 +511,17 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench26ServerlessStateOfTheSystem22getAdmittedInvocationsEv">
+<span id="_CPPv3NK6wrench26ServerlessStateOfTheSystem22getAdmittedInvocationsEv"></span><span id="_CPPv2NK6wrench26ServerlessStateOfTheSystem22getAdmittedInvocationsEv"></span><span id="wrench::ServerlessStateOfTheSystem::getAdmittedInvocationsC"></span><span class="target" id="classwrench_1_1_serverless_state_of_the_system_1aa82132427892e3a74789c4357a9960e0"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getAdmittedInvocations</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem22getAdmittedInvocationsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the list of admitted invocations (whose image layers are not all downloaded from remote) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of admitted invocations </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv">
 <span id="_CPPv3NK6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv"></span><span id="_CPPv2NK6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv"></span><span id="wrench::ServerlessStateOfTheSystem::getAvailableDiskSpaceC"></span><span class="target" id="classwrench_1_1_serverless_state_of_the_system_1ae0393baff64446cd24a76b8aa438a2cb"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">sg_size_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getAvailableDiskSpace</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem21getAvailableDiskSpaceEv" title="Link to this definition"></a><br /></dt>
 <dd><p>Getter for the map of available disk space for activated compute nodes. Note that Disk space is managed in an LRU fashion, so it’s not because a disk is full that nothing can be done, perhaps. </p>
@@ -602,6 +617,28 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A number of nodes </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench26ServerlessStateOfTheSystem30getOutstandingInvocationCountsEv">
+<span id="_CPPv3NK6wrench26ServerlessStateOfTheSystem30getOutstandingInvocationCountsEv"></span><span id="_CPPv2NK6wrench26ServerlessStateOfTheSystem30getOutstandingInvocationCountsEv"></span><span id="wrench::ServerlessStateOfTheSystem::getOutstandingInvocationCountsC"></span><span class="target" id="classwrench_1_1_serverless_state_of_the_system_1ad074cd5f961cc8cc9261810898ed10d9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_function.html#_CPPv4N6wrench8FunctionE" title="wrench::Function"><span class="n"><span class="pre">Function</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getOutstandingInvocationCounts</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem30getOutstandingInvocationCountsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current per-function outstanding invocation counts. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a function-count map </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench26ServerlessStateOfTheSystem25getSchedulableInvocationsEv">
+<span id="_CPPv3NK6wrench26ServerlessStateOfTheSystem25getSchedulableInvocationsEv"></span><span id="_CPPv2NK6wrench26ServerlessStateOfTheSystem25getSchedulableInvocationsEv"></span><span id="wrench::ServerlessStateOfTheSystem::getSchedulableInvocationsC"></span><span class="target" id="classwrench_1_1_serverless_state_of_the_system_1a04fcfb9f90302e1f533607cd877e3b35"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_invocation.html#_CPPv4N6wrench10InvocationE" title="wrench::Invocation"><span class="n"><span class="pre">Invocation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getSchedulableInvocations</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench26ServerlessStateOfTheSystem25getSchedulableInvocationsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the list of schedulable invocations. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of schedulable invocations </p>
 </dd>
 </dl>
 </dd></dl>
