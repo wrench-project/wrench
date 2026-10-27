@@ -77,9 +77,9 @@ namespace wrench {
             should_activate_one_node = not all_functions_could_run;
         }
 
-        // Dectivations
+        // Deactivations
         std::set<std::shared_ptr<ServerlessComputeNode>> to_deactivate = {};
-        if (not has_pending) {
+        if (has_pending) {
             // nevermind
         } else {
             for (auto const& node : scheduling_state->_activated_compute_nodes) {

@@ -37,7 +37,7 @@ namespace wrench {
     	/** @brief The schedulable invocations */
     	std::vector<std::shared_ptr<Invocation>> _schedulable_invocations;
 
-    	/** @brief The per-function pending invocation counts */
+    	/** @brief The per-function pending invocation counts (outstanding minus assigned to containers) */
     	std::map<std::shared_ptr<Function>, unsigned long> _pending_invocation_counts;
 
 	    /** @brief The activated compute nodes */
