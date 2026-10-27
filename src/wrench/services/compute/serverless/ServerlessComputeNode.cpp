@@ -276,18 +276,21 @@ namespace wrench {
                 this->shutdownContainer(container);
             } else {
                 // Start the expiration alarm
-                container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
-                container->_idle_date = S4U_Simulation::getClock();
+                auto now = S4U_Simulation::getClock();
+                container->_idle_date = now;
+                container->_expiration_date = idle_timeout == DBL_MAX ? DBL_MAX : now + idle_timeout;
                 container->_idle_sequence++;
-                container->_expiration_alarm = Alarm::createAndStartAlarm(
-                    _serverless_compute_service->getSimulation(),
-                    container->_expiration_date,
-                    _serverless_compute_service->_hostname,
-                    _serverless_compute_service->getCommPort(),
-                    new
-                    ServerlessComputeServiceContainerIdleTimeoutMessage(
-                        container, container->getIdleSequence()),
-                    "container_idle_timout");
+                if (idle_timeout != DBL_MAX) {
+                    container->_expiration_alarm = Alarm::createAndStartAlarm(
+                        _serverless_compute_service->getSimulation(),
+                        container->_expiration_date,
+                        _serverless_compute_service->_hostname,
+                        _serverless_compute_service->getCommPort(),
+                        new
+                        ServerlessComputeServiceContainerIdleTimeoutMessage(
+                            container, container->getIdleSequence()),
+                        "container_idle_timout");
+                }
             }
         }
     }

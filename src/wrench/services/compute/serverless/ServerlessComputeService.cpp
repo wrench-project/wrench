@@ -1008,19 +1008,6 @@ namespace wrench {
             if (not container->_in_flight_invocations.empty()) {
                 throw std::runtime_error("A container that failed to initialized should not have any attached invocation");
             }
-            // for (auto const& inv : container->_in_flight_invocations) {
-            //     inv->_notify_commport->dputMessage(
-            //         new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-            //             false,
-            //             inv,
-            //             container->_init_failure_cause,
-            //             this->getMessagePayloadValue(
-            //                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-            //     _state_of_the_system->_dispatched_invocations.erase(inv);
-            //     _num_outstanding_invocations -= 1;
-            //     _outstanding_invocation_counts.at(inv->getFunction()) -= 1;
-            // }
-            // container->_in_flight_invocations.clear();
             container->shutdown();
             return;
         }
@@ -1037,19 +1024,20 @@ namespace wrench {
                 compute_node->shutdownContainer(container);
             } else {
                 auto now = S4U_Simulation::getClock();
-                auto expiration_date = now + idle_timeout;
-                // Start the timeout alarm
-                container->_expiration_alarm = Alarm::createAndStartAlarm(
-                    this->simulation_,
-                    expiration_date,
-                    _hostname,
-                    _commport,
-                    new
-                    ServerlessComputeServiceContainerIdleTimeoutMessage(
-                        container, container->getIdleSequence()),
-                    "container_idle_timout");
-                container->_expiration_date = expiration_date;
                 container->_idle_date = now;
+                container->_expiration_date = idle_timeout == DBL_MAX ? DBL_MAX : now + idle_timeout;;
+                if (container->_expiration_date < DBL_MAX) {
+                    // Start the timeout alarm
+                    container->_expiration_alarm = Alarm::createAndStartAlarm(
+                        this->simulation_,
+                        container->_expiration_date,
+                        _hostname,
+                        _commport,
+                        new
+                        ServerlessComputeServiceContainerIdleTimeoutMessage(
+                            container, container->getIdleSequence()),
+                        "container_idle_timout");
+                }
             }
         }
     }
