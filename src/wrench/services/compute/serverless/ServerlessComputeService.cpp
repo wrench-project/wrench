@@ -937,6 +937,13 @@ namespace wrench {
                     invocation->getFunction()->getName().c_str(),
                     (failure_cause ? "FAILURE" : "SUCCESS"));
 
+        // If the function code was started, but was interrupted before recording its end date,
+        // we set its end date to that of the action
+        if (invocation->_function_start_date >= 0.0 &&
+            invocation->_function_end_date < 0.0) {
+            invocation->_function_end_date = action->getEndDate();
+            }
+
         auto compute_node = invocation->_compute_node;
 
         // Update outstanding counts
