@@ -1,0 +1,8 @@
+.. _QueueSizeLimitFailingPolicy:
+wrench::QueueSizeLimitFailingPolicy
+***********************************
+
+.. doxygenclass:: wrench::QueueSizeLimitFailingPolicy
+   :project: user
+   :members:
+

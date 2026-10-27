@@ -1,0 +1,8 @@
+.. _FCFSInvocationOrderingPolicy:
+wrench::FCFSInvocationOrderingPolicy
+************************************
+
+.. doxygenclass:: wrench::FCFSInvocationOrderingPolicy
+   :project: user
+   :members:
+

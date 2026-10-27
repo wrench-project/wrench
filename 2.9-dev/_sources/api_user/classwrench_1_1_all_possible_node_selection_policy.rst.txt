@@ -1,0 +1,8 @@
+.. _AllPossibleNodeSelectionPolicy:
+wrench::AllPossibleNodeSelectionPolicy
+**************************************
+
+.. doxygenclass:: wrench::AllPossibleNodeSelectionPolicy
+   :project: user
+   :members:
+

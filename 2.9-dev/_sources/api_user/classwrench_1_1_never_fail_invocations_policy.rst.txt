@@ -1,0 +1,8 @@
+.. _NeverFailInvocationsPolicy:
+wrench::NeverFailInvocationsPolicy
+**********************************
+
+.. doxygenclass:: wrench::NeverFailInvocationsPolicy
+   :project: user
+   :members:
+

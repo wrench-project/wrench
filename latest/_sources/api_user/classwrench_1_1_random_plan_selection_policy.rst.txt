@@ -1,0 +1,8 @@
+.. _RandomPlanSelectionPolicy:
+wrench::RandomPlanSelectionPolicy
+*********************************
+
+.. doxygenclass:: wrench::RandomPlanSelectionPolicy
+   :project: user
+   :members:
+

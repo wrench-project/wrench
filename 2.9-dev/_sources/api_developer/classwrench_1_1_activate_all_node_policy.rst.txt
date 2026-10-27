@@ -1,0 +1,8 @@
+.. _ActivateAllNodePolicy:
+wrench::ActivateAllNodePolicy
+*****************************
+
+.. doxygenclass:: wrench::ActivateAllNodePolicy
+   :project: developer
+   :members:
+

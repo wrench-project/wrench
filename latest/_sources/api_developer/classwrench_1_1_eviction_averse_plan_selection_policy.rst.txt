@@ -1,0 +1,8 @@
+.. _EvictionAversePlanSelectionPolicy:
+wrench::EvictionAversePlanSelectionPolicy
+*****************************************
+
+.. doxygenclass:: wrench::EvictionAversePlanSelectionPolicy
+   :project: developer
+   :members:
+
