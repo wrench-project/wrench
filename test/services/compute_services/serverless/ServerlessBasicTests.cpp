@@ -554,11 +554,7 @@ private:
 
 TEST_F(ServerlessBasicTest, FunctionInvocation) {
     std::vector<std::shared_ptr<wrench::ServerlessNodeScalingPolicy>> node_activation_policies = {
-<<<<<<< HEAD
-        std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
-=======
         std::make_shared<wrench::ActivateAllNodePolicy>(),
->>>>>>> master
         std::make_shared<wrench::ReactiveScaleUpNodeActivationPolicy>()
     };
     std::vector<std::shared_ptr<wrench::ServerlessInvocationOrderingPolicy>> ordering_policies = {
