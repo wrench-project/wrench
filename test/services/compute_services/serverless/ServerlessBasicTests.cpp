@@ -16,17 +16,17 @@
 #include "wrench/failure_causes/OperationTimeout.h"
 #include "wrench/failure_causes/FunctionNotFound.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies//SelectAllPossibleServerlessNodeSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllNodePolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies//AllPossibleNodeSelectionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/LRUServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomServerlessInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ReactiveScaleUpNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/RandomServerlessPlanSelectionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAversePlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/RandomPlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmContainerPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailInvocationsPolicy.h"
 
 #include "ServerlessTestUtil.h"
 
@@ -554,29 +554,33 @@ private:
 
 TEST_F(ServerlessBasicTest, FunctionInvocation) {
     std::vector<std::shared_ptr<wrench::ServerlessNodeScalingPolicy>> node_activation_policies = {
+<<<<<<< HEAD
         std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>(),
+=======
+        std::make_shared<wrench::ActivateAllNodePolicy>(),
+>>>>>>> master
         std::make_shared<wrench::ReactiveScaleUpNodeActivationPolicy>()
     };
     std::vector<std::shared_ptr<wrench::ServerlessInvocationOrderingPolicy>> ordering_policies = {
-        std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>(),
-        std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0)
+        std::make_shared<wrench::FCFSInvocationOrderingPolicy>(),
+        std::make_shared<wrench::RandomInvocationOrderingPolicy>(0)
     };
     std::vector<std::shared_ptr<wrench::ServerlessNodeSelectionPolicy>> node_selection_policies = {
-        std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>()
+        std::make_shared<wrench::AllPossibleNodeSelectionPolicy>()
     };
     std::vector<std::shared_ptr<wrench::ServerlessEvictionPolicy>> eviction_policies = {
         std::make_shared<wrench::LRUServerlessEvictionPolicy>(),
         std::make_shared<wrench::FewestServerlessEvictionPolicy>()
     };
     std::vector<std::shared_ptr<wrench::ServerlessPlanSelectionPolicy>> selection_policies = {
-        std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>(),
-        std::make_shared<wrench::RandomServerlessPlanSelectionPolicy>(0)
+        std::make_shared<wrench::EvictionAversePlanSelectionPolicy>(),
+        std::make_shared<wrench::RandomPlanSelectionPolicy>(0)
     };
     std::vector<std::shared_ptr<wrench::ServerlessContainerPrewarmPolicy>> container_prewarm_policies = {
-        std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>()
+        std::make_shared<wrench::NeverPrewarmContainerPolicy>()
     };
     std::vector<std::shared_ptr<wrench::ServerlessInvocationFailingPolicy>> invocation_failing_policies = {
-        std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>()
+        std::make_shared<wrench::NeverFailInvocationsPolicy>()
     };
 
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;

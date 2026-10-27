@@ -1,4 +1,4 @@
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAversePlanSelectionPolicy.h>
 
 #include "wrench/services/compute/serverless/schedulers/ServerlessScheduler.h"
 
@@ -8,7 +8,7 @@ namespace wrench {
      * @param plans a map of invocation plans
      * @return a compute node
      */
-    std::shared_ptr<ServerlessComputeNode> EvictionAverseServerlessPlanSelectionPolicy::pickBestPlan(
+    std::shared_ptr<ServerlessComputeNode> EvictionAversePlanSelectionPolicy::pickBestPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>& plans) {
 
         if (plans.empty()) {
@@ -52,7 +52,7 @@ namespace wrench {
      * @param plans a map of plans
      * @return a compute node
      */
-    std::shared_ptr<ServerlessComputeNode> EvictionAverseServerlessPlanSelectionPolicy::pickBestInvocationPlan(
+    std::shared_ptr<ServerlessComputeNode> EvictionAversePlanSelectionPolicy::pickBestInvocationPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);
@@ -63,7 +63,7 @@ namespace wrench {
     * @param plans a map of plans
     * @return a compute node
     */
-    std::shared_ptr<ServerlessComputeNode> EvictionAverseServerlessPlanSelectionPolicy::pickBestLayerLoadPlan(
+    std::shared_ptr<ServerlessComputeNode> EvictionAversePlanSelectionPolicy::pickBestLayerLoadPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);
@@ -74,7 +74,7 @@ namespace wrench {
     * @param plans a map of plans
     * @return a compute node
     */
-    std::shared_ptr<ServerlessComputeNode> EvictionAverseServerlessPlanSelectionPolicy::pickBestLayerCopyPlan(
+    std::shared_ptr<ServerlessComputeNode> EvictionAversePlanSelectionPolicy::pickBestLayerCopyPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);

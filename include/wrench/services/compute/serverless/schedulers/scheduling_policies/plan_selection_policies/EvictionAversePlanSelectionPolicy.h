@@ -1,5 +1,5 @@
-#ifndef EVICTIONAVERSESERVERLESSPLANSELECTIONPOLICY_H
-#define EVICTIONAVERSESERVERLESSPLANSELECTIONPOLICY_H
+#ifndef SERVERLESSEVICTIONAVERSEPLANSELECTIONPOLICY_H
+#define SERVERLESSEVICTIONAVERSEPLANSELECTIONPOLICY_H
 
 #include <vector>
 #include <memory>
@@ -25,9 +25,9 @@ namespace wrench {
      *          - The least number of to-RAM layer loads
      *          - The least number of to-disk layer copies
      */
-    class EvictionAverseServerlessPlanSelectionPolicy : public ServerlessPlanSelectionPolicy {
+    class EvictionAversePlanSelectionPolicy : public ServerlessPlanSelectionPolicy {
     public:
-        EvictionAverseServerlessPlanSelectionPolicy() = default;
+        EvictionAversePlanSelectionPolicy() = default;
 
         std::shared_ptr<ServerlessComputeNode> pickBestInvocationPlan(
             const std::map<std::shared_ptr<ServerlessComputeNode>,
@@ -46,4 +46,4 @@ namespace wrench {
     };
 }
 
-#endif //EVICTIONAVERSESERVERLESSPLANSELECTIONPOLICY_H
+#endif //SERVERLESSEVICTIONAVERSEPLANSELECTIONPOLICY_H

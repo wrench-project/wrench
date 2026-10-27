@@ -1,5 +1,5 @@
 #include <memory>
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/idle_container_selection_policies/ExpiringLatestServerlessReusableContainerSelectionPolicy.h>
+#include <wrench/services/compute/serverless/schedulers/scheduling_policies/idle_container_selection_policies/ExpiringLatestReusableContainerSelectionPolicy.h>
 
 #include "wrench/function/Invocation.h"
 #include "wrench/services/compute/serverless/Container.h"
@@ -15,7 +15,7 @@ namespace wrench {
      * @param candidate_nodes the nodes that can be considered
      * @return a ServerlessComputeNode/Container pair
      */
-    std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<Container>> ExpiringLatestServerlessReusableContainerSelectionPolicy::selectReusableContainer(
+    std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<Container>> ExpiringLatestReusableContainerSelectionPolicy::selectReusableContainer(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state, const std::shared_ptr<Invocation>& invocation,
         const std::vector<std::shared_ptr<ServerlessComputeNode>>& candidate_nodes) {
         std::shared_ptr<ServerlessComputeNode> picked_node = nullptr;

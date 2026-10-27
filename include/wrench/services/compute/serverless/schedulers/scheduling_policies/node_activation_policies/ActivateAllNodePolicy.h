@@ -19,10 +19,10 @@ namespace wrench {
     /**
      * @brief A serverless scheduling node activation policy that activates all compute nodes
      */
-    class ActivateAllServerlessNodeActivationPolicy : public ServerlessNodeScalingPolicy {
+    class ActivateAllNodePolicy : public ServerlessNodeScalingPolicy {
     public:
 
-        ~ActivateAllServerlessNodeActivationPolicy() override = default;
+        ~ActivateAllNodePolicy() override = default;
 
 
         std::pair<unsigned long, std::set<std::shared_ptr<ServerlessComputeNode>>> makeNodeScalingPlan(

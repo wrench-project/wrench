@@ -13,12 +13,12 @@ namespace wrench {
     /**
      * @brief A serverless scheduling invocation failing policy that never fails any schedulable invocation
      */
-    class SchedulableQueueSizeLimitServerlessInvocationFailingPolicy : public ServerlessInvocationFailingPolicy {
+    class QueueSizeLimitFailingPolicy : public ServerlessInvocationFailingPolicy {
     public:
 
-        explicit SchedulableQueueSizeLimitServerlessInvocationFailingPolicy(unsigned long queue_limit);
+        explicit QueueSizeLimitFailingPolicy(unsigned long queue_limit);
 
-        ~SchedulableQueueSizeLimitServerlessInvocationFailingPolicy() override = default;
+        ~QueueSizeLimitFailingPolicy() override = default;
 
         std::set<std::shared_ptr<Invocation>> failSchedulableInvocations(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;

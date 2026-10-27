@@ -1,5 +1,5 @@
-#ifndef FCFSSERVERLESSINVOCATIONORDERINGPOLICY_H
-#define FCFSSERVERLESSINVOCATIONORDERINGPOLICY_H
+#ifndef SERVERLESSFCFSINVOCATIONORDERINGPOLICY_H
+#define SERVERLESSFCFSINVOCATIONORDERINGPOLICY_H
 
 #include <vector>
 #include <memory>
@@ -15,16 +15,16 @@ namespace wrench {
      * @brief A serverless scheduling invocation ordering policy that orders the (schedulable) invocations in
      *        FCFS (First Come First Serve) order
      */
-    class FCFSServerlessInvocationOrderingPolicy : public ServerlessInvocationOrderingPolicy {
+    class FCFSInvocationOrderingPolicy : public ServerlessInvocationOrderingPolicy {
     public:
 
-        FCFSServerlessInvocationOrderingPolicy() = default;
+        FCFSInvocationOrderingPolicy() = default;
 
-        ~FCFSServerlessInvocationOrderingPolicy() override = default;
+        ~FCFSInvocationOrderingPolicy() override = default;
 
         void sortSchedulableInvocations(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
 
     };
 }
 
-#endif //FCFSSERVERLESSINVOCATIONORDERINGPOLICY_H
+#endif //SERVERLESSFCFSINVOCATIONORDERINGPOLICY_H

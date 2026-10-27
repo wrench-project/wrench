@@ -17,11 +17,11 @@ namespace wrench {
      *           - If there is a non-idle container, pick the one with the fewest remaining "slots"
      *           - Among full idle containers, pick the one that will expire the latest
      */
-    class ExpiringLatestServerlessReusableContainerSelectionPolicy : public ServerlessReusableContainerSelectionPolicy {
+    class ExpiringLatestReusableContainerSelectionPolicy : public ServerlessReusableContainerSelectionPolicy {
     public:
-        ExpiringLatestServerlessReusableContainerSelectionPolicy() = default;
+        ExpiringLatestReusableContainerSelectionPolicy() = default;
 
-        ~ExpiringLatestServerlessReusableContainerSelectionPolicy() override = default;
+        ~ExpiringLatestReusableContainerSelectionPolicy() override = default;
 
         std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<Container>> selectReusableContainer(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,

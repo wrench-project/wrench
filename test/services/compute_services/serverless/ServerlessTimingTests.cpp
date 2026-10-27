@@ -19,13 +19,13 @@
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/LRUServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomServerlessInvocationOrderingPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllServerlessNodeActivationPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies/SelectAllPossibleServerlessNodeSelectionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAverseServerlessPlanSelectionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmServerlessContainerPrewarmPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailServerlessInvocationFailingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomInvocationOrderingPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllNodePolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies/AllPossibleNodeSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAversePlanSelectionPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/container_prewarm_policy/NeverPrewarmContainerPolicy.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailInvocationsPolicy.h"
 
 #include "ServerlessTestUtil.h"
 
@@ -271,49 +271,49 @@ TEST_F(ServerlessTimingTest, ImageReuse) {
 
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
         schedulers.push_back(scheduler);
     }
 
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
         schedulers.push_back(scheduler);
     }
 
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0));
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::RandomInvocationOrderingPolicy>(0));
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
         schedulers.push_back(scheduler);
     }
 
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0));
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::RandomInvocationOrderingPolicy>(0));
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
         schedulers.push_back(scheduler);
     }
 
@@ -440,24 +440,24 @@ TEST_F(ServerlessTimingTest, CorePressure) {
 
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmServerlessContainerPrewarmPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::NeverFailServerlessInvocationFailingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
         schedulers.push_back(scheduler);
     }
 
@@ -579,20 +579,20 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -714,20 +714,20 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToInvocations) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -846,20 +846,20 @@ TEST_F(ServerlessTimingTest, DiskPressureDueToImages) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -978,20 +978,20 @@ TEST_F(ServerlessTimingTest, DiskPressureDueToInvocations) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1121,20 +1121,20 @@ TEST_F(ServerlessTimingTest, HotStart) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1301,20 +1301,20 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1468,20 +1468,20 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromRAM) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1635,20 +1635,20 @@ TEST_F(ServerlessTimingTest, TwoIdleContainers) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1782,20 +1782,20 @@ TEST_F(ServerlessTimingTest, OneIdleContainerTwoInvocations) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1966,20 +1966,20 @@ TEST_F(ServerlessTimingTest, IdleContainerEviction) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -2110,20 +2110,20 @@ TEST_F(ServerlessTimingTest, ImageDownloadSimulation) {
     std::vector<std::shared_ptr<wrench::ServerlessScheduler>> schedulers;
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::FCFSServerlessInvocationOrderingPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::FCFSInvocationOrderingPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     {
         auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
-        scheduler->setPolicy(std::make_shared<wrench::ActivateAllServerlessNodeActivationPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::RandomServerlessInvocationOrderingPolicy>(0));
-        scheduler->setPolicy(std::make_shared<wrench::SelectAllPossibleServerlessNodeSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::ActivateAllNodePolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::RandomInvocationOrderingPolicy>(0));
+        scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
-        scheduler->setPolicy(std::make_shared<wrench::EvictionAverseServerlessPlanSelectionPolicy>());
+        scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {

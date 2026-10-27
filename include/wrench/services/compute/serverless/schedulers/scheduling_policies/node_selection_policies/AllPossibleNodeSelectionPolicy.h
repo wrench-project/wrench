@@ -1,7 +1,7 @@
 
 
-#ifndef SELECTALLPOSSIBLESERVERLESSNOTSELECTIONPOLICY_H
-#define SELECTALLPOSSIBLESERVERLESSNOTSELECTIONPOLICY_H
+#ifndef SERVERLESSSELECTALLPOSSIBLENOTSELECTIONPOLICY_H
+#define SERVERLESSSELECTALLPOSSIBLENOTSELECTIONPOLICY_H
 
 #include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies/ServerlessNodeSelectionPolicy.h>
 
@@ -14,11 +14,11 @@ namespace wrench {
     /**
      * @brief A class that implements a serverless scheduling node selection policy that returns all compute nodes on which an invocation could be executed
      */
-    class SelectAllPossibleServerlessNodeSelectionPolicy : public ServerlessNodeSelectionPolicy {
+    class AllPossibleNodeSelectionPolicy : public ServerlessNodeSelectionPolicy {
 
         public:
 
-        ~SelectAllPossibleServerlessNodeSelectionPolicy() override = default;
+        ~AllPossibleNodeSelectionPolicy() override = default;
 
         std::set<std::shared_ptr<ServerlessComputeNode>> selectCandidateNodes(
                 const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
@@ -28,4 +28,4 @@ namespace wrench {
 
 }
 
-#endif //SELECTALLPOSSIBLESERVERLESSNOTSELECTIONPOLICY_H
+#endif //SERVERLESSSELECTALLPOSSIBLENOTSELECTIONPOLICY_H

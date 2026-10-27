@@ -14,12 +14,12 @@ namespace wrench {
     /**
      * @brief A "never prewarm any container" serverless scheduling container prewarm policy
      */
-    class NeverPrewarmServerlessContainerPrewarmPolicy : public ServerlessContainerPrewarmPolicy {
+    class NeverPrewarmContainerPolicy : public ServerlessContainerPrewarmPolicy {
     public:
 
-        NeverPrewarmServerlessContainerPrewarmPolicy() = default;
+        NeverPrewarmContainerPolicy() = default;
 
-        ~NeverPrewarmServerlessContainerPrewarmPolicy() override = default;
+        ~NeverPrewarmContainerPolicy() override = default;
 
         std::vector<std::pair<std::shared_ptr<Function>, std::shared_ptr<ServerlessComputeNode>>> prewarmContainers(
             const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) override;
