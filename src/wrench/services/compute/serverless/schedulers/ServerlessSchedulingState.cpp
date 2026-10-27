@@ -10,16 +10,13 @@ WRENCH_LOG_CATEGORY(wrench_serverless_scheduling_state, "Log category for Server
 
 
 namespace wrench {
-
     /**
      * @brief Constructor
      * @param state current system state
      */
     ServerlessSchedulingState::ServerlessSchedulingState(const ServerlessStateOfTheSystem* state) {
-
         _admitted_invocations = state->getAdmittedInvocations();
         _schedulable_invocations = state->getSchedulableInvocations();
-        _outstanding_invocation_counts = state->getOutstandingInvocationCounts();
 
         _activated_compute_nodes = state->getActivatedComputeNodes();
         _num_deactivated_compute_nodes = state->getNumDeactivatedComputeNodes();
@@ -27,27 +24,29 @@ namespace wrench {
         _ram_available = state->getAvailableRAMSpace();
         _disk_available = state->getAvailableDiskSpace();
 
-        // std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_invocations_on_compute_node;
-        // std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_containers_on_compute_node;
-        // std::map<std::shared_ptr<Container>, unsigned long> _num_possible_new_invocations_on_container;
-
         // Initialize and build useful maps
-        for (const auto &node : _activated_compute_nodes) {
-
-            _num_possible_new_containers_on_compute_node[node] = node->getMaxNumContainers() - node->getTotalNumContainers();
+        for (const auto& node : _activated_compute_nodes) {
+            _num_possible_new_containers_on_compute_node[node] = node->getMaxNumContainers() - node->
+                getTotalNumContainers();
             auto num_total_ongoing_invocations = 0UL;
-            for (auto const &container : node->getInitializedContainers()) {
+
+            for (auto const& container : node->getInitializedContainers()) {
+                auto function = container->getFunction();
                 auto num_in_flight_invocations = container->getNumInflightInvocations();
                 _num_in_flight_invocations_on_container[container] = num_in_flight_invocations;
+                _pending_invocation_counts[function] += num_in_flight_invocations;
                 num_total_ongoing_invocations += num_in_flight_invocations;
                 _num_possible_new_invocations_on_container[container] =
                     container->getMaxNumInflightInvocations() - num_in_flight_invocations;
             }
             for (const auto& container : node->getInitializingContainers()) {
-                num_total_ongoing_invocations +=
-                    container->getNumInflightInvocations();
+                auto function = container->getFunction();
+                auto num_in_flight_invocations = container->getNumInflightInvocations();
+                num_total_ongoing_invocations += num_in_flight_invocations;
+                _pending_invocation_counts[function] += num_in_flight_invocations;
             }
-            _num_possible_new_invocations_on_compute_node[node] = node->getMaxNumInvocations() - num_total_ongoing_invocations;
+            _num_possible_new_invocations_on_compute_node[node] = node->getMaxNumInvocations() -
+                num_total_ongoing_invocations;
 
             _image_layers_on_disk[node] = state->getImageLayersOnDiskAtNode(node);
             _image_layers_on_their_way_to_disk[node] = state->getImageLayersBeingCopiedToNode(node);
@@ -58,23 +57,22 @@ namespace wrench {
             // Make all being-loaded/copied layers protected
             _protected_layers[node] = {};
             auto& protected_layers = _protected_layers.at(node);
-            const auto& layers_being_copied =_image_layers_on_their_way_to_disk.at(node);
-            protected_layers.insert(layers_being_copied.begin(),layers_being_copied.end());
+            const auto& layers_being_copied = _image_layers_on_their_way_to_disk.at(node);
+            protected_layers.insert(layers_being_copied.begin(), layers_being_copied.end());
 
-            const auto& layers_being_loaded =_image_layers_on_their_way_to_ram.at(node);
-            protected_layers.insert(layers_being_loaded.begin(),layers_being_loaded.end());
+            const auto& layers_being_loaded = _image_layers_on_their_way_to_ram.at(node);
+            protected_layers.insert(layers_being_loaded.begin(), layers_being_loaded.end());
 
             _initializing_containers[node] = {};
-            for (auto const &container : node->getInitializingContainers()) {
+            for (auto const& container : node->getInitializingContainers()) {
                 _initializing_containers.at(node).insert(container);
             }
 
             _initialized_containers[node] = {};
-            for (auto const &container : node->getInitializedContainers()) {
+            for (auto const& container : node->getInitializedContainers()) {
                 _initialized_containers.at(node).insert(container);
             }
         }
-
     }
 
     /**
@@ -83,7 +81,8 @@ namespace wrench {
      * @param node the compute node
      * @return True if all necessary layers are in RAM
      */
-    bool ServerlessSchedulingState::areAllImageLayersInRAM(const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode> &node) const {
+    bool ServerlessSchedulingState::areAllImageLayersInRAM(const std::shared_ptr<Image>& image,
+                                                           const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
             if (_image_layers_in_ram.at(node).count(layer) == 0) {
                 return false;
@@ -98,7 +97,8 @@ namespace wrench {
      * @param node the compute node
      * @return True or false
      */
-    bool ServerlessSchedulingState::areAllImageLayersInRAMOrOnTheirWayToRAM(const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode> &node) const {
+    bool ServerlessSchedulingState::areAllImageLayersInRAMOrOnTheirWayToRAM(
+        const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
             if (_image_layers_in_ram.at(node).count(layer))
                 continue;
@@ -117,7 +117,8 @@ namespace wrench {
      * @param node the compute node
      * @return True or false
      */
-    bool ServerlessSchedulingState::areAllImageLayersOnDiskOrOnTheirWayToRAM(const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode> &node) const {
+    bool ServerlessSchedulingState::areAllImageLayersOnDiskOrOnTheirWayToRAM(
+        const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
             if ((_image_layers_on_disk.at(node).count(layer) == 0) and
                 (_image_layers_on_their_way_to_ram.at(node).count(layer) == 0)) {
@@ -133,7 +134,8 @@ namespace wrench {
      * @param node the compute node
      * @return True or false
      */
-    bool ServerlessSchedulingState::areAllImageLayersOnDisk(const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode> &node) const {
+    bool ServerlessSchedulingState::areAllImageLayersOnDisk(const std::shared_ptr<Image>& image,
+                                                            const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
             if (_image_layers_on_disk.at(node).count(layer) == 0) {
                 return false;
@@ -149,7 +151,8 @@ namespace wrench {
      * @param node the compute node
      * @return True or false
      */
-    bool ServerlessSchedulingState::areAllImageLayersOnDiskOrOnTheirWayToDisk(const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode> &node) const {
+    bool ServerlessSchedulingState::areAllImageLayersOnDiskOrOnTheirWayToDisk(
+        const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
             if ((_image_layers_on_disk.at(node).count(layer) == 0) and
                 (_image_layers_on_their_way_to_disk.at(node).count(layer) == 0)) {

@@ -127,7 +127,7 @@ namespace wrench {
       * @brief Get the container's function
       * @return a function
       */
-    const Function* Container::getFunction() const {
+    const std::shared_ptr<Function> Container::getFunction() const {
         return _function;
     }
 

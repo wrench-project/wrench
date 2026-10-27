@@ -408,6 +408,10 @@ namespace wrench {
                     }),
                 pending.end());
         }
+        // Adjust the pending counts
+        for (auto const &inv : to_fail) {
+            scheduling_state->_pending_invocation_counts.at(inv->getFunction())--;
+        }
 
 
         // Invoke the node activation policy

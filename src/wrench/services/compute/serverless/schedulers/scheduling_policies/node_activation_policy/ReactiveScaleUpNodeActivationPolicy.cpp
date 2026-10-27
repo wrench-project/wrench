@@ -1,7 +1,6 @@
 #include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ReactiveScaleUpNodeActivationPolicy.h>
 #include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
 #include <wrench/services/compute/serverless/ServerlessComputeNode.h>
-
 #include "wrench/services/compute/serverless/Container.h"
 
 namespace wrench {
@@ -26,19 +25,25 @@ namespace wrench {
         }
 
         // Activate one node only if at least one schedulable function invocation cannot run
-        bool could_all_functions_run = true;
-        for (auto const& [function, inv] : scheduling_state->_outstanding_invocation_counts) {
+        bool all_functions_could_run = true;
+        for (auto const& [function, count] : scheduling_state->_pending_invocation_counts) {
+
+            if (count == 0) {
+                continue;
+            }
+
             bool function_could_run = false;
             for (auto const& node : scheduling_state->_activated_compute_nodes) {
                 // If no more invocations can run on the node then the function cannot run
-                if (node->isAtPerNodeInvocationLimit()) {
+
+                if (scheduling_state->_num_possible_new_invocations_on_compute_node.at(node) == 0) {
                     continue;
                 }
 
                 // Count how many possible schedulable invocations could be placed for each relevant function
                 bool function_could_run_on_current_container = false;
                 for (auto const& container : scheduling_state->_initialized_containers.at(node)) {
-                    if (container->getFunction() != function.get()) {
+                    if (container->getFunction() != function) {
                         continue;
                     }
                     if (scheduling_state->_num_in_flight_invocations_on_container.at(container) == container->
@@ -48,17 +53,17 @@ namespace wrench {
                     function_could_run_on_current_container = true;
                     break;
                 }
-                function_could_run = function_could_run_on_current_container or (not node->isAtPerNodeContainerLimit());
+                function_could_run = function_could_run_on_current_container or (scheduling_state->_num_possible_new_containers_on_compute_node.at(node) > 0);
                 if (function_could_run) {
                     break;
                 }
             }
-            could_all_functions_run = could_all_functions_run && function_could_run;
-            if (not could_all_functions_run) {
+            all_functions_could_run = all_functions_could_run && function_could_run;
+            if (not all_functions_could_run) {
                 break;
             }
         }
-        if (not could_all_functions_run) {
+        if (not all_functions_could_run) {
             return {1, none};
         } else {
             return {0, none};
