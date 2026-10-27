@@ -75,6 +75,16 @@ namespace wrench {
                 "ServerlessComputeService::ServerlessComputeService(): A non-null scheduler must be provided");
         }
 
+        // Validate uniqueness of compute nodes
+        std::set<std::string> seen_hostnames;
+        for (const auto& h : compute_nodes) {
+            if (!seen_hostnames.insert(h).second) {
+                throw std::invalid_argument(
+                    "ServerlessComputeService: duplicate compute-node hostname: " +
+                    h);
+            }
+        }
+
         // Set some convenient node-spec values and heck platform homogeneity
         auto first_hostname = *(compute_nodes.begin());
         _compute_node_num_cores = S4U_Simulation::getHostNumCores(first_hostname);
