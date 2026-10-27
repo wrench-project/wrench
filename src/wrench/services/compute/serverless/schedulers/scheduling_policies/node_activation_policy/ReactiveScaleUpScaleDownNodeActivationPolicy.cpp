@@ -17,10 +17,20 @@ namespace wrench {
 
         std::set<std::shared_ptr<ServerlessComputeNode>> none = {};
 
-        // Activation
-        bool should_activate_one_node = not scheduling_state->_schedulable_invocations.empty();
+        bool should_activate_one_node;
 
-        if (scheduling_state->_num_deactivated_compute_nodes == 0) {
+        // Activation
+        const bool has_pending =
+            std::any_of(
+                scheduling_state->_pending_invocation_counts.begin(),
+                scheduling_state->_pending_invocation_counts.end(),
+                [](const auto& entry) {
+                    return entry.second != 0;
+                });
+
+        if (not has_pending) {
+            should_activate_one_node = false;
+        } if (scheduling_state->_num_deactivated_compute_nodes == 0) {
             should_activate_one_node = false;
         } else if (scheduling_state->_num_being_activated_compute_nodes > 0) {
             should_activate_one_node = false;
@@ -63,7 +73,7 @@ namespace wrench {
                     break;
                 }
             }
-            should_activate_one_node = all_functions_could_run;
+            should_activate_one_node = not all_functions_could_run;
         }
 
         // Dectivations

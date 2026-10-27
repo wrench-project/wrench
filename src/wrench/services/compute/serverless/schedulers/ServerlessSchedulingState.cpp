@@ -24,6 +24,11 @@ namespace wrench {
         _ram_available = state->getAvailableRAMSpace();
         _disk_available = state->getAvailableDiskSpace();
 
+        // Initialize the pending counts to the outstanding counts
+        for (auto const &[function, count] : state->getOutstandingInvocationCounts()) {
+            _pending_invocation_counts[function] = count;
+        }
+
         // Initialize and build useful maps
         for (const auto& node : _activated_compute_nodes) {
             _num_possible_new_containers_on_compute_node[node] = node->getMaxNumContainers() - node->
@@ -34,7 +39,7 @@ namespace wrench {
                 auto function = container->getFunction();
                 auto num_in_flight_invocations = container->getNumInflightInvocations();
                 _num_in_flight_invocations_on_container[container] = num_in_flight_invocations;
-                _pending_invocation_counts[function] += num_in_flight_invocations;
+                _pending_invocation_counts[function] -= num_in_flight_invocations;
                 num_total_ongoing_invocations += num_in_flight_invocations;
                 _num_possible_new_invocations_on_container[container] =
                     container->getMaxNumInflightInvocations() - num_in_flight_invocations;
@@ -43,7 +48,7 @@ namespace wrench {
                 auto function = container->getFunction();
                 auto num_in_flight_invocations = container->getNumInflightInvocations();
                 num_total_ongoing_invocations += num_in_flight_invocations;
-                _pending_invocation_counts[function] += num_in_flight_invocations;
+                _pending_invocation_counts[function] -= num_in_flight_invocations;
             }
             _num_possible_new_invocations_on_compute_node[node] = node->getMaxNumInvocations() -
                 num_total_ongoing_invocations;
