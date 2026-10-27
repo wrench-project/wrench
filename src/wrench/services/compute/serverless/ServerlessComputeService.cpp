@@ -1257,7 +1257,7 @@ namespace wrench {
         if (not hot_start) {
             // Try to spawn a container
             try {
-                target_container = target_compute_node->spawnContainer(invocation->getFunction().get());
+                target_container = target_compute_node->spawnContainer(invocation->getFunction());
             } catch (ExecutionException& e) {
                 WRENCH_INFO("Couldn't spawn a container for an invocation for function %s: %s",
                             invocation->_function->getName().c_str(),
@@ -2088,7 +2088,7 @@ namespace wrench {
         // At this point, we can start the container
         std::shared_ptr<Container> container;
         try {
-            container = compute_node->spawnContainer(function.get());
+            container = compute_node->spawnContainer(function);
         } catch (ExecutionException& e) {
             WRENCH_INFO("Couldn't pre-warm a container for function %s at node %s: %s",
                         function->getName().c_str(),

@@ -32,11 +32,10 @@ namespace wrench {
      * @brief Represents a container in a serverless platform.
      */
     class Container {
-
     public:
-	/**
-	 * @brief Enum to describe a container's state
-	 */
+        /**
+         * @brief Enum to describe a container's state
+         */
         enum class State {
             INITIALIZING,
             INITIALIZED,
@@ -61,20 +60,18 @@ namespace wrench {
         friend class ServerlessComputeNode;
         friend class ServerlessComputeService;
 
-        Container(const Function* function,
-                           const ServerlessComputeNode* compute_node,
-                           const ServerlessComputeService* serverless_compute_service,
-                           State initial_state);
+        Container(const std::shared_ptr<Function>& function,
+                  const ServerlessComputeNode* compute_node,
+                  const ServerlessComputeService* serverless_compute_service,
+                  State initial_state);
 
-        void makeIdle();
-        void makeBusy();
         void spawn();
         void shutdown();
 
         void freeDiskAndMemoryResources();
 
-        const std::shared_ptr<Function> _function;
-        const ServerlessComputeNode *_compute_node;
+        std::shared_ptr<Function> _function;
+        const ServerlessComputeNode* _compute_node;
         const ServerlessComputeService* _serverless_compute_service;
         State _state;
         std::shared_ptr<FailureCause> _init_failure_cause;

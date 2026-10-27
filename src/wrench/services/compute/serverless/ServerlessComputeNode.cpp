@@ -210,7 +210,7 @@ namespace wrench {
      * @param function a function
      * @return A container
      */
-    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const Function* function) {
+    std::shared_ptr<Container> ServerlessComputeNode::spawnContainer(const std::shared_ptr<Function>& function) {
         if (_initialized_containers.size() + _initializing_containers.size() >= _max_num_containers_per_compute_node) {
             throw std::runtime_error(
                 "ServerlessComputeNode::spawnContainer(): Cannot overcome the per-compute node number of containers limit");
@@ -356,7 +356,7 @@ namespace wrench {
 
         // Container inappropriate?
         if (target_container) {
-            if (invocation->getFunction().get() != target_container->getFunction()) {
+            if (invocation->getFunction() != target_container->getFunction()) {
                 throw std::runtime_error(
                     "ServerlessComputeNode::isInvocationFeasible(): The container isn't for the right function!");
             }
