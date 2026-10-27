@@ -1213,6 +1213,9 @@ namespace wrench {
         // Terminate the containers
         for (const auto& [container] : decisions) {
             auto node = container->getComputeNode();
+            if (node->getInitializedContainers().count(container) == 0 ||  not container->_in_flight_invocations.empty()) {
+                continue; // Already removed, initializing, or currently occupied.
+            }
             node->shutdownContainer(container);
         }
     }
