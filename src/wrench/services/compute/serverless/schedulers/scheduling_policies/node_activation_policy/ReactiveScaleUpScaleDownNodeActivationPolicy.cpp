@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <algorithm>
 
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ReactiveScaleUpScaleDownNodeActivationPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h"
@@ -30,7 +31,7 @@ namespace wrench {
 
         if (not has_pending) {
             should_activate_one_node = false;
-        } if (scheduling_state->_num_deactivated_compute_nodes == 0) {
+        } else if (scheduling_state->_num_deactivated_compute_nodes == 0) {
             should_activate_one_node = false;
         } else if (scheduling_state->_num_being_activated_compute_nodes > 0) {
             should_activate_one_node = false;
@@ -78,7 +79,7 @@ namespace wrench {
 
         // Dectivations
         std::set<std::shared_ptr<ServerlessComputeNode>> to_deactivate = {};
-        if (not scheduling_state->_schedulable_invocations.empty()) {
+        if (not has_pending) {
             // nevermind
         } else {
             for (auto const& node : scheduling_state->_activated_compute_nodes) {

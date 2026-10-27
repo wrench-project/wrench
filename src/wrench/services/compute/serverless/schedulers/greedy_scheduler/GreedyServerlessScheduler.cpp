@@ -514,6 +514,13 @@ namespace wrench {
                     scheduling_state->_disk_available.at(target_node) -= inv->getFunction()->getDiskSpaceLimit();
                 }
                 scheduling_state->_num_possible_new_invocations_on_compute_node.at(target_node) -= 1;
+
+                // Update the pending counts
+                auto& num_pending = scheduling_state->_pending_invocation_counts.at(inv->getFunction());
+                if (num_pending == 0) {
+                    throw std::runtime_error("Cannot select a dispatch for a function with zero pending invocations");
+                }
+                --num_pending;
             }
 
             // Image layer loads
