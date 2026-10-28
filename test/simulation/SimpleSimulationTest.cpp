@@ -387,7 +387,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test(double buffer_size) {
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Can't init again
-    ASSERT_THROW(simulation->init(&argc, argv), std::runtime_error);
+    ASSERT_THROW(simulation->init(&argc, argv), std::logic_error);
 
 
     // Setting up the platform

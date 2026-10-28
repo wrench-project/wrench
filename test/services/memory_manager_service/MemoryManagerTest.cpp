@@ -208,12 +208,12 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-pagecache-simulation");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname

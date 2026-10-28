@@ -337,7 +337,7 @@ void SimulationPlatformTest::do_ProgrammaticPlatformTest_test() {
     //    argv[1] = strdup("--wrench-full-log");
     PlatformCreator platform_creator(100 * 1000000.0);
 
-    ASSERT_THROW(simulation->instantiatePlatform(platform_creator), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_creator), std::logic_error);
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
