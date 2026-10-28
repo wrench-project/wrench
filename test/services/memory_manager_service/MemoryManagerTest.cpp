@@ -8,7 +8,7 @@
  * (at your option) any later version.
  */
 #if 0
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 

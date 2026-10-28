@@ -116,16 +116,25 @@ namespace wrench {
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
             throw std::logic_error("Communicator::communicate(): Calling process is not part of this communicator");
         }
+        for (const auto& send_operation : sends) {
+            if (this->rank_to_commport.find(send_operation.first) ==
+                this->rank_to_commport.end()) {
+                throw std::invalid_argument(
+                    "Communicator::sendReceiveAndCompute(): "
+                    "Unknown destination rank " +
+                    std::to_string(send_operation.first));
+                }
+        }
         // Post all the sends
         std::vector<std::shared_ptr<S4U_PendingCommunication>> posted_sends;
         for (auto const &send_operation: sends) {
-            const auto dst_commport = this->rank_to_commport[send_operation.first];
+            const auto dst_commport = this->rank_to_commport.at(send_operation.first);
             posted_sends.push_back(dst_commport->iputMessage(new wrench::SimulationMessage(send_operation.second)));
         }
         // Post the computation (if any)
         simgrid::s4u::ExecPtr computation = nullptr;
         if (flops > 0) {
-            computation = simgrid::s4u::this_actor::exec_init(flops);
+            computation = simgrid::s4u::this_actor::exec_async(flops);
         }
 
         // Do all the synchronous receives
