@@ -114,7 +114,7 @@ namespace wrench {
          * @brief Constructor
          * @param data_size: number of data_size to send/recv
          */
-        explicit MPI_Bcast_participant(const int data_size) : data_size(data_size) {}
+        explicit MPI_Bcast_participant(int data_size, int root_rank) : data_size(data_size), root_rank(root_rank) {}
 
         /**
 	 * @brief The actor's main method
@@ -122,36 +122,37 @@ namespace wrench {
         void operator()() {
             MPI_Init();
             void *data = SMPI_SHARED_MALLOC(data_size);
-            MPI_Bcast(data, data_size, MPI_CHAR, 0, MPI_COMM_WORLD);
+            MPI_Bcast(data, data_size, MPI_CHAR, root_rank, MPI_COMM_WORLD);
             SMPI_SHARED_FREE(data);
             MPI_Finalize();
         }
 
     private:
         int data_size;
+        int root_rank;
     };
 
     /**
      * @brief Method to perform an SMPI Bcast
      * @param hosts: list of hosts
-     * @param root_host: the host on which the root of the broadcast runs
+     * @param root_rank: the rank of host on which the root of the broadcast runs
      * @param data_size: size in data_size of each message sent/received
      */
     void SMPIExecutor::performBcast(const std::vector<simgrid::s4u::Host *>& hosts,
-                                    const simgrid::s4u::Host *root_host,
+                                    const int root_rank,
                                     const int data_size) {
-        // Make a copy of the host list, to avoid re-ordering it
-        auto ordered_hosts = hosts;
-
-        // Make sure that the root_host is the first host in the list of hosts, so that it's always rank 0
-        auto it = std::find(ordered_hosts.begin(), ordered_hosts.end(), root_host);
-        std::iter_swap(ordered_hosts.begin(), it);
+        // // Make a copy of the host list, to avoid re-ordering it
+        // auto ordered_hosts = hosts;
+        //
+        // // Make sure that the root_host is the first host in the list of hosts, so that it's always rank 0
+        // auto it = std::find(ordered_hosts.begin(), ordered_hosts.end(), root_host);
+        // std::iter_swap(ordered_hosts.begin(), it);
 
         // Start actors to do an MPI_BCast
         std::string instance_id = "MPI_Bcast_" + std::to_string(simgrid::s4u::this_actor::get_pid());
         SMPI_app_instance_start(instance_id.c_str(),
-                                MPI_Bcast_participant(data_size),
-                                ordered_hosts);
+                                MPI_Bcast_participant(data_size, root_rank),
+                                hosts);
         SMPI_app_instance_join(instance_id);
     }
 

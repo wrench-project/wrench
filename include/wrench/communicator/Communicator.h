@@ -50,7 +50,7 @@ namespace wrench {
 
         void performSMPIOperation(const std::string &op_name,
                                   std::vector<simgrid::s4u::Host *> &hosts,
-                                  const simgrid::s4u::Host *root_host,
+                                  int root_rank,
                                   sg_size_t bytes,
                                   const std::string &config);
     };

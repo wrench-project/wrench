@@ -15,7 +15,7 @@ namespace wrench {
 
     public:
         static void performAlltoall(const std::vector<simgrid::s4u::Host *> &hosts, int data_size);
-        static void performBcast(const std::vector<simgrid::s4u::Host *>& hosts, const simgrid::s4u::Host *root_host, int data_size);
+        static void performBcast(const std::vector<simgrid::s4u::Host *>& hosts, int root_rank, int data_size);
         static void performBarrier(const std::vector<simgrid::s4u::Host *>& hosts);
     };
 
