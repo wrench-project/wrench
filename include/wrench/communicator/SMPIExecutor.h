@@ -11,7 +11,7 @@ namespace wrench {
     /** 
      * @brief A wrapper class for all SMPI operations
      */
-    class SMPIExecutor {g
+    class SMPIExecutor {
 
     public:
         static void performAlltoall(const std::vector<simgrid::s4u::Host *> &hosts, int data_size);
