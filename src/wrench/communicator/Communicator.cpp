@@ -1,3 +1,6 @@
+#include <limits>
+#include <stdexcept>
+
 
 #include <simgrid/s4u.hpp>
 #include <smpi/smpi.h>
@@ -13,6 +16,12 @@ WRENCH_LOG_CATEGORY(wrench_core_communicator, "Log category for Communicator");
 
 
 namespace wrench {
+
+    /**
+     * @brief Constructor
+     */
+    Communicator::Communicator(unsigned long size) : size(size), participating_hosts(size, nullptr) {
+    }
 
     /**
      * @brief Destructor
@@ -95,7 +104,7 @@ namespace wrench {
         this->rank_to_commport[desired_rank] = S4U_CommPort::getTemporaryCommPort();
         this->rank_to_host[desired_rank] = simgrid::s4u::this_actor::get_host();
         this->actor_to_rank[my_pid] = desired_rank;
-        this->participating_hosts.push_back(simgrid::s4u::this_actor::get_host());
+        this->participating_hosts.at(desired_rank) = simgrid::s4u::this_actor::get_host();
 
         if (this->size > this->rank_to_commport.size()) {
             simgrid::s4u::this_actor::suspend();
@@ -202,7 +211,7 @@ namespace wrench {
         if (bytes < 1) {
             throw std::invalid_argument("Communicator::MPI_Alltoall(): invalid argument (should be >= 1)");
         }
-        this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, bytes, "smpi/alltoall:" + std::move(config));
+        this->performSMPIOperation("Alltoall", this->participating_hosts, -1, bytes, "smpi/alltoall:" + std::move(config));
     }
 
     /**
@@ -216,7 +225,7 @@ namespace wrench {
         if ((bytes < 1) or (root_rank < 0) or (root_rank >= static_cast<int>(this->size))) {
             throw std::invalid_argument("Communicator::MPI_Bcast(): invalid argument");
         }
-        this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], bytes, "smpi/bcast:" + std::move(config));
+        this->performSMPIOperation("Bcast", this->participating_hosts, root_rank, bytes, "smpi/bcast:" + std::move(config));
     }
 
     /**
@@ -225,7 +234,7 @@ namespace wrench {
      * @param config: the SMPI config option
      */
     void Communicator::MPI_Barrier(std::string config) {
-        this->performSMPIOperation("Barrier", this->participating_hosts, nullptr, 0, "smpi/barrier:" + std::move(config));
+        this->performSMPIOperation("Barrier", this->participating_hosts, -1, 0, "smpi/barrier:" + std::move(config));
     }
 
 
@@ -233,18 +242,26 @@ namespace wrench {
      * @brief Helper method to perform SMPI Operations
      * @param op_name: operation name
      * @param hosts: hosts involved
-     * @param root_host: root hosts (nullptr if none)
+     * @param root_rank: the rank of the root hosts (-1 if none)
      * @param bytes: data size in bytes (0 if none)
      * @param config: the SMPI config option
      */
     void Communicator::performSMPIOperation(const std::string &op_name,
                                             std::vector<simgrid::s4u::Host *> &hosts,
-                                            const simgrid::s4u::Host *root_host,
+                                            const int root_rank,
                                             sg_size_t bytes,
                                             const std::string &config) {
 
 
         S4U_Simulation::enableSMPI();
+
+        if (bytes > static_cast<sg_size_t>(std::numeric_limits<int>::max())) {
+            throw std::invalid_argument(
+                "Communicator::performSMPIOperation(): "
+                "Message size exceeds the supported MPI integer count");
+        }
+
+        const int mpi_count = static_cast<int>(bytes);
 
         // Global synchronization
         this->barrier();
@@ -264,9 +281,9 @@ namespace wrench {
             simgrid::s4u::Engine::set_config(config);
 
             if (op_name == "Alltoall") {
-                SMPIExecutor::performAlltoall(hosts, bytes);
+                SMPIExecutor::performAlltoall(hosts, mpi_count);
             } else if (op_name == "Bcast") {
-                SMPIExecutor::performBcast(hosts, root_host, bytes);
+                SMPIExecutor::performBcast(hosts, root_rank, mpi_count);
             } else if (op_name == "Barrier") {
                 SMPIExecutor::performBarrier(hosts);
             } else {

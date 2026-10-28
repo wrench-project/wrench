@@ -36,7 +36,7 @@ namespace wrench {
 	 *
 	 * @param size: the communicator's size in number of processes
 	 */
-        explicit Communicator(unsigned long size) : size(size){};
+        explicit Communicator(unsigned long size);
 
     private:
 
@@ -50,7 +50,7 @@ namespace wrench {
 
         void performSMPIOperation(const std::string &op_name,
                                   std::vector<simgrid::s4u::Host *> &hosts,
-                                  const simgrid::s4u::Host *root_host,
+                                  int root_rank,
                                   sg_size_t bytes,
                                   const std::string &config);
     };
