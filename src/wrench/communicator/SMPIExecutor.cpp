@@ -30,9 +30,22 @@ namespace wrench {
 	 */
         void operator()() {
             MPI_Init();
+            int num_ranks;
+            MPI_Comm_size(MPI_COMM_WORLD, &num_ranks);
+            const auto ranks = static_cast<std::size_t>(num_ranks);
+            const auto bytes_per_peer = static_cast<std::size_t>(data_size);
+            if (bytes_per_peer > std::numeric_limits<std::size_t>::max() / ranks) {
+                throw std::overflow_error("All-to-all buffer size exceeds size_t");
+            }
+            const auto buffer_size = ranks * bytes_per_peer;
+            void* send_buffer = SMPI_SHARED_MALLOC(buffer_size);
+            // void* receive_buffer = SMPI_SHARED_MALLOC(buffer_size);
+            void *receive_buffer = send_buffer; // This should be fine given SMPI's semantics
+
             void *data = SMPI_SHARED_MALLOC(data_size * data_size);
-            MPI_Alltoall(data, data_size, MPI_CHAR, data, data_size, MPI_CHAR, MPI_COMM_WORLD);
-            SMPI_SHARED_FREE(data);
+            MPI_Alltoall(send_buffer, data_size, MPI_CHAR, receive_buffer, data_size, MPI_CHAR, MPI_COMM_WORLD);
+            SMPI_SHARED_FREE(send_buffer);
+            // SMPI_SHARED_FREE(receive_buffer);
             MPI_Finalize();
         }
 
