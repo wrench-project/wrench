@@ -54,7 +54,7 @@ namespace wrench {
         }
         for (const auto& [invocation, node, container] : invocation_dispatches) {
             std::cerr << "  Invocation dispatch: for " << invocation->getFunction()->getName() <<
-                " at " << node->hostname << " (" << (container ? "on an idle container" : "on a new container")
+                " at " << node->hostname << " (" << (container ? "on an existing container" : "on a new container")
                 << ")" << std::endl;
         }
         for (const auto& [function, node] : container_prewarms) {
