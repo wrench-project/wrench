@@ -137,7 +137,7 @@ namespace wrench {
      * @param root_host: the host on which the root of the broadcast runs
      * @param data_size: size in data_size of each message sent/received
      */
-    void SMPIExecutor::performBcast(std::vector<simgrid::s4u::Host *>& hosts,
+    void SMPIExecutor::performBcast(const std::vector<simgrid::s4u::Host *>& hosts,
                                     const simgrid::s4u::Host *root_host,
                                     const int data_size) {
         // Make a copy of the host list, to avoid re-ordering it

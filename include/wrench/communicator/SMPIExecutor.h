@@ -11,11 +11,11 @@ namespace wrench {
     /** 
      * @brief A wrapper class for all SMPI operations
      */
-    class SMPIExecutor {
+    class SMPIExecutor {g
 
     public:
         static void performAlltoall(const std::vector<simgrid::s4u::Host *> &hosts, int data_size);
-        static void performBcast(std::vector<simgrid::s4u::Host *>& hosts, const simgrid::s4u::Host *root_host, int data_size);
+        static void performBcast(const std::vector<simgrid::s4u::Host *>& hosts, const simgrid::s4u::Host *root_host, int data_size);
         static void performBarrier(const std::vector<simgrid::s4u::Host *>& hosts);
     };
 
