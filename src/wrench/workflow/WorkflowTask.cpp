@@ -473,7 +473,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().task_start = date;
         } else {
-            throw std::runtime_error("WorkflowTask::updateStartDate() cannot be called before WorkflowTask::setStartDate()");
+            throw std::logic_error("WorkflowTask::updateStartDate() cannot be called before WorkflowTask::setStartDate()");
         }
         this->execution_history.top().task_start = date;
     }
@@ -487,7 +487,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().task_end = date;
         } else {
-            throw std::runtime_error("WorkflowTask::setEndDate() cannot be called before WorkflowTask::setStartDate()");
+            throw std::logic_error("WorkflowTask::setEndDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
 
