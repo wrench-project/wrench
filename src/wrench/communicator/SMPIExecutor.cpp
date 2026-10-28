@@ -137,18 +137,21 @@ namespace wrench {
      * @param root_host: the host on which the root of the broadcast runs
      * @param data_size: size in data_size of each message sent/received
      */
-    void SMPIExecutor::performBcast(std::vector<simgrid::s4u::Host *> &hosts,
+    void SMPIExecutor::performBcast(std::vector<simgrid::s4u::Host *>& hosts,
                                     const simgrid::s4u::Host *root_host,
                                     const int data_size) {
+        // Make a copy of the host list, to avoid re-ordering it
+        auto ordered_hosts = hosts;
+
         // Make sure that the root_host is the first host in the list of hosts, so that it's always rank 0
-        auto it = std::find(hosts.begin(), hosts.end(), root_host);
-        std::iter_swap(hosts.begin(), it);
+        auto it = std::find(ordered_hosts.begin(), ordered_hosts.end(), root_host);
+        std::iter_swap(ordered_hosts.begin(), it);
 
         // Start actors to do an MPI_BCast
         std::string instance_id = "MPI_Bcast_" + std::to_string(simgrid::s4u::this_actor::get_pid());
         SMPI_app_instance_start(instance_id.c_str(),
                                 MPI_Bcast_participant(data_size),
-                                hosts);
+                                ordered_hosts);
         SMPI_app_instance_join(instance_id);
     }
 
