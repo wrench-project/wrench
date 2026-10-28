@@ -43,7 +43,7 @@ protected:
         try {
             workflow->addControlDependency(t2, t1);
             throw std::runtime_error("Creating a dependency cycle in workflow should throw");
-        } catch (std::runtime_error &ignore) {}
+        } catch (std::invalid_argument &ignore) {}
 
         f1 = wrench::Simulation::addFile("file-01", 1);
         f2 = wrench::Simulation::addFile("file-02", 1);

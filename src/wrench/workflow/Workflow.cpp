@@ -198,7 +198,7 @@ namespace wrench {
         }
 
         if (this->dag.doesPathExist(dst.get(), src.get())) {
-            throw std::runtime_error("Workflow::addControlDependency(): Adding dependency between task " + src->getID() +
+            throw std::invalid_argument("Workflow::addControlDependency(): Adding dependency between task " + src->getID() +
                                      " and " + dst->getID() + " would create a cycle in the workflow graph");
         }
 
