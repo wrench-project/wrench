@@ -36,7 +36,7 @@ namespace wrench {
 	 *
 	 * @param size: the communicator's size in number of processes
 	 */
-        explicit Communicator(unsigned long size) : size(size){};
+        explicit Communicator(unsigned long size);
 
     private:
 

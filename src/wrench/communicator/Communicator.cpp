@@ -18,6 +18,12 @@ WRENCH_LOG_CATEGORY(wrench_core_communicator, "Log category for Communicator");
 namespace wrench {
 
     /**
+     * @brief Constructor
+     */
+    Communicator::Communicator(unsigned long size) : size(size), participating_hosts(size, nullptr) {
+    }
+
+    /**
      * @brief Destructor
      */
     Communicator::~Communicator() {
@@ -98,7 +104,7 @@ namespace wrench {
         this->rank_to_commport[desired_rank] = S4U_CommPort::getTemporaryCommPort();
         this->rank_to_host[desired_rank] = simgrid::s4u::this_actor::get_host();
         this->actor_to_rank[my_pid] = desired_rank;
-        this->participating_hosts.push_back(simgrid::s4u::this_actor::get_host());
+        this->participating_hosts.at(desired_rank) = simgrid::s4u::this_actor::get_host();
 
         if (this->size > this->rank_to_commport.size()) {
             simgrid::s4u::this_actor::suspend();
