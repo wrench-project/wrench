@@ -141,12 +141,6 @@ namespace wrench {
     void SMPIExecutor::performBcast(const std::vector<simgrid::s4u::Host *>& hosts,
                                     const int root_rank,
                                     const int data_size) {
-        // // Make a copy of the host list, to avoid re-ordering it
-        // auto ordered_hosts = hosts;
-        //
-        // // Make sure that the root_host is the first host in the list of hosts, so that it's always rank 0
-        // auto it = std::find(ordered_hosts.begin(), ordered_hosts.end(), root_host);
-        // std::iter_swap(ordered_hosts.begin(), it);
 
         // Start actors to do an MPI_BCast
         std::string instance_id = "MPI_Bcast_" + std::to_string(simgrid::s4u::this_actor::get_pid());
