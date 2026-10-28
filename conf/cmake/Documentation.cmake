@@ -86,6 +86,10 @@ if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND AND SPHINX_FOUND)
     )
 
 else()
-    add_custom_target(doc echo "ERROR: Cannot build documentation because at least one of Doxygen, Swagger-Codegen, or Sphinx is not installed." COMMAND echo "       If you have installed them, re-run cmake." VERBATIM)
-
+    add_custom_target(doc
+            COMMAND "${CMAKE_COMMAND}" -E echo
+            "Cannot build documentation: Doxygen, Swagger Codegen, and Sphinx are required."
+            COMMAND false
+            VERBATIM
+    )
 endif()
