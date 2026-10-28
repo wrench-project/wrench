@@ -28,6 +28,8 @@
 #include "wrench/failure_causes/JobKilled.h"
 #include "wrench/failure_causes/NetworkError.h"
 #include "wrench/failure_causes/NotAllowed.h"
+#include "wrench/failure_causes/InvalidOperation.h"
+#include "wrench/failure_causes/OperationAborted.h"
 #include "wrench/failure_causes/NotEnoughResourcesForJob.h"
 #include "wrench/failure_causes/NotEnoughResources.h"
 #include "wrench/failure_causes/HostError.h"
