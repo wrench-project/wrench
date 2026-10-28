@@ -148,8 +148,16 @@ namespace wrench {
 
 
     /**
-     * @brief Method to spawn a container. It will try to terminate idle containers to
-     *        make the new container fit!
+     * @brief Allocate the resources backing a new container.
+     *
+     * Requires the image layers to be present on the compute node.
+     * Opens those layers and allocates the container's private disk/RAM
+     * resources and storage service.
+     *
+     * Does not evict other containers or image layers. Any necessary
+     * reclamation must be performed before calling this method.
+     *
+     * Does not execute the application's initialization cpde.
      */
     void Container::spawn() {
         // WRENCH_INFO("Spawning a new container for an invocation of function %s",
