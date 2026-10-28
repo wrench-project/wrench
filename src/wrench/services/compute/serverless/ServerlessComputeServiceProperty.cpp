@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/compute/serverless/ServerlessComputeServiceProperty.h>
+#include "wrench/services/compute/serverless/ServerlessComputeServiceProperty.h"
 
 namespace wrench {
 

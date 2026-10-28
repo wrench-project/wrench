@@ -7,19 +7,19 @@
  * (at your option) any later version.
  */
 
-#include <fsmod/File.hpp>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/services/helper_services/alarm/Alarm.h>
-#include <wrench/failure_causes/NotEnoughResources.h>
-#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/services/compute/serverless/Container.h>
-#include <wrench/services/compute/serverless/ServerlessComputeService.h>
-#include <wrench/services/storage/simple/SimpleStorageService.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/function/Image.h>
-#include <wrench/function/ImageLayer.h>
-#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
+#include <string>
 
+#include <fsmod/File.hpp>
+
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/services/helper_services/alarm/Alarm.h"
+#include "wrench/failure_causes/NotEnoughResources.h"
+#include "wrench/failure_causes/StorageServiceNotEnoughSpace.h"
+#include "wrench/services/compute/serverless/Container.h"
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/function/Image.h"
 #include "wrench/failure_causes/FatalFailure.h"
 #include "wrench/logging/TerminalOutput.h"
 
@@ -178,9 +178,11 @@ namespace wrench {
         } catch (ExecutionException&) {
             this->freeDiskAndMemoryResources();
             throw;
-        } catch (simgrid::Exception&) {
+        } catch (simgrid::Exception& e) {
             this->freeDiskAndMemoryResources();
-            throw ExecutionException(std::make_shared<FatalFailure>("Can't open image layer file in RAM"));
+            throw ExecutionException(
+                std::make_shared<FatalFailure>(
+                    std::string("Failed to open or touch an image layer on disk: ") + e.what()));
         }
 
         // Open the image layer memory files (do this first to pin them to RAM - would

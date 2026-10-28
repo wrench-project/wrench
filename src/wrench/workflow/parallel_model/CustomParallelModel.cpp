@@ -8,9 +8,8 @@
  */
 
 
-#include <wrench/workflow/parallel_model/CustomParallelModel.h>
-
-#include <wrench/logging/TerminalOutput.h>
+#include "wrench/workflow/parallel_model/CustomParallelModel.h"
+#include "wrench/logging/TerminalOutput.h"
 
 #include <utility>
 

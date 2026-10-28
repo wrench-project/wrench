@@ -7,14 +7,14 @@
  * (at your option) any later version.
  */
 
-#include <wrench/execution_controller/ExecutionController.h>
-#include <wrench/execution_controller/ExecutionControllerMessage.h>
-#include <wrench/logging/TerminalOutput.h>
+#include "wrench/execution_controller/ExecutionController.h"
+#include "wrench/execution_controller/ExecutionControllerMessage.h"
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/managers/data_movement_manager/DataMovementManager.h"
 #include "wrench/managers/job_manager/JobManager.h"
 #include "wrench/managers/function_manager/FunctionManager.h"
-#include <wrench/services/helper_services/alarm/Alarm.h>
-#include <wrench/failure_causes/NetworkError.h>
+#include "wrench/services/helper_services/alarm/Alarm.h"
+#include "wrench/failure_causes/NetworkError.h"
 
 #include <utility>
 

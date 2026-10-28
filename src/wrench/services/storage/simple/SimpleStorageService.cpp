@@ -7,23 +7,22 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/FileNotFound.h>
-#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
-
-#include <wrench/services/storage/simple/SimpleStorageService.h>
-#include <wrench/services/storage/simple/SimpleStorageServiceBufferized.h>
-#include <wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h>
-#include <wrench/services/ServiceMessage.h>
+#include "wrench/failure_causes/FileNotFound.h"
+#include "wrench/failure_causes/StorageServiceNotEnoughSpace.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/services/storage/simple/SimpleStorageServiceBufferized.h"
+#include "wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/data_file/DataFile.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
-// #include <wrench/services/memory/MemoryManager.h>
-#include <wrench/util/UnitParser.h>
-#include <wrench/failure_causes/InvalidDirectoryPath.h>
-#include <wrench/failure_causes/NotAllowed.h>
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/data_file/DataFile.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
+// #include "wrench/services/memory/MemoryManager.h"
+#include "wrench/util/UnitParser.h"
+#include "wrench/failure_causes/InvalidDirectoryPath.h"
+#include "wrench/failure_causes/NotAllowed.h"
 
 namespace sgfs = simgrid::fsmod;
 

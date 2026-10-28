@@ -7,10 +7,9 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/NetworkError.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/compute/ComputeService.h>
+#include "wrench/failure_causes/NetworkError.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/compute/ComputeService.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_network_error, "Log category for NetworkError");
 

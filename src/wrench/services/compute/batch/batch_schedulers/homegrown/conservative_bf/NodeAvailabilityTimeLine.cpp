@@ -9,10 +9,11 @@
 
 #include <iostream>
 #include <set>
-#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h"
-#include <boost/icl/interval_map.hpp>
 #include <utility>
-#include <wrench/services/compute/batch/BatchJob.h>
+#include <boost/icl/interval_map.hpp>
+
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h"
+#include "wrench/services/compute/batch/BatchJob.h"
 
 namespace wrench {
 

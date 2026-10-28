@@ -17,7 +17,7 @@
 
 #include <simgrid/forward.h>
 
-#include <wrench/function/ImageLayer.h>
+#include "wrench/function/ImageLayer.h"
 
 
 namespace wrench {

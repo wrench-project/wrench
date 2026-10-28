@@ -14,7 +14,8 @@
 #include <memory>
 #include <cfloat>
 #include <fsmod/File.hpp>
-#include <wrench/function/Function.h>
+
+#include "wrench/function/Function.h"
 
 namespace wrench {
     class Alarm;

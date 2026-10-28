@@ -8,17 +8,20 @@
  *
  */
 
-#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
-#include "wrench/simgrid_S4U_util/S4U_DaemonActor.h"
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <boost/algorithm/string.hpp>
 #include <memory>
+
+#include <boost/algorithm/string.hpp>
+
 #include <simgrid/version.h>
-#include <wrench/failure_causes/HostError.h>
+
+#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/simgrid_S4U_util/S4U_DaemonActor.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/failure_causes/HostError.h"
 
 #ifdef MESSAGE_MANAGER
-#include <wrench/util/MessageManager.h>
+#include "wrench/util/MessageManager.h"
 #endif
 
 

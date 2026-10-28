@@ -120,6 +120,9 @@ file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS
 
 
 add_library(wrench STATIC ${SOURCE_FILES})
+target_include_directories(wrench BEFORE PRIVATE
+        "${PROJECT_SOURCE_DIR}/include"
+)
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SimGrid_LIBRARY} ${FSMOD_LIBRARY})
 

@@ -7,17 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <wrench/simulation/Simulation.h>
-#include <wrench/simulation/SimulationOutput.h>
-#include <wrench/workflow/Workflow.h>
-#include "simgrid/s4u.hpp"
-#include "simgrid/plugins/energy.h"
-
-#include <wrench-dev.h>
-
-#include <nlohmann/json.hpp>
-#include <boost/algorithm/string.hpp>
-
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
@@ -25,6 +14,18 @@
 #include <vector>
 #include <cmath>
 #include <unordered_set>
+
+#include <nlohmann/json.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include <simgrid/s4u.hpp>
+#include <simgrid/plugins/energy.h>
+
+#include "wrench-dev.h"
+
+#include "wrench/simulation/Simulation.h"
+#include "wrench/simulation/SimulationOutput.h"
+#include "wrench/workflow/Workflow.h"
 
 #define DBL_EQUAL(x, y) (std::abs((x) - (y)) < 0.1)
 

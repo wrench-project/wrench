@@ -9,19 +9,20 @@
 
 #include <set>
 #include <utility>
-#include <wrench-dev.h>
-#include <wrench/workflow/Workflow.h>
-#include <wrench/job/CompoundJob.h>
-#include <wrench/action/SleepAction.h>
-#include <wrench/action/ComputeAction.h>
-#include <wrench/action/FileReadAction.h>
-#include <wrench/action/FileWriteAction.h>
-#include <wrench/action/FileCopyAction.h>
-#include <wrench/action/FileDeleteAction.h>
-#include <wrench/action/FileRegistryAddEntryAction.h>
-#include <wrench/action/FileRegistryDeleteEntryAction.h>
-#include <wrench/action/CustomAction.h>
-#include <wrench/action/MPIAction.h>
+#include "wrench-dev.h"
+
+#include "wrench/workflow/Workflow.h"
+#include "wrench/job/CompoundJob.h"
+#include "wrench/action/SleepAction.h"
+#include "wrench/action/ComputeAction.h"
+#include "wrench/action/FileReadAction.h"
+#include "wrench/action/FileWriteAction.h"
+#include "wrench/action/FileCopyAction.h"
+#include "wrench/action/FileDeleteAction.h"
+#include "wrench/action/FileRegistryAddEntryAction.h"
+#include "wrench/action/FileRegistryDeleteEntryAction.h"
+#include "wrench/action/CustomAction.h"
+#include "wrench/action/MPIAction.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
 

@@ -14,9 +14,9 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
-#include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
 
-#include "Version.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h"
+#include "wrench/simulation/Version.h"
 #include "wrench/simulation/SimulationOutput.h"
 
 

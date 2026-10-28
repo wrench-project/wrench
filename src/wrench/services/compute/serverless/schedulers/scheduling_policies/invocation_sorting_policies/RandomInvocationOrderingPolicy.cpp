@@ -1,7 +1,8 @@
 #include <random>
 #include <algorithm>
-#include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomInvocationOrderingPolicy.h>
+
+#include "wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h"
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomInvocationOrderingPolicy.h"
 
 #include "wrench/function/Invocation.h"
 

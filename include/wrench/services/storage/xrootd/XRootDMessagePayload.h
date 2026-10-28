@@ -15,7 +15,7 @@
 
 
 #include "wrench/services/ServiceMessagePayload.h"
-#include <wrench/services/storage/StorageServiceMessagePayload.h>
+#include "wrench/services/storage/StorageServiceMessagePayload.h"
 
 namespace wrench {
     namespace XRootD {

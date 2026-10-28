@@ -7,15 +7,15 @@
  * (at your option) any later version.
  */
 
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/services/storage/StorageServiceMessage.h>
-#include <wrench/services/storage/storage_helpers/FileTransferThread.h>
-#include "wrench/services/storage/storage_helpers/FileTransferThreadMessage.h"
-
-#include <wrench-dev.h>
 #include <boost/algorithm/string/classification.hpp>
 #include <utility>
-//#include <wrench/services/memory/MemoryManager.h>
+
+#include "wrench-dev.h"
+
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/services/storage/StorageServiceMessage.h"
+#include "wrench/services/storage/storage_helpers/FileTransferThread.h"
+#include "wrench/services/storage/storage_helpers/FileTransferThreadMessage.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_file_transfer_thread, "Log category for File Transfer Thread");
 

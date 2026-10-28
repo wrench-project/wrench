@@ -8,11 +8,11 @@
  */
 
 #include <memory>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/services/storage/simple/SimpleStorageService.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
-#include <wrench/services/storage/compound/CompoundStorageService.h>
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/services/storage/compound/CompoundStorageService.h"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <iostream>

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h>
+#include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 
 namespace wrench {
 

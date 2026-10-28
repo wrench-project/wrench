@@ -10,20 +10,20 @@
 #include <algorithm>
 #include <utility>
 
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/simulation/SimulationMessage.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/services/ServiceMessage.h>
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/simulation/SimulationMessage.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/services/ServiceMessage.h"
 
-#include <wrench/services/file_registry/FileRegistryService.h>
+#include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/file_registry/FileRegistryMessage.h"
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/data_file/DataFile.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/services/network_proximity/NetworkProximityService.h>
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/data_file/DataFile.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/services/network_proximity/NetworkProximityService.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_file_registry_service,
                     "Log category for File Registry Service");

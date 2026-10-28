@@ -8,11 +8,11 @@
  *
  */
 
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <simgrid/plugins/live_migration.h>
+
+#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_virtual_machine, "Log category for S4U_VirtualMachine");
 

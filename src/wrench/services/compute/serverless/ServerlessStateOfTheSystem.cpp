@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/compute/serverless/ServerlessComputeService.h>
-#include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
+#include "wrench/services/compute/serverless/ServerlessStateOfTheSystem.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 

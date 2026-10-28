@@ -1,13 +1,13 @@
 #ifndef WRENCH_SERVERLESSSCHEDULER_H
 #define WRENCH_SERVERLESSSCHEDULER_H
 
-#include <wrench/function/Invocation.h>
-#include <wrench/function/Image.h>
-#include <wrench/function/ImageLayer.h>
-#include <wrench/services/compute/serverless/ServerlessStateOfTheSystem.h>
-#include <wrench/services/compute/serverless/Container.h>
 #include <vector>
 #include <string>
+
+#include "wrench/function/Invocation.h"
+#include "wrench/function/ImageLayer.h"
+#include "wrench/services/compute/serverless/ServerlessStateOfTheSystem.h"
+#include "wrench/services/compute/serverless/Container.h"
 
 namespace wrench {
     /***********************/

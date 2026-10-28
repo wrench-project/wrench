@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.h>
+#include "wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.h"
 
 namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(BareMetalComputeServiceMessagePayload, NOT_ENOUGH_CORES_MESSAGE_PAYLOAD);

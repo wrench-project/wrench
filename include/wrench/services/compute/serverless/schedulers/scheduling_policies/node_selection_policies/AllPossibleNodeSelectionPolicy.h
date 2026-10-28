@@ -3,7 +3,7 @@
 #ifndef SERVERLESSSELECTALLPOSSIBLENOTSELECTIONPOLICY_H
 #define SERVERLESSSELECTALLPOSSIBLENOTSELECTIONPOLICY_H
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies/ServerlessNodeSelectionPolicy.h>
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_selection_policies/ServerlessNodeSelectionPolicy.h"
 
 namespace wrench {
 

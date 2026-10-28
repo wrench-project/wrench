@@ -7,11 +7,10 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/NotEnoughResourcesForJob.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/job/Job.h>
-#include <wrench/services/Service.h>
+#include "wrench/failure_causes/NotEnoughResourcesForJob.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/job/Job.h"
+#include "wrench/services/Service.h"
 
 #include <utility>
 

@@ -7,11 +7,9 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/JobKilled.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/job/Job.h>
-#include <wrench/services/storage/StorageService.h>
+#include "wrench/failure_causes/JobKilled.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/storage/StorageService.h"
 
 #include <utility>
 

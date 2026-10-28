@@ -7,9 +7,9 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/FunctionalityNotAvailable.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/Service.h>
+#include "wrench/failure_causes/FunctionalityNotAvailable.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/Service.h"
 
 #include <utility>
 

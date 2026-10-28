@@ -2,11 +2,12 @@
 #include <algorithm>
 #include <utility>
 
-#include <wrench/logging/TerminalOutput.h>
+#include <smpi/smpi.h>
+#include <simgrid/s4u.hpp>
+
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/communicator/SMPIExecutor.h"
 #include "wrench/simulation/Simulation.h"
-#include "smpi/smpi.h"
-#include "simgrid/s4u.hpp"
 
 
 WRENCH_LOG_CATEGORY(wrench_core_smpi_executor, "Log category for SMPIExecutor");

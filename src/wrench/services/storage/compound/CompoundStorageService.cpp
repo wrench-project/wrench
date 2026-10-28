@@ -1,18 +1,17 @@
 #include <cmath>
 
-#include <wrench/services/storage/compound/CompoundStorageService.h>
-
+#include "wrench/services/storage/compound/CompoundStorageService.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include "wrench/services/storage/compound/CompoundStorageServiceMessage.h"
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/failure_causes/FileNotFound.h>
-#include <wrench/failure_causes/NotAllowed.h>
-#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/services/storage/StorageServiceMessagePayload.h>
-#include <wrench/services/storage/simple/SimpleStorageService.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/failure_causes/FileNotFound.h"
+#include "wrench/failure_causes/NotAllowed.h"
+#include "wrench/failure_causes/StorageServiceNotEnoughSpace.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/services/storage/StorageServiceMessagePayload.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_storage_system,
                     "Log category for Compound Storage Service");

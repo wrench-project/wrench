@@ -7,9 +7,8 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/HostError.h>
-
-#include <wrench/logging/TerminalOutput.h>
+#include "wrench/failure_causes/HostError.h"
+#include "wrench/logging/TerminalOutput.h"
 
 #include <utility>
 

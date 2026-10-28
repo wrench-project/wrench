@@ -4,7 +4,7 @@
 #include <set>
 #include <memory>
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/ServerlessInvocationFailingPolicy.h>
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/ServerlessInvocationFailingPolicy.h"
 
 namespace wrench {
     class Invocation;

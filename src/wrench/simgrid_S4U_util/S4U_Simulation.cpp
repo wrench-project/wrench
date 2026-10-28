@@ -11,18 +11,18 @@
 #include <iostream>
 #include <set>
 #include <climits>
-#include <wrench/util/UnitParser.h>
-#include <simgrid/plugins/energy.h>
+
 #include <simgrid/plugins/file_system.h>
-#include <wrench/failure_causes/FailureCause.h>
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simulation/Simulation.h>
+#include <simgrid/plugins/energy.h>
 
-#include <simgrid/version.h>
+#include "wrench/util/UnitParser.h"
+#include "wrench/failure_causes/FailureCause.h"
+#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simulation/Simulation.h"
 
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "smpi/smpi.h"
 
 

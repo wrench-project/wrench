@@ -7,21 +7,22 @@
  * (at your option) any later version.
  */
 
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/job/CompoundJob.h>
-#include <wrench/action/Action.h>
-#include <wrench/action/SleepAction.h>
-#include <wrench/action/ComputeAction.h>
-#include <wrench/action/FileReadAction.h>
-#include <wrench/action/FileWriteAction.h>
-#include <wrench/action/FileCopyAction.h>
-#include <wrench/action/FileDeleteAction.h>
-#include <wrench/action/CustomAction.h>
-#include <wrench/action/FileRegistryAddEntryAction.h>
-#include <wrench/action/FileRegistryDeleteEntryAction.h>
-
 #include <utility>
-#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
+
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/job/CompoundJob.h"
+#include "wrench/action/Action.h"
+#include "wrench/action/SleepAction.h"
+#include "wrench/action/ComputeAction.h"
+#include "wrench/action/FileReadAction.h"
+#include "wrench/action/FileWriteAction.h"
+#include "wrench/action/FileCopyAction.h"
+#include "wrench/action/FileDeleteAction.h"
+#include "wrench/action/CustomAction.h"
+#include "wrench/action/FileRegistryAddEntryAction.h"
+#include "wrench/action/FileRegistryDeleteEntryAction.h"
+#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_core_action, "Log category for  Action");
 

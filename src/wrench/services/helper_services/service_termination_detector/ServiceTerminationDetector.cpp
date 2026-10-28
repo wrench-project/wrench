@@ -6,14 +6,14 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
-
-#include <wrench/simulation/Simulation.h>
-#include <wrench-dev.h>
-
 #include <utility>
+
+#include "wrench-dev.h"
+
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
+#include "wrench/simulation/Simulation.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_core_failure_detector, "Log category for ServiceTerminationDetector");
 

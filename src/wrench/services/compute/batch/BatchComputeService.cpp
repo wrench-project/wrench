@@ -11,28 +11,27 @@
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/compute/batch/BatchComputeService.h>
-#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/util/TraceFileLoader.h>
-#include <wrench/job/PilotJob.h>
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/compute/batch/BatchComputeService.h"
+#include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/util/TraceFileLoader.h"
+#include "wrench/job/PilotJob.h"
 #include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/easy_bf/EasyBackfillingBatchScheduler.h"
 #include "wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h"
-#include <wrench/failure_causes/FunctionalityNotAvailable.h>
-#include <wrench/failure_causes/JobKilled.h>
-#include <wrench/failure_causes/ServiceIsDown.h>
-#include <wrench/failure_causes/NotEnoughResourcesForJob.h>
-#include <wrench/failure_causes/JobTimeout.h>
-#include <wrench/failure_causes/NotAllowed.h>
+#include "wrench/failure_causes/FunctionalityNotAvailable.h"
+#include "wrench/failure_causes/JobKilled.h"
+#include "wrench/failure_causes/ServiceIsDown.h"
+#include "wrench/failure_causes/NotEnoughResourcesForJob.h"
+#include "wrench/failure_causes/JobTimeout.h"
 
 #include "wrench/failure_causes/InvalidOperation.h"
 

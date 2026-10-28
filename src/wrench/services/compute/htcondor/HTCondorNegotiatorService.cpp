@@ -7,18 +7,18 @@
  * (at your option) any later version.
  */
 
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
-#include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h>
-#include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/job/CompoundJob.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/services/compute/batch/BatchComputeService.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
-#include <wrench/services/compute/htcondor/HTCondorComputeService.h>
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h"
+#include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h"
+#include "wrench/services/compute/htcondor/HTCondorNegotiatorService.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/job/CompoundJob.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/services/compute/batch/BatchComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
+#include "wrench/services/compute/htcondor/HTCondorComputeService.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_htcondor_negotiator, "Log category for HTCondorNegotiator");
 
