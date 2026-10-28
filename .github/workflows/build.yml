@@ -18,11 +18,6 @@ jobs:
     strategy:
       matrix:
         include:
-#          - build: "Debian Bookworm - g++-12"
-#            DIST: debian-bookworm
-#            COMPILER: gcc12
-#            batsched: off
-
           - build: "Debian Trixie - g++-14"
             DIST: debian-trixie
             COMPILER: gcc14
