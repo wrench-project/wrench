@@ -20,27 +20,20 @@ WRENCH_LOG_CATEGORY(wrench_core_serverless_state_of_the_system, "Log category fo
 namespace wrench {
     /**
      * @brief Constructor
-     * @param compute_hosts the list of compute hosts
+     * @param compute_nodes the list of compute nodes
+     * @param num_compute_nodes_initially_activated the number of compute nodes that are initially activated
      * @param service the ServerlessComputeService whose state this is
      */
-    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts,
+    ServerlessStateOfTheSystem::ServerlessStateOfTheSystem(const std::vector<std::string>& compute_nodes,
+                                                           unsigned long num_compute_nodes_initially_activated,
                                                            ServerlessComputeService* service)
         : _head_storage_service(nullptr),
           _free_space_on_head_storage(0),
           _serverless_compute_service(service) {
-        unsigned long compute_nodes_initially_activated;
-        if (service->getPropertyValueAsString(ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED)
-            == "all") {
-            compute_nodes_initially_activated = compute_hosts.size();
-        } else {
-            compute_nodes_initially_activated =
-                service->getPropertyValueAsUnsignedLong(
-                    ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED);
-        }
-        for (const auto& hostname : compute_hosts) {
+        for (const auto& hostname : compute_nodes) {
             auto compute_node = std::make_shared<
                 ServerlessComputeNode>(hostname, service);
-            if (compute_nodes_initially_activated) {
+            if (_activated_compute_nodes.size() < num_compute_nodes_initially_activated) {
                 _activated_compute_nodes.push_back(compute_node);
             } else {
                 _deactivated_compute_nodes.push_back(compute_node);

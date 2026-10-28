@@ -243,6 +243,7 @@ namespace wrench {
 
         void setNextSchedulerWakeup(double wakeup_date);
 
+        unsigned long _num_compute_nodes_initially_activated;
         unsigned long _compute_node_num_cores;
         double _compute_node_core_speed;
         sg_size_t _compute_node_ram;
