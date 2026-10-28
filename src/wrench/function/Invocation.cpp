@@ -8,6 +8,9 @@
  */
 
 #include "wrench/function/Invocation.h"
+
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/failure_causes//InvalidOperation.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/serverless/Container.h"
 #include "wrench/services/compute/serverless/ServerlessComputeNode.h"
@@ -44,7 +47,7 @@ namespace wrench {
         if (_done) {
             return _function_output;
         }
-        throw std::runtime_error("Invocation::get_output(): Invocation is not done yet");
+        throw ExecutionException(std::make_shared<InvalidOperation>("Invocation is not done yet"));
     }
 
     /**
@@ -115,14 +118,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Checks if the invocation was successful.
-     * @return True if the invocation was successful, false otherwise.
+     * @brief Checks if the invocation has successfully completed.
+     * @return True if the invocation was successful, false if it has failed (throws if the invocation is not done yet)
      */
     bool Invocation::hasSucceeded() const {
         if (_done) {
             return _success;
         }
-        throw std::runtime_error("Invocation::hasSucceeded(): Invocation is not done yet");
+        throw ExecutionException(std::make_shared<InvalidOperation>("Invocation is not done yet"));
     }
 
     /**
@@ -149,6 +152,6 @@ namespace wrench {
         if (_done) {
             return _failure_cause;
         }
-        throw std::runtime_error("Invocation::getFailureCause(): Invocation is not done yet or was successful");
+        throw ExecutionException(std::make_shared<InvalidOperation>("Invocation is not done yet or was successful"));
     }
 } // namespace wrench

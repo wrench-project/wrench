@@ -29,6 +29,8 @@
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
+#include "wrench/failure_causes/InvalidOperation.h"
+
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_compute_service");
 
 namespace wrench {
@@ -660,10 +662,9 @@ namespace wrench {
         if (this->current_jobs.find(job) == this->current_jobs.end()) {
             WRENCH_INFO(
                 "Trying to terminate a compound job that's not (no longer?) running!");
-            std::string msg = "Job cannot be terminated because it is not running";
             auto answer_message = new ComputeServiceTerminateCompoundJobAnswerMessage(
                 job, this->getSharedPtr<BareMetalComputeService>(), false,
-                std::make_shared<NotAllowed>(this->getSharedPtr<BareMetalComputeService>(), msg),
+                std::make_shared<InvalidOperation>("Job cannot be terminated because it is not running"),
                 this->getMessagePayloadValue(
                     BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answer_message);

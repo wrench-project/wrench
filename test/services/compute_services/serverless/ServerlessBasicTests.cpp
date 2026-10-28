@@ -7,12 +7,13 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
+#include "wrench/failure_causes/InvalidOperation.h"
 #include "wrench/failure_causes/OperationTimeout.h"
 #include "wrench/failure_causes/FunctionNotFound.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
@@ -508,20 +509,29 @@ private:
             try {
                 auto ignore = invocation->hasSucceeded();
                 throw std::runtime_error("Shouldn't be able to call isSuccess() on an invocation that's not done yet");
-            } catch (std::runtime_error& expected) {
+            } catch (wrench::ExecutionException& e) {
+                if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
+                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                }
             }
 
             try {
                 auto ignore = invocation->getFailureCause();
                 throw std::runtime_error(
                     "Shouldn't be able to call getFailureCause() on an invocation that's not done");
-            } catch (std::runtime_error& expected) {
+            } catch (wrench::ExecutionException& e) {
+                if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
+                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                }
             }
 
             try {
                 auto ignore = invocation->getOutput();
                 throw std::runtime_error("Shouldn't be able to call getOutput() on an invocation that's not done");
-            } catch (std::runtime_error& expected) {
+            } catch (wrench::ExecutionException& e) {
+                if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
+                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                }
             }
 
             wrench::Simulation::sleep(1);
@@ -835,10 +845,6 @@ private:
                 throw std::runtime_error(
                     "Unexpected dispatch / start dates: " + std::to_string(invocation->getDispatchDate()) + " / " +
                     std::to_string(invocation->getFunctionStartDate()));
-            }
-
-            if (invocation->getFunctionEndDate() != -1.0) {
-                throw std::runtime_error("Unexpected end date: " + std::to_string(invocation->getFunctionEndDate()));
             }
         }
 

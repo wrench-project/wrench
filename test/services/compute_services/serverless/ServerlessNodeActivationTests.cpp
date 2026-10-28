@@ -218,7 +218,7 @@ void ServerlessNodeActivationTest::do_BasicTest_test() {
         {
             {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "2"},
             {wrench::ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "10000ms"},
-            {wrench::ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED, "false"},
+            {wrench::ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED, "0"},
         }, {}));
 
     std::string user_host = "UserHost";

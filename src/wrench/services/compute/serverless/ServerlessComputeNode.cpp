@@ -276,18 +276,21 @@ namespace wrench {
                 this->shutdownContainer(container);
             } else {
                 // Start the expiration alarm
-                container->_expiration_date = S4U_Simulation::getClock() + idle_timeout;
-                container->_idle_date = S4U_Simulation::getClock();
+                auto now = S4U_Simulation::getClock();
+                container->_idle_date = now;
+                container->_expiration_date = idle_timeout == DBL_MAX ? DBL_MAX : now + idle_timeout;
                 container->_idle_sequence++;
-                container->_expiration_alarm = Alarm::createAndStartAlarm(
-                    _serverless_compute_service->getSimulation(),
-                    container->_expiration_date,
-                    _serverless_compute_service->_hostname,
-                    _serverless_compute_service->getCommPort(),
-                    new
-                    ServerlessComputeServiceContainerIdleTimeoutMessage(
-                        container, container->getIdleSequence()),
-                    "container_idle_timout");
+                if (idle_timeout != DBL_MAX) {
+                    container->_expiration_alarm = Alarm::createAndStartAlarm(
+                        _serverless_compute_service->getSimulation(),
+                        container->_expiration_date,
+                        _serverless_compute_service->_hostname,
+                        _serverless_compute_service->getCommPort(),
+                        new
+                        ServerlessComputeServiceContainerIdleTimeoutMessage(
+                            container, container->getIdleSequence()),
+                        "container_idle_timout");
+                }
             }
         }
     }
@@ -336,6 +339,7 @@ namespace wrench {
     bool ServerlessComputeNode::couldInvocationRunRightNow(
         const std::shared_ptr<Invocation>& invocation,
         const std::shared_ptr<Container>& target_container) const {
+
         // Sanity checks
         if (invocation->isDispatched()) {
             throw std::runtime_error(
@@ -402,18 +406,6 @@ namespace wrench {
             WRENCH_INFO(
                 "Scheduled invocation cannot be started because not all layers for image %s are in RAM at node %s",
                 image->getName().c_str(), this->hostname.c_str());
-            return false;
-        }
-
-        // Are we within compute node limits in terms of number of invocations
-        auto num_in_flight_invocations = 0UL;
-        for (auto const& container : _initializing_containers) {
-            num_in_flight_invocations += container->_in_flight_invocations.size();
-        }
-        for (auto const& container : _initialized_containers) {
-            num_in_flight_invocations += container->_in_flight_invocations.size();
-        }
-        if (num_in_flight_invocations >= _max_num_invocations_per_compute_node) {
             return false;
         }
 

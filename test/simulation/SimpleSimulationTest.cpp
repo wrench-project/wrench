@@ -192,10 +192,10 @@ private:
             cs->startVM(vm_name);
             throw std::runtime_error("Should not be able to start an already-started VM");
         } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
+            auto cause = std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected Failure Cause " + e.getCause()->toString() +
-                                         " (Expected: NotAllowed");
+                                         " (Expected: InvalidOperation");
             }
         }
 

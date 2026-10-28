@@ -32,6 +32,8 @@
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 #include <wrench/simulation/Simulation.h>
 
+#include "wrench/failure_causes/OperationAborted.h"
+
 WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
 
 namespace wrench {
@@ -73,6 +75,16 @@ namespace wrench {
         if (not scheduler) {
             throw std::invalid_argument(
                 "ServerlessComputeService::ServerlessComputeService(): A non-null scheduler must be provided");
+        }
+
+        // Validate uniqueness of compute nodes
+        std::set<std::string> seen_hostnames;
+        for (const auto& h : compute_nodes) {
+            if (!seen_hostnames.insert(h).second) {
+                throw std::invalid_argument(
+                    "ServerlessComputeService: duplicate compute-node hostname: " +
+                    h);
+            }
         }
 
         // Set some convenient node-spec values and heck platform homogeneity
@@ -937,6 +949,13 @@ namespace wrench {
                     invocation->getFunction()->getName().c_str(),
                     (failure_cause ? "FAILURE" : "SUCCESS"));
 
+        // If the function code was started, but was interrupted before recording its end date,
+        // we set its end date to that of the action
+        if (invocation->_function_start_date >= 0.0 &&
+            invocation->_function_end_date < 0.0) {
+            invocation->_function_end_date = action->getEndDate();
+            }
+
         auto compute_node = invocation->_compute_node;
 
         // Update outstanding counts
@@ -991,19 +1010,6 @@ namespace wrench {
             if (not container->_in_flight_invocations.empty()) {
                 throw std::runtime_error("A container that failed to initialized should not have any attached invocation");
             }
-            // for (auto const& inv : container->_in_flight_invocations) {
-            //     inv->_notify_commport->dputMessage(
-            //         new ServerlessComputeServiceFunctionInvocationCompleteMessage(
-            //             false,
-            //             inv,
-            //             container->_init_failure_cause,
-            //             this->getMessagePayloadValue(
-            //                 ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
-            //     _state_of_the_system->_dispatched_invocations.erase(inv);
-            //     _num_outstanding_invocations -= 1;
-            //     _outstanding_invocation_counts.at(inv->getFunction()) -= 1;
-            // }
-            // container->_in_flight_invocations.clear();
             container->shutdown();
             return;
         }
@@ -1020,19 +1026,20 @@ namespace wrench {
                 compute_node->shutdownContainer(container);
             } else {
                 auto now = S4U_Simulation::getClock();
-                auto expiration_date = now + idle_timeout;
-                // Start the timeout alarm
-                container->_expiration_alarm = Alarm::createAndStartAlarm(
-                    this->simulation_,
-                    expiration_date,
-                    _hostname,
-                    _commport,
-                    new
-                    ServerlessComputeServiceContainerIdleTimeoutMessage(
-                        container, container->getIdleSequence()),
-                    "container_idle_timout");
-                container->_expiration_date = expiration_date;
                 container->_idle_date = now;
+                container->_expiration_date = idle_timeout == DBL_MAX ? DBL_MAX : now + idle_timeout;;
+                if (container->_expiration_date < DBL_MAX) {
+                    // Start the timeout alarm
+                    container->_expiration_alarm = Alarm::createAndStartAlarm(
+                        this->simulation_,
+                        container->_expiration_date,
+                        _hostname,
+                        _commport,
+                        new
+                        ServerlessComputeServiceContainerIdleTimeoutMessage(
+                            container, container->getIdleSequence()),
+                        "container_idle_timout");
+                }
             }
         }
     }
@@ -1192,8 +1199,7 @@ namespace wrench {
                     new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                         false,
                         inv,
-                        std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                                                     "Invocation was forcefully failed by the scheduler"),
+                        std::make_shared<OperationAborted>("Invocation was forcefully failed by the scheduler"),
                         this->getMessagePayloadValue(
                             ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
             }
@@ -1208,6 +1214,9 @@ namespace wrench {
         // Terminate the containers
         for (const auto& [container] : decisions) {
             auto node = container->getComputeNode();
+            if (node->getInitializedContainers().count(container) == 0 ||  not container->_in_flight_invocations.empty()) {
+                continue; // Already removed, initializing, or currently occupied.
+            }
             node->shutdownContainer(container);
         }
     }

@@ -78,7 +78,7 @@ protected:
 class BasicCreationDestructionTestWMS : public wrench::ExecutionController {
 public:
     BasicCreationDestructionTestWMS(BandwidthMeterServiceTest *test,
-                                    std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                                    const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 

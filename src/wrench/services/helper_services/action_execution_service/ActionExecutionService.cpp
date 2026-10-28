@@ -30,6 +30,8 @@
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
 
+#include "wrench/failure_causes/InvalidOperation.h"
+
 WRENCH_LOG_CATEGORY(wrench_core_action_scheduler, "Log category for Action Scheduler");
 
 namespace wrench {
@@ -803,10 +805,9 @@ namespace wrench {
         if (this->all_actions.find(action) == this->all_actions.end()) {
             WRENCH_INFO(
                 "Trying to terminate an action that's not (no longer?) running!");
-            std::string error_message = "Action cannot be terminated because it is not running";
             auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
                 false,
-                std::make_shared<NotAllowed>(this->getSharedPtr<ActionExecutionService>(), error_message),
+                std::make_shared<InvalidOperation>("Action cannot be terminated because it is not running"),
                 0.0);
             answer_commport->dputMessage(answer_message);
             return;

@@ -21,6 +21,8 @@
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/simgrid_S4U_util/S4U_CommPort.h>
 
+#include "wrench/failure_causes/InvalidOperation.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_core_cloud_service, "Log category for Cloud Service");
 
@@ -692,10 +694,9 @@ namespace wrench
 
         if (vm->getState() != S4U_VirtualMachine::State::RUNNING)
         {
-            std::string error_message("Cannot shutdown a VM that is not running");
             msg_to_send_back = new CloudComputeServiceShutdownVMAnswerMessage(
                 false,
-                std::make_shared<NotAllowed>(this->getSharedPtr<CloudComputeService>(), error_message),
+                std::make_shared<InvalidOperation>("Cannot shutdown a VM that is not running"),
                 this->getMessagePayloadValue(
                     CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         }
@@ -858,11 +859,10 @@ namespace wrench
         // If the VM is not in the DOWN state, say "failure"
         if (vm->getState() != S4U_VirtualMachine::State::DOWN)
         {
-            std::string error_message("Cannot start a VM that is not down");
             msg_to_send_back = new CloudComputeServiceStartVMAnswerMessage(
                 false,
                 nullptr,
-                std::make_shared<NotAllowed>(this->getSharedPtr<CloudComputeService>(), error_message),
+                std::make_shared<InvalidOperation>("Cannot start a VM that is not down"),
                 this->getMessagePayloadValue(
                     CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(msg_to_send_back);
@@ -958,7 +958,7 @@ namespace wrench
             std::string error_message("Cannot suspend a VM that is not running");
             msg_to_send_back = new CloudComputeServiceSuspendVMAnswerMessage(
                 false,
-                std::make_shared<NotAllowed>(this->getSharedPtr<CloudComputeService>(), error_message),
+                std::make_shared<InvalidOperation>("Cannot suspend a VM that is not running"),
                 this->getMessagePayloadValue(
                     CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
         }
@@ -997,10 +997,9 @@ namespace wrench
 
         if (vm->getState() != S4U_VirtualMachine::State::SUSPENDED)
         {
-            std::string error_message("Cannot resume a VM that is not suspended");
             msg_to_send_back = new CloudComputeServiceResumeVMAnswerMessage(
                 false,
-                std::make_shared<NotAllowed>(this->getSharedPtr<CloudComputeService>(), error_message),
+                std::make_shared<InvalidOperation>("Cannot resume a VM that is not suspended"),
                 this->getMessagePayloadValue(
                     CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
         }
@@ -1037,10 +1036,9 @@ namespace wrench
 
         if (vm->getState() != S4U_VirtualMachine::State::DOWN)
         {
-            std::string error_message("Cannot destroy a VM that is not down");
             msg_to_send_back = new CloudComputeServiceDestroyVMAnswerMessage(
                 false,
-                std::make_shared<NotAllowed>(this->getSharedPtr<CloudComputeService>(), error_message),
+                std::make_shared<InvalidOperation>("Cannot destroy a VM that is not down"),
                 this->getMessagePayloadValue(
                     CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
         }

@@ -34,6 +34,8 @@
 #include <wrench/failure_causes/JobTimeout.h>
 #include <wrench/failure_causes/NotAllowed.h>
 
+#include "wrench/failure_causes/InvalidOperation.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_core_batch_service, "Log category for Batch Service");
 
@@ -1326,12 +1328,11 @@ namespace wrench {
 
         //        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
         if (!is_pending && !is_running && !is_waiting) {
-            std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
             // Send a failure reply
             auto answer_message =
                 new ComputeServiceTerminateCompoundJobAnswerMessage(
                     job, this->getSharedPtr<BatchComputeService>(), false,
-                    std::make_shared<NotAllowed>(this->getSharedPtr<BatchComputeService>(), msg),
+                    std::make_shared<InvalidOperation>("Job cannot be terminated because it is neither pending, not running, not waiting"),
                     this->getMessagePayloadValue(
                         BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
             answer_commport->dputMessage(answer_message);

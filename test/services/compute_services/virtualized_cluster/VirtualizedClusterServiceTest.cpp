@@ -17,6 +17,10 @@
 #include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/services/Service.h"
 
+namespace wrench {
+    class InvalidOperation;
+}
+
 WRENCH_LOG_CATEGORY(virtualized_cluster_service_test, "Log category for VirtualizedClusterServiceTest");
 
 #define EPSILON 0.01
@@ -320,15 +324,12 @@ private:
             cs->shutdownVM(vm_name);
             throw std::runtime_error("Should not be able to shutdown a non-running VM");
         } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
+            auto cause = std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() +
-                                         " (expected: NotAllowed)");
+                                         " (expected: InvalidOperation)");
             }
             auto error_msg = cause->toString();// coverage
-            if (cause->getService() != cs) {
-                throw std::runtime_error("Failure cause does not point to the (correct) service");
-            }
         }
 
         // Coverage
@@ -951,10 +952,10 @@ private:
             cs->suspendVM(vm_list[3]);
             throw std::runtime_error("Should not be able to suspend a non-running VM");
         } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
+            auto cause = std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString() +
-                                         " (Expected: NotAllowed)");
+                                         " (Expected: InvalidOperation)");
             }
         }
 
