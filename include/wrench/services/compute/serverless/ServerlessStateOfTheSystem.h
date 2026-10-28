@@ -22,9 +22,7 @@
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/data_file/DataFile.h>
 
-namespace wrench
-{
-
+namespace wrench {
     /***********************/
     /** \cond INTERNAL     */
     /***********************/
@@ -33,7 +31,6 @@ namespace wrench
      * @brief A class that stores the current state of a serverless compute service
      */
     class ServerlessStateOfTheSystem {
-
     public:
         [[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>> getActivatedComputeNodes() const;
         [[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
@@ -42,17 +39,26 @@ namespace wrench
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
         [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
 
-        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
-        [[nodiscard]] bool isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>&layer) const;
-        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingCopiedToNode(
+            const std::shared_ptr<ServerlessComputeNode>& node) const;
+        [[nodiscard]] bool isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                    const std::shared_ptr<ImageLayer>& layer) const;
+        [[nodiscard]] bool isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                         const std::shared_ptr<ImageLayer>& layer) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersOnDiskAtNode(
+            const std::shared_ptr<ServerlessComputeNode>& node) const;
 
-        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool isImageLayerInRAMAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
-        [[nodiscard]] bool isImageLayerBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode> &node, const std::shared_ptr<ImageLayer> &layer) const;
-        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingLoadedAtNode(
+            const std::shared_ptr<ServerlessComputeNode>& node) const;
+        [[nodiscard]] bool isImageLayerInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                   const std::shared_ptr<ImageLayer>& layer) const;
+        [[nodiscard]] bool isImageLayerBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                         const std::shared_ptr<ImageLayer>& layer) const;
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersInRAMAtNode(
+            const std::shared_ptr<ServerlessComputeNode>& node) const;
 
-        [[nodiscard]] std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> getAdmittedInvocations() const;
+        [[nodiscard]] std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>
+        getAdmittedInvocations() const;
         [[nodiscard]] std::vector<std::shared_ptr<Invocation>> getSchedulableInvocations() const;
         [[nodiscard]] std::map<std::shared_ptr<Function>, unsigned long> getOutstandingInvocationCounts() const;
 
@@ -61,7 +67,9 @@ namespace wrench
     private:
         friend class ServerlessComputeService;
 
-        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_hosts, ServerlessComputeService *service);
+        explicit ServerlessStateOfTheSystem(const std::vector<std::string>& compute_nodes,
+                                            unsigned long num_compute_nodes_initially_activated,
+                                            ServerlessComputeService* service);
 
         // set of (registered)) functions
         std::set<std::shared_ptr<Function>> _functions;
@@ -92,19 +100,19 @@ namespace wrench
 
         // Layer tracking
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_in_ram;
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_being_loaded_in_ram;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>>
+        _image_layers_being_loaded_in_ram;
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_disk;
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_being_copied_to_disk;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>>
+        _image_layers_being_copied_to_disk;
 
         // The compute service this is for
-        ServerlessComputeService *_serverless_compute_service;
-
+        ServerlessComputeService* _serverless_compute_service;
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-
 } // namespace wrench
 
 #endif // WRENCH_SERVERLESSSTATEOFTHESYSTEM_H
