@@ -7,19 +7,19 @@
  * (at your option) any later version.
  */
 
-#include <fsmod/File.hpp>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/services/helper_services/alarm/Alarm.h>
-#include <wrench/failure_causes/NotEnoughResources.h>
-#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/services/compute/serverless/Container.h>
-#include <wrench/services/compute/serverless/ServerlessComputeService.h>
-#include <wrench/services/storage/simple/SimpleStorageService.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/function/Image.h>
-#include <wrench/function/ImageLayer.h>
-#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
+#include <string>
 
+#include <fsmod/File.hpp>
+
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/services/helper_services/alarm/Alarm.h"
+#include "wrench/failure_causes/NotEnoughResources.h"
+#include "wrench/failure_causes/StorageServiceNotEnoughSpace.h"
+#include "wrench/services/compute/serverless/Container.h"
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/function/Image.h"
 #include "wrench/failure_causes/FatalFailure.h"
 #include "wrench/logging/TerminalOutput.h"
 
@@ -27,7 +27,6 @@ WRENCH_LOG_CATEGORY(Container, "Log category for Container");
 
 
 namespace wrench {
-
     unsigned long Container::_creation_id_counter = 0;
 
     /**
@@ -149,8 +148,16 @@ namespace wrench {
 
 
     /**
-     * @brief Method to spawn a container. It will try to terminate idle containers to
-     *        make the new container fit!
+     * @brief Allocate the resources backing a new container.
+     *
+     * Requires the image layers to be present on the compute node.
+     * Opens those layers and allocates the container's private disk/RAM
+     * resources and storage service.
+     *
+     * Does not evict other containers or image layers. Any necessary
+     * reclamation must be performed before calling this method.
+     *
+     * Does not execute the application's initialization cpde.
      */
     void Container::spawn() {
         // WRENCH_INFO("Spawning a new container for an invocation of function %s",
@@ -162,30 +169,31 @@ namespace wrench {
         // be weird if somebody removed them
         auto compute_disk_ss = _compute_node->getDiskStorage();
         try {
-            for (auto const &layer : _function->getImage()->getLayers()) {
+            for (auto const& layer : _function->getImage()->getLayers()) {
                 auto fd = compute_disk_ss->openFile(
                     FileLocation::LOCATION(compute_disk_ss, layer->getFile()));
-                fd->read(1, false); // To update the last access date
                 _opened_image_layer_disk_files.insert(fd);
+                fd->read(1, false); // To update the last access date
             }
         } catch (ExecutionException&) {
             this->freeDiskAndMemoryResources();
             throw;
-        } catch (simgrid::Exception&) {
+        } catch (simgrid::Exception& e) {
             this->freeDiskAndMemoryResources();
-            throw ExecutionException(std::make_shared<FatalFailure>("Can't open image layer file in RAM"));
+            throw ExecutionException(
+                std::make_shared<FatalFailure>(
+                    std::string("Failed to open or touch an image layer on disk: ") + e.what()));
         }
 
         // Open the image layer memory files (do this first to pin them to RAM - would
         // be weird if somebody removed them
         auto compute_ram_ss = _compute_node->getMemoryStorage();
         try {
-            for (auto const &layer : _function->getImage()->getLayers()) {
+            for (auto const& layer : _function->getImage()->getLayers()) {
                 auto fd = compute_ram_ss->openFile(
                     FileLocation::LOCATION(compute_ram_ss, layer->getRAMFile()));
                 _opened_image_layer_ram_files.insert(fd);
                 fd->read(1, false); // To update the last access date
-
             }
         } catch (ExecutionException& e) {
             this->freeDiskAndMemoryResources();
@@ -284,7 +292,8 @@ namespace wrench {
 
         if (not _in_flight_invocations.empty()) {
             // TODO: DO SOMETHING BETTER HERE
-            throw std::runtime_error("Container::shutdown(): Cannot shutdown a container that has in-flight invocations");
+            throw std::runtime_error(
+                "Container::shutdown(): Cannot shutdown a container that has in-flight invocations");
         }
 
         if (_expiration_alarm) {
@@ -354,23 +363,23 @@ namespace wrench {
         }
 
         // Close the image disk file
-        try {
-            for (auto const &layer_file : _opened_image_layer_disk_files) {
-                if (layer_file) {
+        for (auto const& layer_file : _opened_image_layer_disk_files) {
+            if (layer_file) {
+                try {
                     layer_file->close();
+                } catch (simgrid::Exception& ignore) {
                 }
             }
-        } catch (simgrid::Exception& ignore) {
         }
 
         // Close the image ram file
-        try {
-            for (auto const &layer_file : _opened_image_layer_ram_files) {
-                if (layer_file) {
+        for (auto const& layer_file : _opened_image_layer_ram_files) {
+            if (layer_file) {
+                try {
                     layer_file->close();
+                } catch (simgrid::Exception& ignore) {
                 }
             }
-        } catch (simgrid::Exception& ignore) {
         }
 
         // Reset all pointers, just to be safe

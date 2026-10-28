@@ -17,10 +17,10 @@
 #include <unordered_set>
 #include <memory>
 #include <string>
-#include <wrench/services/compute/serverless/ServerlessComputeNode.h>
-#include <wrench/function/Invocation.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/data_file/DataFile.h>
+
+#include "wrench/services/compute/serverless/ServerlessComputeNode.h"
+#include "wrench/function/Invocation.h"
+#include "wrench/services/storage/StorageService.h"
 
 namespace wrench {
     /***********************/
@@ -59,7 +59,7 @@ namespace wrench {
 
         [[nodiscard]] std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>
         getAdmittedInvocations() const;
-        [[nodiscard]] std::vector<std::shared_ptr<Invocation>> getSchedulableInvocations() const;
+        [[nodiscard]] const std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations() const;
         [[nodiscard]] std::map<std::shared_ptr<Function>, unsigned long> getOutstandingInvocationCounts() const;
 
         ~ServerlessStateOfTheSystem() = default;

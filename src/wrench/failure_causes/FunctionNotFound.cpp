@@ -7,10 +7,10 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/FunctionNotFound.h>
-#include <wrench/function/Function.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/failure_causes/FailureCause.h>
+#include "wrench/failure_causes/FunctionNotFound.h"
+#include "wrench/function/Function.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/failure_causes/FailureCause.h"
 
 #include <utility>
 

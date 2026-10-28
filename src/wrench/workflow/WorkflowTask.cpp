@@ -7,11 +7,11 @@
  * (at your option) any later version.
  */
 
-#include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/workflow/WorkflowTask.h>
-#include <wrench/workflow/Workflow.h>
-#include <wrench/services/compute/cloud/CloudComputeService.h>
+#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/workflow/WorkflowTask.h"
+#include "wrench/workflow/Workflow.h"
+#include "wrench/services/compute/cloud/CloudComputeService.h"
 
 #include <utility>
 

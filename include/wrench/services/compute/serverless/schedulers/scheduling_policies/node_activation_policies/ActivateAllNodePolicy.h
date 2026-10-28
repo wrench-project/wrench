@@ -7,7 +7,7 @@
 
 #include <simgrid/forward.h>
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ServerlessNodeScalingPolicy.h>
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ServerlessNodeScalingPolicy.h"
 
 
 namespace wrench {

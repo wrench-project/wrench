@@ -4,9 +4,9 @@
 #include <set>
 #include <vector>
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h>
-#include <wrench/services/compute/serverless/Container.h>
-#include <wrench/function/ImageLayer.h>
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
+#include "wrench/services/compute/serverless/Container.h"
+#include "wrench/function/ImageLayer.h"
 
 namespace wrench {
     /* Anonymous namespace to implement a templated helper for avoiding code duplication */

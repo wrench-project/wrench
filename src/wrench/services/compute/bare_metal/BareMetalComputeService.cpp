@@ -13,22 +13,21 @@
 #include <memory>
 #include <utility>
 
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
-#include <wrench/job/CompoundJob.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/services/compute/ComputeServiceMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/job/PilotJob.h>
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
-
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h"
+#include "wrench/job/CompoundJob.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/job/PilotJob.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h"
 #include "wrench/failure_causes/InvalidOperation.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_compute_service");

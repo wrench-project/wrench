@@ -1,4 +1,4 @@
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailInvocationsPolicy.h>
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/NeverFailInvocationsPolicy.h"
 
 namespace wrench {
 

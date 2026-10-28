@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/storage/compound/CompoundStorageServiceProperty.h>
+#include "wrench/services/storage/compound/CompoundStorageServiceProperty.h"
 
 namespace wrench {
 

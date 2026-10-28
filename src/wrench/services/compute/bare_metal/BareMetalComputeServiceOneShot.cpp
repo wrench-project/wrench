@@ -10,15 +10,15 @@
 #include <map>
 #include <utility>
 
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
-#include <wrench/job/CompoundJob.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
-#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/job/PilotJob.h>
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
+#include "wrench/job/CompoundJob.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h"
+#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/job/PilotJob.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service_one_shot, "Log category for bare_metal_compute_service_on_shot");
 

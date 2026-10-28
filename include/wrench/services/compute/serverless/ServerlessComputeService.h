@@ -10,8 +10,8 @@
 #ifndef SERVERLESSCOMPUTESERVICE_H
 #define SERVERLESSCOMPUTESERVICE_H
 
-#include <wrench/function/Function.h>
-#include <wrench/managers/function_manager/FunctionManager.h>
+#include "wrench/function/Function.h"
+#include "wrench/managers/function_manager/FunctionManager.h"
 #include "wrench/services/compute/serverless/ServerlessComputeServiceMessagePayload.h"
 #include "wrench/function/Invocation.h"
 #include "wrench/services/compute/ComputeService.h"

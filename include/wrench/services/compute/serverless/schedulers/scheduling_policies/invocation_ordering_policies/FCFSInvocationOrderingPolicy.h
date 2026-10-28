@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/ServerlessInvocationOrderingPolicy.h>
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/ServerlessInvocationOrderingPolicy.h"
 
 namespace wrench {
 

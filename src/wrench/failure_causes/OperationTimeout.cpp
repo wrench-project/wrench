@@ -7,12 +7,12 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/OperationTimeout.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/job/Job.h>
-
 #include <utility>
+
+#include "wrench/failure_causes/OperationTimeout.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/job/Job.h"
+
 
 WRENCH_LOG_CATEGORY(wrench_core_operation_timeout, "Log category for OperationTimeout");
 

@@ -17,8 +17,8 @@
 #include <set>
 #include <typeinfo>
 #include <boost/core/demangle.hpp>
-#include <simgrid/s4u.hpp>
-#include <wrench/simulation/SimulationMessage.h>
+
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 

@@ -7,9 +7,10 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/metering/EnergyMeterService.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench-dev.h>
+#include "wrench-dev.h"
+
+#include "wrench/services/metering/EnergyMeterService.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 
 #define EPSILON 0.0001
 

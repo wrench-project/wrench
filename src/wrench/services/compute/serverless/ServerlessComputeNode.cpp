@@ -7,20 +7,17 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/compute/serverless/ServerlessComputeNode.h>
-#include <wrench/function/Invocation.h>
-#include <wrench/function/Image.h>
-#include <wrench/function/ImageLayer.h>
-#include <wrench/services/compute/serverless/Container.h>
-#include <wrench/services/storage/simple/SimpleStorageService.h>
-#include <wrench/services/helper_services/alarm/Alarm.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/compute/serverless/ServerlessComputeService.h>
-#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
-
+#include "wrench/services/compute/serverless/ServerlessComputeNode.h"
+#include "wrench/function/Invocation.h"
+#include "wrench/function/Image.h"
+#include "wrench/function/ImageLayer.h"
+#include "wrench/services/compute/serverless/Container.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/services/helper_services/alarm/Alarm.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/compute/serverless/ServerlessComputeService.h"
+#include "wrench/services/compute/serverless/ServerlessComputeServiceMessage.h"
 #include "wrench/exceptions/ExecutionException.h"
-#include "wrench/failure_causes/NotEnoughResources.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_serverless_compute_node, "Log category for Serverless Compute Node");
 

@@ -7,12 +7,11 @@
  * (at your option) any later version.
  */
 
+#include "wrench-dev.h"
 
-#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
-#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
-
-#include <wrench/simulation/Simulation.h>
-#include <wrench-dev.h>
+#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
+#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h"
+#include "wrench/simulation/Simulation.h"
 
 
 WRENCH_LOG_CATEGORY(wrench_core_host_state_change_detector, "Log category for HostStateChangeDetector");

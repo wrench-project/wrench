@@ -7,12 +7,11 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/InvalidDirectoryPath.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/failure_causes/FailureCause.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/services/compute/ComputeService.h>
+#include "wrench/failure_causes/InvalidDirectoryPath.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/failure_causes/FailureCause.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/compute/ComputeService.h"
 
 #include <utility>
 

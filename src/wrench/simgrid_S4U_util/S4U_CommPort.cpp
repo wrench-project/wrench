@@ -9,21 +9,21 @@
 
 #include <iostream>
 #include <memory>
+
 #include <simgrid/s4u/Mailbox.hpp>
 #include <simgrid/s4u.hpp>
-#include <wrench/failure_causes/NetworkError.h>
 
 #ifdef MESSAGE_MANAGER
-#include <wrench/util/MessageManager.h>
+#include "wrench/util/MessageManager.h"
 #endif
 
-#include <wrench/failure_causes/FailureCause.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/simulation/SimulationMessage.h>
+#include "wrench/failure_causes/NetworkError.h"
+#include "wrench/failure_causes/FailureCause.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/exceptions/ExecutionException.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_commport, "CommPort");

@@ -8,10 +8,11 @@
  *
  */
 
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simulation/SimulationMessage.h>
 #include <typeinfo>
 #include <boost/core/demangle.hpp>
+
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_message, "Log category for SimulationMessage");
 

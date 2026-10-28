@@ -7,19 +7,19 @@
  * (at your option) any later version.
  */
 
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/action/Action.h>
-#include <wrench/action/MPIAction.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/failure_causes/NotEnoughResourcesForJob.h>
-#include <wrench/services/helper_services/action_executor//ActionExecutor.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
-#include "smpi/smpi.h"
-
-
 #include <memory>
 #include <utility>
+
+#include "smpi/smpi.h"
+
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/action/Action.h"
+#include "wrench/action/MPIAction.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/failure_causes/NotEnoughResourcesForJob.h"
+#include "wrench/services/helper_services/action_executor//ActionExecutor.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_mpi_action, "Log category for MPIAction");
 

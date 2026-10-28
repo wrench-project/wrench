@@ -10,12 +10,12 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
-#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h"
-#include <boost/icl/interval_map.hpp>
 #include <utility>
-#include <wrench/services/compute/batch/BatchJob.h>
+#include <boost/icl/interval_map.hpp>
 
-#include <wrench/logging/TerminalOutput.h>
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h"
+#include "wrench/services/compute/batch/BatchJob.h"
+#include "wrench/logging/TerminalOutput.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_core_availability_time_line, "Log category for CoreAvailabilityTimeLine");
 

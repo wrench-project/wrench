@@ -91,6 +91,9 @@ if (NOT ${WRENCH_VERSION_EXTRA} STREQUAL "")
     set(WRENCH_RELEASE_VERSION "${WRENCH_RELEASE_VERSION}-${WRENCH_VERSION_EXTRA}")
 endif ()
 
+# Generate the version header before any source compilation.
+include("${PROJECT_SOURCE_DIR}/conf/cmake/Version.cmake")
+
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
 include_directories(SYSTEM ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${FSMOD_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
@@ -120,11 +123,14 @@ file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS
 
 
 add_library(wrench STATIC ${SOURCE_FILES})
+target_include_directories(wrench BEFORE PRIVATE
+        "${PROJECT_SOURCE_DIR}/include"
+)
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SimGrid_LIBRARY} ${FSMOD_LIBRARY})
 
 # wrench version
-add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
+#add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
 
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)

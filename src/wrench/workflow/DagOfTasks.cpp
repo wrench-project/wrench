@@ -8,9 +8,11 @@
  */
 
 #include <vector>
-#include <wrench/workflow/DagOfTasks.h>
-#include <wrench/logging/TerminalOutput.h>
+
 #include <boost/property_map/property_map.hpp>
+
+#include "wrench/workflow/DagOfTasks.h"
+#include "wrench/logging/TerminalOutput.h"
 
 
 WRENCH_LOG_CATEGORY(dag_of_tasks, "Log category for DagOfTasks");

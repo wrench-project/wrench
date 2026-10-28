@@ -9,20 +9,19 @@
 
 #include <memory>
 #include <utility>
-#include <wrench/services/storage/storage_helpers/FileTransferThreadMessage.h>
 
-#include <wrench/services/storage/simple/SimpleStorageServiceBufferized.h>
-#include <wrench/services/ServiceMessage.h>
+#include "wrench/services/storage/storage_helpers/FileTransferThreadMessage.h"
+#include "wrench/services/storage/simple/SimpleStorageServiceBufferized.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/data_file/DataFile.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/simulation/SimulationTimestampTypes.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
-#include <wrench/failure_causes/NetworkError.h>
-//#include <wrench/services/memory/MemoryManager.h>
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/data_file/DataFile.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/simulation/SimulationTimestampTypes.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/failure_causes/NetworkError.h"
 
 namespace sgfs = simgrid::fsmod;
 

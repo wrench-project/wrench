@@ -8,10 +8,11 @@
  */
 
 #include <string>
-#include <simgrid/s4u/Actor.hpp>
 #include <iostream>
-#include <wrench/logging/TerminalOutput.h>
 
+#include <simgrid/s4u/Actor.hpp>
+
+#include "wrench/logging/TerminalOutput.h"
 
 namespace wrench {
 

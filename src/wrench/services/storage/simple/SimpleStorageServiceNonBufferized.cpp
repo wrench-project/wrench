@@ -8,20 +8,19 @@
  */
 
 #include <utility>
-#include <wrench/failure_causes/InvalidDirectoryPath.h>
-#include <wrench/failure_causes/FileNotFound.h>
-#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
 
-#include <wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h>
-#include <wrench/services/ServiceMessage.h>
+#include "wrench/failure_causes/InvalidDirectoryPath.h"
+#include "wrench/failure_causes/FileNotFound.h"
+#include "wrench/failure_causes/StorageServiceNotEnoughSpace.h"
+#include "wrench/services/storage/simple/SimpleStorageServiceNonBufferized.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
-#include <wrench/simgrid_S4U_util/S4U_CommPort.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/data_file/DataFile.h>
-#include <wrench/exceptions/ExecutionException.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
-//#include <wrench/services/memory/MemoryManager.h>
+#include "wrench/simgrid_S4U_util/S4U_CommPort.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/data_file/DataFile.h"
+#include "wrench/exceptions/ExecutionException.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service_non_bufferized,
                     "Log category for Simple Storage Service Non Bufferized");

@@ -8,10 +8,12 @@
  */
 
 #include <set>
-#include <wrench-dev.h>
-#include <wrench/workflow/Workflow.h>
-#include <wrench/job/StandardJob.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
+
+#include "wrench-dev.h"
+
+#include "wrench/workflow/Workflow.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_standard_job, "Log category for StandardJob");
 

@@ -11,9 +11,10 @@
 #ifndef WRENCH_S4U_VIRTUALMACHINE_H
 #define WRENCH_S4U_VIRTUALMACHINE_H
 
-#include <simgrid/s4u/VirtualMachine.hpp>
 #include <set>
-#include <wrench/services/Service.h>
+#include <simgrid/s4u/VirtualMachine.hpp>
+
+#include "wrench/services/Service.h"
 
 
 namespace wrench {

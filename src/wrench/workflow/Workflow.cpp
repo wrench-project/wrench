@@ -7,10 +7,10 @@
  * (at your option) any later version.
  */
 
-#include <wrench/workflow/WorkflowTask.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/workflow/Workflow.h>
+#include "wrench/workflow/WorkflowTask.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/workflow/Workflow.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow, "Log category for Workflow");
 

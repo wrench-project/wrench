@@ -7,10 +7,9 @@
  * (at your option) any later version.
  */
 
-#include <wrench/failure_causes/ServiceIsDown.h>
-
-#include <wrench/logging/TerminalOutput.h>
-#include <wrench/services/compute/ComputeService.h>
+#include "wrench/failure_causes/ServiceIsDown.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/compute/ComputeService.h"
 
 #include <utility>
 

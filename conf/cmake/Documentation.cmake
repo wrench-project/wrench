@@ -76,9 +76,14 @@ if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND AND SPHINX_FOUND)
     add_custom_command(TARGET doc POST_BUILD COMMAND sphinx-build
             ${CMAKE_HOME_DIRECTORY}/doc/source
             ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION})
-    add_custom_command(TARGET doc POST_BUILD COMMAND cp -R
-            ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}
-            ${CMAKE_HOME_DIRECTORY}/docs/build/latest)
+    add_custom_command(TARGET doc POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E remove_directory
+                    "${CMAKE_HOME_DIRECTORY}/docs/build/latest"
+            COMMAND "${CMAKE_COMMAND}" -E copy_directory
+                    "${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}"
+                    "${CMAKE_HOME_DIRECTORY}/docs/build/latest"
+            VERBATIM
+    )
 
 else()
     add_custom_target(doc echo "ERROR: Cannot build documentation because at least one of Doxygen, Swagger-Codegen, or Sphinx is not installed." COMMAND echo "       If you have installed them, re-run cmake." VERBATIM)

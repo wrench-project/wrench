@@ -1,4 +1,4 @@
-#include <wrench.h>
+#include "wrench.h"
 
 
 #include <utility>
@@ -7,9 +7,9 @@
 #include <set>
 #include <vector>
 
-#include <wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h>
-#include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
-#include <wrench/logging/TerminalOutput.h>
+#include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h"
+#include "wrench/logging/TerminalOutput.h"
 
 
 WRENCH_LOG_CATEGORY(wrench_greedy_serverless_scheduler, "Log category for GreedyServerlessScheduler");

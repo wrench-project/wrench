@@ -6,14 +6,13 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-
-
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/services/compute/batch/BatchComputeService.h>
-#include <wrench-dev.h>
-
 #include <memory>
 #include <utility>
+
+#include "wrench-dev.h"
+
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
 #include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.h"
 

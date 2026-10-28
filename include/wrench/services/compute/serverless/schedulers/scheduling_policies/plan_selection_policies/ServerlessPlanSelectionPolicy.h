@@ -7,7 +7,7 @@
 
 #include <simgrid/forward.h>
 
-#include <wrench/services/compute/serverless/schedulers/scheduling_policies/ServerlessSchedulingPolicy.h>
+#include "wrench/services/compute/serverless/schedulers/scheduling_policies/ServerlessSchedulingPolicy.h"
 
 namespace wrench {
 

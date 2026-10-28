@@ -16,9 +16,7 @@
 #include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/managers/function_manager/FunctionManager.h"
-
-#include <wrench/services/compute/serverless/ServerlessComputeServiceMessage.h>
-
+#include "wrench/services/compute/serverless/ServerlessComputeServiceMessage.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_CommPort.h"
 #include "wrench/simulation/SimulationMessage.h"

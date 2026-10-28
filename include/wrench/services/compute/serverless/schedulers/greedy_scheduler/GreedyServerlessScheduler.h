@@ -1,8 +1,8 @@
 #ifndef WRENCH_GREEDYSERVERLESSCHEDULER_H
 #define WRENCH_GREEDYSERVERLESSCHEDULER_H
 
-#include <wrench/services/compute/serverless/schedulers/ServerlessScheduler.h>
-#include <wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h>
+#include "wrench/services/compute/serverless/schedulers/ServerlessScheduler.h"
+#include "wrench/services/compute/serverless/schedulers/ServerlessSchedulingState.h"
 
 
 namespace wrench {
