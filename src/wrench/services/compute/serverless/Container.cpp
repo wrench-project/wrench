@@ -172,8 +172,8 @@ namespace wrench {
             for (auto const& layer : _function->getImage()->getLayers()) {
                 auto fd = compute_disk_ss->openFile(
                     FileLocation::LOCATION(compute_disk_ss, layer->getFile()));
-                fd->read(1, false); // To update the last access date
                 _opened_image_layer_disk_files.insert(fd);
+                fd->read(1, false); // To update the last access date
             }
         } catch (ExecutionException&) {
             this->freeDiskAndMemoryResources();
