@@ -12,8 +12,10 @@
 #define WRENCH_S4U_COMMPORT_H
 
 
+#include <memory>
 #include <string>
 #include <map>
+#include <deque>
 #include <set>
 #include <typeinfo>
 #include <boost/core/demangle.hpp>
