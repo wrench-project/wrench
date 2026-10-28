@@ -73,7 +73,7 @@ namespace wrench {
         /**
          * @brief Destructor
          */
-        ~SimulationTrace<T>() {
+        ~SimulationTrace() override {
             for (auto &timestamp: this->trace) {
                 delete timestamp;
             }
