@@ -103,7 +103,7 @@ namespace wrench {
      */
     void Simulation::init(int *argc, char **argv) {
         if (Simulation::initialized) {
-            throw std::runtime_error("Simulation::init(): Simulation already initialized");
+            throw std::logic_error("Simulation::init(): Simulation already initialized");
         }
 
         if (*argc < 1) {
@@ -324,10 +324,10 @@ namespace wrench {
      */
     void Simulation::instantiatePlatform(const std::string &filename) {
         if (not this->s4u_simulation->isInitialized()) {
-            throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
+            throw std::logic_error("Simulation::instantiatePlatform(): Simulation is not initialized");
         }
         if (already_setup) {
-            throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
+            throw std::logic_error("Simulation::instantiatePlatform(): Platform already setup");
         }
 
         this->s4u_simulation->setupPlatformFromFile(filename);
@@ -362,10 +362,10 @@ namespace wrench {
      */
     void Simulation::instantiatePlatform(const std::function<void()> &creation_function) {
         if (not this->s4u_simulation->isInitialized()) {
-            throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
+            throw std::logic_error("Simulation::instantiatePlatform(): Simulation is not initialized");
         }
         if (already_setup) {
-            throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
+            throw std::logic_error("Simulation::instantiatePlatform(): Platform already setup");
         }
 
         this->s4u_simulation->setupPlatformFromLambda(creation_function);
@@ -532,8 +532,8 @@ namespace wrench {
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();
-        } catch (std::runtime_error &e) {
-            throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
+        } catch (std::logic_error &e) {
+            throw std::logic_error("Simulation::launch(): " + std::string(e.what()));
         }
 
         // Before starting the simulation, obtain the initial pstate of each host.
@@ -582,17 +582,17 @@ namespace wrench {
     void Simulation::checkSimulationSetup() const {
         // Check that the simulation is initialized
         if (not this->s4u_simulation->isInitialized()) {
-            throw std::runtime_error("Simulation is not initialized");
+            throw std::logic_error("Simulation is not initialized");
         }
 
         // Check that a platform has been set up
         if (not this->s4u_simulation->isPlatformSetup()) {
-            throw std::runtime_error("Simulation platform has not been setup");
+            throw std::logic_error("Simulation platform has not been setup");
         }
 
         // Check that there is at least one execution controller
         if (this->execution_controllers.empty()) {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "An execution controller should have been instantiated and passed to Simulation.add()");
         }
     }

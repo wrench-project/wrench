@@ -180,7 +180,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -292,7 +292,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
 
@@ -423,7 +423,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 4;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     argv[2] = strdup("--cfg=contexts/stack-size:100");
@@ -526,7 +526,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");

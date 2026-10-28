@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -178,7 +178,7 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_TwoCommunicatingActio
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
     //    argv[2] = strdup("--log=wrench_core_commport.threshold:debug");
@@ -304,7 +304,7 @@ void BareMetalComputeServiceActionsThatCommunicateTest::do_MPICollectives_test()
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
     //        argv[2] = strdup("--cfg=smpi/host-speed:0.001");

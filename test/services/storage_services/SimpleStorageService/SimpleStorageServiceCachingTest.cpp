@@ -154,7 +154,7 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCaching_test(double buffer_siz
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 //            argv[1] = strdup("--wrench-full-log");
 
@@ -278,7 +278,7 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCachingCopy_test(double buffer
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //        argv[1] = strdup("--wrench-full-log");
 
@@ -431,7 +431,7 @@ void SimpleStorageServiceCachingTest::do_SimpleLRUCachingUnevictable_test(double
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 //        argv[1] = strdup("--wrench-full-log");
 

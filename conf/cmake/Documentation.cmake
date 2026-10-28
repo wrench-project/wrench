@@ -64,7 +64,7 @@ if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND AND SPHINX_FOUND)
 
     add_custom_command(TARGET doc
             POST_BUILD
-            COMMAND swagger-codegen generate -i ${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon/doc/wrench-openapi.json -l html2 -o ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}/restapi
+            COMMAND "${SWAGGER_CODEGEN_FOUND}" generate -i ${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon/doc/wrench-openapi.json -l html2 -o ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}/restapi
             COMMENT "Generating REST API HTML"
             VERBATIM
     )
@@ -73,7 +73,7 @@ if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND AND SPHINX_FOUND)
             ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}
             ${CMAKE_HOME_DIRECTORY}/doc/source
             ${WRENCH_RELEASE_VERSION})
-    add_custom_command(TARGET doc POST_BUILD COMMAND sphinx-build
+    add_custom_command(TARGET doc POST_BUILD COMMAND "${SPHINX_FOUND}"
             ${CMAKE_HOME_DIRECTORY}/doc/source
             ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION})
     add_custom_command(TARGET doc POST_BUILD
@@ -86,6 +86,10 @@ if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND AND SPHINX_FOUND)
     )
 
 else()
-    add_custom_target(doc echo "ERROR: Cannot build documentation because at least one of Doxygen, Swagger-Codegen, or Sphinx is not installed." COMMAND echo "       If you have installed them, re-run cmake." VERBATIM)
-
+    add_custom_target(doc
+            COMMAND "${CMAKE_COMMAND}" -E echo
+            "Cannot build documentation: Doxygen, Swagger Codegen, and Sphinx are required."
+            COMMAND false
+            VERBATIM
+    )
 endif()

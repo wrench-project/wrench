@@ -174,7 +174,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskBasicTest) {
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1024");
 
@@ -368,7 +368,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1024");
 //        argv[2] = strdup("--wrench-full-log");
@@ -566,7 +566,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskTerminateAndFailTest)
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
 

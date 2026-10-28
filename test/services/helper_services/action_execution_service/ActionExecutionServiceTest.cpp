@@ -199,7 +199,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -295,7 +295,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionBogusSpecTest
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -404,7 +404,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceNonReadyActionTest_tes
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[2] = strdup("--wrench-full-log");
 
@@ -526,7 +526,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -699,7 +699,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -829,7 +829,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -960,7 +960,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1068,7 +1068,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1235,7 +1235,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");

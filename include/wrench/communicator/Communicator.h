@@ -39,6 +39,9 @@ namespace wrench {
         explicit Communicator(unsigned long size) : size(size){};
 
     private:
+
+        unsigned long _smpi_arrivals = 0;
+        unsigned long _barrier_arrivals = 0;
         unsigned long size;
         std::map<aid_t, unsigned long> actor_to_rank;
         std::map<unsigned long, S4U_CommPort *> rank_to_commport;

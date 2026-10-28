@@ -311,7 +311,7 @@ bool compareLinks(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 
 void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     auto simulation = wrench::Simulation::createSimulation();
@@ -452,7 +452,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowExecutionJSONTest) {
 /**********************************************************************/
 void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_test() {
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     auto simulation = wrench::Simulation::createSimulation();
@@ -641,7 +641,7 @@ TEST_F(SimulationDumpJSONTest, SimulationSearchForHostUtilizationGraphLayoutTest
 
 void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     auto simulation = wrench::Simulation::createSimulation();
@@ -841,7 +841,7 @@ bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1061,7 +1061,7 @@ bool compareLinkname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -1242,7 +1242,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpDiskOperationsTest) {
 void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 //        argv[1] = strdup("--wrench-full-log");
 
@@ -1327,7 +1327,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpPlatformGraphJSONTest) {
 void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -1530,7 +1530,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpPlatformGraphJSONWithBrokenRoutingT
 void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSONBrokenRouting_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -1551,7 +1551,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpUnifiedJSONTest) {
 void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
     //    argv[2] = strdup("--wrench-full-logs");

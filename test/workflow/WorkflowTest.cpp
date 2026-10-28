@@ -43,7 +43,7 @@ protected:
         try {
             workflow->addControlDependency(t2, t1);
             throw std::runtime_error("Creating a dependency cycle in workflow should throw");
-        } catch (std::runtime_error &ignore) {}
+        } catch (std::invalid_argument &ignore) {}
 
         f1 = wrench::Simulation::addFile("file-01", 1);
         f2 = wrench::Simulation::addFile("file-02", 1);
@@ -71,11 +71,11 @@ protected:
         try {
             t1->updateStartDate(666.6);
             throw std::runtime_error("Should not be able to call WorkflowTask::updateStartDate()");
-        } catch (std::runtime_error &ignore) {}
+        } catch (std::logic_error &ignore) {}
         try {
             t1->setTerminationDate(666.6);
             throw std::runtime_error("Should not be able to call WorkflowTask::setTerminationDate()");
-        } catch (std::runtime_error &ignore) {}
+        } catch (std::logic_error &ignore) {}
     }
 
     // data members

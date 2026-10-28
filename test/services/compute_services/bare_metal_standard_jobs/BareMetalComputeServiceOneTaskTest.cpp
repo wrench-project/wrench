@@ -181,20 +181,20 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 0;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
 
-    ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
+    ASSERT_THROW(simulation->init(&argc, argv), std::logic_error);
     free(argv);
 
     argc = 1;
-    ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->init(&argc, nullptr), std::logic_error);
 
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     argc = 1;
-    argv = (char **) calloc(argc, sizeof(char *));
+    argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     simulation->init(&argc, argv);
@@ -333,20 +333,20 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("TwoCoreHost",
                                                                 {std::make_pair("TwoCoreHost",
@@ -356,12 +356,12 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
                                                                 {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("TwoCoreHost", {"/disk1"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "TwoCoreHost";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -603,7 +603,7 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     simulation->init(&argc, argv);
@@ -692,7 +692,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     simulation->init(&argc, argv);
@@ -815,7 +815,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 //            argv[1] = strdup("--wrench-full-log");
 
@@ -954,7 +954,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //        argv[1] = strdup("--wrench-full-log");
 
@@ -1070,15 +1070,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
@@ -1207,18 +1207,18 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 //        argv[1] = strdup("--wrench-full-log");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     // Get a hostname
     std::string hostname = "TwoCoreHost";
@@ -1349,17 +1349,17 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
@@ -1468,17 +1468,17 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
@@ -1573,7 +1573,7 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-        test->task->getStateAsString();
+        auto ignore = test->task->getStateAsString();
 
         return 0;
     }
@@ -1587,18 +1587,18 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 //            argv[1] = strdup("--wrench-full-log");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
@@ -1700,18 +1700,18 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
@@ -1808,18 +1808,18 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
@@ -1921,7 +1921,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -2028,7 +2028,7 @@ private:
         // Submit the job again
         try {
             job_manager->submitJob(job, test->compute_service);
-        } catch (wrench::ExecutionException &e) {
+        } catch (wrench::ExecutionException &ignore) {
             throw std::runtime_error("Should  be able to submit a job to a service that has been resumed");
         }
 
@@ -2046,7 +2046,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -2136,7 +2136,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionButDontWait_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -157,21 +157,21 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 0;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
 
-    ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
+    ASSERT_THROW(simulation->init(&argc, argv), std::logic_error);
     free(argv);
 
     argc = 1;
-    ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->init(&argc, nullptr), std::logic_error);
 
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     argc = 1;
-    argv = (char **) calloc(argc, sizeof(char *));
+    argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -320,21 +320,21 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //            argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -344,12 +344,12 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
                                                                 {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -373,10 +373,10 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
 class BareMetalOneSleepActionTestWMS : public wrench::ExecutionController {
 public:
     BareMetalOneSleepActionTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   std::shared_ptr<wrench::Workflow> workflow,
+                                   const std::shared_ptr<wrench::Workflow>& workflow,
                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                                   const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -426,7 +426,7 @@ private:
         } catch (std::invalid_argument &ignore) {}
 
         job_manager->submitJob(job, this->test->compute_service, {});
-        job->getStateAsString();// coverage
+        auto ignore = job->getStateAsString();// coverage
 
         // Try to submit again (coverate)
         try {
@@ -494,21 +494,21 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -518,12 +518,12 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
                                                                 {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -554,10 +554,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
 class BareMetalOneSleepActionDetachedTestWMS : public wrench::ExecutionController {
 public:
     BareMetalOneSleepActionDetachedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   std::shared_ptr<wrench::Workflow> workflow,
+                                   const std::shared_ptr<wrench::Workflow>& workflow,
                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                                   const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -578,7 +578,7 @@ private:
         try {
             job->setDetached(false);
             throw std::runtime_error("Shouldn't be able to call setDetached() on a job unless is hasn't been submitted");
-        } catch (std::invalid_argument &ignore) {}
+        } catch (std::logic_error &ignore) {}
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent(1000.00);
@@ -600,21 +600,21 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionDetached_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -624,12 +624,12 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionDetached_test() {
                                                                 {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -732,21 +732,21 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -756,12 +756,12 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
                                                                 {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -792,10 +792,10 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
 class BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS : public wrench::ExecutionController {
 public:
     BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                                             std::shared_ptr<wrench::Workflow> workflow,
+                                                             const std::shared_ptr<wrench::Workflow>& workflow,
                                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                             std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                             const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -862,21 +862,21 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -886,12 +886,12 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
                                                                 {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -922,7 +922,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
 class BareMetalServiceCrashedTestWMS : public wrench::ExecutionController {
 public:
     BareMetalServiceCrashedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                   const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -966,8 +966,8 @@ private:
             throw std::runtime_error("Unexpected event-level failure cause");
         }
 
-        // Chek action stuff
-        job->getStateAsString();// coverage
+        // Check action stuff
+        auto ignore = job->getStateAsString();// coverage
 
         if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
@@ -1006,7 +1006,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1014,14 +1014,14 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1031,13 +1031,13 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
                                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -1129,7 +1129,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     // argv[1] = strdup("--wrench-full-log");
@@ -1137,14 +1137,14 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1154,12 +1154,12 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -1255,7 +1255,7 @@ private:
             (top.execution_host != "Host4") or
             (top.num_cores_allocated != 0) or
             (top.state != wrench::Action::State::COMPLETED) or
-            (top.ram_allocated != 0.0) or
+            (top.ram_allocated != 0) or
             (top.physical_execution_host != "Host4")) {
             throw std::runtime_error("Unexpected last history");
         }
@@ -1268,7 +1268,7 @@ private:
             (top.execution_host != "Host4") or
             (top.num_cores_allocated != 0) or
             (top.state != wrench::Action::State::FAILED) or
-            (top.ram_allocated != 0.0) or
+            (top.ram_allocated != 0) or
             (top.physical_execution_host != "Host4")) {
             throw std::runtime_error("Unexpected last history");
         }
@@ -1297,7 +1297,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1305,14 +1305,14 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1322,13 +1322,13 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"},
                                                                                      {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10MB"}})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -1439,21 +1439,21 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1463,12 +1463,12 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -1545,7 +1545,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1553,14 +1553,14 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1570,12 +1570,12 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -1655,7 +1655,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
 //        argv[1] = strdup("--wrench-full-log");
@@ -1663,14 +1663,14 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1680,12 +1680,12 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -1750,21 +1750,21 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1774,12 +1774,12 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
@@ -1863,21 +1863,21 @@ void BareMetalComputeServiceOneActionTest::do_FileRegistryActions_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BareMetalComputeService("Host3",
                                                                 {std::make_pair("Host4",
@@ -1887,12 +1887,12 @@ void BareMetalComputeServiceOneActionTest::do_FileRegistryActions_test() {
                                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
                             wrench::SimpleStorageService::createSimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(

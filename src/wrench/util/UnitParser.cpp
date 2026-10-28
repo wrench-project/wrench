@@ -85,9 +85,9 @@ namespace wrench {
 
         double res = strtod(c_string, &ptr);
         if (errno == ERANGE)
-            throw std::runtime_error("Value out of range when parsing value " + string);
+            throw std::invalid_argument("Value out of range when parsing value " + string);
         if (ptr == string)
-            throw std::runtime_error("Cannot parse value " + string);
+            throw std::invalid_argument("Cannot parse value " + string);
         if (ptr[0] == '\0') {
             if (res == 0)
                 return res;// Ok, 0 can be unit-less
@@ -95,7 +95,7 @@ namespace wrench {
         }
         auto u = units.find(ptr);
         if (u == units.end())
-            throw std::runtime_error("Unknown unit '" + std::string(ptr) + " when parsing value " + string);
+            throw std::invalid_argument("Unknown unit '" + std::string(ptr) + " when parsing value " + string);
         return res * u->second;
     }
 
@@ -117,7 +117,7 @@ namespace wrench {
             } else {
                 return static_cast<sg_size_t>(value);
             }
-        } catch (std::runtime_error &e) {
+        } catch (std::invalid_argument &e) {
             throw std::invalid_argument(e.what());
         }
     }
@@ -133,7 +133,7 @@ namespace wrench {
         static const UnitParser::unit_scale units{std::make_tuple("f", 1.0, 10, true)};
         try {
             return parseValueWithUnit(string, units, "f");// default: bytes
-        } catch (std::runtime_error &e) {
+        } catch (std::invalid_argument &e) {
             throw std::invalid_argument(e.what());
         }
     }
@@ -151,7 +151,7 @@ namespace wrench {
                                                   std::make_tuple("Bps", 1.0, 10, true)};
         try {
             return parseValueWithUnit(string, units, "bps");// default: bits
-        } catch (std::runtime_error &e) {
+        } catch (std::invalid_argument &e) {
             throw std::invalid_argument(e.what());
         }
     }
@@ -174,7 +174,7 @@ namespace wrench {
                                       std::make_pair("ps", 1e-12)};
         try {
             return parseValueWithUnit(string, units, "s");// default: bits
-        } catch (std::runtime_error &e) {
+        } catch (std::invalid_argument &e) {
             throw std::invalid_argument(e.what());
         }
     }

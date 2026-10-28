@@ -102,7 +102,7 @@ void FailureCommandLineArgsTest::do_MissingFailureCommandLineArgsTest_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 

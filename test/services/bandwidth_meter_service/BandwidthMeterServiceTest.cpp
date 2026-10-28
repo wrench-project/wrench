@@ -97,7 +97,7 @@ private:
         try {
             this->createBandwidthMeter({}, TWO_SECOND_PERIOD);
             throw std::runtime_error("Bad invocation of simple constructor should have thrown");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
             // expected
         }
         try {
@@ -105,7 +105,7 @@ private:
             bogus_linknames.emplace_back("bogus_link");
             this->createBandwidthMeter(bogus_linknames, 5.0);
             throw std::runtime_error("Bad invocation of simple constructor should have thrown");
-        } catch (std::invalid_argument &e) {
+        } catch (std::invalid_argument &ignore) {
             // expected
         }
 
@@ -159,7 +159,7 @@ TEST_F(BandwidthMeterServiceTest, BasicCreationDestruction) {
 void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 

@@ -97,7 +97,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-version");
 
@@ -162,7 +162,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--help-wrench");
 
@@ -215,7 +215,7 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpSimGridArgument) {
 void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--help-simgrid");
 
@@ -273,7 +273,7 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--help");
 
@@ -301,7 +301,7 @@ void SimulationCommandLineArgumentsTest::do_CommPortPoolSizeArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-commport-pool-size1000");
 
@@ -330,7 +330,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-no-color");
 
@@ -402,7 +402,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(const std::stri
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup(arg.c_str());
 
@@ -460,7 +460,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 

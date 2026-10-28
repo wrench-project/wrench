@@ -215,7 +215,7 @@ void BatchServiceTest::do_BogusSetupTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -439,7 +439,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -581,7 +581,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     // argv[1] = strdup("--wrench-full-log");
 
@@ -729,7 +729,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -862,7 +862,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1024,7 +1024,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1181,7 +1181,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1351,7 +1351,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1483,7 +1483,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1596,7 +1596,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1735,7 +1735,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1860,7 +1860,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -2060,7 +2060,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -2210,7 +2210,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -2469,7 +2469,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //            argv[1] = strdup("--wrench-full-log");
 
@@ -2642,7 +2642,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -2794,7 +2794,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -2935,7 +2935,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -3062,7 +3062,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -3194,7 +3194,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -3330,7 +3330,7 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 

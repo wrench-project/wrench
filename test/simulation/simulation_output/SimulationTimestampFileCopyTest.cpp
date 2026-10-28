@@ -157,7 +157,7 @@ TEST_F(SimulationTimestampFileCopyTest, SimulationTimestampFileCopyBasicTest) {
 void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-default-control-message-size=1");
 

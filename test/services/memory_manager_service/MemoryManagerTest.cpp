@@ -8,7 +8,7 @@
  * (at your option) any later version.
  */
 #if 0
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -121,7 +121,7 @@ void MemoryManagerTest::do_MemoryManagerBadSetupTest_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-pagecache-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -204,16 +204,16 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-pagecache-simulation");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::logic_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname

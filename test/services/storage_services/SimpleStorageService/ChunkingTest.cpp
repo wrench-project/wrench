@@ -122,7 +122,7 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));

@@ -7,12 +7,11 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include <wrench/job/PilotJob.h>
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
@@ -51,7 +50,7 @@ public:
     }
 
 protected:
-    ~BareMetalComputeServiceTestScheduling() {
+    ~BareMetalComputeServiceTestScheduling() override {
         workflow->clear();
         wrench::Simulation::removeAllFiles();
     }
@@ -97,7 +96,7 @@ class RAMPressureTestWMS : public wrench::ExecutionController {
 
 public:
     RAMPressureTestWMS(BareMetalComputeServiceTestScheduling *test,
-                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                       const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -124,10 +123,9 @@ private:
         }
 
         auto ram_availabilities = this->test->cs->getPerHostAvailableMemoryCapacity();
-        if ((not BareMetalComputeServiceTestScheduling::isAboutTheSame(ram_availabilities["Host1"], 500)) ||
-            (not BareMetalComputeServiceTestScheduling::isAboutTheSame(ram_availabilities["Host2"], 1000))) {
-            throw std::runtime_error("Unexpected memory_manager_service availabilities");
-        }
+        if ((ram_availabilities["Host1"] != 500) ||
+            (ram_availabilities["Host2"] != 1000)) {
+            throw std::runtime_error("Unexpected memory_manager_service availabilities");}
 
 
         // Wait for completions
@@ -193,7 +191,7 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -235,7 +233,7 @@ class LoadBalancing1TestWMS : public wrench::ExecutionController {
 
 public:
     LoadBalancing1TestWMS(BareMetalComputeServiceTestScheduling *test,
-                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                          const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -319,7 +317,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -361,7 +359,7 @@ class LoadBalancing2TestWMS : public wrench::ExecutionController {
 
 public:
     LoadBalancing2TestWMS(BareMetalComputeServiceTestScheduling *test,
-                          std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                          const std::string& hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -446,7 +444,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);

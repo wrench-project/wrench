@@ -96,9 +96,7 @@ namespace wrench {
      * @param d: true if the job is supposed to be detached, false otherwise
      */
     void CompoundJob::setDetached(bool d) {
-        if (this->state != CompoundJob::State::NOT_SUBMITTED) {
-            throw std::invalid_argument("CompoundJob::setDetached(): Can only be called on a job that has not be submitted yet");
-        }
+	assertJobNotSubmitted();
         this->detached = d;
     }
 
@@ -423,7 +421,7 @@ namespace wrench {
             throw std::invalid_argument("CompoundJob::addDependency(): Both actions must belong to this job");
         }
         if (pathExists(child, parent)) {
-            throw std::invalid_argument("CompoundJob::addDependency(): Adding this dependency would create a cycle");
+            throw std::logic_error("CompoundJob::addDependency(): Adding this dependency would create a cycle");
         }
 
         child->parents.insert(parent.get());
@@ -517,7 +515,7 @@ namespace wrench {
      */
     void CompoundJob::assertJobNotSubmitted() const {
         if (this->state != CompoundJob::State::NOT_SUBMITTED) {
-            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob once it has been submitted");
+            throw std::logic_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob once it has been submitted");
         }
     }
 
@@ -526,7 +524,7 @@ namespace wrench {
      */
     void CompoundJob::assertActionNameDoesNotAlreadyExist(const std::string &name) {
         if (this->name_map.find(name) != this->name_map.end()) {
-            throw std::runtime_error("CompoundJob::assertActionNameDoesNotAlreadyExist(): Task with name " + name + " already exists");
+            throw std::logic_error("CompoundJob::assertActionNameDoesNotAlreadyExist(): Task with name " + name + " already exists");
         }
     }
 

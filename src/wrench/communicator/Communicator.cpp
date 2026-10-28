@@ -51,7 +51,25 @@ namespace wrench {
      * @return a rank
      */
     unsigned long Communicator::join() {
-        return this->join(this->rank_to_commport.size());
+        const auto my_pid = simgrid::s4u::this_actor::get_pid();
+
+        // An existing participant keeps its assigned rank.
+        const auto existing = actor_to_rank.find(my_pid);
+        if (existing != actor_to_rank.end()) {
+            return existing->second;
+        }
+
+        // Find an unused rank rather than assuming ranks were assigned in order.
+        unsigned long rank = 0;
+        while (rank < size && rank_to_commport.count(rank) != 0) {
+            ++rank;
+        }
+
+        if (rank == size) {
+            throw std::invalid_argument("Communicator::join(): Communicator is full");
+        }
+
+        return this->join(rank);
     }
 
     /**
@@ -114,18 +132,27 @@ namespace wrench {
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
 
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
-            throw std::invalid_argument("Communicator::communicate(): Calling process is not part of this communicator");
+            throw std::logic_error("Communicator::communicate(): Calling process is not part of this communicator");
+        }
+        for (const auto& send_operation : sends) {
+            if (this->rank_to_commport.find(send_operation.first) ==
+                this->rank_to_commport.end()) {
+                throw std::invalid_argument(
+                    "Communicator::sendReceiveAndCompute(): "
+                    "Unknown destination rank " +
+                    std::to_string(send_operation.first));
+                }
         }
         // Post all the sends
         std::vector<std::shared_ptr<S4U_PendingCommunication>> posted_sends;
         for (auto const &send_operation: sends) {
-            const auto dst_commport = this->rank_to_commport[send_operation.first];
+            const auto dst_commport = this->rank_to_commport.at(send_operation.first);
             posted_sends.push_back(dst_commport->iputMessage(new wrench::SimulationMessage(send_operation.second)));
         }
         // Post the computation (if any)
         simgrid::s4u::ExecPtr computation = nullptr;
         if (flops > 0) {
-            computation = simgrid::s4u::this_actor::exec_init(flops);
+            computation = simgrid::s4u::this_actor::exec_async(flops);
         }
 
         // Do all the synchronous receives
@@ -147,16 +174,15 @@ namespace wrench {
      */
     void Communicator::barrier() {
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
-        static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
-            throw std::invalid_argument("Communicator::barrier(): Calling process is not part of this communicator");
+            throw std::logic_error("Communicator::barrier(): Calling process is not part of this communicator");
         }
 
-        count++;
-        if (count < this->size) {
+        _barrier_arrivals++;
+        if (_barrier_arrivals < this->size) {
             simgrid::s4u::this_actor::suspend();
         } else {
-            count = 0;
+            _barrier_arrivals = 0;
             for (auto const &item: this->actor_to_rank) {
                 if (item.first != my_pid) {
                     simgrid::s4u::Actor::by_pid(item.first)->resume();
@@ -174,7 +200,7 @@ namespace wrench {
      */
     void Communicator::MPI_Alltoall(const sg_size_t bytes, std::string config) {
         if (bytes < 1) {
-            throw std::runtime_error("Communicator::MPI_Alltoall(): invalid argument (should be >= 1)");
+            throw std::invalid_argument("Communicator::MPI_Alltoall(): invalid argument (should be >= 1)");
         }
         this->performSMPIOperation("Alltoall", this->participating_hosts, nullptr, bytes, "smpi/alltoall:" + std::move(config));
     }
@@ -188,7 +214,7 @@ namespace wrench {
      */
     void Communicator::MPI_Bcast(const int root_rank, const sg_size_t bytes, std::string config) {
         if ((bytes < 1) or (root_rank < 0) or (root_rank >= static_cast<int>(this->size))) {
-            throw std::runtime_error("Communicator::MPI_Bcast(): invalid argument");
+            throw std::invalid_argument("Communicator::MPI_Bcast(): invalid argument");
         }
         this->performSMPIOperation("Bcast", this->participating_hosts, this->rank_to_host[root_rank], bytes, "smpi/bcast:" + std::move(config));
     }
@@ -223,14 +249,16 @@ namespace wrench {
         // Global synchronization
         this->barrier();
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
-        static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
-            throw std::invalid_argument("Communicator::MPI_AllToAll(): Calling process is not part of this communicator");
+            throw std::logic_error("Communicator::MPI_AllToAll(): Calling process is not part of this communicator");
         }
-        count++;
-        if (count < this->size) {
+        _smpi_arrivals++;
+
+        if (_smpi_arrivals < this->size) {
             simgrid::s4u::this_actor::suspend();
         } else {
+            _smpi_arrivals = 0; // Prepare the counter for the next collective.
+
             // I am the last arrived process and will be doing the entire operation with temp actors
             // Set the configuration
             simgrid::s4u::Engine::set_config(config);
