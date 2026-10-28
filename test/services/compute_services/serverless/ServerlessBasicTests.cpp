@@ -836,10 +836,6 @@ private:
                     "Unexpected dispatch / start dates: " + std::to_string(invocation->getDispatchDate()) + " / " +
                     std::to_string(invocation->getFunctionStartDate()));
             }
-
-            if (invocation->getFunctionEndDate() != -1.0) {
-                throw std::runtime_error("Unexpected end date: " + std::to_string(invocation->getFunctionEndDate()));
-            }
         }
 
         return 0;

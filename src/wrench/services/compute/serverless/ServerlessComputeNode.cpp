@@ -339,6 +339,7 @@ namespace wrench {
     bool ServerlessComputeNode::couldInvocationRunRightNow(
         const std::shared_ptr<Invocation>& invocation,
         const std::shared_ptr<Container>& target_container) const {
+
         // Sanity checks
         if (invocation->isDispatched()) {
             throw std::runtime_error(
@@ -405,18 +406,6 @@ namespace wrench {
             WRENCH_INFO(
                 "Scheduled invocation cannot be started because not all layers for image %s are in RAM at node %s",
                 image->getName().c_str(), this->hostname.c_str());
-            return false;
-        }
-
-        // Are we within compute node limits in terms of number of invocations
-        auto num_in_flight_invocations = 0UL;
-        for (auto const& container : _initializing_containers) {
-            num_in_flight_invocations += container->_in_flight_invocations.size();
-        }
-        for (auto const& container : _initialized_containers) {
-            num_in_flight_invocations += container->_in_flight_invocations.size();
-        }
-        if (num_in_flight_invocations >= _max_num_invocations_per_compute_node) {
             return false;
         }
 
