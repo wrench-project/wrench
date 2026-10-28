@@ -114,7 +114,7 @@ namespace wrench {
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
 
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
-            throw std::invalid_argument("Communicator::communicate(): Calling process is not part of this communicator");
+            throw std::logic_error("Communicator::communicate(): Calling process is not part of this communicator");
         }
         // Post all the sends
         std::vector<std::shared_ptr<S4U_PendingCommunication>> posted_sends;
@@ -149,7 +149,7 @@ namespace wrench {
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
         static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
-            throw std::invalid_argument("Communicator::barrier(): Calling process is not part of this communicator");
+            throw std::logic_error("Communicator::barrier(): Calling process is not part of this communicator");
         }
 
         count++;
@@ -225,7 +225,7 @@ namespace wrench {
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
         static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
-            throw std::invalid_argument("Communicator::MPI_AllToAll(): Calling process is not part of this communicator");
+            throw std::logic_error("Communicator::MPI_AllToAll(): Calling process is not part of this communicator");
         }
         count++;
         if (count < this->size) {
