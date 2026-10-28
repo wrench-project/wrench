@@ -1,0 +1,8 @@
+.. _OperationAborted:
+wrench::OperationAborted
+************************
+
+.. doxygenclass:: wrench::OperationAborted
+   :project: internal
+   :members:
+

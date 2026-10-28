@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="wrench::Job" href="classwrench_1_1_job.html" />
-    <link rel="prev" title="wrench::InvalidDirectoryPath" href="classwrench_1_1_invalid_directory_path.html" /> 
+    <link rel="prev" title="wrench::InvalidOperation" href="classwrench_1_1_invalid_operation.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -138,6 +138,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image.html">wrench::Image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image_layer.html">wrench::ImageLayer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_operation.html">wrench::InvalidOperation</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::Invocation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench10InvocationE"><code class="docutils literal notranslate"><span class="pre">wrench::Invocation</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench10Invocation14getComputeNodeEv"><code class="docutils literal notranslate"><span class="pre">getComputeNode()</span></code></a></li>
@@ -177,6 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_aborted.html">wrench::OperationAborted</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -406,10 +408,10 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench10Invocation12hasSucceededEv">
 <span id="_CPPv3NK6wrench10Invocation12hasSucceededEv"></span><span id="_CPPv2NK6wrench10Invocation12hasSucceededEv"></span><span id="wrench::Invocation::hasSucceededC"></span><span class="target" id="classwrench_1_1_invocation_1a763b4fe74f221fede5ba20040c59207a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasSucceeded</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10Invocation12hasSucceededEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Checks if the invocation was successful. </p>
+<dd><p>Checks if the invocation has successfully completed. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if the invocation was successful, false otherwise. </p>
+<dd class="field-odd"><p>True if the invocation was successful, false if it has failed (throws if the invocation is not done yet) </p>
 </dd>
 </dl>
 </dd></dl>
@@ -456,7 +458,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="classwrench_1_1_invalid_directory_path.html" class="btn btn-neutral float-left" title="wrench::InvalidDirectoryPath" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="classwrench_1_1_invalid_operation.html" class="btn btn-neutral float-left" title="wrench::InvalidOperation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="classwrench_1_1_job.html" class="btn btn-neutral float-right" title="wrench::Job" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

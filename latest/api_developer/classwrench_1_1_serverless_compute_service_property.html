@@ -138,6 +138,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image.html">wrench::Image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_image_layer.html">wrench::ImageLayer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_directory_path.html">wrench::InvalidDirectoryPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invalid_operation.html">wrench::InvalidOperation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_invocation.html">wrench::Invocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job.html">wrench::Job</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_job_killed.html">wrench::JobKilled</a></li>
@@ -159,6 +160,7 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_allowed.html">wrench::NotAllowed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources.html">wrench::NotEnoughResources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_not_enough_resources_for_job.html">wrench::NotEnoughResourcesForJob</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_aborted.html">wrench::OperationAborted</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_operation_timeout.html">wrench::OperationTimeout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_parallel_model.html">wrench::ParallelModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_pilot_job.html">wrench::PilotJob</a></li>
@@ -174,7 +176,6 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">wrench::ServerlessComputeServiceProperty</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServicePropertyE"><code class="docutils literal notranslate"><span class="pre">wrench::ServerlessComputeServiceProperty</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty32COMPUTE_NODE_ACTIVATION_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">COMPUTE_NODE_ACTIVATION_OVERHEAD</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE"><code class="docutils literal notranslate"><span class="pre">COMPUTE_NODES_INITIALLY_ACTIVATED</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty26CONTAINER_STARTUP_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">CONTAINER_STARTUP_OVERHEAD</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty30INVOCATION_PROCESSING_OVERHEADE"><code class="docutils literal notranslate"><span class="pre">INVOCATION_PROCESSING_OVERHEAD</span></code></a></li>
@@ -183,6 +184,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty27MAX_NUM_CONTAINERS_PER_NODEE"><code class="docutils literal notranslate"><span class="pre">MAX_NUM_CONTAINERS_PER_NODE</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty27MAX_OUTSTANDING_INVOCATIONSE"><code class="docutils literal notranslate"><span class="pre">MAX_OUTSTANDING_INVOCATIONS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE"><code class="docutils literal notranslate"><span class="pre">MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty37NUM_COMPUTE_NODES_INITIALLY_ACTIVATEDE"><code class="docutils literal notranslate"><span class="pre">NUM_COMPUTE_NODES_INITIALLY_ACTIVATED</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty31SIMULATE_REMOTE_IMAGE_DOWNLOADSE"><code class="docutils literal notranslate"><span class="pre">SIMULATE_REMOTE_IMAGE_DOWNLOADS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty28STORAGE_SERVICES_BUFFER_SIZEE"><code class="docutils literal notranslate"><span class="pre">STORAGE_SERVICES_BUFFER_SIZE</span></code></a></li>
 </ul>
@@ -310,12 +312,6 @@
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE">
-<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE"></span><span id="wrench::ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1ab08558ac4598f25f225faefde8c9afba"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPUTE_NODES_INITIALLY_ACTIVATED</span></span></span><a class="headerlink" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty33COMPUTE_NODES_INITIALLY_ACTIVATEDE" title="Link to this definition"></a><br /></dt>
-<dd><p>Whether compute nodes are initially all activated (i.e., usable immediately). (“true”: all activated, “false”: all de-activated; default: “true”) </p>
-</dd></dl>
-
-<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE"></span><span id="wrench::ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1ad830e1f44f716bc3a817d776e01e825c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CONTAINER_IDLE_TIMEOUT</span></span></span><a class="headerlink" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty22CONTAINER_IDLE_TIMEOUTE" title="Link to this definition"></a><br /></dt>
 <dd><p>The timeout before an idle container is terminated and its disk/resources reclaimed. </p>
@@ -361,6 +357,12 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE">
 <span id="_CPPv3N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE"></span><span id="wrench::ServerlessComputeServiceProperty::MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a8ade8b52626790b58d98a79887d9dfad"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTION</span></span></span><a class="headerlink" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty40MAX_OUTSTANDING_INVOCATIONS_PER_FUNCTIONE" title="Link to this definition"></a><br /></dt>
 <dd><p>The maximum number of outstanding per-function invocations, i.e., invocations that have not yet completed or failed, including those waiting for image preparation or execution for a particular function. (default value: “infinity”) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench32ServerlessComputeServiceProperty37NUM_COMPUTE_NODES_INITIALLY_ACTIVATEDE">
+<span id="_CPPv3N6wrench32ServerlessComputeServiceProperty37NUM_COMPUTE_NODES_INITIALLY_ACTIVATEDE"></span><span id="_CPPv2N6wrench32ServerlessComputeServiceProperty37NUM_COMPUTE_NODES_INITIALLY_ACTIVATEDE"></span><span id="wrench::ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED__ssC"></span><span class="target" id="classwrench_1_1_serverless_compute_service_property_1a1c79d161d56acb27b241a9f6971025b4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NUM_COMPUTE_NODES_INITIALLY_ACTIVATED</span></span></span><a class="headerlink" href="#_CPPv4N6wrench32ServerlessComputeServiceProperty37NUM_COMPUTE_NODES_INITIALLY_ACTIVATEDE" title="Link to this definition"></a><br /></dt>
+<dd><p>The number of compute nodes are initially all activated (“all” means all are activated) (e.g., “0”, “all”, “12”) </p>
 </dd></dl>
 
 <dl class="cpp var">

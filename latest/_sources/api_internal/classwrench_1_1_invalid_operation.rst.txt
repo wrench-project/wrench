@@ -1,0 +1,8 @@
+.. _InvalidOperation:
+wrench::InvalidOperation
+************************
+
+.. doxygenclass:: wrench::InvalidOperation
+   :project: internal
+   :members:
+
