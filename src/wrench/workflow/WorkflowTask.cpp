@@ -598,7 +598,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().task_terminated = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setTerminationDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
