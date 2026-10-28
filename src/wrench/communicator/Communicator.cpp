@@ -226,9 +226,12 @@ namespace wrench {
             throw std::logic_error("Communicator::MPI_AllToAll(): Calling process is not part of this communicator");
         }
         _smpi_arrivals++;
+
         if (_smpi_arrivals < this->size) {
             simgrid::s4u::this_actor::suspend();
         } else {
+            _smpi_arrivals = 0; // Prepare the counter for the next collective.
+
             // I am the last arrived process and will be doing the entire operation with temp actors
             // Set the configuration
             simgrid::s4u::Engine::set_config(config);
