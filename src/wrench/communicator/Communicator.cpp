@@ -147,16 +147,15 @@ namespace wrench {
      */
     void Communicator::barrier() {
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
-        static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
             throw std::logic_error("Communicator::barrier(): Calling process is not part of this communicator");
         }
 
-        count++;
-        if (count < this->size) {
+        _barrier_arrivals++;
+        if (_barrier_arrivals < this->size) {
             simgrid::s4u::this_actor::suspend();
         } else {
-            count = 0;
+            _barrier_arrivals = 0;
             for (auto const &item: this->actor_to_rank) {
                 if (item.first != my_pid) {
                     simgrid::s4u::Actor::by_pid(item.first)->resume();

@@ -117,7 +117,7 @@ void StorageServiceProxySimultaneousTest::do_Simultaneous_test(std::string mode)
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //argv[3] = strdup("--wrench-full-log");
     //argv[1] = strdup("--log=wrench_core_commport.threshold=debug");

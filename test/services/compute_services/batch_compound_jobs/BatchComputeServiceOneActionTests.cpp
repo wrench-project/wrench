@@ -158,7 +158,7 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 0;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
 
     ASSERT_THROW(simulation->init(&argc, argv), std::logic_error);
     free(argv);
@@ -171,7 +171,7 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
     ASSERT_THROW(simulation->launch(), std::logic_error);
 
     argc = 1;
-    argv = (char **) calloc(argc, sizeof(char *));
+    argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -357,7 +357,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -476,7 +476,7 @@ void BatchComputeServiceOneActionTest::do_BadServiceSpecificArgs_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -632,7 +632,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -754,7 +754,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -902,7 +902,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1044,7 +1044,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1180,7 +1180,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1329,7 +1329,7 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1433,7 +1433,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1538,7 +1538,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[1] = strdup("--wrench-full-log");
@@ -1630,7 +1630,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 

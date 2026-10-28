@@ -250,7 +250,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 
@@ -406,7 +406,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-energy-simulation");
 
@@ -524,7 +524,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 
@@ -675,7 +675,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -843,7 +843,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 
@@ -949,7 +949,7 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));

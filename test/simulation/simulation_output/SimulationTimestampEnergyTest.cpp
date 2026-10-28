@@ -99,7 +99,7 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampPstateSetTest) {
 void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 
@@ -192,7 +192,7 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampEnergyConsumptionTest) 
 void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 
@@ -322,7 +322,7 @@ TEST_F(SimulationTimestampEnergyTest, EnergyMeterSingleMeasurementPeriodTest) {
 void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 
@@ -458,7 +458,7 @@ TEST_F(SimulationTimestampEnergyTest, EnergyMeterMultipleMeasurmentPeriodTest) {
 void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 

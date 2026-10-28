@@ -253,7 +253,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 //        argv[1] = strdup("--wrench-full-log");
 
@@ -398,7 +398,7 @@ void DynamicServiceCreationTest::do_WeirdVectorBug_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
 

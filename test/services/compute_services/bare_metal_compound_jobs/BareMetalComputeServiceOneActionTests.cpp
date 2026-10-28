@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <math.h>
+#include <cmath>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -157,7 +157,7 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 0;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
 
     ASSERT_THROW(simulation->init(&argc, argv), std::logic_error);
     free(argv);
@@ -171,7 +171,7 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
     ASSERT_THROW(simulation->launch(), std::logic_error);
 
     argc = 1;
-    argv = (char **) calloc(argc, sizeof(char *));
+    argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -320,7 +320,7 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //            argv[1] = strdup("--wrench-full-log");
 
@@ -373,10 +373,10 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
 class BareMetalOneSleepActionTestWMS : public wrench::ExecutionController {
 public:
     BareMetalOneSleepActionTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   std::shared_ptr<wrench::Workflow> workflow,
+                                   const std::shared_ptr<wrench::Workflow>& workflow,
                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                                   const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -426,7 +426,7 @@ private:
         } catch (std::invalid_argument &ignore) {}
 
         job_manager->submitJob(job, this->test->compute_service, {});
-        job->getStateAsString();// coverage
+        auto ignore = job->getStateAsString();// coverage
 
         // Try to submit again (coverate)
         try {
@@ -494,7 +494,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -505,7 +505,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::logic_error);
@@ -554,10 +554,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
 class BareMetalOneSleepActionDetachedTestWMS : public wrench::ExecutionController {
 public:
     BareMetalOneSleepActionDetachedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   std::shared_ptr<wrench::Workflow> workflow,
+                                   const std::shared_ptr<wrench::Workflow>& workflow,
                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                                   const std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -600,7 +600,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionDetached_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -732,7 +732,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -743,7 +743,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::logic_error);
@@ -792,10 +792,10 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
 class BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS : public wrench::ExecutionController {
 public:
     BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                                             std::shared_ptr<wrench::Workflow> workflow,
+                                                             const std::shared_ptr<wrench::Workflow>& workflow,
                                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                             std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                                             const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -862,7 +862,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -922,7 +922,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
 class BareMetalServiceCrashedTestWMS : public wrench::ExecutionController {
 public:
     BareMetalServiceCrashedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                   const std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -966,8 +966,8 @@ private:
             throw std::runtime_error("Unexpected event-level failure cause");
         }
 
-        // Chek action stuff
-        job->getStateAsString();// coverage
+        // Check action stuff
+        auto ignore = job->getStateAsString();// coverage
 
         if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
@@ -1006,7 +1006,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1129,7 +1129,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     // argv[1] = strdup("--wrench-full-log");
@@ -1255,7 +1255,7 @@ private:
             (top.execution_host != "Host4") or
             (top.num_cores_allocated != 0) or
             (top.state != wrench::Action::State::COMPLETED) or
-            (top.ram_allocated != 0.0) or
+            (top.ram_allocated != 0) or
             (top.physical_execution_host != "Host4")) {
             throw std::runtime_error("Unexpected last history");
         }
@@ -1268,7 +1268,7 @@ private:
             (top.execution_host != "Host4") or
             (top.num_cores_allocated != 0) or
             (top.state != wrench::Action::State::FAILED) or
-            (top.ram_allocated != 0.0) or
+            (top.ram_allocated != 0) or
             (top.physical_execution_host != "Host4")) {
             throw std::runtime_error("Unexpected last history");
         }
@@ -1297,7 +1297,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1309,7 +1309,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::logic_error);
 
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add(static_cast<wrench::ComputeService*>(nullptr)), std::invalid_argument);
 
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::logic_error);
@@ -1439,7 +1439,7 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1545,7 +1545,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -1655,7 +1655,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-host-shutdown-simulation");
 //        argv[1] = strdup("--wrench-full-log");
@@ -1750,7 +1750,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1863,7 +1863,7 @@ void BareMetalComputeServiceOneActionTest::do_FileRegistryActions_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     //    argv[1] = strdup("--wrench-full-log");
 

@@ -181,7 +181,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 0;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
 
     ASSERT_THROW(simulation->init(&argc, argv), std::logic_error);
     free(argv);
@@ -194,7 +194,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     ASSERT_THROW(simulation->launch(), std::logic_error);
 
     argc = 1;
-    argv = (char **) calloc(argc, sizeof(char *));
+    argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     simulation->init(&argc, argv);
@@ -333,7 +333,7 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -603,7 +603,7 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     simulation->init(&argc, argv);
@@ -692,7 +692,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     simulation->init(&argc, argv);
@@ -815,7 +815,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 //            argv[1] = strdup("--wrench-full-log");
 
@@ -954,7 +954,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //        argv[1] = strdup("--wrench-full-log");
 
@@ -1070,7 +1070,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     ASSERT_THROW(simulation->launch(), std::logic_error);
@@ -1207,7 +1207,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 //        argv[1] = strdup("--wrench-full-log");
 
@@ -1349,7 +1349,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     ASSERT_THROW(simulation->launch(), std::logic_error);
@@ -1468,7 +1468,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 
     ASSERT_THROW(simulation->launch(), std::logic_error);
@@ -1587,7 +1587,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
 //            argv[1] = strdup("--wrench-full-log");
 
@@ -1700,7 +1700,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1808,7 +1808,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1921,7 +1921,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -2046,7 +2046,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -2136,7 +2136,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionButDontWait_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    auto **argv = (char **) calloc(argc, sizeof(char *));
+    auto **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_task_test");
     //    argv[1] = strdup("--wrench-full-log");
 

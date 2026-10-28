@@ -652,7 +652,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test(sg_size_t bu
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 //        argv[1] = strdup("--wrench-full-log");
 
@@ -842,7 +842,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test(sg_size_t b
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -987,7 +987,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test(sg_size_t 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -1184,7 +1184,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test(sg_
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
     //    argv[2] = strdup("--log=wrench_core_commport.t=debug");
@@ -1391,7 +1391,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test(sg
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1651,7 +1651,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test(sg_size_t buffer_siz
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
 
@@ -1756,7 +1756,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test(sg_size_t buffer_size
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 

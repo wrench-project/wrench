@@ -187,7 +187,7 @@ void BatchComputeServiceMPIActionTest::do_MPIAction_test() {
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("one_action_test");
     argv[1] = strdup("--wrench-commport-pool-size=10000");
     //        argv[2] = strdup("--wrench-full-log");

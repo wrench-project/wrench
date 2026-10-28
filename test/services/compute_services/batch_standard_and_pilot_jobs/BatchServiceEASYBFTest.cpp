@@ -173,7 +173,7 @@ void BatchServiceEASY_BFTest::do_EASY_BF_test(int num_compute_nodes,
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-commport-pool-size=50000");
     // argv[2] = strdup("--wrench-full-log");

@@ -159,7 +159,7 @@ TEST_F(BandwidthMeterServiceTest, BasicCreationDestruction) {
 void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 

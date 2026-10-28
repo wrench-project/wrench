@@ -200,7 +200,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     // argv[1] = strdup("--wrench-full-log");
 
@@ -316,7 +316,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 1;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     //    argv[1] = strdup("--wrench-full-log");
 
@@ -429,7 +429,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");
@@ -550,7 +550,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
     //    argv[2] = strdup("--wrench-full-log");

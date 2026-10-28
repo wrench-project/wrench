@@ -179,7 +179,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 3;
-    char **argv = (char **) calloc(argc, sizeof(char *));
+    char **argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-link-shutdown-simulation");
     argv[2] = strdup("--wrench-default-control-message-size=10");
@@ -284,7 +284,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_MultiActionJobLinkFailure_test(
     auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 3;
-    auto argv = (char **) calloc(argc, sizeof(char *));
+    auto argv = static_cast<char**>(calloc(argc, sizeof(char*)));
     int argi = 0;
     argv[argi++] = strdup("multi_action_test");
     argv[argi++] = strdup("--wrench-link-shutdown-simulation");
