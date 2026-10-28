@@ -42,7 +42,6 @@ namespace wrench {
             // void* receive_buffer = SMPI_SHARED_MALLOC(buffer_size);
             void *receive_buffer = send_buffer; // This should be fine given SMPI's semantics
 
-            void *data = SMPI_SHARED_MALLOC(data_size * data_size);
             MPI_Alltoall(send_buffer, data_size, MPI_CHAR, receive_buffer, data_size, MPI_CHAR, MPI_COMM_WORLD);
             SMPI_SHARED_FREE(send_buffer);
             // SMPI_SHARED_FREE(receive_buffer);
