@@ -28,8 +28,15 @@ namespace wrench {
         : _head_storage_service(nullptr),
           _free_space_on_head_storage(0),
           _serverless_compute_service(service) {
-        auto compute_nodes_initially_activated =
-            service->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED);
+        unsigned long compute_nodes_initially_activated;
+        if (service->getPropertyValueAsString(ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED)
+            == "all") {
+            compute_nodes_initially_activated = compute_hosts.size();
+        } else {
+            compute_nodes_initially_activated =
+                service->getPropertyValueAsUnsignedLong(
+                    ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED);
+        }
         for (const auto& hostname : compute_hosts) {
             auto compute_node = std::make_shared<
                 ServerlessComputeNode>(hostname, service);
@@ -75,7 +82,8 @@ namespace wrench {
      *
      * @return The RAM availability map
      */
-    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> ServerlessStateOfTheSystem::getAvailableRAMSpace() const {
+    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t>
+    ServerlessStateOfTheSystem::getAvailableRAMSpace() const {
         std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
         for (const auto& compute_node : _activated_compute_nodes) {
             to_return[compute_node] = compute_node->getMemoryStorage()->getTotalFreeSpaceZeroTime();
@@ -129,7 +137,7 @@ namespace wrench {
      * @return true or false
      */
     bool ServerlessStateOfTheSystem::isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                              const std::shared_ptr<ImageLayer>& layer) const {
+                                                                   const std::shared_ptr<ImageLayer>& layer) const {
         return _image_layers_being_copied_to_disk.at(node).count(layer) != 0;
     }
 
@@ -142,7 +150,7 @@ namespace wrench {
      * @return true or false
      */
     bool ServerlessStateOfTheSystem::isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                   const std::shared_ptr<ImageLayer>& layer) const {
+                                                              const std::shared_ptr<ImageLayer>& layer) const {
         return _image_layers_on_disk.at(node).count(layer) != 0;
     }
 
@@ -166,7 +174,7 @@ namespace wrench {
      * @return true or false
      */
     bool ServerlessStateOfTheSystem::isImageLayerBeingLoadedAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                              const std::shared_ptr<ImageLayer>& layer) const {
+                                                                   const std::shared_ptr<ImageLayer>& layer) const {
         return _image_layers_being_loaded_in_ram.at(node).count(layer) != 0;
     }
 
@@ -179,7 +187,7 @@ namespace wrench {
      * @return true or false
      */
     bool ServerlessStateOfTheSystem::isImageLayerInRAMAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                        const std::shared_ptr<ImageLayer>& layer) const {
+                                                             const std::shared_ptr<ImageLayer>& layer) const {
         return _image_layers_in_ram.at(node).count(layer) != 0;
     }
 
@@ -199,7 +207,8 @@ namespace wrench {
      *
      * @return The list of admitted invocations
      */
-    std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> ServerlessStateOfTheSystem::getAdmittedInvocations() const {
+    std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>
+    ServerlessStateOfTheSystem::getAdmittedInvocations() const {
         return _admitted_invocations;
     }
 
@@ -220,5 +229,4 @@ namespace wrench {
     getOutstandingInvocationCounts() const {
         return _outstanding_invocation_counts;
     }
-
 } // namespace wrench

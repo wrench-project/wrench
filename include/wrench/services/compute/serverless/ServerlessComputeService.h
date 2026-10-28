@@ -28,7 +28,7 @@ namespace wrench {
     class ServerlessComputeService : public ComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-            {ServerlessComputeServiceProperty::COMPUTE_NODES_INITIALLY_ACTIVATED, "true"},
+            {ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED, "all"},
             {ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "0"},
             {ServerlessComputeServiceProperty::MAX_NUM_CONTAINERS_PER_NODE, "0"},

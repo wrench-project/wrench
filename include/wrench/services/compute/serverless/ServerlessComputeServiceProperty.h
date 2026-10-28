@@ -24,10 +24,10 @@ namespace wrench {
 
     public:
 
-        /** @brief Whether compute nodes are initially all activated (i.e., usable immediately).
-         * ("true": all activated, "false": all de-activated; default: "true")
+        /** @brief The number of compute nodes are initially all activated ("all" means all are activated)
+         * (e.g., "0", "all", "12")
          **/
-        DECLARE_PROPERTY_NAME(COMPUTE_NODES_INITIALLY_ACTIVATED);
+        DECLARE_PROPERTY_NAME(NUM_COMPUTE_NODES_INITIALLY_ACTIVATED);
 
         /** @brief The compute node activation overhead; activating multiple nodes at once incurs this overhead only once (default value: "0s")
          *  Examples: "5s", "5000ms", etc.
