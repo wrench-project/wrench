@@ -210,7 +210,7 @@ namespace wrench {
      *
      * @return The list of schedulable invocations
      */
-    std::vector<std::shared_ptr<Invocation>> ServerlessStateOfTheSystem::getSchedulableInvocations() const {
+    const std::vector<std::shared_ptr<Invocation>>& ServerlessStateOfTheSystem::getSchedulableInvocations() const {
         return _schedulable_invocations;
     }
 

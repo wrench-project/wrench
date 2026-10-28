@@ -59,7 +59,7 @@ namespace wrench {
 
         [[nodiscard]] std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>
         getAdmittedInvocations() const;
-        [[nodiscard]] std::vector<std::shared_ptr<Invocation>> getSchedulableInvocations() const;
+        [[nodiscard]] const std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations() const;
         [[nodiscard]] std::map<std::shared_ptr<Function>, unsigned long> getOutstandingInvocationCounts() const;
 
         ~ServerlessStateOfTheSystem() = default;
