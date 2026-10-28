@@ -481,6 +481,9 @@ namespace wrench {
         if (child.get() == this or pathExists(child, this->getSharedPtr())) {
             throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
+
+        child->assertJobNotSubmitted();
+        
         this->children.insert(child);
         child->parents.insert(this->getSharedPtr());
     }
