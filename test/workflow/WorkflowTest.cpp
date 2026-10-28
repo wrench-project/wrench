@@ -71,11 +71,11 @@ protected:
         try {
             t1->updateStartDate(666.6);
             throw std::runtime_error("Should not be able to call WorkflowTask::updateStartDate()");
-        } catch (std::runtime_error &ignore) {}
+        } catch (std::logic_error &ignore) {}
         try {
             t1->setTerminationDate(666.6);
             throw std::runtime_error("Should not be able to call WorkflowTask::setTerminationDate()");
-        } catch (std::runtime_error &ignore) {}
+        } catch (std::logic_error &ignore) {}
     }
 
     // data members
