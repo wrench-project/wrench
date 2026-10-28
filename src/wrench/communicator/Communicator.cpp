@@ -51,7 +51,25 @@ namespace wrench {
      * @return a rank
      */
     unsigned long Communicator::join() {
-        return this->join(this->rank_to_commport.size());
+        const auto my_pid = simgrid::s4u::this_actor::get_pid();
+
+        // An existing participant keeps its assigned rank.
+        const auto existing = actor_to_rank.find(my_pid);
+        if (existing != actor_to_rank.end()) {
+            return existing->second;
+        }
+
+        // Find an unused rank rather than assuming ranks were assigned in order.
+        unsigned long rank = 0;
+        while (rank < size && rank_to_commport.count(rank) != 0) {
+            ++rank;
+        }
+
+        if (rank == size) {
+            throw std::invalid_argument("Communicator::join(): Communicator is full");
+        }
+
+        return this->join(rank);
     }
 
     /**
