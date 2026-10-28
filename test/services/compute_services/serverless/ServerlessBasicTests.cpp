@@ -509,7 +509,10 @@ private:
             try {
                 auto ignore = invocation->hasSucceeded();
                 throw std::runtime_error("Shouldn't be able to call isSuccess() on an invocation that's not done yet");
-            } catch (std::runtime_error& expected) {
+            } catch (wrench::ExecutionException& e) {
+                if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
+                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                }
             }
 
             try {
@@ -525,7 +528,10 @@ private:
             try {
                 auto ignore = invocation->getOutput();
                 throw std::runtime_error("Shouldn't be able to call getOutput() on an invocation that's not done");
-            } catch (std::runtime_error& expected) {
+            } catch (wrench::ExecutionException& e) {
+                if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
+                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                }
             }
 
             wrench::Simulation::sleep(1);
