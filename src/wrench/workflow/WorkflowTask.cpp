@@ -107,7 +107,7 @@ namespace wrench {
 	// output or adding any edges.
 	for (const auto& consumer : consumers) {
     		if (this->workflow->pathExists(consumer, producer)) {
-        		throw std::runtime_error(
+        		throw std::logic_error(
             		"WorkflowTask::addOutputFile(): Adding output file '" +
             		file->getID() + "' would create a cycle through task '" +
             		consumer->getID() + "'");
@@ -500,7 +500,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().computation_start = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setComputationStartDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -514,7 +514,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().computation_end = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setComputationEndDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -528,7 +528,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().read_input_start = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setReadInputStartDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -542,7 +542,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().read_input_end = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setReadInputEndDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -556,7 +556,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().write_output_start = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setWriteOutputStartDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -570,7 +570,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().write_output_end = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setWriteOutputEndDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -584,7 +584,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().task_failed = date;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setFailureDate() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -888,7 +888,7 @@ namespace wrench {
             this->execution_history.top().execution_host = hostname;
             this->execution_history.top().physical_execution_host = physical_hostname;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
         }
     }
@@ -901,7 +901,7 @@ namespace wrench {
         if (not this->execution_history.empty()) {
             this->execution_history.top().num_cores_allocated = num_cores;
         } else {
-            throw std::runtime_error(
+            throw std::logic_error(
                     "WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
         }
     }

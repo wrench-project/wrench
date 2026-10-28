@@ -163,16 +163,16 @@ TEST_F(WorkflowTaskTest, GetSet) {
     ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
 
     // without setting a start date first, the following 10 'setXXXXXX' should fail
-    ASSERT_THROW(t1->setReadInputStartDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setReadInputEndDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setComputationStartDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setComputationEndDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setWriteOutputStartDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setWriteOutputEndDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setEndDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setFailureDate(1.0), std::runtime_error);
-    ASSERT_THROW(t1->setNumCoresAllocated(10), std::runtime_error);
-    ASSERT_THROW(t1->setExecutionHost("host"), std::runtime_error);
+    ASSERT_THROW(t1->setReadInputStartDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setReadInputEndDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setComputationStartDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setComputationEndDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setWriteOutputStartDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setWriteOutputEndDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setEndDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setFailureDate(1.0), std::logic_error);
+    ASSERT_THROW(t1->setNumCoresAllocated(10), std::logic_error);
+    ASSERT_THROW(t1->setExecutionHost("host"), std::logic_error);
 
     // getting the execution_host before a task has run at least once should return an empty string
     ASSERT_TRUE(t1->getExecutionHost().empty());
