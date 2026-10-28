@@ -112,8 +112,10 @@ namespace wrench {
         }
 
         // check that task exists (this should never happen)
-        if (tasks.find(task->id) == tasks.end()) {
-            throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
+        const auto it = tasks.find(task->getID());
+        if (it == tasks.end() || it->second != task) {
+            throw std::invalid_argument(
+                "Workflow::removeTask(): Task does not belong to this workflow");
         }
 
         // Remove the task from the ready tasks, just in case
