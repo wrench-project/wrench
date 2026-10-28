@@ -1573,7 +1573,7 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-        test->task->getStateAsString();
+        auto ignore = test->task->getStateAsString();
 
         return 0;
     }
@@ -2028,7 +2028,7 @@ private:
         // Submit the job again
         try {
             job_manager->submitJob(job, test->compute_service);
-        } catch (wrench::ExecutionException &e) {
+        } catch (wrench::ExecutionException &ignore) {
             throw std::runtime_error("Should  be able to submit a job to a service that has been resumed");
         }
 

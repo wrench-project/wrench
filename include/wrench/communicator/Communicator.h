@@ -40,6 +40,7 @@ namespace wrench {
 
     private:
 
+        unsigned long _smpi_arrivals = 0;
         unsigned long _barrier_arrivals = 0;
         unsigned long size;
         std::map<aid_t, unsigned long> actor_to_rank;

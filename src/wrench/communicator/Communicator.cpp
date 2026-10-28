@@ -222,12 +222,11 @@ namespace wrench {
         // Global synchronization
         this->barrier();
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
-        static unsigned long count = 0;
         if (this->actor_to_rank.find(my_pid) == this->actor_to_rank.end()) {
             throw std::logic_error("Communicator::MPI_AllToAll(): Calling process is not part of this communicator");
         }
-        count++;
-        if (count < this->size) {
+        _smpi_arrivals++;
+        if (_smpi_arrivals < this->size) {
             simgrid::s4u::this_actor::suspend();
         } else {
             // I am the last arrived process and will be doing the entire operation with temp actors
