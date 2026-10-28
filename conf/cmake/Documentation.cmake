@@ -64,7 +64,7 @@ if (DOXYGEN_FOUND AND SWAGGER_CODEGEN_FOUND AND SPHINX_FOUND)
 
     add_custom_command(TARGET doc
             POST_BUILD
-            COMMAND "${SWAGGER_CODEGEN_FOUND}" -i ${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon/doc/wrench-openapi.json -l html2 -o ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}/restapi
+            COMMAND "${SWAGGER_CODEGEN_FOUND}" generate -i ${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon/doc/wrench-openapi.json -l html2 -o ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}/restapi
             COMMENT "Generating REST API HTML"
             VERBATIM
     )
