@@ -32,6 +32,8 @@
 #include <wrench/services/storage/simple/SimpleStorageService.h>
 #include <wrench/simulation/Simulation.h>
 
+#include "wrench/failure_causes/OperationAborted.h"
+
 WRENCH_LOG_CATEGORY(wrench_core_serverless_service, "Log category for Serverless Compute Service");
 
 namespace wrench {
@@ -1197,8 +1199,7 @@ namespace wrench {
                     new ServerlessComputeServiceFunctionInvocationCompleteMessage(
                         false,
                         inv,
-                        std::make_shared<NotAllowed>(this->getSharedPtr<ServerlessComputeService>(),
-                                                     "Invocation was forcefully failed by the scheduler"),
+                        std::make_shared<OperationAborted>("Invocation was forcefully failed by the scheduler"),
                         this->getMessagePayloadValue(
                             ServerlessComputeServiceMessagePayload::FUNCTION_COMPLETION_MESSAGE_PAYLOAD)));
             }

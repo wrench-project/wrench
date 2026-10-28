@@ -68,7 +68,7 @@ public:
     SimpleStorageServiceDeleteRegisterTestWMS(SimpleStorageServiceDeleteRegisterTest *test,
                                               const std::shared_ptr<wrench::StorageService> &storage_service,
                                               const std::shared_ptr<wrench::FileRegistryService> &file_registry_service,
-                                              std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), storage_service(storage_service),
+                                              const std::string& hostname) : wrench::ExecutionController(hostname, "test"), test(test), storage_service(storage_service),
                                                                       file_registry_service(file_registry_service) {
         this->test = test;
     }
