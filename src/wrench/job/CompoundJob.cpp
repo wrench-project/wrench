@@ -417,8 +417,8 @@ namespace wrench {
         if (parent == child) {
             throw std::invalid_argument("CompoundJob::addDependency(): Cannot add a dependency between a task and itself");
         }
-        if (parent->getJob() != this->getSharedPtr() or child->getJob() != this->getSharedPtr()) {
-            throw std::invalid_argument("CompoundJob::addDependency(): Both actions must belong to this job");
+        if (this->actions.count(parent) == 0 || this->actions.count(child) == 0) {
+            throw std::invalid_argument("CompoundJob::addActionDependency(): Both actions must currently belong to this job");
         }
         if (pathExists(child, parent)) {
             throw std::logic_error("CompoundJob::addDependency(): Adding this dependency would create a cycle");
@@ -638,20 +638,17 @@ namespace wrench {
         return this->children;
     }
 
-    //    /**
-    //     * @brief Returns a reference to the job's parent jobs, if any (use with caution)
-    //     * @return a set of jobs (a reference)
-    //     */
-    //    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
-    //        return this->parents;
-    //    }
-
     /**
      * @brief Remove an action from the job
      * @param action: the action to remove
      */
     void CompoundJob::removeAction(const shared_ptr<Action> &action) {
         assertJobNotSubmitted();
+        if (!action || this->actions.find(action) == this->actions.end()) {
+            throw std::invalid_argument("CompoundJob::removeAction(): "
+                "Action does not belong to this job");
+        }
+
         this->state_task_map[action->getState()].erase(action);
         for (auto const &parent: action->parents) {
             parent->children.erase(action.get());
