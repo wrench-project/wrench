@@ -1,3 +1,6 @@
+#include <limits>
+#include <stdexcept>
+
 
 #include <simgrid/s4u.hpp>
 #include <smpi/smpi.h>
@@ -246,6 +249,14 @@ namespace wrench {
 
         S4U_Simulation::enableSMPI();
 
+        if (bytes > static_cast<sg_size_t>(std::numeric_limits<int>::max())) {
+            throw std::invalid_argument(
+                "Communicator::performSMPIOperation(): "
+                "Message size exceeds the supported MPI integer count");
+        }
+
+        const int mpi_count = static_cast<int>(bytes);
+
         // Global synchronization
         this->barrier();
         const auto my_pid = simgrid::s4u::this_actor::get_pid();
@@ -264,9 +275,9 @@ namespace wrench {
             simgrid::s4u::Engine::set_config(config);
 
             if (op_name == "Alltoall") {
-                SMPIExecutor::performAlltoall(hosts, bytes);
+                SMPIExecutor::performAlltoall(hosts, mpi_count);
             } else if (op_name == "Bcast") {
-                SMPIExecutor::performBcast(hosts, root_host, bytes);
+                SMPIExecutor::performBcast(hosts, root_host, mpi_count);
             } else if (op_name == "Barrier") {
                 SMPIExecutor::performBarrier(hosts);
             } else {
