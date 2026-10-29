@@ -140,7 +140,7 @@ private:
 
             // Create a file read action executor
             auto file_read_action_executor = std::make_shared<wrench::ActionExecutor>(
-                    "Host2", 0, 0.0, 0, false, this->_commport, nullptr, file_registry_add_entry_action,
+                    "Host2", 0, 0.0, 0, 0, false, this->_commport, nullptr, file_registry_add_entry_action,
                     nullptr);
 
             // Start it
@@ -177,13 +177,13 @@ private:
                                                                                                    this->test->ss, this->test->file));
             // coverage
             wrench::Action::getActionTypeAsString(file_registry_delete_entry_action);
-            file_registry_delete_entry_action->getFile();
-            file_registry_delete_entry_action->getFileRegistryService();
-            file_registry_delete_entry_action->getFileLocation();
+            auto ignore_f = file_registry_delete_entry_action->getFile();
+            auto ignore_frs = file_registry_delete_entry_action->getFileRegistryService();
+            auto ignore_fl = file_registry_delete_entry_action->getFileLocation();
 
             // Create a file read action executor
             auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->_commport, nullptr, file_registry_delete_entry_action,
+                    new wrench::ActionExecutor("Host2", 0, 0.0, 0, 0, false, this->_commport, nullptr, file_registry_delete_entry_action,
                                                nullptr));
 
             // Start it

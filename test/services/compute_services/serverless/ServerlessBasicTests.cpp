@@ -39,7 +39,6 @@ WRENCH_LOG_CATEGORY(serverless_basic_tests,
                     "Log category for ServerlessBasicTests tests");
 
 class ServerlessBasicTest : public ::testing::Test {
-
 public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
@@ -91,6 +90,20 @@ protected:
             <prop id="ram" value="64GB" />
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
                 <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="ServerlessComputeNodeDifferentRAM" speed="50Gf" core="10">
+            <prop id="ram" value="1GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="ServerlessComputeNodeDifferentDisk" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="1GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
         </host>
@@ -197,7 +210,7 @@ private:
     int main() override {
         wrench::Simulation::sleep(1); // so that the service has started its sub-services
 
-        // Retrieve resource information
+        // Retrieve resource information (no simulation)
         auto num_hosts = compute_service->getNumHosts();
         auto cores = compute_service->getPerHostNumCores();
         auto idle_cores = compute_service->getPerHostNumIdleCores();
@@ -246,6 +259,15 @@ private:
             throw std::runtime_error("Unexpected available_memories map");
         }
 
+        {
+            // Retrieve resource information (simulate it)
+            auto s_num_hosts = compute_service->getNumHosts(true);
+            auto s_cores = compute_service->getPerHostNumCores(true);
+            auto s_idle_cores = compute_service->getPerHostNumIdleCores(true);
+            auto s_memories = compute_service->getPerHostMemoryCapacity(true);
+            auto s_available_memories = compute_service->getPerHostAvailableMemoryCapacity(true);
+        }
+
         // Bad registration
         auto function_manager = this->createFunctionManager();
         std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
@@ -262,7 +284,8 @@ private:
         auto image = wrench::FunctionManager::createImage("image", {layer});
         wrench::StorageService::createFileAtLocation(layer_location);
         try {
-            function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10, 2000 * MB,
+            function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10,
+                                               2000 * MB,
                                                8000 * MB, 10 * MB,
                                                1 * MB);
             throw std::runtime_error("Function registration should have failed due to RAM space");
@@ -270,7 +293,8 @@ private:
         }
 
         try {
-            function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10, 20000 * GB,
+            function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10,
+                                               20000 * GB,
                                                8000 * MB, 10 * MB,
                                                1 * MB);
             throw std::runtime_error("Function registration should have failed due to disk space");
@@ -329,6 +353,54 @@ void ServerlessBasicTest::do_SanityTest_test() {
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
                          std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         nullptr, {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {{wrench::
+                         ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER, "0"}}, {})),
+                     std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {{wrench::
+                         ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED, "10"}}, {})),
+                     std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNodeDifferentRAM"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNodeDifferentDisk"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {{wrench::
+                         ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED, "10"}}, {})),
+                     std::invalid_argument);
     }
 
     {
@@ -394,7 +466,8 @@ private:
         auto image = wrench::FunctionManager::createImage("my_image", {layer});
         wrench::StorageService::createFileAtLocation(layer_location);
 
-        function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10, 2000 * MB, 8000 * MB,
+        function_manager->registerFunction("Function 1", noop_init, lambda, image, this->compute_service, 10, 2000 * MB,
+                                           8000 * MB,
                                            10 * MB, 1 * MB);
 
         auto registered_function2 = function_manager->registerFunction("Function 2", noop_init, lambda, image,
@@ -406,6 +479,9 @@ private:
         if (registered_function2->getTimeLimit() != 10.0) {
             throw std::runtime_error("Registered function time limit should be 10 seconds");
         }
+
+        // Shutdown service (coverage)
+        this->compute_service->stop();
 
         return 0;
     }
@@ -511,7 +587,8 @@ private:
                 throw std::runtime_error("Shouldn't be able to call isSuccess() on an invocation that's not done yet");
             } catch (wrench::ExecutionException& e) {
                 if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
-                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                    throw std::runtime_error(
+                        "Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
                 }
             }
 
@@ -521,7 +598,8 @@ private:
                     "Shouldn't be able to call getFailureCause() on an invocation that's not done");
             } catch (wrench::ExecutionException& e) {
                 if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
-                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                    throw std::runtime_error(
+                        "Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
                 }
             }
 
@@ -530,7 +608,8 @@ private:
                 throw std::runtime_error("Shouldn't be able to call getOutput() on an invocation that's not done");
             } catch (wrench::ExecutionException& e) {
                 if (not std::dynamic_pointer_cast<wrench::InvalidOperation>(e.getCause())) {
-                    throw std::runtime_error("Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
+                    throw std::runtime_error(
+                        "Should have gotten an InvalidOperation failure cause. Instead: " + e.getCause()->toString());
                 }
             }
 

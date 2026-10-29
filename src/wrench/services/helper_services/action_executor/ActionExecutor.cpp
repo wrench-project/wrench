@@ -27,7 +27,8 @@ namespace wrench {
      * @param hostname: the name of the host on which the action executor will run
      * @param num_cores: the number of cores
      * @param ram_footprint: the RAM footprint
-     * @param thread_creation_overhead: the thread creation overhead in seconds
+     * @param startup_overhead: the executor's startup overhead in seconds
+     * @param thread_creation_overhead: the thread creation overhead in seconds (used only by action implementations)
      * @param simulate_computation_as_sleep: whether to simulate computation as sleep
      * @param callback_commport: the callback commport to which an "action done" or "action failed" message will be sent (if nullptr, then no message is sent)
      * @param custom_callback_msg: a custom callback message (if nullptr, an ActionExecutorDoneMessage message wil be sent)
@@ -38,6 +39,7 @@ namespace wrench {
         const std::string& hostname,
         unsigned long num_cores,
         sg_size_t ram_footprint,
+        double startup_overhead,
         double thread_creation_overhead,
         bool simulate_computation_as_sleep,
         S4U_CommPort* callback_commport,
@@ -57,7 +59,8 @@ namespace wrench {
         this->action_execution_service = action_execution_service;
         this->num_cores = num_cores;
         this->ram_footprint = ram_footprint;
-        this->action_startup_overhead = thread_creation_overhead;
+        _thread_creation_overhead = thread_creation_overhead;
+        _startup_overhead = startup_overhead;
         this->simulation_compute_as_sleep = simulate_computation_as_sleep;
 
         this->killed_on_purpose = false;
@@ -68,11 +71,13 @@ namespace wrench {
     }
 
     /**
-     * @brief Return the executor's thread creation overhead
+     * @brief Return the executor's thread creation overhead. This overhead value
+     *        can be used by an action in any way it desires. The executor does not
+     *        use it itself.
      * @return an overhead (in seconds)
      */
     double ActionExecutor::getThreadCreationOverhead() const {
-        return this->action_startup_overhead;
+        return _thread_creation_overhead;
     }
 
     /**
@@ -156,7 +161,8 @@ namespace wrench {
             this->_hostname,
             this->num_cores,
             this->ram_footprint,
-            this->action_startup_overhead,
+            0,
+            _thread_creation_overhead,
             this->simulation_compute_as_sleep,
             this->callback_commport,
             this->custom_callback_message,
@@ -195,8 +201,8 @@ namespace wrench {
         this->action->setState(Action::State::STARTED);
 
         // Overhead
-        if (this->action_startup_overhead > 0) {
-            S4U_Simulation::sleep(this->action_startup_overhead);
+        if (this->_startup_overhead > 0) {
+            S4U_Simulation::sleep(this->_startup_overhead);
         }
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
