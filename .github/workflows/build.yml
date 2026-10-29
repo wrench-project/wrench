@@ -131,7 +131,7 @@ jobs:
           batsched: ${{ matrix.batsched }}
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: |
-          if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
+          if [[ "$DIST" == "ubuntu-resolute" && "$COMPILER" == "gcc15" && "$batsched" == "off" ]]; then
             docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
             docker exec -w /home/wrench/wrench/build wrench make doc;
             docker cp wrench:/home/wrench/wrench/docs .;
@@ -160,7 +160,7 @@ jobs:
           batsched: ${{ matrix.batsched }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          if [[ "$DIST" == "ubuntu-noble" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
+          if [[ "$DIST" == "ubuntu-resolute" && "$COMPILER" == "gcc15" && "$batsched" == "off" ]]; then
             docker exec -w /home/wrench/wrench/build wrench lcov --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --directory . --capture --output-file coverage.info;
             docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info --ignore-errors unused,unused '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
             docker cp wrench:/home/wrench/wrench/build/coverage.info .;
