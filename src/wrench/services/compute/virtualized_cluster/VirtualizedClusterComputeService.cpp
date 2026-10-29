@@ -261,7 +261,7 @@ namespace wrench {
         auto vm = std::get<0>(vm_tuple);
 
         // Check that the target host has sufficient resources
-        double dest_available_ram = Simulation::getHostMemoryCapacity(dest_pm_hostname) -
+        sg_size_t dest_available_ram = Simulation::getHostMemoryCapacity(dest_pm_hostname) -
                                     this->used_ram_per_execution_host[dest_pm_hostname];
         double dest_available_cores =
                 static_cast<double>(Simulation::getHostNumCores(dest_pm_hostname)) - static_cast<double>(this->used_cores_per_execution_host[dest_pm_hostname]);
@@ -275,7 +275,24 @@ namespace wrench {
 
         } else {
             // Do the migration
+            const auto source_host = vm->getPhysicalHostname();
+            const auto num_cores = vm->getNumCores();
+            const auto ram = vm->getMemory();
+
+            // Do the migration
             vm->migrate(dest_pm_hostname);
+
+            // Update accounting
+            this->used_cores_per_execution_host.at(source_host) -= num_cores;
+            this->used_ram_per_execution_host.at(source_host) -= ram;
+
+            this->used_cores_per_execution_host.at(dest_pm_hostname) += num_cores;
+            this->used_ram_per_execution_host.at(dest_pm_hostname) += ram;
+
+            // Update the actual stored tuple, not the local vm_tuple copy.
+            std::get<1>(this->vm_list.at(vm_name)) = dest_pm_hostname;
+
+            // Notification message to send back
             msg_to_send_back = new VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
                     true,
                     nullptr,
@@ -283,12 +300,7 @@ namespace wrench {
                             VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        //        try {
-        answer_commport->dputMessage(
-                msg_to_send_back);
-        //        } catch (ExecutionException &e) {
-        //            // ignore
-        //        }
+        answer_commport->dputMessage(msg_to_send_back);
     }
 
 }// namespace wrench
