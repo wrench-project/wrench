@@ -302,14 +302,11 @@ private:
 };
 
 TEST_F(KillFailActionExecutorTest, KillSleep) {
-    // loopThroughTestCases({0.0, 0.2, 10.2}, true, "sleep");
     loopThroughTestCases({0.0, 2.0, 5.0, 15.0}, true, "sleep");
 }
 
 TEST_F(KillFailActionExecutorTest, FailSleep) {
-    // loopThroughTestCases({0.0, 0.2, 10.2}, false, "sleep");
-    loopThroughTestCases({0.0, 2.0, 5.0, 15.0}, true, "sleep");
-}
+    loopThroughTestCases({0.0, 2.0, 5.0, 15.0}, false, "sleep");}
 
 TEST_F(KillFailActionExecutorTest, KillCompute) {
     loopThroughTestCases({0.0, 0.2, 10.2}, true, "compute");
