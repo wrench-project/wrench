@@ -140,7 +140,7 @@ namespace wrench {
         /**
          * @brief Destructor
          */
-        ~SimulationTrace<SimulationTimestampPstateSet>() {
+        ~SimulationTrace() {
             for (auto &timestamp: this->trace) {
                 delete timestamp;
             }
