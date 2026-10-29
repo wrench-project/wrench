@@ -23,6 +23,11 @@ jobs:
             COMPILER: gcc15
             batsched: off
 
+          - build: "Ubuntu Resolute Raccoon - g++-15 - batsched"
+            DIST: ubuntu-resolute
+            COMPILER: gcc15-batsched
+            batsched: on
+
           - build: "Ubuntu Resolute Raccoon - clang-21"
             DIST: ubuntu-resolute
             COMPILER: clang21
@@ -96,7 +101,7 @@ jobs:
           docker exec -w /home/wrench/wrench/build wrench make examples;
           echo "Running examples...";
           docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh 
-          if [[ "$DIST" == "ubuntu-resolute" && "$COMPILER" == "gcc13" && "$batsched" == "off" ]]; then
+          if [[ "$DIST" == "ubuntu-resolute" && "$COMPILER" == "gcc21" && "$batsched" == "off" ]]; then
             # With coverage
             echo "Building and running unit tests (with coverage tracking)...";
             docker exec -w /home/wrench/wrench/build wrench make unit_tests_coverage;
