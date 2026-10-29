@@ -161,8 +161,15 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           if [[ "$DIST" == "ubuntu-resolute" && "$COMPILER" == "gcc15" && "$batsched" == "off" ]]; then
-            docker exec -w /home/wrench/wrench/build wrench lcov --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --directory . --capture --output-file coverage.info;
-            docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info --ignore-errors unused,unused '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+            docker exec -w /home/wrench/wrench/build wrench lcov --capture \
+              --directory . \
+              --output-file coverage.info \
+              --exclude '*/test/*' \
+              --exclude '*/examples/*' \
+              --exclude '*/include/*' \
+              --ignore-errors mismatch,mismatch \
+              --ignore-errors gcov,gcov \
+              --ignore-errors unused,unused
             docker cp wrench:/home/wrench/wrench/build/coverage.info .;
             bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
           fi
