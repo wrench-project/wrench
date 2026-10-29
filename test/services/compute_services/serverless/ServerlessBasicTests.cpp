@@ -480,6 +480,9 @@ private:
             throw std::runtime_error("Registered function time limit should be 10 seconds");
         }
 
+        // Shutdown service (coverage)
+        this->compute_service->stop();
+
         return 0;
     }
 };
