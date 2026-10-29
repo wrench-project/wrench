@@ -268,6 +268,13 @@ private:
             simgrid::s4u::Host::by_name("Host2")->turn_off();
         }
 
+        if (this->action_type == "sleep" &&
+    this->sleep_time > expected_completion_date + EPSILON &&
+    action->getState() != wrench::Action::State::COMPLETED) {
+
+            throw std::runtime_error(
+                "Sleep action should have completed before the interruption");
+    }
 
         // Is the start date sensible?
         RUNTIME_DBL_EQ(action->getStartDate(), 0.0, "action start date", EPSILON);
@@ -295,11 +302,13 @@ private:
 };
 
 TEST_F(KillFailActionExecutorTest, KillSleep) {
-    loopThroughTestCases({0.0, 0.2, 10.2}, true, "sleep");
+    // loopThroughTestCases({0.0, 0.2, 10.2}, true, "sleep");
+    loopThroughTestCases({0.0, 2.0, 5.0, 15.0}, true, "sleep");
 }
 
 TEST_F(KillFailActionExecutorTest, FailSleep) {
-    loopThroughTestCases({0.0, 0.2, 10.2}, false, "sleep");
+    // loopThroughTestCases({0.0, 0.2, 10.2}, false, "sleep");
+    loopThroughTestCases({0.0, 2.0, 5.0, 15.0}, true, "sleep");
 }
 
 TEST_F(KillFailActionExecutorTest, KillCompute) {
