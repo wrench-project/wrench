@@ -33,25 +33,15 @@ jobs:
             COMPILER: clang21
             batsched: off
 
-          - build: "Ubuntu Jammy Jellyfish - g++-11"
-            DIST: ubuntu-jammy
-            COMPILER: gcc11
-            batsched: off
-
-          - build: "Ubuntu Noble Numbat - clang++-18"
-            DIST: ubuntu-noble
-            COMPILER: clang18
-            batsched: off
-
           - build: "Ubuntu Noble Numbat - g++-13"
             DIST: ubuntu-noble
             COMPILER: gcc13
             batsched: off
 
-          - build: "Ubuntu Noble Numbat - g++-13 - batsched"
-            DIST: ubuntu-noble
-            COMPILER: gcc13-batsched
-            batsched: on
+          - build: "Ubuntu Jammy Jellyfish - g++-11"
+            DIST: ubuntu-jammy
+            COMPILER: gcc11
+            batsched: off
 
           - build: "Debian Trixie - g++-14"
             DIST: debian-trixie
