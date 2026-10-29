@@ -166,10 +166,12 @@ private:
         sg_size_t ram = 0;
         double expected_completion_date = -1;
         double thread_overhead = 0;
+        double startup_overhead = 0;
         if (this->action_type == "sleep") {
             action = std::dynamic_pointer_cast<wrench::Action>(job->addSleepAction("", 10.0));
-            thread_overhead = 0.2;
-            expected_completion_date = 10 + thread_overhead;
+            thread_overhead = 3.0;
+            startup_overhead = 2.0;
+            expected_completion_date = startup_overhead + thread_overhead + 10;
             num_cores = 0;
             ram = 0.0;
         }
@@ -241,7 +243,7 @@ private:
             "Host2",
             num_cores,
             ram,
-            0,
+            startup_overhead,
             thread_overhead,
             false,
             this->_commport,
