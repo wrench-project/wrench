@@ -798,7 +798,7 @@ namespace wrench
                           {
                               return a_ram < b_ram;
                           }
-                          else if (a_num_cores < b_num_cores)
+                          else if (a_num_cores != b_num_cores)
                           {
                               return a_num_cores < b_num_cores;
                           }
@@ -823,7 +823,7 @@ namespace wrench
                           {
                               return a_num_cores < b_num_cores;
                           }
-                          else if (a_ram < b_ram)
+                          else if (a_ram != b_ram)
                           {
                               return a_ram < b_ram;
                           }
