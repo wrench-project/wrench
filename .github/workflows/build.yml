@@ -23,6 +23,11 @@ jobs:
             COMPILER: gcc14
             batsched: off
 
+          - build: "Ubuntu Resolute Raccoon - g++-15"
+            DIST: ubuntu-resolute
+            COMPILER: gcc15
+            batsched: off
+
           - build: "Ubuntu Jammy Jellyfish - g++-11"
             DIST: ubuntu-jammy
             COMPILER: gcc11
