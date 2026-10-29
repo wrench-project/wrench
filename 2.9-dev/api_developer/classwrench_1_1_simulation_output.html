@@ -312,14 +312,45 @@
 <p><blockquote>
 <div><p><blockquote>
 <div><p><blockquote>
-<div><p>&gt;NOTE&lt;&lt;&lt;&lt; The timestamps the JSON is generated from are disabled by default. </p>
+<div><p>&gt;NOTE&lt;&lt;&lt;&lt; The timestamps the JSON is generated from are disabled by default. Enable them with <a class="reference internal" href="../api_user/classwrench_1_1_simulation_output.html#classwrench_1_1_simulation_output_1a8036ce1d66c704673043463faaafaf52"><span class="std std-ref">SimulationOutput::enableDiskTimestamps()</span></a> to use. </p>
 </div></blockquote>
 </p>
 </div></blockquote>
 </p>
 </div></blockquote>
-Enable them with <a class="reference internal" href="../api_user/classwrench_1_1_simulation_output.html#classwrench_1_1_simulation_output_1a8036ce1d66c704673043463faaafaf52"><span class="std std-ref">SimulationOutput::enableDiskTimestamps()</span></a> to use.</p>
+</p>
 <p>The JSON array has the following format:</p>
+<p><span><p>{</p>
+<p>“disk_operations”: {</p>
+<p>“io_host”: {                        &lt;— Hostname</p>
+<p>”/”: {                          &lt;— Mount</p>
+<p>”reads”: [</p>
+<p>{</p>
+<p>“bytes”: &lt;double&gt;,</p>
+<p>”end”: &lt;double&gt;,</p>
+<p>”failed”: &lt;double&gt;,</p>
+<p>”start”: &lt;double&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>…</p>
+<p>}</p>
+<p>],</p>
+<p>”writes”: [</p>
+<p>{</p>
+<p>“bytes”: &lt;double&gt;,</p>
+<p>”end”: &lt;double&gt;,</p>
+<p>”failed”: &lt;double&gt;,</p>
+<p>”start”: &lt;double&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>…</p>
+<p>}</p>
+<p>]</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -335,6 +366,42 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <span id="_CPPv3N6wrench16SimulationOutput29dumpHostEnergyConsumptionJSONERKNSt6stringEb"></span><span id="_CPPv2N6wrench16SimulationOutput29dumpHostEnergyConsumptionJSONERKNSt6stringEb"></span><span id="wrench::SimulationOutput::dumpHostEnergyConsumptionJSON__ssCR.b"></span><span class="target" id="classwrench_1_1_simulation_output_1ad35a45b55e9e18385be320d86267b808"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dumpHostEnergyConsumptionJSON</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_path</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">writing_file</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput29dumpHostEnergyConsumptionJSONERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Writes a JSON file containing host energy consumption information as a JSON array. </p>
 <p>The JSON array has the following format:</p>
+<p><span><p>{</p>
+<p>“energy_consumption”: {</p>
+<p>{</p>
+<p>hostname: &lt;string&gt;,</p>
+<p>pstates: [</p>
+<p>{</p>
+<p>pstate: &lt;int&gt;,</p>
+<p>idle: &lt;double&gt;,</p>
+<p>epsilon: &lt;double&gt;,</p>
+<p>all_cores: &lt;double&gt;,</p>
+<p>speed: &lt;double&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>pstate: &lt;int&gt;,</p>
+<p>idle: &lt;double&gt;,</p>
+<p>epsilon: &lt;double&gt;,</p>
+<p>all_cores: &lt;double&gt;,</p>
+<p>speed: &lt;double&gt;</p>
+<p>} …</p>
+<p>],</p>
+<p>watts_off: &lt;double&gt;,</p>
+<p>pstate_trace: [</p>
+<p>{</p>
+<p>time: &lt;double&gt;,</p>
+<p>pstate: &lt;int&gt;</p>
+<p>}, …</p>
+<p>],</p>
+<p>consumed_energy_trace: [</p>
+<p>{</p>
+<p>time: &lt;double&gt;,</p>
+<p>joules: &lt;double&gt;</p>
+<p>}, …</p>
+<p>]</p>
+<p>}, …</p>
+<p>}</p>
+</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -350,6 +417,28 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <span id="_CPPv3N6wrench16SimulationOutput17dumpLinkUsageJSONERKNSt6stringEb"></span><span id="_CPPv2N6wrench16SimulationOutput17dumpLinkUsageJSONERKNSt6stringEb"></span><span id="wrench::SimulationOutput::dumpLinkUsageJSON__ssCR.b"></span><span class="target" id="classwrench_1_1_simulation_output_1adca8f2d21ae6c1129d8ce421760f39db"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dumpLinkUsageJSON</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_path</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">writing_file</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput17dumpLinkUsageJSONERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Writes a JSON file containing link usage information as a JSON array.</p>
 <p>This information will not be generated without using the bandwidth meter service and providing it with link names to monitor.</p>
+<p><span><p>{</p>
+<p>“link_usage”: {</p>
+<p>“links”: [</p>
+<p>{</p>
+<p>“link_usage_trace”: [</p>
+<p>{</p>
+<p>“bytes per second”: &lt;double&gt;,</p>
+<p>”time”: &lt;double&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>…</p>
+<p>},</p>
+<p>],</p>
+<p>”linkname”: &lt;string&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>…</p>
+<p>}</p>
+<p>]</p>
+<p>}</p>
+<p>}</p>
+</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -365,6 +454,48 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <span id="_CPPv3N6wrench16SimulationOutput21dumpPlatformGraphJSONERKNSt6stringEb"></span><span id="_CPPv2N6wrench16SimulationOutput21dumpPlatformGraphJSONERKNSt6stringEb"></span><span id="wrench::SimulationOutput::dumpPlatformGraphJSON__ssCR.b"></span><span class="target" id="classwrench_1_1_simulation_output_1ad1514155d43a7e4f8753b95d4d664c65"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dumpPlatformGraphJSON</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_path</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">writing_file</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput21dumpPlatformGraphJSONERKNSt6stringEb" title="Link to this definition"></a><br /></dt>
 <dd><p>Writes a JSON file containing all hosts, network links, and the routes between each host. </p>
 <p>The JSON array has the following format:</p>
+<p><span><p>{</p>
+<p>“platform”:{</p>
+<p>vertices: [</p>
+<p>{</p>
+<p>type: &lt;”host”&gt;,</p>
+<p>id: &lt;string&gt;,</p>
+<p>flop_rate: &lt;double (flops per second)&gt;,</p>
+<p>memory_manager_service: &lt;double (bytes)&gt;,</p>
+<p>cores: &lt;unsigned_long&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>type: &lt;”link”&gt;,</p>
+<p>id: &lt;string&gt;,</p>
+<p>bandwidth: &lt;double (bytes per second)&gt;,</p>
+<p>latency: &lt;double (in seconds)&gt;</p>
+<p>}, …</p>
+<p>],</p>
+<p>edges: [</p>
+<p>{</p>
+<p>source: {</p>
+<p>type: &lt;string&gt;,</p>
+<p>id: &lt;string&gt;</p>
+<p>}</p>
+<p>target: {</p>
+<p>type: &lt;string&gt;,</p>
+<p>id: &lt;string&gt;</p>
+<p>}</p>
+<p>}, …</p>
+<p>],</p>
+<p>routes: [</p>
+<p>{</p>
+<p>source: &lt;string&gt;,</p>
+<p>target: &lt;string&gt;,</p>
+<p>latency: &lt;double (in seconds)&gt;</p>
+<p>route: [</p>
+<p>link_id, …</p>
+<p>]</p>
+<p>}</p>
+<p>],</p>
+<p>}</p>
+<p>}</p>
+</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -380,6 +511,55 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <span id="_CPPv3N6wrench16SimulationOutput25dumpWorkflowExecutionJSONERKNSt10shared_ptrI8WorkflowEERKNSt6stringEbb"></span><span id="_CPPv2N6wrench16SimulationOutput25dumpWorkflowExecutionJSONERKNSt10shared_ptrI8WorkflowEERKNSt6stringEbb"></span><span id="wrench::SimulationOutput::dumpWorkflowExecutionJSON__std::shared_ptr:Workflow:CR.ssCR.b.b"></span><span class="target" id="classwrench_1_1_simulation_output_1a6a6e05c0f8f14eb7813282dc40ce09c1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dumpWorkflowExecutionJSON</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_workflow.html#_CPPv4N6wrench8WorkflowE" title="wrench::Workflow"><span class="n"><span class="pre">Workflow</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">workflow</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">file_path</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">generate_host_utilization_layout</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">writing_file</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput25dumpWorkflowExecutionJSONERKNSt10shared_ptrI8WorkflowEERKNSt6stringEbb" title="Link to this definition"></a><br /></dt>
 <dd><p>Writes <a class="reference internal" href="../api_user/classwrench_1_1_workflow_task.html#classwrench_1_1_workflow_task"><span class="std std-ref">WorkflowTask</span></a> execution history for each task to a file, formatted as a JSON array. </p>
 <p>The JSON array has the following format:</p>
+<p><span><p>{</p>
+<p>“workflow_execution”: {</p>
+<p>“tasks”: [</p>
+<p>{</p>
+<p>“compute”: {</p>
+<p>“end”: &lt;double&gt;,</p>
+<p>”start”: &lt;double&gt;</p>
+<p>},</p>
+<p>”execution_host”: {</p>
+<p>“cores”: &lt;unsigned_long&gt;,</p>
+<p>”flop_rate”: &lt;double&gt;,</p>
+<p>”hostname”: &lt;string&gt;,</p>
+<p>”memory_manager_service”: &lt;double&gt;</p>
+<p>},</p>
+<p>”failed”: &lt;double&gt;,</p>
+<p>”num_cores_allocated”: &lt;unsigned_long&gt;,</p>
+<p>”read”: [</p>
+<p>{</p>
+<p>“end”: &lt;double&gt;,</p>
+<p>”start”: &lt;double&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>…</p>
+<p>}</p>
+<p>],</p>
+<p>”task_id”: &lt;string&gt;,</p>
+<p>”color”: &lt;string&gt;,</p>
+<p>”terminated”: &lt;double&gt;,</p>
+<p>”whole_task”: {</p>
+<p>“end”: &lt;double&gt;,</p>
+<p>”start”: &lt;double&gt;</p>
+<p>},</p>
+<p>”write”: [</p>
+<p>{</p>
+<p>“end”: &lt;double&gt;,</p>
+<p>”start”: &lt;double&gt;</p>
+<p>},</p>
+<p>{</p>
+<p>…</p>
+<p>}</p>
+<p>],</p>
+<p>},</p>
+<p>{</p>
+<p>…</p>
+<p>}</p>
+<p>]</p>
+<p>}</p>
+<p>}</p>
+</span></p>
 <p>If generate_host_utilization_layout is set to true, a recursive function searches for a possible host utilization layout where tasks are assumed to use contiguous numbers of cores on their execution hosts. Note that each <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> does not enforce this, and such a layout may not exist for some workflow executions. In this situation, the function will go through the entire search space until all possible layouts are evaluated. For a large <a class="reference internal" href="../api_user/classwrench_1_1_workflow.html#classwrench_1_1_workflow"><span class="std std-ref">Workflow</span></a>, this may take a very long time.</p>
 <p>If a host utilization layout is able to be generated, the ‘vertical_position’ values will be set for each task run, and the task can be plotted as a rectangle on a graph where the y-axis denotes the number of cores - 1, and the x-axis denotes the workflow execution timeline. The vertical_position specifies the bottom of the rectangle. num_cores_allocated specifies the height of the rectangle.</p>
 <dl class="field-list simple">
@@ -413,7 +593,7 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench16SimulationOutput25enableBandwidthTimestampsEb">
 <span id="_CPPv3N6wrench16SimulationOutput25enableBandwidthTimestampsEb"></span><span id="_CPPv2N6wrench16SimulationOutput25enableBandwidthTimestampsEb"></span><span id="wrench::SimulationOutput::enableBandwidthTimestamps__b"></span><span class="target" id="classwrench_1_1_simulation_output_1a2c6fa75fc1a64bb16b2a20649ffcaee4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enableBandwidthTimestamps</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput25enableBandwidthTimestampsEb" title="Link to this definition"></a><br /></dt>
-<dd><p>Enable or Disable the insertion of link-usage-related timestamps in the simulation output (enabled by default) </p>
+<dd><p>Enable or Disable the insertion of link-usage-related timestamps in the simulation output (enabled by default). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>enabled</strong> – true to enable, false to disable </p>
@@ -424,7 +604,7 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench16SimulationOutput20enableDiskTimestampsEb">
 <span id="_CPPv3N6wrench16SimulationOutput20enableDiskTimestampsEb"></span><span id="_CPPv2N6wrench16SimulationOutput20enableDiskTimestampsEb"></span><span id="wrench::SimulationOutput::enableDiskTimestamps__b"></span><span class="target" id="classwrench_1_1_simulation_output_1a8036ce1d66c704673043463faaafaf52"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enableDiskTimestamps</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput20enableDiskTimestampsEb" title="Link to this definition"></a><br /></dt>
-<dd><p>Enable or Disable the insertion of disk-related timestamps in the simulation output (enabled by default) </p>
+<dd><p>Enable or Disable the insertion of disk-related timestamps in the simulation output (enabled by default). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>enabled</strong> – true to enable, false to disable </p>
@@ -435,7 +615,7 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench16SimulationOutput22enableEnergyTimestampsEb">
 <span id="_CPPv3N6wrench16SimulationOutput22enableEnergyTimestampsEb"></span><span id="_CPPv2N6wrench16SimulationOutput22enableEnergyTimestampsEb"></span><span id="wrench::SimulationOutput::enableEnergyTimestamps__b"></span><span class="target" id="classwrench_1_1_simulation_output_1a5745936cc26be43d3685f0a3c9315726"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enableEnergyTimestamps</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput22enableEnergyTimestampsEb" title="Link to this definition"></a><br /></dt>
-<dd><p>Enable or Disable the insertion of energy-related timestamps in the simulation output (enabled by default) </p>
+<dd><p>Enable or Disable the insertion of energy-related timestamps in the simulation output (enabled by default). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>enabled</strong> – true to enable, false to disable </p>
@@ -446,7 +626,7 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench16SimulationOutput33enableFileReadWriteCopyTimestampsEb">
 <span id="_CPPv3N6wrench16SimulationOutput33enableFileReadWriteCopyTimestampsEb"></span><span id="_CPPv2N6wrench16SimulationOutput33enableFileReadWriteCopyTimestampsEb"></span><span id="wrench::SimulationOutput::enableFileReadWriteCopyTimestamps__b"></span><span class="target" id="classwrench_1_1_simulation_output_1a16a904d875134201a2fbfd6eb4d0ea37"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enableFileReadWriteCopyTimestamps</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput33enableFileReadWriteCopyTimestampsEb" title="Link to this definition"></a><br /></dt>
-<dd><p>Enable or Disable the insertion of file-related timestamps in the simulation output (enabled by default) </p>
+<dd><p>Enable or Disable the insertion of file-related timestamps in the simulation output (enabled by default). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>enabled</strong> – true to enable, false to disable </p>
@@ -457,7 +637,7 @@ Enable them with <a class="reference internal" href="../api_user/classwrench_1_1
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench16SimulationOutput28enableWorkflowTaskTimestampsEb">
 <span id="_CPPv3N6wrench16SimulationOutput28enableWorkflowTaskTimestampsEb"></span><span id="_CPPv2N6wrench16SimulationOutput28enableWorkflowTaskTimestampsEb"></span><span id="wrench::SimulationOutput::enableWorkflowTaskTimestamps__b"></span><span class="target" id="classwrench_1_1_simulation_output_1a53017a8582b00f0488dabb8d2a37410d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enableWorkflowTaskTimestamps</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enabled</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench16SimulationOutput28enableWorkflowTaskTimestampsEb" title="Link to this definition"></a><br /></dt>
-<dd><p>Enable or Disable the insertion of task-related timestamps in the simulation output (enabled by default) </p>
+<dd><p>Enable or Disable the insertion of task-related timestamps in the simulation output (enabled by default). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>enabled</strong> – true to enable, false to disable </p>

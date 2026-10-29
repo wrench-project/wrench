@@ -98,10 +98,10 @@ service via a job manager. For instance:</p>
 
 <span class="c1">// Create a standard job with 4 workflow tasks</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">job</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">createStandardJob</span><span class="p">(</span>
-<span class="w">                 </span><span class="p">{</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task&quot;</span><span class="p">),</span>
-<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task2&quot;</span><span class="p">),</span>
-<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task3&quot;</span><span class="p">),</span>
-<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">&quot;task4&quot;</span><span class="p">)});</span>
+<span class="w">                 </span><span class="p">{</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">"task"</span><span class="p">),</span>
+<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">"task2"</span><span class="p">),</span>
+<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">"task3"</span><span class="p">),</span>
+<span class="w">                  </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">getWorkflow</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getTaskByID</span><span class="p">(</span><span class="s">"task4"</span><span class="p">)});</span>
 
 <span class="c1">// Submit the job to the bare-metal service</span>
 <span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">submitJob</span><span class="p">(</span><span class="n">job</span><span class="p">,</span><span class="w"> </span><span class="n">some_bare_metal_service</span><span class="p">);</span>
@@ -147,16 +147,16 @@ specified number of cores.</p></li>
 <span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">service_specific_args</span><span class="p">;</span>
 
 <span class="c1">// task will run on host Node1 with as many cores as possible</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Node1&quot;</span><span class="p">;</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"task"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Node1"</span><span class="p">;</span>
 
 <span class="c1">// task2 will run on host Node2 with 16 cores</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task2&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Node2:16&quot;</span><span class="p">;</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"task2"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Node2:16"</span><span class="p">;</span>
 
 <span class="c1">// task3 will run on any host with as many cores as possible</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task3&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// could be omitted altogether</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"task3"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span><span class="p">;</span><span class="w"> </span><span class="c1">// could be omitted altogether</span>
 
 <span class="c1">// task4 will run on some host with 4 cores</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;task4&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;4&quot;</span><span class="p">;</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"task4"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"4"</span><span class="p">;</span>
 
 <span class="c1">// Submit the job</span>
 <span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">submitJob</span><span class="p">(</span><span class="n">job</span><span class="p">,</span><span class="w"> </span><span class="n">some_bare_metal_service</span><span class="p">,</span><span class="w"> </span><span class="n">service_specific_args</span><span class="p">);</span>

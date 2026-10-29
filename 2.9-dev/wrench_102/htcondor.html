@@ -112,9 +112,9 @@ example).</p>
 <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">wrench</span><span class="o">::</span><span class="n">BatchComputeService</span><span class="o">&gt;</span><span class="w"> </span><span class="n">some_batch2_cs</span><span class="p">;</span>
 
 <span class="c1">// Create a HTCondorComputeService instance with the above</span>
-<span class="c1">// three services as &quot;child&quot; services</span>
+<span class="c1">// three services as "child" services</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">htcondor_cs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simulation</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span>
-<span class="w">     </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">HTCondorComputeService</span><span class="p">(</span><span class="s">&quot;some_host&quot;</span><span class="p">,</span>
+<span class="w">     </span><span class="k">new</span><span class="w"> </span><span class="n">wrench</span><span class="o">::</span><span class="n">HTCondorComputeService</span><span class="p">(</span><span class="s">"some_host"</span><span class="p">,</span>
 <span class="w">                                        </span><span class="p">{</span><span class="n">some_baremetal_cs</span><span class="p">,</span><span class="w"> </span><span class="n">some_batch1_cs</span><span class="p">,</span><span class="w"> </span><span class="n">some_batch2_cs</span><span class="p">}));</span>
 
 <span class="c1">// One CloudComputeService instance</span>
@@ -132,7 +132,7 @@ services to the HTCondor service:</p>
 <span class="k">auto</span><span class="w"> </span><span class="n">vm1_cs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">some_cloud_cs</span><span class="o">-&gt;</span><span class="n">startVM</span><span class="p">(</span><span class="n">vm1</span><span class="p">);</span>
 <span class="k">auto</span><span class="w"> </span><span class="n">vm2_cs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">some_cloud_cs</span><span class="o">-&gt;</span><span class="n">startVM</span><span class="p">(</span><span class="n">vm2</span><span class="p">);</span>
 
-<span class="c1">// Add the two VM&#39;s bare-metal compute services to HTCondor</span>
+<span class="c1">// Add the two VM's bare-metal compute services to HTCondor</span>
 <span class="n">htcondor_cs</span><span class="o">-&gt;</span><span class="n">addComputeService</span><span class="p">(</span><span class="n">vm1_cs</span><span class="p">);</span>
 <span class="n">htcondor_cs</span><span class="o">-&gt;</span><span class="n">addComputeService</span><span class="p">(</span><span class="n">vm2_cs</span><span class="p">);</span>
 </pre></div>
@@ -171,12 +171,12 @@ optional if there is a single child batch compute service).</p></li>
 <span class="k">auto</span><span class="w"> </span><span class="n">g_job</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">createStandardJob</span><span class="p">(...);</span>
 
 <span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">service_specific_args</span><span class="p">;</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;-N&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;2&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// 2 compute nodes</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;-c&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;4&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// 4 cores per compute nodes</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;-t&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;3600&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// runs for one hour</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;universe&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;grid&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Grid universe</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"-N"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"2"</span><span class="p">;</span><span class="w"> </span><span class="c1">// 2 compute nodes</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"-c"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"4"</span><span class="p">;</span><span class="w"> </span><span class="c1">// 4 cores per compute nodes</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"-t"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"3600"</span><span class="p">;</span><span class="w"> </span><span class="c1">// runs for one hour</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"universe"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"grid"</span><span class="p">;</span><span class="w"> </span><span class="c1">// Grid universe</span>
 <span class="c1">// Set it to run on the first batch compute service</span>
-<span class="n">service_specific_args</span><span class="p">[</span><span class="s">&quot;-service&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">batch1_cs</span><span class="o">-&gt;</span><span class="n">getName</span><span class="p">();</span>
+<span class="n">service_specific_args</span><span class="p">[</span><span class="s">"-service"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">batch1_cs</span><span class="o">-&gt;</span><span class="n">getName</span><span class="p">();</span>
 
 <span class="n">job_manager</span><span class="o">-&gt;</span><span class="n">submitJob</span><span class="p">(</span><span class="n">g_job</span><span class="p">,</span><span class="w"> </span><span class="n">htcondor_cs</span><span class="p">,</span><span class="w"> </span><span class="n">service_specific_args</span><span class="p">);</span>
 </pre></div>

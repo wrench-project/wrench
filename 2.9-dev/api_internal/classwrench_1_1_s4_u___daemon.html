@@ -554,7 +554,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon10S4U_DaemonERKNSt6stringERKNSt6stringE">
 <span id="_CPPv3N6wrench10S4U_Daemon10S4U_DaemonERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N6wrench10S4U_Daemon10S4U_DaemonERKNSt6stringERKNSt6stringE"></span><span id="wrench::S4U_Daemon::S4U_Daemon__ssCR.ssCR"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a26bde93d71d1876397eb6911fba158a3"></span><span class="sig-name descname"><span class="n"><span class="pre">S4U_Daemon</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">hostname</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">process_name_prefix</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon10S4U_DaemonERKNSt6stringERKNSt6stringE" title="Link to this definition"></a><br /></dt>
-<dd><p>Constructor (daemon with a commport) </p>
+<dd><p>Constructor (daemon with a commport). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -581,7 +581,8 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon7cleanupEbi">
 <span id="_CPPv3N6wrench10S4U_Daemon7cleanupEbi"></span><span id="_CPPv2N6wrench10S4U_Daemon7cleanupEbi"></span><span id="wrench::S4U_Daemon::cleanup__b.i"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1ab6fe4db53ea5c0a934b507b146c504d1"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cleanup</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">has_returned_from_main</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">return_value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon7cleanupEbi" title="Link to this definition"></a><br /></dt>
-<dd><p>Cleanup function called when the daemon terminates (for whatever reason). The default behavior is to throw an exception if the host is off. This method should be overridden in a daemons implements some fault-tolerant behavior, or is naturally tolerant. </p>
+<dd><p>Release all mutexes that the running actor holds, if any. </p>
+<p>Cleanup function called when the daemon terminates (for whatever reason). The default behavior is to throw an exception if the host is off. This method should be overridden in a daemons implements some fault-tolerant behavior, or is naturally tolerant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -606,7 +607,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon15deleteLifeSaverEv">
 <span id="_CPPv3N6wrench10S4U_Daemon15deleteLifeSaverEv"></span><span id="_CPPv2N6wrench10S4U_Daemon15deleteLifeSaverEv"></span><span id="wrench::S4U_Daemon::deleteLifeSaver"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1ac16fd12d9fed60bfe10eb85af531901a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deleteLifeSaver</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon15deleteLifeSaverEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Delete the daemon’s life-saver (use at your own risks, if you’re not the <a class="reference internal" href="../api_user/classwrench_1_1_simulation.html#classwrench_1_1_simulation"><span class="std std-ref">Simulation</span></a> class) </p>
+<dd><p>Delete the daemon’s life-saver (use at your own risks, if you’re not the <a class="reference internal" href="../api_user/classwrench_1_1_simulation.html#classwrench_1_1_simulation"><span class="std std-ref">Simulation</span></a> class). </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -634,7 +635,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench10S4U_Daemon14getReturnValueEv">
 <span id="_CPPv3NK6wrench10S4U_Daemon14getReturnValueEv"></span><span id="_CPPv2NK6wrench10S4U_Daemon14getReturnValueEv"></span><span id="wrench::S4U_Daemon::getReturnValueC"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1aaf08a815c6ddd79b576d6f1bb096dfd7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getReturnValue</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10S4U_Daemon14getReturnValueEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Returns the value returned by <a class="reference internal" href="#classwrench_1_1_s4_u___daemon_1a0073b1104849679756809330533400eb"><span class="std std-ref">main()</span></a> (if the daemon has returned from main) </p>
+<dd><p>Returns the value returned by <a class="reference internal" href="#classwrench_1_1_s4_u___daemon_1a0073b1104849679756809330533400eb"><span class="std std-ref">main()</span></a> (if the daemon has returned from main). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The return value </p>
@@ -667,7 +668,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench10S4U_Daemon19hasReturnedFromMainEv">
 <span id="_CPPv3NK6wrench10S4U_Daemon19hasReturnedFromMainEv"></span><span id="_CPPv2NK6wrench10S4U_Daemon19hasReturnedFromMainEv"></span><span id="wrench::S4U_Daemon::hasReturnedFromMainC"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1a4de97c8f7759c7d5c7c445502da9d1a2"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasReturnedFromMain</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench10S4U_Daemon19hasReturnedFromMainEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Returns true if the daemon has returned from <a class="reference internal" href="#classwrench_1_1_s4_u___daemon_1a0073b1104849679756809330533400eb"><span class="std std-ref">main()</span></a> (i.e., not brutally killed) </p>
+<dd><p>Returns true if the daemon has returned from <a class="reference internal" href="#classwrench_1_1_s4_u___daemon_1a0073b1104849679756809330533400eb"><span class="std std-ref">main()</span></a> (i.e., not brutally killed). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The true or false </p>
@@ -711,7 +712,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench10S4U_Daemon9killActorEv">
 <span id="_CPPv3N6wrench10S4U_Daemon9killActorEv"></span><span id="_CPPv2N6wrench10S4U_Daemon9killActorEv"></span><span id="wrench::S4U_Daemon::killActor"></span><span class="target" id="classwrench_1_1_s4_u___daemon_1ac4a828920d1217c73f0c4dfb2ab70fff"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">killActor</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench10S4U_Daemon9killActorEv" title="Link to this definition"></a><br /></dt>
-<dd><p>Kill the daemon/actor (does nothing if already dead) </p>
+<dd><p>Kill the daemon/actor (does nothing if already dead). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>true if actor was killed, false if not (e.g., daemon was already dead) </p>

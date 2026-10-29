@@ -520,16 +520,23 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench31ConstantEfficiencyParallelModel23getPurelySequentialWorkEdm">
 <span id="_CPPv3N6wrench31ConstantEfficiencyParallelModel23getPurelySequentialWorkEdm"></span><span id="_CPPv2N6wrench31ConstantEfficiencyParallelModel23getPurelySequentialWorkEdm"></span><span id="wrench::ConstantEfficiencyParallelModel::getPurelySequentialWork__double.unsigned-l"></span><span class="target" id="classwrench_1_1_constant_efficiency_parallel_model_1adc529fc4bb78535f2932816c8744eb5d"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getPurelySequentialWork</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">total_work</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_threads</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6wrench31ConstantEfficiencyParallelModel23getPurelySequentialWorkEdm" title="Link to this definition"></a><br /></dt>
-<dd><p>Returns the purely sequential amount of work. </p>
+<dd><p>Returns the amount of work each thread much perform. </p>
+<p>
+Returns the purely sequential amount of work </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>total_work</strong> – total amount of work </p></li>
+<li><p><strong>num_threads</strong> – the number of threads </p></li>
 <li><p><strong>total_work</strong> – total amount of work (in flops) </p></li>
 <li><p><strong>num_threads</strong> – number of threads </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>an amount of work (in flops) </p>
+<dd class="field-even"><p>a vector of work amounts</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>an amount of work (in flops) </p>
 </dd>
 </dl>
 </dd></dl>

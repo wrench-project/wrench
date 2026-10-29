@@ -104,11 +104,11 @@ which VM instances are created and (live) migrated:</p>
 
 <span class="c1">// Create a VM with 2 cores and 1 GiB of RAM on Host1, which could fail</span>
 <span class="c1">// if not enough resources are available</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">vm1_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">createVM</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">30</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Host1&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">vm1_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">createVM</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">30</span><span class="p">),</span><span class="w"> </span><span class="s">"Host1"</span><span class="p">);</span>
 
 <span class="c1">// Create a VM with 4 cores and 2 GiB of RAM on Host2 , which could fail</span>
 <span class="c1">// if not enough resources are available</span>
-<span class="k">auto</span><span class="w"> </span><span class="n">vm2_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">createVM</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">31</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Host2&quot;</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">vm2_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">createVM</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">31</span><span class="p">),</span><span class="w"> </span><span class="s">"Host2"</span><span class="p">);</span>
 
 <span class="p">[...]</span>
 
@@ -121,10 +121,10 @@ which VM instances are created and (live) migrated:</p>
 <span class="p">[...]</span>
 
 <span class="c1">// Live migrate vm1 to Host3</span>
-<span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">migrateVM</span><span class="p">(</span><span class="n">vm1_name</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Host3&quot;</span><span class="p">);</span>
+<span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">migrateVM</span><span class="p">(</span><span class="n">vm1_name</span><span class="p">,</span><span class="w"> </span><span class="s">"Host3"</span><span class="p">);</span>
 
 <span class="c1">// Live migrate vm2 to Host4</span>
-<span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">migrateVM</span><span class="p">(</span><span class="n">vm2_name</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Host4&quot;</span><span class="p">);</span>
+<span class="n">virtualized_cluster_cs</span><span class="o">-&gt;</span><span class="n">migrateVM</span><span class="p">(</span><span class="n">vm2_name</span><span class="p">,</span><span class="w"> </span><span class="s">"Host4"</span><span class="p">);</span>
 
 <span class="p">[...]</span>
 

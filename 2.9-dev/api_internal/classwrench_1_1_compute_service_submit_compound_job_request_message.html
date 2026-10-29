@@ -486,7 +486,31 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench45ComputeServiceSubmitCompoundJobRequestMessageE">
 <span id="_CPPv3N6wrench45ComputeServiceSubmitCompoundJobRequestMessageE"></span><span id="_CPPv2N6wrench45ComputeServiceSubmitCompoundJobRequestMessageE"></span><span id="wrench::ComputeServiceSubmitCompoundJobRequestMessage"></span><span class="target" id="classwrench_1_1_compute_service_submit_compound_job_request_message"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComputeServiceSubmitCompoundJobRequestMessage</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">wrench</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="classwrench_1_1_compute_service_message.html#_CPPv4N6wrench21ComputeServiceMessageE" title="wrench::ComputeServiceMessage"><span class="n"><span class="pre">ComputeServiceMessage</span></span></a><a class="headerlink" href="#_CPPv4N6wrench45ComputeServiceSubmitCompoundJobRequestMessageE" title="Link to this definition"></a><br /></dt>
-<dd><p>A message sent to a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> to submit a <a class="reference internal" href="classwrench_1_1_compound_job.html#classwrench_1_1_compound_job"><span class="std std-ref">CompoundJob</span></a> for execution. </p>
+<dd><p>A message sent to a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> to submit a <a class="reference internal" href="classwrench_1_1_standard_job.html#classwrench_1_1_standard_job"><span class="std std-ref">StandardJob</span></a> for execution. </p>
+<p>The commport_name to which the answer message should be sent</p>
+<p>The submitted job</p>
+<p><a class="reference internal" href="../api_user/classwrench_1_1_service.html#classwrench_1_1_service"><span class="std std-ref">Service</span></a> specific arguments</p>
+<p>A message sent by a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> in answer to a <a class="reference internal" href="classwrench_1_1_standard_job.html#classwrench_1_1_standard_job"><span class="std std-ref">StandardJob</span></a> submission request</p>
+<p>The standard job that was submitted</p>
+<p>The compute service to which the job was submitted</p>
+<p>Whether to job submission was successful</p>
+<p>The cause of the failure, or nullptr on success</p>
+<p>A message sent by a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> when a <a class="reference internal" href="classwrench_1_1_standard_job.html#classwrench_1_1_standard_job"><span class="std std-ref">StandardJob</span></a> has completed execution</p>
+<p>The job that has completed</p>
+<p>The compute service on which the job has completed</p>
+<p>A message sent by a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> when a <a class="reference internal" href="classwrench_1_1_standard_job.html#classwrench_1_1_standard_job"><span class="std std-ref">StandardJob</span></a> has failed to execute</p>
+<p>The job that has failed</p>
+<p>The compute service on which the job has failed</p>
+<p>The cause of the failure</p>
+<p>A message sent to a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> to terminate a <a class="reference internal" href="classwrench_1_1_standard_job.html#classwrench_1_1_standard_job"><span class="std std-ref">StandardJob</span></a> previously submitted for execution</p>
+<p>The commport_name to which the answer message should be sent</p>
+<p>The job to terminate</p>
+<p>A message sent by a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> in answer to a <a class="reference internal" href="classwrench_1_1_standard_job.html#classwrench_1_1_standard_job"><span class="std std-ref">StandardJob</span></a> termination request</p>
+<p>The standard job to terminate</p>
+<p>The compute service to which the job had been submitted</p>
+<p>Whether to job termination was successful</p>
+<p>The cause of the failure, or nullptr on success</p>
+<p>A message sent to a <a class="reference internal" href="../api_user/classwrench_1_1_compute_service.html#classwrench_1_1_compute_service"><span class="std std-ref">ComputeService</span></a> to submit a <a class="reference internal" href="classwrench_1_1_compound_job.html#classwrench_1_1_compound_job"><span class="std std-ref">CompoundJob</span></a> for execution </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
