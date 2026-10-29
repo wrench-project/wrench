@@ -94,6 +94,20 @@ protected:
                 <prop id="mount" value="/"/>
             </disk>
         </host>
+        <host id="ServerlessComputeNodeDifferentRAM" speed="50Gf" core="10">
+            <prop id="ram" value="1GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="ServerlessComputeNodeDifferentDisk" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="1GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
         <host id="HostWrongMountPoint" speed="50Gf" core="10">
             <prop id="ram" value="64GB" />
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
@@ -329,6 +343,48 @@ void ServerlessBasicTest::do_SanityTest_test() {
         ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
                          "ServerlessHeadNode", "/", compute_nodes,
                          std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         nullptr, {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {{wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_CONTAINER, "0"}}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {{wrench::ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED, "10"}}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNodeDifferentRAM"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {})), std::invalid_argument);
+    }
+    {
+        std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNodeDifferentDisk"};
+        ASSERT_THROW(simulation->add(new wrench::ServerlessComputeService(
+                         "ServerlessHeadNode", "/", compute_nodes,
+                         std::make_shared<wrench::GreedyServerlessScheduler>(), {{wrench::ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED, "10"}}, {})), std::invalid_argument);
     }
 
     {
