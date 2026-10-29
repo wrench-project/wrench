@@ -41,7 +41,7 @@ public:
     std::shared_ptr<wrench::StorageService> ss1;
     std::shared_ptr<wrench::StorageService> ss2;
 
-    void loopThroughTestCases(std::vector<double> points_of_interest, bool kill, std::string action_type) {
+    void loopThroughTestCases(const std::vector<double>& points_of_interest, bool kill, const std::string& action_type) {
         std::vector<double> deltas = {
             0.000000000, 0.000000001, 0.00000001, 0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1
         };
@@ -133,8 +133,6 @@ protected:
 /**********************************************************************/
 /**  DO KILL FAIL ACTION EXECUTOR SUCCESS TEST                       **/
 /**********************************************************************/
-
-
 class KillFailActionExecutorTestWMS : public wrench::ExecutionController {
 public:
     KillFailActionExecutorTestWMS(KillFailActionExecutorTest* test,
@@ -179,15 +177,15 @@ private:
             action = std::dynamic_pointer_cast<wrench::Action>(
                 job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
             thread_overhead = 0.1;
-            expected_completion_date = 10.2 + thread_overhead;
             num_cores = 2;
+            expected_completion_date = 10 + static_cast<double>(num_cores) * thread_overhead;
             ram = 200;
         }
         else if (this->action_type == "file_read") {
             action = std::dynamic_pointer_cast<wrench::Action>(
                 job->addFileReadAction("", wrench::FileLocation::LOCATION(this->test->ss1, this->test->file)));
             thread_overhead = 0.1;
-            expected_completion_date = 10.84743174020618639020;
+            expected_completion_date = 10.4743174020618639020;
             num_cores = 0;
             ram = 0.0;
         }
@@ -204,7 +202,7 @@ private:
             action = std::dynamic_pointer_cast<wrench::Action>(job->addFileCopyAction(
                 "", wrench::FileLocation::LOCATION(this->test->ss1, this->test->file),
                 wrench::FileLocation::LOCATION(this->test->ss2, this->test->file)));
-            thread_overhead = 0.1;
+            thread_overhead = 0.2;
             expected_completion_date = 10.97973091237113507646;
             num_cores = 0;
             ram = 0.0;
@@ -212,7 +210,7 @@ private:
         else if (this->action_type == "file_delete") {
             action = std::dynamic_pointer_cast<wrench::Action>(
                 job->addFileDeleteAction("", wrench::FileLocation::LOCATION(this->test->ss1, this->test->file)));
-            thread_overhead = 0.1;
+            thread_overhead = 0.2;
             expected_completion_date = 0.12242927216494845083;
             num_cores = 0;
             ram = 0.0;
@@ -220,11 +218,11 @@ private:
         else if (this->action_type == "custom") {
             auto storage_service = this->test->ss1;
             auto file = this->test->file;
-            auto lambda_execute = [storage_service, file](std::shared_ptr<wrench::ActionExecutor> action_executor) {
+            auto lambda_execute = [storage_service, file](const std::shared_ptr<wrench::ActionExecutor>& action_executor) {
                 storage_service->readFile(wrench::FileLocation::LOCATION(storage_service, file));
                 wrench::Simulation::sleep(10.0);
             };
-            auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) {
+            auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor>& action_executor) {
             };
 
             action = std::dynamic_pointer_cast<wrench::Action>(
@@ -243,6 +241,7 @@ private:
             "Host2",
             num_cores,
             ram,
+            0,
             thread_overhead,
             false,
             this->_commport,
@@ -263,7 +262,7 @@ private:
         }
         else {
             // Fail it
-            WRENCH_INFO("FAILING THE ACTION EXECUTOR BYT TURNING OFF THE HOST");
+            WRENCH_INFO("FAILING THE ACTION EXECUTOR BY TURNING OFF THE HOST");
             simgrid::s4u::Host::by_name("Host2")->turn_off();
         }
 
@@ -275,17 +274,17 @@ private:
         // Is the state and end date sensible?
         if (action->getState() == wrench::Action::State::COMPLETED) {
             if (fabs(action->getEndDate() - expected_completion_date) >  EPSILON) {
-                throw std::runtime_error("Unexpected action state : " + action->getStateAsString());
+                throw std::runtime_error("Unexpected completion date : " + std::to_string(action->getEndDate()) + " (should be " + std::to_string(expected_completion_date) + ")");
             }
         }
         if (this->kill and action->getState() == wrench::Action::State::KILLED) {
             if (fabs(action->getEndDate() - this->sleep_time) > EPSILON) {
-                throw std::runtime_error("Unexpected action state : " + action->getStateAsString());
+                throw std::runtime_error("Unexpected completion date : " + std::to_string(action->getEndDate()) + " (should be " + std::to_string(this->sleep_time) + ")");
             }
         }
         if ((not this->kill) and action->getState() == wrench::Action::State::FAILED) {
             if (fabs(action->getEndDate() - this->sleep_time) > EPSILON) {
-                throw std::runtime_error("Unexpected action state : " + action->getStateAsString());
+                throw std::runtime_error("Unexpected completion date : " + std::to_string(action->getEndDate()) + " (should be " + std::to_string(this->sleep_time) + ")");
             }
         }
 

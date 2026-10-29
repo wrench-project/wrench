@@ -132,7 +132,7 @@ namespace wrench {
   */
     void ComputeAction::simulateComputationAsSleep(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
-        S4U_Simulation::sleep(static_cast<double>(num_threads) *action_executor->getThreadCreationOverhead());
+        S4U_Simulation::sleep(static_cast<double>(num_threads) * action_executor->getThreadCreationOverhead());
         // Then sleep for the computation duration
         double sleep_time = (sequential_work + parallel_per_thread_work) / Simulation::getFlopRate();
         Simulation::sleep(sleep_time);

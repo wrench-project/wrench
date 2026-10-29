@@ -471,6 +471,7 @@ namespace wrench {
                 new ActionExecutor(target_host->get_name(),
                                    target_num_cores,
                                    required_ram,
+                                   0,
                                    this->getPropertyValueAsTimeInSecond(
                                        ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD),
                                    this->getPropertyValueAsBoolean(

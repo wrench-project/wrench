@@ -155,6 +155,7 @@ private:
             "Host2",
             num_cores,
             ram,
+            0,
             thread_creation_overhead,
             simulation_computation_as_sleep,
             this->_commport,
@@ -188,7 +189,7 @@ private:
         }
 
         // Is the end-date sensible?
-        double expected_end_date = 10.2 + thread_creation_overhead;
+        double expected_end_date = 10 + 2 * thread_creation_overhead;
         if (fabs(action->getEndDate() - expected_end_date) > EPSILON) {
             throw std::runtime_error(
                 "Unexpected action end date: " + std::to_string(action->getEndDate()) + " (expected: ~" + std::to_string(expected_end_date) + ")");
@@ -277,26 +278,25 @@ private:
         auto job = job_manager->createCompoundJob("");
 
         // Create an action executor
-        std::shared_ptr<wrench::Action> action;
         unsigned long num_cores = 2;
-        double ram = 200;
+        sg_size_t ram = 200;
 
         // Coverage
         try {
             job->addComputeAction("", -1.0, 0, 0, 1, wrench::ParallelModel::AMDAHL(1.0));
             throw std::runtime_error("Shouldn't be able to create a compute action with bogus arguments");
-        }
-        catch (std::invalid_argument& ignore) {
+        } catch (std::invalid_argument& ignore) {
         }
 
         // Too much RAM
-        action = std::dynamic_pointer_cast<wrench::Action>(
+        auto action = std::dynamic_pointer_cast<wrench::Action>(
             job->addComputeAction("", 20.0, 300.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
 
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
             new wrench::ActionExecutor("Host2",
                                        num_cores,
                                        ram,
+                                       0,
                                        0.1,
                                        false,
                                        this->_commport,

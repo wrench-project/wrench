@@ -137,7 +137,7 @@ private:
 
         // Create a sleep action executor with a timeout
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->_commport, nullptr, sleep_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, 0, false, this->_commport, nullptr, sleep_action, nullptr));
         sleep_action_executor->setActionTimeout(5);
         // Start it
         sleep_action_executor->setSimulation(this->getSimulation());

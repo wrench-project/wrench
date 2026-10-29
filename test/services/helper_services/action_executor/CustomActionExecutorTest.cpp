@@ -160,6 +160,7 @@ private:
                 num_cores,
                 ram,
                 0,
+                0,
                 false,
                 this->_commport, nullptr,
                 action, nullptr);

@@ -40,6 +40,7 @@ namespace wrench {
             const std::string& hostname,
             unsigned long num_cores,
             sg_size_t ram_footprint,
+            double startup_overhead,
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
             S4U_CommPort* callback_commport,
@@ -52,7 +53,7 @@ namespace wrench {
         void cleanup(bool has_returned_from_main, int return_value) override;
         std::shared_ptr<ActionExecutionService> getActionExecutionService() const;
         bool getSimulateComputationAsSleep() const;
-        void setActionTimeout(const double timeout);
+        void setActionTimeout(double timeout);
 
     protected:
         void execute_action();
@@ -64,8 +65,10 @@ namespace wrench {
         SimulationMessage* custom_callback_message;
         bool killed_on_purpose;
 
+        double _startup_overhead;
+        double _thread_creation_overhead;
+
         bool simulation_compute_as_sleep;
-        double action_startup_overhead;
         double action_timeout = 0;
 
         unsigned long num_cores;
@@ -94,6 +97,7 @@ namespace wrench {
         ActionExecutorActorWithTimeout(const std::string& hostname,
                                        unsigned long num_cores,
                                        sg_size_t ram_footprint,
+                                       double startup_overhead,
                                        double thread_creation_overhead,
                                        bool simulate_computation_as_sleep,
                                        S4U_CommPort* callback_commport,
@@ -104,6 +108,7 @@ namespace wrench {
                                        std::shared_ptr<FailureCause> *failure_cause) : ActionExecutor(hostname,
                                                                         num_cores,
                                                                         ram_footprint,
+                                                                        startup_overhead,
                                                                         thread_creation_overhead,
                                                                         simulate_computation_as_sleep,
                                                                         callback_commport,
