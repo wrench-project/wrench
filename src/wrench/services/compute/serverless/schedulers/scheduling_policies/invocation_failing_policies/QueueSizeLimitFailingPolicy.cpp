@@ -36,7 +36,7 @@ namespace wrench {
         }
 
         std::set<std::shared_ptr<Invocation>> to_fail;
-        auto iterator_offset = static_cast<std::vector<std::shared_ptr<wrench::Invocation>>::difference_type>(num_to_fail);
+        auto iterator_offset = static_cast<std::vector<std::shared_ptr<Invocation>>::difference_type>(num_to_fail);
         for (auto it = scheduling_state->_schedulable_invocations.end() - iterator_offset;
              it != scheduling_state->_schedulable_invocations.end(); ++it) {
             to_fail.insert(*it);

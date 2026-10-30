@@ -596,10 +596,6 @@ namespace wrench {
             ServerlessComputeServiceInvocationExecutionCompleteMessage>(message)) {
             processInvocationCompletion(scsiec_msg->_invocation, scsiec_msg->_action);
             return true;
-            // } else if (const auto scscpc_msg = std::dynamic_pointer_cast<
-            //     ServerlessComputeServiceContainerPrewarmCompleteMessage>(message)) {
-            //     processPrewarmCompletion(scscpc_msg->_container, scscpc_msg->_action);
-            //     return true;
         } else if (const auto scsncc_msg = std::dynamic_pointer_cast<
             ServerlessComputeServiceNodeCopyCompleteMessage>(message)) {
             processNodeCopyCompletion(scsncc_msg->_layer, scsncc_msg->_compute_node, scsncc_msg->_action);
@@ -710,8 +706,9 @@ namespace wrench {
     *
     * @param name the name of the function to register
     * @param initialization_code the function's initialization code, which is executed only once on each container
-     *        for the function, before any actual function executions can take place.
-     * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
+    *        for the function, before any actual function executions can take place.
+    * @param code the function's code, which can only be executed after the initialization code has executed (successfully) on the container.
+    * @param image the function's image
     * @param time_limit_in_seconds the time limit for execution
     * @param disk_space_limit_in_bytes the disk space limit for the function
     * @param RAM_limit_in_bytes the RAM limit for the function
@@ -1006,10 +1003,10 @@ namespace wrench {
     /**
      * @brief Process a container initialization completion
      * @param container The container
+     * @param init_action The container inititalization action
      */
     void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
-                                                                            const std::shared_ptr<Action>&
-                                                                            init_action) {
+                                                                            const std::shared_ptr<Action>& init_action) {
         auto compute_node = container->getComputeNode();
 
         if (compute_node->_initializing_containers.count(container) == 0) {
