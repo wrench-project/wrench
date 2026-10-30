@@ -78,6 +78,10 @@ namespace wrench {
         if (transaction->dst_opened_file) {
             auto dst_file_system = transaction->dst_opened_file->get_file_system();
             auto dst_file_path = transaction->dst_opened_file->get_path();
+            // The streaming activity already simulated the transfer.
+            // Apply its filesystem effects without simulating the I/O again (for LRU!)
+            transaction->dst_opened_file->seek(0, SEEK_SET);
+            transaction->dst_opened_file->write(transaction->transfer_size, false);
             transaction->dst_opened_file->close();
             if (not dst_file_system->file_exists(transaction->dst_location->getFilePath())) {
                 dst_file_system->move_file(dst_file_path, transaction->dst_location->getFilePath());

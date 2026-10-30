@@ -95,7 +95,7 @@ namespace wrench {
     public:
         FileRegistryFileLookupByProximityAnswerMessage(std::shared_ptr<DataFile> file,
                                                        const std::string &reference_host,
-                                                       std::map<double, std::shared_ptr<FileLocation>> locations,
+                                                       std::multimap<double, std::shared_ptr<FileLocation>> locations,
                                                        sg_size_t payload);
 
         /** @brief The file to lookup */
@@ -112,7 +112,7 @@ namespace wrench {
          * @brief A map of all locations where the file resides sorted with respect to their distance from
          * the host 'host_to_measure_from'
          */
-        std::map<double, std::shared_ptr<FileLocation>> locations;
+        std::multimap<double, std::shared_ptr<FileLocation>> locations;
     };
 
     /**

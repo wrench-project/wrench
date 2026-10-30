@@ -224,20 +224,6 @@ namespace wrench {
     };
 
     /**
-     * @brief a message sent to a ServerlessComputeService to notify that a container prewarm has completed
-     */
-    class ServerlessComputeServiceContainerPrewarmCompleteMessage : public ServerlessComputeServiceMessage {
-    public:
-        explicit ServerlessComputeServiceContainerPrewarmCompleteMessage(std::shared_ptr<Container> container,
-                                                                         std::shared_ptr<Action> action);
-
-        /** @brief The container that was pre-warmed */
-        std::shared_ptr<Container> _container;
-        /** @brief The action that initialized the container (to check status) */
-        std::shared_ptr<Action> _action;
-    };
-
-    /**
      * @brief a message sent to a ServerlessComputeService to notify that the scheduler should be invoked
      */
     class ServerlessComputeServiceSchedulerWakeupMessage : public ServerlessComputeServiceMessage {

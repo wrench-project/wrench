@@ -86,7 +86,7 @@ namespace wrench {
      */
     FileRegistryFileLookupByProximityAnswerMessage::FileRegistryFileLookupByProximityAnswerMessage(
             std::shared_ptr<DataFile> file, const std::string& reference_host,
-            std::map<double, std::shared_ptr<FileLocation>> locations,
+            std::multimap<double, std::shared_ptr<FileLocation>> locations,
             sg_size_t payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (reference_host.empty())) {

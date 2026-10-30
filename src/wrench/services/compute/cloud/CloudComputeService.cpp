@@ -787,18 +787,18 @@ namespace wrench
         {
             // Sort the possible hosts to implement best fit (using RAM first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
-                      [](std::string const& a, std::string const& b)
+                      [this](std::string const& a, std::string const& b)
                       {
-                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                          sg_size_t a_ram = Simulation::getHostMemoryCapacity(a);
-                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                          sg_size_t b_ram = Simulation::getHostMemoryCapacity(b);
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a) - this->used_cores_per_execution_host.at(a);
+                          sg_size_t a_ram = Simulation::getHostMemoryCapacity(a) - this->used_ram_per_execution_host.at(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b) - this->used_cores_per_execution_host.at(b);
+                          sg_size_t b_ram = Simulation::getHostMemoryCapacity(b) - this->used_ram_per_execution_host.at(b);
 
                           if (a_ram != b_ram)
                           {
                               return a_ram < b_ram;
                           }
-                          else if (a_num_cores < b_num_cores)
+                          else if (a_num_cores != b_num_cores)
                           {
                               return a_num_cores < b_num_cores;
                           }
@@ -812,18 +812,19 @@ namespace wrench
         {
             // Sort the possible hosts to implement best fit (using cores first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
-                      [](std::string const& a, std::string const& b)
+                      [this](std::string const& a, std::string const& b)
                       {
-                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                          sg_size_t a_ram = Simulation::getHostMemoryCapacity(a);
-                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                          sg_size_t b_ram = Simulation::getHostMemoryCapacity(b);
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a) - this->used_cores_per_execution_host.at(a);
+                          sg_size_t a_ram = Simulation::getHostMemoryCapacity(a) - this->used_ram_per_execution_host.at(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b) - this->used_cores_per_execution_host.at(b);
+                          sg_size_t b_ram = Simulation::getHostMemoryCapacity(b) - this->used_ram_per_execution_host.at(b);
+
 
                           if (a_num_cores != b_num_cores)
                           {
                               return a_num_cores < b_num_cores;
                           }
-                          else if (a_ram < b_ram)
+                          else if (a_ram != b_ram)
                           {
                               return a_ram < b_ram;
                           }

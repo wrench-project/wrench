@@ -424,22 +424,27 @@ namespace wrench {
             this->ongoing_tmp_commports.erase(ftt);
         }
 
-        // Retire the commports of the ftt! ( already done elsewhere)
-        // S4U_CommPort::retireTemporaryCommPort(ftt->commport);
-        // S4U_CommPort::retireTemporaryCommPort(ftt->recv_commport);
-
         // Deal with possibly open source file
         if (ftt->src_opened_file) {
             ftt->src_opened_file->close();
         }
         // Deal with possibly opened destination file
         if (ftt->dst_opened_file) {
-            auto dst_file_system = ftt->dst_opened_file->get_file_system();
-            auto dst_file_path = ftt->dst_opened_file->get_path();
+            const auto fs = ftt->dst_opened_file->get_file_system();
+            const auto opened_path = ftt->dst_opened_file->get_path();
+            const auto final_path = ftt->dst_location->getFilePath();
+
             ftt->dst_opened_file->close();
-            if (not dst_file_system->file_exists(ftt->dst_location->getFilePath())) {
-                dst_file_system->move_file(dst_file_path, ftt->dst_location->getFilePath());
-            }
+
+            if (success) {
+                if (!fs->file_exists(final_path)) {
+                    fs->move_file(opened_path, final_path);
+                }
+            } else if (opened_path != final_path &&
+                       fs->file_exists(opened_path)) {
+                // Discard this operation's incomplete temporary destination.
+                fs->unlink_file(opened_path);
+                       }
         }
 
         // Send back the relevant acks

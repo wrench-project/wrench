@@ -214,16 +214,6 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param container The container
-     */
-    ServerlessComputeServiceContainerPrewarmCompleteMessage::ServerlessComputeServiceContainerPrewarmCompleteMessage(
-        std::shared_ptr<Container> container,
-        std::shared_ptr<Action> action) : ServerlessComputeServiceMessage(0), _container(std::move(container)),
-                                          _action(std::move(action)) {
-    }
-
-    /**
-     * @brief Constructor
      */
     ServerlessComputeServiceSchedulerWakeupMessage::ServerlessComputeServiceSchedulerWakeupMessage() :
         ServerlessComputeServiceMessage(0) {

@@ -51,7 +51,7 @@ namespace wrench {
         [[nodiscard]] unsigned long getIdleSequence() const;
         [[nodiscard]] double getIdleDate() const;
         [[nodiscard]] double getExpirationDate() const;
-        [[nodiscard]] const std::shared_ptr<Function> getFunction() const;
+        [[nodiscard]] std::shared_ptr<Function> getFunction() const;
         [[nodiscard]] std::shared_ptr<StorageService> getPrivateStorageService() const;
         [[nodiscard]] ServerlessComputeNode* getComputeNode() const;
 
