@@ -81,7 +81,7 @@ namespace wrench {
      *
      * @return a map of <distance , file location> pairs
      */
-    std::map<double, std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(
+    std::multimap<double, std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(
             const std::shared_ptr<DataFile> &file,
             const std::string &reference_host,
             const std::shared_ptr<NetworkProximityService> &network_proximity_service) {
@@ -258,7 +258,7 @@ namespace wrench {
             }
 
             double proximity;
-            std::map<double, std::shared_ptr<FileLocation>> map_to_return;
+            std::multimap<double, std::shared_ptr<FileLocation>> map_to_return;
             auto itr = map_to_return.cbegin();
 
             for (auto &location: all_file_locations) {

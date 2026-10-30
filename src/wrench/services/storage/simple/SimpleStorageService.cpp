@@ -526,7 +526,7 @@ namespace wrench {
         std::string reservation_file_path = partition->get_name() + "/.reserved_space";
         if (not this->file_system->file_exists(reservation_file_path)) {
             this->file_system->create_file(reservation_file_path, 0);
-            this->file_system->make_file_evictable(reservation_file_path, true);
+            this->file_system->make_file_evictable(reservation_file_path, false); // make it inevictable!
         }
         auto reservation_file = this->file_system->open(reservation_file_path, "a");
         // reservation_file->seek(SEEK_END);
@@ -698,6 +698,9 @@ namespace wrench {
             return std::make_shared<InvalidDirectoryPath>(dst_location);
         }
 
+        // Open source file
+        src_opened_file = src_file_system->open(src_location->getFilePath(), "r");
+
         // Open destination file (as it may fail)
         try {
             bool dst_file_already_there = dst_file_system->file_exists(dst_location->getFilePath());
@@ -707,19 +710,22 @@ namespace wrench {
                 dst_file_system->create_file(dot_file_path, dst_location->getFile()->getSize());
                 dst_opened_file = dst_file_system->open(dot_file_path, "r+");
                 dst_opened_file->seek(0, SEEK_SET);
-            }
-            else {
+            } else {
                 // Open the file
                 dst_opened_file = dst_file_system->open(dst_location->getFilePath(), "r+");
                 dst_opened_file->seek(0, SEEK_SET);
             }
-        }
-        catch (simgrid::fsmod::NotEnoughSpaceException& e) {
+        } catch (simgrid::fsmod::NotEnoughSpaceException& e) {
+            src_opened_file->close();
+            src_opened_file.reset();
             return std::make_shared<StorageServiceNotEnoughSpace>(file, this->getSharedPtr<SimpleStorageService>());
+        } catch (...) {
+            src_opened_file->close();
+            src_opened_file.reset();
+            throw;
         }
 
-        // Open source file
-        src_opened_file = src_file_system->open(src_location->getFilePath(), "r");
+
 
         return nullptr;
     }

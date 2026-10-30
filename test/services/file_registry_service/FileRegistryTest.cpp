@@ -343,7 +343,7 @@ private:
 
         std::vector<std::string> file1_expected_locations = {"Host4", "Host1", "Host2"};
         std::vector<std::string> file1_locations(3);
-        std::map<double, std::shared_ptr<wrench::FileLocation>> file1_locations_by_proximity;
+        std::multimap<double, std::shared_ptr<wrench::FileLocation>> file1_locations_by_proximity;
 
         try {
             frs->lookupEntry(nullptr_file, "Host3", nps);

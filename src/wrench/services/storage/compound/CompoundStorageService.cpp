@@ -17,12 +17,16 @@ WRENCH_LOG_CATEGORY(wrench_core_compound_storage_system,
                     "Log category for Compound Storage Service");
 
 namespace wrench {
-
     /** @brief The null allocator */
-    StorageSelectionStrategyCallback NullAllocator = [](const std::shared_ptr<DataFile> &file,
-                                                        const std::map<std::string, std::vector<std::shared_ptr<StorageService>>> &resources,
-                                                        const std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &mapping,
-                                                        const std::vector<std::shared_ptr<FileLocation>> &previous_allocations,
+    StorageSelectionStrategyCallback NullAllocator = [](const std::shared_ptr<DataFile>& file,
+                                                        const std::map<
+                                                            std::string, std::vector<std::shared_ptr<StorageService>>>&
+                                                        resources,
+                                                        const std::map<
+                                                            std::shared_ptr<DataFile>, std::vector<std::shared_ptr<
+                                                                FileLocation>>>& mapping,
+                                                        const std::vector<std::shared_ptr<FileLocation>>&
+                                                        previous_allocations,
                                                         unsigned int stripe_count) {
         return std::vector<std::shared_ptr<FileLocation>>();
     };
@@ -39,11 +43,13 @@ namespace wrench {
      *  @param messagepayload_list: the configurable message payloads
      */
 
-    CompoundStorageService::CompoundStorageService(const std::string &hostname,
+    CompoundStorageService::CompoundStorageService(const std::string& hostname,
                                                    const std::set<std::shared_ptr<StorageService>>& storage_services,
                                                    const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-                                                   const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : CompoundStorageService(hostname, storage_services, NullAllocator,
-                                                                                                                                       property_list, messagepayload_list){};
+                                                   const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) :
+        CompoundStorageService(hostname, storage_services, NullAllocator,
+                               property_list, messagepayload_list) {
+    };
 
     /**
      *  @brief Constructor
@@ -54,48 +60,57 @@ namespace wrench {
      *  @param messagepayload_list: the configurable message payloads
      */
     CompoundStorageService::CompoundStorageService(
-            const std::string &hostname,
-            const std::set<std::shared_ptr<StorageService>>& storage_services,
-            StorageSelectionStrategyCallback &allocate,
-            const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
-            const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(hostname, "compound_storage_" + std::to_string(getNewUniqueNumber())), allocate(allocate) {
+        const std::string& hostname,
+        const std::set<std::shared_ptr<StorageService>>& storage_services,
+        StorageSelectionStrategyCallback& allocate,
+        const WRENCH_PROPERTY_COLLECTION_TYPE& property_list,
+        const WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE& messagepayload_list) : StorageService(
+                                                                                 hostname,
+                                                                                 "compound_storage_" + std::to_string(
+                                                                                     getNewUniqueNumber())),
+                                                                             allocate(allocate) {
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
         if (storage_services.empty()) {
             throw std::invalid_argument("Got an empty list of StorageServices for CompoundStorageService."
-                                        "Must specify at least one valid StorageService");
+                "Must specify at least one valid StorageService");
         }
 
-        if (std::any_of(storage_services.begin(), storage_services.end(), [](const auto &elem) { return elem == nullptr; })) {
+        if (std::any_of(storage_services.begin(), storage_services.end(),
+                        [](const auto& elem) { return elem == nullptr; })) {
             throw std::invalid_argument("One of the StorageServices provided is not initialized");
         }
 
         /* For now, we do not allow storage services that are simple with more than one mount point */
-        if (std::any_of(storage_services.begin(), storage_services.end(), [](const auto &elem) {
-          auto sss = std::dynamic_pointer_cast<SimpleStorageService>(elem);
-          return sss->hasMultipleMountPoints(); })) {
+        if (std::any_of(storage_services.begin(), storage_services.end(), [](const auto& elem) {
+            auto sss = std::dynamic_pointer_cast<SimpleStorageService>(elem);
+            return sss->hasMultipleMountPoints();
+        })) {
             throw std::invalid_argument("One of the SimpleStorageServices provided has more than one mount point. "
-                                        "In the current state of the implementation this is currently not allowed");
+                "In the current state of the implementation this is currently not allowed");
         }
 
-        for (const auto &storage_service: storage_services) {
+        for (const auto& storage_service : storage_services) {
             if (this->storage_services.find(storage_service->getHostname()) != this->storage_services.end()) {
                 this->storage_services[storage_service->getHostname()].push_back(storage_service);
             } else {
-                this->storage_services[storage_service->getHostname()] = std::vector<std::shared_ptr<wrench::StorageService>>{storage_service};
+                this->storage_services[storage_service->getHostname()] = std::vector<std::shared_ptr<
+                    wrench::StorageService>>{storage_service};
             }
             this->total_nb_storage_services++;
         }
 
-        if (property_list.find(wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE) == property_list.end()) {
+        if (property_list.find(wrench::CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE) == property_list.
+            end()) {
             // If MAX_ALLOCATION_CHUNK_SIZE was not provided, update it now that we have validated the SSS list
             // (Set as smallest disk capacity in bytes for instance ?)
             // TODO
             // this->setProperty(CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE, "2000000B");
         }
 
-        this->max_chunk_size = this->getPropertyValueAsSizeInByte(CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE);
+        this->max_chunk_size = this->getPropertyValueAsSizeInByte(
+            CompoundStorageServiceProperty::MAX_ALLOCATION_CHUNK_SIZE);
         this->internal_stripping = this->getPropertyValueAsBoolean(CompoundStorageServiceProperty::INTERNAL_STRIPING);
         // this->traceInternalStorageUse(IOAction::None);
     }
@@ -108,14 +123,15 @@ namespace wrench {
     int CompoundStorageService::main() {
         // TODO: Use another color?
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
-        std::string message = "Compound Storage Service " + this->getName() + "  starting on host " + this->getHostname();
+        std::string message = "Compound Storage Service " + this->getName() + "  starting on host " + this->
+            getHostname();
         WRENCH_INFO("%s", message.c_str());
 
         WRENCH_INFO("CSS - Registered underlying storage services:");
-        for (const auto &storage_server: this->storage_services) {
-            for (const auto &service: storage_server.second) {
+        for (const auto& storage_server : this->storage_services) {
+            for (const auto& service : storage_server.second) {
                 message = " - " + service->process_name + " on " + service->getHostname() +
-                        " (" + std::to_string(service->getTotalFreeSpaceZeroTime()) + " bytes)";
+                    " (" + std::to_string(service->getTotalFreeSpaceZeroTime()) + " bytes)";
                 WRENCH_INFO("%s", message.c_str());
             }
         }
@@ -133,8 +149,8 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Compound Storage Service %s on host %s cleanly terminating!",
-                    this->getName().c_str(),
-                    S4U_Simulation::getHostName().c_str());
+                     this->getName().c_str(),
+                     S4U_Simulation::getHostName().c_str());
 
         return 0;
     }
@@ -146,25 +162,25 @@ namespace wrench {
      *
      * @return false if the daemon should terminate
      */
-    bool CompoundStorageService::processNextMessage(SimulationMessage *message) {
+    bool CompoundStorageService::processNextMessage(SimulationMessage* message) {
         WRENCH_INFO("CSS::Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message)) {
             return processStopDaemonRequest(msg->ack_commport);
-        } else if (auto csarm = dynamic_cast<CompoundStorageAllocationRequestMessage *>(message)) {
+        } else if (auto csarm = dynamic_cast<CompoundStorageAllocationRequestMessage*>(message)) {
             WRENCH_INFO("Calling processStorageSelectionMessage for file :  %s", csarm->file->getID().c_str());
             return processStorageSelectionMessage(csarm);
-        } else if (auto cslrm = dynamic_cast<CompoundStorageLookupRequestMessage *>(message)) {
+        } else if (auto cslrm = dynamic_cast<CompoundStorageLookupRequestMessage*>(message)) {
             WRENCH_INFO("Calling processStorageLookupMessage for file :  %s", cslrm->file->getID().c_str());
             return processStorageLookupMessage(cslrm);
         } else {
             throw std::runtime_error(
-                    "CSS::processNextMessage(): Unexpected [" + message->getName() + "] message." +
-                    "This is only an abstraction layer and it can't be used as an actual storage service");
+                "CSS::processNextMessage(): Unexpected [" + message->getName() + "] message." +
+                "This is only an abstraction layer and it can't be used as an actual storage service");
         }
     }
 
-    bool CompoundStorageService::processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage *msg) {
+    bool CompoundStorageService::processStorageSelectionMessage(const CompoundStorageAllocationRequestMessage* msg) {
         auto file = msg->file;
         WRENCH_INFO("CSS::processStorageSelectionMessage(): For file %s", file->getID().c_str());
 
@@ -172,10 +188,10 @@ namespace wrench {
             WRENCH_INFO("CSS::processStorageSelectionMessage: File %s already known by CSS", file->getID().c_str());
 
             msg->answer_commport->dputMessage(
-                    new CompoundStorageAllocationAnswerMessage(
-                            this->file_location_mapping[file],
-                            this->getMessagePayloadValue(
-                                    CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+                new CompoundStorageAllocationAnswerMessage(
+                    this->file_location_mapping[file],
+                    this->getMessagePayloadValue(
+                        CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
             return true;
         }
 
@@ -195,8 +211,6 @@ namespace wrench {
                     part_file = Simulation::addFile(part_file_name, this->max_chunk_size);
                 }
                 parts.push_back(part_file);
-//                parts.push_back(
-//                        this->simulation_->addFile(file_name + "_stripe_" + std::to_string(part_id), this->max_chunk_size));
                 part_id++;
                 remaining -= this->max_chunk_size;
             }
@@ -212,18 +226,37 @@ namespace wrench {
 
         // Resolve allocations for all parts (possibly only one part)
         std::vector<std::shared_ptr<FileLocation>> designated_locations = {};
-        for (const auto &part: parts) {
-            WRENCH_DEBUG("CSS::processStorageSelectionMessage(): File %s NOT already known by CSS", part->getID().c_str());
-            auto locations = this->allocate(part, this->storage_services, this->file_location_mapping, designated_locations, msg->stripe_count);
+        for (const auto& part : parts) {
+            WRENCH_DEBUG("CSS::processStorageSelectionMessage(): File %s NOT already known by CSS",
+                         part->getID().c_str());
+            auto locations = this->allocate(part, this->storage_services, this->file_location_mapping,
+                                            designated_locations, msg->stripe_count);
             if (!locations.empty()) {
-                for (auto new_loc: locations) {
-                    bool success = new_loc->getStorageService()->reserveSpace(new_loc);
+                for (auto new_loc : locations) {
+                    if (!new_loc->getStorageService()->reserveSpace(new_loc)) {
+                        // Roll back only reservations successfully made for this request.
+                        for (auto& previous : designated_locations) {
+                            previous->getStorageService()->unreserveSpace(previous);
+                        }
+
+                        // Report allocation failure without recording a file mapping.
+                        msg->answer_commport->dputMessage(
+                            new CompoundStorageAllocationAnswerMessage(
+                                {},
+                                this->getMessagePayloadValue(
+                                    CompoundStorageServiceMessagePayload::
+                                    STORAGE_SELECTION_PAYLOAD)));
+
+                        return true; // Request handled; keep the service running.
+                    }
+
                     designated_locations.push_back(new_loc);
                 }
             } else {
-                WRENCH_WARN("CSS::processStorageSelectionMessage(): File %s (or parts) could not be placed on any ss", file->getID().c_str());
+                WRENCH_WARN("CSS::processStorageSelectionMessage(): File %s (or parts) could not be placed on any ss",
+                            file->getID().c_str());
                 //UNRESERVE ALL PREVIOUSLY RESERVED LOCATIONS
-                for (auto &d : designated_locations) {
+                for (auto& d : designated_locations) {
                     d->getStorageService()->unreserveSpace(d);
                 }
                 designated_locations = {};
@@ -233,45 +266,51 @@ namespace wrench {
         if (!designated_locations.empty()) {
             this->file_location_mapping[file] = designated_locations;
             this->partial_io_stripe_index[file] = 0;
-            WRENCH_INFO("CSS::processStorageSelectionMessage(): Local mapping updated for file %s", file->getID().c_str());
+            WRENCH_INFO("CSS::processStorageSelectionMessage(): Local mapping updated for file %s",
+                        file->getID().c_str());
         }
         msg->answer_commport->dputMessage(
-                new CompoundStorageAllocationAnswerMessage(
-                        designated_locations,
-                        this->getMessagePayloadValue(
-                                CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+            new CompoundStorageAllocationAnswerMessage(
+                designated_locations,
+                this->getMessagePayloadValue(
+                    CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
 
-        WRENCH_INFO("CSS::processStorageSelectionMessage(): Answer sent, file striped in %lu stripes (roughly %llu bytes each)", designated_locations.size(), designated_locations[0]->getFile()->getSize());
+        WRENCH_INFO(
+            "CSS::processStorageSelectionMessage(): Answer sent, file striped in %lu stripes (roughly %llu bytes each)",
+            designated_locations.size(), designated_locations[0]->getFile()->getSize());
 
         return true;
     }
 
-    bool CompoundStorageService::processStorageLookupMessage(const CompoundStorageLookupRequestMessage *msg) {
+    bool CompoundStorageService::processStorageLookupMessage(const CompoundStorageLookupRequestMessage* msg) {
         auto file = msg->file;
         WRENCH_INFO("CSS::processStorageLookupMessage(): For file %s", file->getID().c_str());
 
         if (this->file_location_mapping.find(file) == this->file_location_mapping.end()) {
-            WRENCH_INFO("CSS::processStorageLookupMessage(): File %s is not known by this CompoundStorageService", file->getID().c_str());
+            WRENCH_INFO("CSS::processStorageLookupMessage(): File %s is not known by this CompoundStorageService",
+                        file->getID().c_str());
 
             msg->answer_commport->dputMessage(
-                    new CompoundStorageLookupAnswerMessage(
-                            std::vector<std::shared_ptr<FileLocation>>(),
-                            this->getMessagePayloadValue(
-                                    CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+                new CompoundStorageLookupAnswerMessage(
+                    std::vector<std::shared_ptr<FileLocation>>(),
+                    this->getMessagePayloadValue(
+                        CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
         } else {
             auto mapped_locations = this->file_location_mapping[file];
-            WRENCH_INFO("CSS::processStorageLookupMessage(): File %s is known by this CompoundStorageService", file->getID().c_str());
-            for (const auto &loc: mapped_locations) {
-                WRENCH_DEBUG("CSS::processStorageLookupMessage(): File stripe %s is known by this CompoundStorageService and associated to storage service %s",
-                             loc->getFile()->getID().c_str(),
-                             loc->getStorageService()->getName().c_str());
+            WRENCH_INFO("CSS::processStorageLookupMessage(): File %s is known by this CompoundStorageService",
+                        file->getID().c_str());
+            for (const auto& loc : mapped_locations) {
+                WRENCH_DEBUG(
+                    "CSS::processStorageLookupMessage(): File stripe %s is known by this CompoundStorageService and associated to storage service %s",
+                    loc->getFile()->getID().c_str(),
+                    loc->getStorageService()->getName().c_str());
             }
 
             msg->answer_commport->dputMessage(
-                    new CompoundStorageLookupAnswerMessage(
-                            mapped_locations,
-                            this->getMessagePayloadValue(
-                                    CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+                new CompoundStorageLookupAnswerMessage(
+                    mapped_locations,
+                    this->getMessagePayloadValue(
+                        CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
         }
 
         return true;
@@ -285,17 +324,19 @@ namespace wrench {
      *
      * @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or empty vector if it's not.
      */
-    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<DataFile> &file, S4U_CommPort *answer_commport) {
+    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(
+        const std::shared_ptr<DataFile>& file, S4U_CommPort* answer_commport) {
         WRENCH_INFO("CSS::lookupFileLocation() - DataFile + CommPort");
 
         this->_commport->putMessage(
-                new CompoundStorageLookupRequestMessage(
-                        answer_commport,
-                        file,
-                        this->getMessagePayloadValue(
-                                CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+            new CompoundStorageLookupRequestMessage(
+                answer_commport,
+                file,
+                this->getMessagePayloadValue(
+                    CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
 
-        auto msg = answer_commport->getMessage<CompoundStorageLookupAnswerMessage>(this->network_timeout, "CSS::lookupFileLocation(): Received a totally");
+        auto msg = answer_commport->getMessage<CompoundStorageLookupAnswerMessage>(
+            this->network_timeout, "CSS::lookupFileLocation(): Received a totally");
 
         return msg->locations;
     }
@@ -308,7 +349,8 @@ namespace wrench {
      *
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or nullptr if it's not.
      */
-    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(const std::shared_ptr<FileLocation> &location) {
+    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupFileLocation(
+        const std::shared_ptr<FileLocation>& location) {
         WRENCH_INFO("CSS::lookupFileLocation() - FileLocation");
         auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
@@ -331,17 +373,19 @@ namespace wrench {
      *  @return A vector of shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or empty vector if it's not / could not be allocated.
      */
-    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<DataFile>& file, unsigned int stripe_count, S4U_CommPort *answer_commport) {
+    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(
+        const std::shared_ptr<DataFile>& file, unsigned int stripe_count, S4U_CommPort* answer_commport) {
         WRENCH_INFO("CSS::lookupOrDesignateStorageService() - DataFile + commport");
 
         this->_commport->putMessage(new CompoundStorageAllocationRequestMessage(
-                answer_commport,
-                file,
-                stripe_count,
-                this->getMessagePayloadValue(
-                        CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
+            answer_commport,
+            file,
+            stripe_count,
+            this->getMessagePayloadValue(
+                CompoundStorageServiceMessagePayload::STORAGE_SELECTION_PAYLOAD)));
 
-        auto msg = answer_commport->getMessage<CompoundStorageAllocationAnswerMessage>(this->network_timeout, "StorageService::writeFile(): Received a totally");
+        auto msg = answer_commport->getMessage<CompoundStorageAllocationAnswerMessage>(
+            this->network_timeout, "StorageService::writeFile(): Received a totally");
         return msg->locations;
     }
 
@@ -355,7 +399,8 @@ namespace wrench {
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or nullptr if it's not.
      */
-    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<FileLocation>& location) {
+    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(
+        const std::shared_ptr<FileLocation>& location) {
         auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
         auto locations = this->lookupOrDesignateStorageService(location->getFile(), 0, temp_commport);
@@ -376,7 +421,8 @@ namespace wrench {
      *  @return A shared_ptr on a FileLocation if the DataFile is known to the CompoundStorageService or could be allocated
      *          or nullptr if it's not.
      */
-    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(const std::shared_ptr<FileLocation>& location, unsigned int stripe_count) {
+    std::vector<std::shared_ptr<FileLocation>> CompoundStorageService::lookupOrDesignateStorageService(
+        const std::shared_ptr<FileLocation>& location, unsigned int stripe_count) {
         auto temp_commport = S4U_CommPort::getTemporaryCommPort();
 
         auto locations = this->lookupOrDesignateStorageService(location->getFile(), stripe_count, temp_commport);
@@ -393,8 +439,8 @@ namespace wrench {
      * @param location: the location to delete
      * @param wait_for_answer: whether this call should
      */
-    void CompoundStorageService::deleteFile(S4U_CommPort *answer_commport,
-                                            const std::shared_ptr<FileLocation> &location,
+    void CompoundStorageService::deleteFile(S4U_CommPort* answer_commport,
+                                            const std::shared_ptr<FileLocation>& location,
                                             bool wait_for_answer) {
         WRENCH_INFO("CSS::deleteFile(): Starting for file %s", location->getFile()->getID().c_str());
 
@@ -413,20 +459,22 @@ namespace wrench {
         // this->traceInternalStorageUse(IOAction::DeleteStart, designated_locations);
 
         // Send a message to the storage service's daemon
-        for (const auto &loc: designated_locations) {
-            WRENCH_DEBUG("CSS:deleteFile Issuing delete message to SSS %s", loc->getStorageService()->getName().c_str());
+        for (const auto& loc : designated_locations) {
+            WRENCH_DEBUG("CSS:deleteFile Issuing delete message to SSS %s",
+                         loc->getStorageService()->getName().c_str());
 
             // assertServiceIsUp(loc->getStorageService());
 
             loc->getStorageService()->getCommPort()->putMessage(new StorageServiceFileDeleteRequestMessage(
-                    answer_commport,
-                    loc,
-                    this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+                answer_commport,
+                loc,
+                this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
 
             if (wait_for_answer) {
                 std::unique_ptr<SimulationMessage> message = nullptr;
 
-                auto msg = answer_commport->getMessage<StorageServiceFileDeleteAnswerMessage>(this->network_timeout, "StorageService::deleteFile():");
+                auto msg = answer_commport->getMessage<StorageServiceFileDeleteAnswerMessage>(
+                    this->network_timeout, "StorageService::deleteFile():");
                 if (!msg->success) {
                     throw ExecutionException(std::move(msg->failure_cause));
                 }
@@ -458,8 +506,8 @@ namespace wrench {
      *
      * @return true if the file is present, false otherwise
      */
-    bool CompoundStorageService::lookupFile(S4U_CommPort *answer_commport,
-                                            const std::shared_ptr<FileLocation> &location) {
+    bool CompoundStorageService::lookupFile(S4U_CommPort* answer_commport,
+                                            const std::shared_ptr<FileLocation>& location) {
         WRENCH_INFO("CSS::lookupFile(): Lookup for file %s", location->getFile()->getID().c_str());
 
         if (!answer_commport or !location) {
@@ -476,17 +524,18 @@ namespace wrench {
         bool available = true;
 
         // Send a message to the storage service's daemon
-        for (const auto &loc: file_parts) {
+        for (const auto& loc : file_parts) {
             assertServiceIsUp(loc->getStorageService());
 
             loc->getStorageService()->getCommPort()->putMessage(new StorageServiceFileLookupRequestMessage(
-                    answer_commport,
-                    location,
-                    this->getMessagePayloadValue(
-                            StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                answer_commport,
+                loc,
+                this->getMessagePayloadValue(
+                    StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
 
             // Wait for a reply
-            auto msg = answer_commport->getMessage<StorageServiceFileLookupAnswerMessage>(this->network_timeout, "StorageService::lookupFile():");
+            auto msg = answer_commport->getMessage<StorageServiceFileLookupAnswerMessage>(
+                this->network_timeout, "StorageService::lookupFile():");
             available &= msg->file_is_available;
         }
 
@@ -499,8 +548,8 @@ namespace wrench {
      * @param src_location: the source location
      * @param dst_location: the destination location
      */
-    void CompoundStorageService::copyFile(const std::shared_ptr<FileLocation> &src_location,
-                                          const std::shared_ptr<FileLocation> &dst_location) {
+    void CompoundStorageService::copyFile(const std::shared_ptr<FileLocation>& src_location,
+                                          const std::shared_ptr<FileLocation>& dst_location) {
         WRENCH_INFO("CSS::copyFile() at %f: Copy %s between %s and %s",
                     S4U_Simulation::getClock(),
                     src_location->getFile()->getID().c_str(),
@@ -545,8 +594,8 @@ namespace wrench {
      * @param dst_location: the destination location
      *
      */
-    void CompoundStorageService::copyFileIamSource(const std::shared_ptr<FileLocation> &src_location,
-                                                   const std::shared_ptr<FileLocation> &dst_location) {
+    void CompoundStorageService::copyFileIamSource(const std::shared_ptr<FileLocation>& src_location,
+                                                   const std::shared_ptr<FileLocation>& dst_location) {
         WRENCH_INFO("CSS::copyFileIamSource() - Starting at %f", S4U_Simulation::getClock());
 
         std::vector<std::shared_ptr<FileLocation>> src_parts = {};
@@ -560,17 +609,18 @@ namespace wrench {
 
         WRENCH_INFO("CSS::copyFileIamSource(): Source file has %zu known part(s)", src_parts.size());
         if (src_parts.size() > 1) {
-            for (const auto &src_part: src_parts) {
+            for (const auto& src_part : src_parts) {
                 dst_parts.push_back(
-                        FileLocation::LOCATION(dst_location->getStorageService(), dst_location->getDirectoryPath(), src_part->getFile()));
+                    FileLocation::LOCATION(dst_location->getStorageService(), dst_location->getDirectoryPath(),
+                                           src_part->getFile()));
             }
         } else {
-            dst_parts.push_back(dst_location);// no stripping, dst location doesn't have to change
+            dst_parts.push_back(dst_location); // no stripping, dst location doesn't have to change
         }
 
         // Now run the copy(ies) between the source(s) and the destination(s)
         auto copy_idx = 0;
-        int total_parts = src_parts.size();// = dst_parts.size()
+        int total_parts = src_parts.size(); // = dst_parts.size()
 
         auto tmp_commport = S4U_CommPort::getTemporaryCommPort();
 
@@ -586,7 +636,7 @@ namespace wrench {
             bool dst_is_bufferized = dst_parts[copy_idx]->getStorageService()->isBufferized();
             bool dst_is_non_bufferized = not dst_is_bufferized;
 
-            S4U_CommPort *commport_to_contact;
+            S4U_CommPort* commport_to_contact;
             if (dst_is_non_bufferized) {
                 commport_to_contact = dst_parts[copy_idx]->getStorageService()->getCommPort();
             } else if (src_is_non_bufferized) {
@@ -596,15 +646,15 @@ namespace wrench {
             }
 
             this->simulation_->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
-                                                                    src_parts[copy_idx],
-                                                                    dst_parts[copy_idx]);
+                                                                     src_parts[copy_idx],
+                                                                     dst_parts[copy_idx]);
             commport_to_contact->dputMessage(
-                    new StorageServiceFileCopyRequestMessage(
-                            tmp_commport,
-                            src_parts[copy_idx],
-                            dst_parts[copy_idx],
-                            dst_parts[copy_idx]->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                new StorageServiceFileCopyRequestMessage(
+                    tmp_commport,
+                    src_parts[copy_idx],
+                    dst_parts[copy_idx],
+                    dst_parts[copy_idx]->getStorageService()->getMessagePayloadValue(
+                        StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
 
             copy_idx++;
         }
@@ -629,11 +679,12 @@ namespace wrench {
         if (total_parts > 1) {
             WRENCH_DEBUG("CSS::copyFileIamSource(): Cleaning up file parts on destination to merge as a single file");
             auto dest_storage_svc = dst_location->getStorageService();
-            for (const auto &part: dst_parts) {
+            for (const auto& part : dst_parts) {
                 dest_storage_svc->deleteFileAtLocation(part);
             }
             dest_storage_svc->createFileAtLocation(FileLocation::LOCATION(dest_storage_svc,
-                                                                          dst_location->getDirectoryPath(), dst_location->getFile()));
+                                                                          dst_location->getDirectoryPath(),
+                                                                          dst_location->getFile()));
             WRENCH_DEBUG("CSS::copyFileIamSource(): All parts on destination replaced by a single file");
         }
 
@@ -656,11 +707,15 @@ namespace wrench {
      * @param dst_location: the destination location
      *
      */
-    void CompoundStorageService::copyFileIamDestination(const std::shared_ptr<FileLocation> &src_location,
-                                                        const std::shared_ptr<FileLocation> &dst_location) {
+    void CompoundStorageService::copyFileIamDestination(const std::shared_ptr<FileLocation>& src_location,
+                                                        const std::shared_ptr<FileLocation>& dst_location) {
         WRENCH_DEBUG("CSS::copyFileIamDestination() - Starting at %f", S4U_Simulation::getClock());
 
         // this->traceInternalStorageUse(IOAction::CopyToStart);
+        if (not StorageService::hasFileAtLocation(src_location)) {
+            throw ExecutionException(
+                std::make_shared<FileNotFound>(src_location));
+        }
 
         std::vector<std::shared_ptr<FileLocation>> src_parts = {};
         std::vector<std::shared_ptr<FileLocation>> dst_parts = {};
@@ -668,33 +723,38 @@ namespace wrench {
         // Find one or many SSS location(s) for the destination file (depending on whether the original file needs stripping or not)*
         dst_parts = this->lookupOrDesignateStorageService(dst_location);
         if (dst_parts.empty()) {
-            throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(dst_location->getFile(), this->getSharedPtr<CompoundStorageService>()));
+            throw ExecutionException(
+                std::make_shared<StorageServiceNotEnoughSpace>(dst_location->getFile(),
+                                                               this->getSharedPtr<CompoundStorageService>()));
         }
 
         // this->traceInternalStorageUse(IOAction::CopyToStart, dst_parts);
-        WRENCH_INFO("CSS::copyFileIamDestination(): Destination file will be written as %zu stripe(s) / file_part(s)", dst_parts.size());
+        WRENCH_INFO("CSS::copyFileIamDestination(): Destination file will be written as %zu stripe(s) / file_part(s)",
+                    dst_parts.size());
         if (dst_parts.size() > 1) {
-            for (const auto &dst_part: dst_parts) {
+            for (const auto& dst_part : dst_parts) {
                 auto part_size = dst_part->getFile()->getSize();
-                dst_part->getFile()->setSize(0);     // make our datafile act as a reference / link
-                StorageService::createFileAtLocation(// create link on source storage service
-                        FileLocation::LOCATION(
-                                src_location->getStorageService(),
-                                src_location->getDirectoryPath(),
-                                dst_part->getFile()));
+                dst_part->getFile()->setSize(0); // make our datafile act as a reference / link
+                StorageService::createFileAtLocation( // create link on source storage service
+                    FileLocation::LOCATION(
+                        src_location->getStorageService(),
+                        src_location->getDirectoryPath(),
+                        dst_part->getFile()));
                 // Prepare for copy once again
                 dst_part->getFile()->setSize(part_size);
                 src_parts.push_back(
-                        FileLocation::LOCATION(src_location->getStorageService(), src_location->getDirectoryPath(), dst_part->getFile()));
+                    FileLocation::LOCATION(src_location->getStorageService(), src_location->getDirectoryPath(),
+                                           dst_part->getFile()));
             }
-            WRENCH_INFO("CSS::copyFileIamDestination(): %zu stripe(s) / file_part(s) created from source file", src_parts.size());
+            WRENCH_INFO("CSS::copyFileIamDestination(): %zu stripe(s) / file_part(s) created from source file",
+                        src_parts.size());
         } else {
-            src_parts.push_back(src_location);// no stripping, src location doesn't have to change
+            src_parts.push_back(src_location); // no stripping, src location doesn't have to change
         }
 
         // Now run the copy(ies) between the source(s) and the destination(s)
         unsigned long int copy_idx = 0;
-        auto total_parts = src_parts.size();// = dst_parts.size()
+        auto total_parts = src_parts.size(); // = dst_parts.size()
 
         auto tmp_commport = S4U_CommPort::getTemporaryCommPort();
 
@@ -723,7 +783,7 @@ namespace wrench {
             bool dst_is_bufferized = dst_parts[copy_idx]->getStorageService()->isBufferized();
             bool dst_is_non_bufferized = not dst_is_bufferized;
 
-            S4U_CommPort *commport_to_contact;
+            S4U_CommPort* commport_to_contact;
             if (dst_is_non_bufferized) {
                 commport_to_contact = dst_parts[copy_idx]->getStorageService()->getCommPort();
             } else if (src_is_non_bufferized) {
@@ -733,20 +793,20 @@ namespace wrench {
             }
 
             this->simulation_->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
-                                                                    src_parts[copy_idx],
-                                                                    dst_parts[copy_idx]);
+                                                                     src_parts[copy_idx],
+                                                                     dst_parts[copy_idx]);
 
             // That's quite dirty, but : space is reserved during the call to lookupOrDesignateFileLocation, so that
             // we keep track of future space usage on various storage nodes while allocating multiple chunks of a given
             // file. So right before we actually start the copy, we un-reserve space.
             dst_parts[copy_idx]->getStorageService()->unreserveSpace(dst_parts[copy_idx]);
             commport_to_contact->dputMessage(
-                    new StorageServiceFileCopyRequestMessage(
-                            tmp_commport,
-                            src_parts[copy_idx],
-                            dst_parts[copy_idx],
-                            dst_parts[copy_idx]->getStorageService()->getMessagePayloadValue(
-                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                new StorageServiceFileCopyRequestMessage(
+                    tmp_commport,
+                    src_parts[copy_idx],
+                    dst_parts[copy_idx],
+                    dst_parts[copy_idx]->getStorageService()->getMessagePayloadValue(
+                        StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
 
             copy_idx++;
         }
@@ -771,9 +831,9 @@ namespace wrench {
         // Once copy is done, remove links (only if source file was stripped)
         if (total_parts > 1) {
             WRENCH_DEBUG("CSS::copyFileIamDestination(): Cleaning up file parts from source");
-            for (const auto &src_part: src_parts) {
+            for (const auto& src_part : src_parts) {
                 auto part_size = src_part->getFile()->getSize();
-                src_part->getFile()->setSize(0);// make our datafile a link once again
+                src_part->getFile()->setSize(0); // make our datafile a link once again
                 WRENCH_DEBUG("CSS::copyFileIamDestination(): Deleting part %s", src_part->getFile()->getID().c_str());
                 StorageService::deleteFileAtLocation(src_part);
                 src_part->getFile()->setSize(part_size);
@@ -803,11 +863,12 @@ namespace wrench {
      * @param wait_for_answer: whether to wait for the answer
      *
      */
-    void CompoundStorageService::writeFile(S4U_CommPort *answer_commport /*unused*/,
-                                           const std::shared_ptr<FileLocation> &location,
+    void CompoundStorageService::writeFile(S4U_CommPort* answer_commport /*unused*/,
+                                           const std::shared_ptr<FileLocation>& location,
                                            sg_size_t num_bytes_to_write,
                                            bool wait_for_answer) {
-        WRENCH_INFO("CSS::writeFile(): Writing  %llu to file %s - starting at %f", num_bytes_to_write, location->getFile()->getID().c_str(), S4U_Simulation::getClock());
+        WRENCH_INFO("CSS::writeFile(): Writing  %llu to file %s - starting at %f", num_bytes_to_write,
+                    location->getFile()->getID().c_str(), S4U_Simulation::getClock());
 
         if (location == nullptr) {
             throw std::invalid_argument("CSS::writeFile(): Invalid arguments (location is a nullptr)");
@@ -818,8 +879,12 @@ namespace wrench {
         // Find the file, or allocate file/parts of file onto known SSS
         auto designated_locations = this->lookupOrDesignateStorageService(location);
         if (designated_locations.empty()) {
-            WRENCH_WARN("CSS::writeFile(): 'designated_locations' vector empty (error or lack of space from the allocator point of view)");
-            throw ExecutionException(std::make_shared<StorageServiceNotEnoughSpace>(location->getFile(), this->getSharedPtr<CompoundStorageService>()));
+            WRENCH_WARN(
+                "CSS::writeFile(): 'designated_locations' vector empty (error or lack of space from the allocator point of view)")
+;
+            throw ExecutionException(
+                std::make_shared<StorageServiceNotEnoughSpace>(location->getFile(),
+                                                               this->getSharedPtr<CompoundStorageService>()));
         }
 
         // If num_bytes_to_write > the entire file size, we have a big problem (it should almost always be way smaller, as it represents the bytes only in a subset of all file chunks)
@@ -829,7 +894,8 @@ namespace wrench {
         }
 
         // Identify, for current main file, where to start writing (maybe at the beginning, maybe somewhere in the file, indicated by a chunk index)
-        WRENCH_INFO("CSS::writeFile(): looking for first and last stripes to write for %s", location->getFile()->getID().c_str());
+        WRENCH_INFO("CSS::writeFile(): looking for first and last stripes to write for %s",
+                    location->getFile()->getID().c_str());
         auto locations_start = this->partial_io_stripe_index[location->getFile()];
         if (locations_start == designated_locations.size()) {
             locations_start = 0;
@@ -847,46 +913,50 @@ namespace wrench {
             num_bytes_to_write -= designated_locations[locations_start]->getFile()->getSize();
             locations_start++;
         }
-        locations_start--;// back up one stripe because when writing eg. 1 stripe, we want to write from stripe X to stripe X, not stripe X to X+1
+        locations_start--;
+        // back up one stripe because when writing eg. 1 stripe, we want to write from stripe X to stripe X, not stripe X to X+1
 
         // Writes are now going to take place on these locations only
         WRENCH_INFO("CSS::writeFile(): Writing file %s from part %s to part %s",
                     location->getFile()->getID().c_str(),
-                    designated_locations[this->partial_io_stripe_index[location->getFile()]]->getFile()->getID().c_str(),
+                    designated_locations[this->partial_io_stripe_index[location->getFile()]]->getFile()->getID().c_str(
+                    ),
                     designated_locations[locations_start]->getFile()->getID().c_str());
 
         // Prepare a vector containing all file chunks that will need to be written (one per action)
         std::vector<std::shared_ptr<wrench::FileLocation>> designated_locations_subset(
-                designated_locations.begin() + this->partial_io_stripe_index[location->getFile()],
-                designated_locations.begin() + (++locations_start));
+            designated_locations.begin() + this->partial_io_stripe_index[location->getFile()],
+            designated_locations.begin() + (++locations_start));
         // UPDATE the next starting location for writing file chunks
         this->partial_io_stripe_index[location->getFile()] = locations_start;
 
         // this->traceInternalStorageUse(IOAction::WriteStart, designated_locations_subset);
-        WRENCH_INFO("CSS::writeFile(): Destination file %s has %zu stripes, and for now we'll be writing on %zu of these stripes",
-                    location->getFile()->getID().c_str(),
-                    designated_locations.size(),
-                    designated_locations_subset.size());
+        WRENCH_INFO(
+            "CSS::writeFile(): Destination file %s has %zu stripes, and for now we'll be writing on %zu of these stripes",
+            location->getFile()->getID().c_str(),
+            designated_locations.size(),
+            designated_locations_subset.size());
 
         // Contact every SimpleStorageService that we want to use, and request a FileWrite
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         unsigned int request_count = 0;
         WRENCH_INFO("CSS::writeFile(): Using commport created : %s", recv_commport->get_name().c_str());
-        for (auto &dloc: designated_locations_subset) {
+        for (auto& dloc : designated_locations_subset) {
             WRENCH_INFO("CSS::writeFile(): Sending full write request %d on file %s (<%llu> b) to %s",
-                        request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
+                        request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(),
+                        dloc->getStorageService()->getName().c_str());
 
             //TODO: THIS IS UGLY, PERHAPS WOULD BE BETTER TO THINK UP ANOTHER "RESERVE" SCHEME...
             dloc->getStorageService()->unreserveSpace(dloc);
 
             dloc->getStorageService()->getCommPort()->dputMessage(
-                    new StorageServiceFileWriteRequestMessage(
-                            recv_commport,
-                            simgrid::s4u::this_actor::get_host(),
-                            dloc,
-                            dloc->getFile()->getSize(),
-                            this->getMessagePayloadValue(
-                                    CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+                new StorageServiceFileWriteRequestMessage(
+                    recv_commport,
+                    simgrid::s4u::this_actor::get_host(),
+                    dloc,
+                    dloc->getFile()->getSize(),
+                    this->getMessagePayloadValue(
+                        CompoundStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
             request_count++;
         }
 
@@ -896,7 +966,8 @@ namespace wrench {
         unsigned int recv = 0;
         while (recv < request_count) {
             // Wait for answer to current request
-            auto msg = recv_commport->getMessage<StorageServiceFileWriteAnswerMessage>(this->network_timeout, "CSS::writeFile(): ");
+            auto msg = recv_commport->getMessage<StorageServiceFileWriteAnswerMessage>(
+                this->network_timeout, "CSS::writeFile(): ");
             if (not msg->success) {
                 WRENCH_WARN("CSS::fileWrite(): Network timeout while waiting for and answer %d", recv);
                 throw ExecutionException(msg->failure_cause);
@@ -907,28 +978,28 @@ namespace wrench {
 
         WRENCH_INFO("CSS::writeFile(): %u FileWriteRequests sent and validated", request_count);
 
-        for (const auto &msg: messages) {
+        for (const auto& msg : messages) {
             // Update buffer size according to which storage service actually answered.
             auto buffer_size = msg->buffer_size;
 
             if (buffer_size >= 1) {
                 auto file = location->getFile();
-                for (auto const &dwmb: msg->data_write_commport_and_bytes) {
+                for (auto const& dwmb : msg->data_write_commport_and_bytes) {
                     // Bufferized
                     sg_size_t remaining = dwmb.second;
                     while (remaining > buffer_size) {
                         dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
-                                file, buffer_size, false));
+                            file, buffer_size, false));
                         remaining -= buffer_size;
                     }
                     dwmb.first->dputMessage(new StorageServiceFileContentChunkMessage(
-                            file, remaining, true));
+                        file, remaining, true));
                 }
             }
         }
 
         WRENCH_INFO("CSS::writeFile(): Waiting for final acks");
-        for (const auto &mailbox_msg: messages) {
+        for (const auto& mailbox_msg : messages) {
             auto ack_msg = recv_commport->getMessage<StorageServiceAckMessage>("CSS::writeFile(): ");
             if (ack_msg->failure_cause) {
                 throw ExecutionException(ack_msg->failure_cause);
@@ -947,8 +1018,9 @@ namespace wrench {
 
         // this->traceInternalStorageUse(IOAction::WriteEnd, designated_locations_subset);
 
-        for (const auto &loc: designated_locations_subset) {
-            WRENCH_DEBUG("CSS::writeFile(): For location %s, free space = %llu", loc->getStorageService()->getName().c_str(), loc->getStorageService()->getTotalFreeSpace());
+        for (const auto& loc : designated_locations_subset) {
+            WRENCH_DEBUG("CSS::writeFile(): For location %s, free space = %llu",
+                         loc->getStorageService()->getName().c_str(), loc->getStorageService()->getTotalFreeSpace());
         }
 
         WRENCH_INFO("CSS::writeFile(): All writes done and ack");
@@ -962,11 +1034,12 @@ namespace wrench {
      * @param num_bytes: the number of bytes to read
      * @param wait_for_answer: whether to wait for the answer
      */
-    void CompoundStorageService::readFile(S4U_CommPort *answer_commport /*unused*/,
-                                          const std::shared_ptr<FileLocation> &location,
+    void CompoundStorageService::readFile(S4U_CommPort* answer_commport /*unused*/,
+                                          const std::shared_ptr<FileLocation>& location,
                                           sg_size_t num_bytes,
                                           bool wait_for_answer) {
-        WRENCH_INFO("CSS::readFile(): Reading file %s - starting at %f", location->getFile()->getID().c_str(), S4U_Simulation::getClock());
+        WRENCH_INFO("CSS::readFile(): Reading file %s - starting at %f", location->getFile()->getID().c_str(),
+                    S4U_Simulation::getClock());
 
         if (!answer_commport or !location) {
             throw std::invalid_argument("StorageService::readFile(): Invalid nullptr arguments");
@@ -979,7 +1052,8 @@ namespace wrench {
             throw ExecutionException(std::make_shared<FileNotFound>(location));
         }
 
-        WRENCH_INFO("CSS::readFile(): looking for first and last stripes to read for %s", location->getFile()->getID().c_str());
+        WRENCH_INFO("CSS::readFile(): looking for first and last stripes to read for %s",
+                    location->getFile()->getID().c_str());
         auto locations_start = this->partial_io_stripe_index[location->getFile()];
         if (locations_start == designated_locations.size()) {
             locations_start = 0;
@@ -1003,30 +1077,33 @@ namespace wrench {
         // Writes are now going to take place on these locations only
         WRENCH_INFO("CSS::readFile(): Reading file %s from part %s to part %s",
                     location->getFile()->getID().c_str(),
-                    designated_locations[this->partial_io_stripe_index[location->getFile()]]->getFile()->getID().c_str(),
+                    designated_locations[this->partial_io_stripe_index[location->getFile()]]->getFile()->getID().c_str(
+                    ),
                     designated_locations[locations_start]->getFile()->getID().c_str());
 
         std::vector<std::shared_ptr<wrench::FileLocation>> designated_locations_subset(
-                designated_locations.begin() + this->partial_io_stripe_index[location->getFile()],
-                designated_locations.begin() + (++locations_start));
+            designated_locations.begin() + this->partial_io_stripe_index[location->getFile()],
+            designated_locations.begin() + (++locations_start));
         // UPDATE the progress on reading the file stripes
         this->partial_io_stripe_index[location->getFile()] = locations_start;
 
         // Contact every SSS
         auto recv_commport = S4U_CommPort::getTemporaryCommPort();
         unsigned int request_count = 0;
-        for (const auto &dloc: designated_locations_subset) {
+        for (const auto& dloc : designated_locations_subset) {
             WRENCH_DEBUG("CSS::readFile(): Sending full read request %d on file %s (<%llu> b) to %s",
-                         request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(), dloc->getStorageService()->getName().c_str());
+                         request_count, dloc->getFile()->getID().c_str(), dloc->getFile()->getSize(),
+                         dloc->getStorageService()->getName().c_str());
 
             dloc->getStorageService()->getCommPort()->dputMessage(
-                    new StorageServiceFileReadRequestMessage(
-                            recv_commport,
-                            simgrid::s4u::this_actor::get_host(),
-                            dloc,
-                            dloc->getFile()->getSize(),// Note : not using num_bytes, because we know how many full stripes to write to amount to the same number of bytes
-                            this->getMessagePayloadValue(
-                                    CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                new StorageServiceFileReadRequestMessage(
+                    recv_commport,
+                    simgrid::s4u::this_actor::get_host(),
+                    dloc,
+                    dloc->getFile()->getSize(),
+                    // Note : not using num_bytes, because we know how many full stripes to write to amount to the same number of bytes
+                    this->getMessagePayloadValue(
+                        CompoundStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
             request_count++;
         }
 
@@ -1036,7 +1113,8 @@ namespace wrench {
         unsigned int recv = 0;
         while (recv < request_count) {
             // Wait for answer to current request
-            auto msg = recv_commport->getMessage<StorageServiceFileReadAnswerMessage>(this->network_timeout, "CSS::readFile(): ");
+            auto msg = recv_commport->getMessage<StorageServiceFileReadAnswerMessage>(
+                this->network_timeout, "CSS::readFile(): ");
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
             }
@@ -1047,7 +1125,7 @@ namespace wrench {
 
         WRENCH_DEBUG("CSS::readFile(): %u FileReadRequests sent and validated", request_count);
 
-        for (const auto &msg: messages) {
+        for (const auto& msg : messages) {
             if (msg->buffer_size < 1) {
                 // Non-Bufferized ; just wait for an ack for this message (note this may not be THE ack to this precise message, but it doesn't matter)
                 auto ack_msg = recv_commport->getMessage<StorageServiceAckMessage>("CSS::readFile(): ");
@@ -1063,7 +1141,8 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<StorageServiceFileContentChunkMessage> file_content_chunk_msg = nullptr;
                     try {
-                        file_content_chunk_msg = msg->commport_to_receive_the_file_content->getMessage<StorageServiceFileContentChunkMessage>("StorageService::readFile(): Received an");
+                        file_content_chunk_msg = msg->commport_to_receive_the_file_content->getMessage<
+                            StorageServiceFileContentChunkMessage>("StorageService::readFile(): Received an");
                     } catch (...) {
                         S4U_CommPort::retireTemporaryCommPort(msg->commport_to_receive_the_file_content);
                         throw;
@@ -1080,7 +1159,8 @@ namespace wrench {
 
                 // Waiting for all the final acks (same thing as for un buffered sources : we're waiting on N ack messages, not necessarily the ones corresponding to this exact message)
                 for (unsigned long source = 0; source < number_of_sources; source++) {
-                    auto ack_msg = recv_commport->getMessage<StorageServiceAckMessage>(this->network_timeout, "StorageService::readFile(): Received an");
+                    auto ack_msg = recv_commport->getMessage<StorageServiceAckMessage>(
+                        this->network_timeout, "StorageService::readFile(): Received an");
                     if (ack_msg->failure_cause) {
                         throw ExecutionException(ack_msg->failure_cause);
                     }
@@ -1110,7 +1190,7 @@ namespace wrench {
     double CompoundStorageService::getLoad() {
         WRENCH_WARN("CSS::getLoad(): Not implemented");
         throw std::logic_error("CSS::getLoad(): Not implemented. "
-                               "Call getLoad() on an underlying storage service instead");
+            "Call getLoad() on an underlying storage service instead");
     }
 
     /**
@@ -1121,8 +1201,8 @@ namespace wrench {
     sg_size_t CompoundStorageService::getTotalSpace() {
         // WRENCH_INFO("CompoundStorageService::getTotalSpace");
         sg_size_t free_space = 0.0;
-        for (const auto &storage_server: this->storage_services) {
-            for (const auto &service: storage_server.second) {
+        for (const auto& storage_server : this->storage_services) {
+            for (const auto& service : storage_server.second) {
                 free_space += service->getTotalSpace();
             }
         }
@@ -1138,12 +1218,12 @@ namespace wrench {
      * @return The free space in bytes at the path
      *
      */
-    sg_size_t CompoundStorageService::getTotalFreeSpaceAtPath(const std::string &path) {
+    sg_size_t CompoundStorageService::getTotalFreeSpaceAtPath(const std::string& path) {
         WRENCH_DEBUG("CSS::getFreeSpace Forwarding request to internal services");
 
         sg_size_t free_space = 0;
-        for (const auto &storage_server: this->storage_services) {
-            for (const auto &service: storage_server.second) {
+        for (const auto& storage_server : this->storage_services) {
+            for (const auto& service : storage_server.second) {
                 free_space += service->getTotalFreeSpaceAtPath(path);
             }
         }
@@ -1155,7 +1235,8 @@ namespace wrench {
      *  @param is_scratch true or false
      */
     void CompoundStorageService::setIsScratch(bool is_scratch) {
-        WRENCH_WARN("CSS::setScratch Forbidden because CompoundStorageService doesn't manage any storage resources itself");
+        WRENCH_WARN(
+            "CSS::setScratch Forbidden because CompoundStorageService doesn't manage any storage resources itself");
         throw std::logic_error("CSS: can't be setup as a scratch space, it is only an abstraction layer.");
     }
 
@@ -1164,7 +1245,8 @@ namespace wrench {
      *
      * @return The set of known StorageServices.
      */
-    std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>> &CompoundStorageService::getAllServices() {
+    std::map<std::string, std::vector<std::shared_ptr<wrench::StorageService>>>&
+    CompoundStorageService::getAllServices() {
         WRENCH_DEBUG("CSS::getAllServices");
         return this->storage_services;
     }
@@ -1176,19 +1258,21 @@ namespace wrench {
      *
      * @return a date in seconds, or -1 if the file is not found
      */
-    double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation> &location) {
+    double CompoundStorageService::getFileLastWriteDate(const std::shared_ptr<FileLocation>& location) {
         if (location == nullptr) {
             throw std::invalid_argument("CSS::getFileLastWriteDate(): Invalid nullptr argument");
         }
 
         auto designated_locations = this->lookupFileLocation(location);
         if (designated_locations.empty()) {
-            throw std::invalid_argument("CSS::getFileLastWriteDate(): File not known to the CompoundStorageService. Unable to forward to underlying StorageService");
+            throw std::invalid_argument(
+                "CSS::getFileLastWriteDate(): File not known to the CompoundStorageService. Unable to forward to underlying StorageService");
         }
 
-        for (const auto &loc: designated_locations) {
+        for (const auto& loc : designated_locations) {
             auto designated_storage_service = std::dynamic_pointer_cast<SimpleStorageService>(loc->getStorageService());
-            if (designated_storage_service)// In case of multiple file parts, return LastWriteDate from first part found (they should be all the same, or very close)
+            if (designated_storage_service)
+                // In case of multiple file parts, return LastWriteDate from first part found (they should be all the same, or very close)
                 return designated_storage_service->getFileLastWriteDate(loc);
         }
 
@@ -1202,7 +1286,7 @@ namespace wrench {
      *
      * @return true if the file is present, false otherwise
      */
-    bool CompoundStorageService::hasFile(const std::shared_ptr<FileLocation> &location) {
+    bool CompoundStorageService::hasFile(const std::shared_ptr<FileLocation>& location) {
         auto file_location = this->lookupFileLocation(location);
         if (file_location.empty()) {
             WRENCH_INFO("CSS::hasFile(): File %s not found", location->getFile()->getID().c_str());
@@ -1231,17 +1315,18 @@ namespace wrench {
      *
      * @return false if the daemon should terminate
      */
-    bool CompoundStorageService::processStopDaemonRequest(S4U_CommPort *ack_commport) {
+    bool CompoundStorageService::processStopDaemonRequest(S4U_CommPort* ack_commport) {
         try {
             ack_commport->putMessage(new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                    CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (ExecutionException &) {
+                CompoundStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+        } catch (ExecutionException&) {
             return false;
         }
         return false;
     }
 
-    void CompoundStorageService::traceInternalStorageUse(IOAction action, const std::vector<std::shared_ptr<FileLocation>> &locations) {
+    void CompoundStorageService::traceInternalStorageUse(IOAction action,
+                                                         const std::vector<std::shared_ptr<FileLocation>>& locations) {
         auto ts = S4U_Simulation::getClock();
         AllocationTrace trace;
         trace.act = action;
@@ -1251,8 +1336,8 @@ namespace wrench {
         if (locations.empty()) {
             trace.file_name = "nofile";
 
-            for (const auto &storage: this->storage_services) {
-                for (const auto &storage_service: storage.second) {
+            for (const auto& storage : this->storage_services) {
+                for (const auto& storage_service : storage.second) {
                     DiskUsage disk_usage;
                     disk_usage.service = storage_service;
                     disk_usage.free_space = storage_service->getTotalFreeSpaceZeroTime();
@@ -1260,13 +1345,12 @@ namespace wrench {
                     trace.disk_usage.push_back(disk_usage);
                 }
             }
-
         } else {
             trace.file_name = locations.begin()->get()->getFile()->getID();
 
             std::set<std::string> known_services;
 
-            for (const auto &location: locations) {
+            for (const auto& location : locations) {
                 auto storage_service = location->getStorageService();
                 if (known_services.find(storage_service->getName()) == known_services.end()) {
                     DiskUsage disk_usage;
@@ -1284,4 +1368,4 @@ namespace wrench {
 
         this->internal_storage_use.push_back(std::make_pair(ts, trace));
     }
-};// namespace wrench
+}; // namespace wrench

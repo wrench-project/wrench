@@ -494,7 +494,7 @@ namespace wrench {
             this->simulation_->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), _hostname, src_opened_file->get_path(), to_read, unique_disk_sequence_number_read);
             int unique_disk_sequence_number_write = this->simulation_->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), _hostname, dst_opened_file->get_path(), to_read);
             dst_opened_file->write(to_read);
-            this->simulation_->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), _hostname, dst_opened_file->get_path(), to_read, unique_disk_sequence_number_write);
+            this->simulation_->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), _hostname, dst_opened_file->get_path(), to_read, unique_disk_sequence_number_write);
             remaining -= to_read;
         }
     }

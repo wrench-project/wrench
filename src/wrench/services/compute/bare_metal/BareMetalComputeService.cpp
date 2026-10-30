@@ -830,8 +830,8 @@ namespace wrench {
         for (auto const& action : this->ready_actions) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
                 // The action has been dispatched (but its state it not set to RUNNING yet,
-                // since there can be zero-size, instant communication!)
-                break;
+                // since there can be zero-size, instant communication!). move on to the next action.
+                continue;
             }
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
