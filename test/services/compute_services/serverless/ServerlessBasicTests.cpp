@@ -619,6 +619,9 @@ private:
                 throw std::runtime_error("Invocation should not be done yet");
             }
 
+            // coverage
+            this->compute_service->isThereAtLeastOneHostWithIdleResources(1, 10.0);
+
             function_manager->wait_one(invocation);
 
             if (!invocation->isDone()) {
