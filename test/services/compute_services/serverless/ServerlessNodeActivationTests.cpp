@@ -40,6 +40,7 @@ public:
     std::shared_ptr<wrench::ServerlessComputeService> compute_service = nullptr;
 
     void do_BasicTest_test();
+    void do_ActivateThenDeactivate_test();
 
 protected:
     ~ServerlessNodeActivationTest() override {
@@ -120,7 +121,7 @@ public:
 
 
 /**********************************************************************/
-/**  FUNCTION INVOCATION TEST                                       **/
+/**  NODE ACTIVATION TEST                                            **/
 /**********************************************************************/
 
 class ServerlessNodeActivationTestFunctionInvocationController : public wrench::ExecutionController {
@@ -169,24 +170,29 @@ private:
 
         auto input = std::make_shared<MyFunctionInput>(1, 2);
 
-        // Place an invocation and wait for it
-        auto invocation1 = function_manager->invokeFunction(registered_function1, this->compute_service, input);
-        function_manager->wait_one(invocation1);
+        // Place two invocations (the second invocation should go faster because the node has already been activate)
+        double expected[2] = {20.0, 10.0};
+        for (int i=0; i < 2; i++) {
+            // Place an invocation and wait for it
+            auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+            function_manager->wait_one(invocation);
 
-        if (!invocation1->hasSucceeded()) {
-            throw std::runtime_error(
-                "Invocation failed after compute-node activation");
-        }
+            if (!invocation->hasSucceeded()) {
+                throw std::runtime_error(
+                    "Invocation " + std::to_string(i) + "failed after compute-node activation");
+            }
 
-        if (invocation1->getComputeNode() != "ServerlessComputeNode1") {
-            throw std::runtime_error(
-                "Invocation did not execute on the expected compute node");
-        }
+            if (invocation->getComputeNode() != "ServerlessComputeNode1") {
+                throw std::runtime_error(
+                    "Invocation " + std::to_string(i) + "did not execute on the expected compute node");
+            }
 
-        auto elapsed1 = invocation1->getFunctionEndDate() - invocation1->getSubmitDate();
-
-        if (std::abs(elapsed1 - 20) > 10E-6) {
-            throw std::runtime_error("Invocation1 should have taken 20s (it took " + std::to_string(elapsed1) + ")");
+            auto elapsed = invocation->getFunctionEndDate() - invocation->getSubmitDate();
+            if (std::abs(elapsed - expected[i]) > 10E-6) {
+                throw std::runtime_error("Invocation " + std::to_string(i) + " should have taken " + std::to_string(expected[i]) + " (it took " + std::to_string(elapsed) + ")");
+            }
+            // Sleep for a bit (likely not needed)
+            wrench::Simulation::sleep(60);
         }
 
         return 0;
@@ -224,6 +230,132 @@ void ServerlessNodeActivationTest::do_BasicTest_test() {
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessNodeActivationTestFunctionInvocationController(this, user_host, serverless_provider,
+                                                                     storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**  NODE ACTIVATION/DEACTIVATION TEST                               **/
+/**********************************************************************/
+
+class ServerlessNodeActivationDeactivationTestFunctionInvocationController : public wrench::ExecutionController {
+public:
+    ServerlessNodeActivationDeactivationTestFunctionInvocationController(ServerlessNodeActivationTest* test,
+                                                             const std::string& hostname,
+                                                             const std::shared_ptr<wrench::ServerlessComputeService>
+                                                             & compute_service,
+                                                             const std::shared_ptr<wrench::StorageService>&
+                                                             storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessNodeActivationTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        // Register a function that computes for 10 seconds
+        auto function_manager = this->createFunctionManager();
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::compute(10);
+            return std::make_shared<MyFunctionOutput>("DONE");
+        };
+
+        // Create layer 1
+        auto layer1_file = wrench::Simulation::addFile("layer1_file", 1);
+        auto layer1_location = wrench::FileLocation::LOCATION(this->storage_service, layer1_file);
+        wrench::StorageService::createFileAtLocation(layer1_location);
+        auto layer1 = wrench::FunctionManager::createImageLayer("my_layer1", layer1_location, layer1_file->getSize());
+
+        // Create the image
+        auto image1 = wrench::FunctionManager::createImage("my_image", {layer1});
+
+        // Registering a function
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
+                                                                       this->compute_service, 3600, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
+
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+
+        // Place two invocations (each invocation should take the same time because nodes are to be de-activated!)
+        double expected[2] = {20.0, 20.0};
+
+        for (int i=0; i < 2; i++) {
+            // Place an invocation and wait for it
+            auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+            function_manager->wait_one(invocation);
+
+            if (!invocation->hasSucceeded()) {
+                throw std::runtime_error(
+                    "Invocation failed after compute-node activation");
+            }
+
+            if (invocation->getComputeNode() != "ServerlessComputeNode1") {
+                throw std::runtime_error(
+                    "Invocation did not execute on the expected compute node");
+            }
+
+            auto elapsed = invocation->getFunctionEndDate() - invocation->getSubmitDate();
+            if (std::abs(elapsed - expected[i]) > 10E-6) {
+                throw std::runtime_error("Invocation " + std::to_string(i) + " should have taken " + std::to_string(expected[i]) + " (it took " + std::to_string(elapsed) + ")");
+            }
+            // Sleep for a bit (likely not needed)
+            wrench::Simulation::sleep(60);
+        }
+
+
+
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessNodeActivationTest, ActivateThenDeactive) {
+    DO_TEST_WITH_FORK(do_ActivateThenDeactivate_test);
+}
+
+void ServerlessNodeActivationTest::do_ActivateThenDeactivate_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
+    scheduler->setPolicy(std::make_shared<wrench::ReactiveScaleUpScaleDownNodeActivationPolicy>());
+
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes,
+        scheduler,
+        {
+            {wrench::ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE, "2"},
+            {wrench::ServerlessComputeServiceProperty::COMPUTE_NODE_ACTIVATION_OVERHEAD, "10000ms"},
+            {wrench::ServerlessComputeServiceProperty::NUM_COMPUTE_NODES_INITIALLY_ACTIVATED, "0"},
+        }, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessNodeActivationDeactivationTestFunctionInvocationController(this, user_host, serverless_provider,
                                                                      storage_service));
 
     simulation->launch();
