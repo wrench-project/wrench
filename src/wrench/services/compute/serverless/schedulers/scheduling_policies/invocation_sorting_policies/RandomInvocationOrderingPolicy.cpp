@@ -22,7 +22,8 @@ namespace wrench {
      */
     void RandomInvocationOrderingPolicy::sortSchedulableInvocations(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
-        std::shuffle(scheduling_state->_schedulable_invocations.begin(), scheduling_state->_schedulable_invocations.end(), _rng);
+        auto& schedulable_invocations = scheduling_state->getSchedulableInvocations();
+        std::shuffle(schedulable_invocations.begin(), schedulable_invocations.end(), _rng);
     }
 
 }

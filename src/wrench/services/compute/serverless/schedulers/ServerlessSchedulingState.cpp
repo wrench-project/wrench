@@ -24,7 +24,7 @@ namespace wrench {
         _disk_available = state->getAvailableDiskSpace();
 
         // Initialize the pending counts to the outstanding counts
-        for (auto const &[function, count] : state->getOutstandingInvocationCounts()) {
+        for (auto const& [function, count] : state->getOutstandingInvocationCounts()) {
             _pending_invocation_counts[function] = count;
         }
 
@@ -78,6 +78,367 @@ namespace wrench {
             }
         }
     }
+
+    /**
+     * @brief Get the schedulable invocations
+     * @return A (reference to) the list of schedulable invocations
+     */
+    std::vector<std::shared_ptr<Invocation>>& ServerlessSchedulingState::getSchedulableInvocations() {
+        return _schedulable_invocations;
+    }
+
+    /**
+     * @brief Get the pending invocation counts
+     * @return The map of pending invocations
+     */
+    const std::map<std::shared_ptr<Function>, unsigned long>& ServerlessSchedulingState::getPendingInvocationCounts() const {
+        return _pending_invocation_counts;
+    }
+
+    /**
+     * @brief Get the number of (planned) in-flight invocations at a container
+     * @param container A container
+     * @return A number of invocations
+     */
+    unsigned long ServerlessSchedulingState::getNumInFlightInvocationsOnContainer(
+        const std::shared_ptr<Container>& container) const {
+        return _num_in_flight_invocations_on_container.at(container);
+    }
+
+    /**
+     * @brief Get the activated compute nodes
+     * @return A list of compute nodes
+     */
+    const std::vector<std::shared_ptr<ServerlessComputeNode>>& ServerlessSchedulingState::getActivatedComputeNodes() {
+        return _activated_compute_nodes;
+    }
+
+    /**
+     * @brief Get the number of compute nodes that are being activated
+     * @return A number of nodes
+     */
+    unsigned long ServerlessSchedulingState::getNumBeingActivatedComputeNodes() const {
+        return _num_being_activated_compute_nodes;
+    }
+
+    /**
+     * @brief Get the number of deactivated compute nodes
+     * @return A number of nodes
+     */
+    unsigned long ServerlessSchedulingState::getNumDeactivatedComputeNodes() const {
+        return _num_deactivated_compute_nodes;
+    }
+
+    /**
+     * @brief Get the initialized containers at a compute node
+     * @param node A compute node
+     * @return A set of containers
+     */
+    const std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializedContainers(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _initialized_containers.at(node);
+    }
+
+    /**
+    * @brief Get the initializing containers at a compute node
+    * @param node A compute node
+    * @return A set of containers
+    */
+    const std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializingContainers(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _initializing_containers.at(node);
+    }
+
+
+    /**
+     * @brief Get the number of possible new invocations at a compute node
+     * @param node A compute node
+     * @return A number of possible new invocations
+     */
+    unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsAtComputeNode(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _num_possible_new_invocations_on_compute_node.at(node);
+    }
+
+    /**
+     * @brief Get the number of possible new invocations on a container
+     * @param container A container
+     * @return A number of possible new invocations
+     */
+    unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsOnContainer(
+        const std::shared_ptr<Container>& container) {
+        return _num_possible_new_invocations_on_container.at(container);
+    }
+
+    /**
+     * @brief Get the number of possible new containers at a compute node
+     * @param node A compute node
+     * @return A number of possible new containers
+     */
+    unsigned long ServerlessSchedulingState::getNumPossibleNewContainersAtComputeNode(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _num_possible_new_containers_on_compute_node.at(node);
+    }
+
+    /**
+     * @brief Get the protected image layers at a compute node
+     * @param node A compute node
+     * @return A set of image layers
+     */
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getProtectedImageLayers(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _protected_layers.at(node);
+    }
+
+    /**
+     * @brief Get the image layers on disk at a compute node
+     * @param node A compute node
+     * @return A set of image layers
+     */
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnDisk(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _image_layers_on_disk.at(node);
+    }
+
+    /**
+     * @brief Get the image layers on their way to disk at a compute node
+     * @param node A compute node
+     * @return A set of image layers
+     */
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToDisk(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _image_layers_on_their_way_to_disk.at(node);
+    }
+
+    /**
+     * @brief Get the image layers in RAM at a compute node
+     * @param node A compute node
+     * @return A set of image layers
+     */
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersInRAM(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _image_layers_in_ram.at(node);
+    }
+
+    /**
+     * @brief Get the image layers on their way to RAM at a compute node
+     * @param node A compute node
+     * @return A set of image layers
+     */
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToRAM(
+        const std::shared_ptr<ServerlessComputeNode>& node) {
+        return _image_layers_on_their_way_to_ram.at(node);
+    }
+
+    /**
+     * @brief Get the RAM space (in bytes) available at a compute node
+     * @param node A compute node
+     * @return A number of bytes
+     */
+    sg_size_t ServerlessSchedulingState::getRAMSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return _ram_available.at(node);
+    }
+
+    /**
+     * @brief Get the disk space (in bytes) available at a compute node
+     * @param node A compute node
+     * @return A number of bytes
+     */
+    sg_size_t ServerlessSchedulingState::getDiskSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return _disk_available.at(node);
+    }
+
+
+
+    /**
+     * @brief Exclude a compute node from all future planning
+     * @param node 
+     */
+    void ServerlessSchedulingState::excludeNodeFromPlanning(const std::shared_ptr<ServerlessComputeNode>& node) {
+        auto& active_nodes = _activated_compute_nodes;
+        const auto node_it =
+            std::find(active_nodes.begin(), active_nodes.end(), node);
+        if (node_it == active_nodes.end()) {
+            return;
+        }
+        active_nodes.erase(node_it);
+        _num_deactivated_compute_nodes += 1;
+
+        _disk_available.erase(node);
+        _ram_available.erase(node);
+        _image_layers_on_disk.erase(node);
+        _image_layers_on_their_way_to_disk.erase(node);
+        _image_layers_in_ram.erase(node);
+        _image_layers_on_their_way_to_ram.erase(node);
+        _protected_layers.erase(node);
+
+        _initializing_containers.erase(node);
+        for (const auto& container :
+             _initialized_containers.at(node)) {
+            _num_possible_new_invocations_on_container.erase(container);
+            _num_in_flight_invocations_on_container.erase(container);
+        }
+        _initialized_containers.erase(node);
+
+        _num_possible_new_invocations_on_compute_node.erase(node);
+        _num_possible_new_containers_on_compute_node.erase(node);
+    }
+
+    /**
+     * @brief Plan to fail some invocations
+     * @param invocations A set of invocations to fail
+     */
+    void ServerlessSchedulingState::planInvocationFailures(const std::set<std::shared_ptr<Invocation>>& invocations) {
+        if (invocations.empty()) {
+            return;
+        }
+
+        // Filter out the "to fail" invocations from the list of schedulable invocations
+        auto& pending = _schedulable_invocations;
+        pending.erase(
+            std::remove_if(
+                pending.begin(),
+                pending.end(),
+                [&invocations](const auto& invocation) {
+                    return invocations.count(invocation) != 0;
+                }),
+            pending.end());
+
+        // Adjust the pending counts
+        for (auto const& inv : invocations) {
+            _pending_invocation_counts.at(inv->getFunction())--;
+        }
+    }
+
+    /**
+     * @brief Make all of an image's layer protected at a compute node
+     * @param node The compute node
+     * @param image The image
+     */
+    void ServerlessSchedulingState::protectImageLayers(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                       const std::shared_ptr<Image>& image) {
+        const auto& layers = image->getLayers();
+        _protected_layers.at(node).insert(layers.begin(), layers.end());
+    }
+
+    /**
+     * @brief Plan for the termination of an idle container
+     * @param container the container
+     */
+    void ServerlessSchedulingState::planIdleContainerTermination(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                                 const std::shared_ptr<Container>& container) {
+        _ram_available.at(node) += container->getFunction()->getRAMSpaceLimit();
+        _disk_available.at(node) += container->getFunction()->getDiskSpaceLimit();
+        _num_possible_new_containers_on_compute_node.at(node) += 1;
+        _initialized_containers.at(node).erase(container);
+        _num_possible_new_invocations_on_container.erase(container);
+        _num_in_flight_invocations_on_container.erase(container);
+    }
+
+    /**
+     * @brief Plan a layer eviction from RAM
+     *
+     * @param node The compute node where the eviction will take place
+     * @param layer The layer that will be evicted
+     */
+    void ServerlessSchedulingState::planLayerEvictionFromRAM(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                             const std::shared_ptr<ImageLayer>& layer) {
+        if (_protected_layers.at(node).count(layer)) {
+            throw std::runtime_error(
+                "Eviction plan attempts to evict a protected RAM layer");
+        }
+        auto& resident_layers = _image_layers_in_ram.at(node);
+
+        if (resident_layers.erase(layer) != 1) {
+            throw std::runtime_error(
+                "Eviction plan attempts to evict a nonresident "
+                "or already-evicted RAM layer");
+        }
+        _ram_available.at(node) += layer->getRAMFootprint();
+    }
+
+    /**
+     * @brief Plan a layer eviction from Disk
+     *
+     * @param node The compute node where the eviction will take place
+     * @param layer The layer that will be evicted
+     */
+    void ServerlessSchedulingState::planLayerEvictionFromDisk(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                              const std::shared_ptr<ImageLayer>& layer) {
+        if (_protected_layers.at(node).count(layer)) {
+            throw std::runtime_error(
+                "Eviction plan attempts to evict a protected disk layer");
+        }
+        auto& resident_layers = _image_layers_on_disk.at(node);
+
+        if (resident_layers.erase(layer) != 1) {
+            throw std::runtime_error(
+                "Eviction plan attempts to evict a nonresident "
+                "or already-evicted disk layer");
+        }
+        _disk_available.at(node) += layer->getDiskFootprint();
+    }
+
+
+    /**
+     * @brief Plan for a new invocation
+     * @param inv The invocation to place
+     * @param node The node on which to place it
+     * @param container The container to use (if non-nullptr)
+     */
+    void ServerlessSchedulingState::planInvocationDispatch(const std::shared_ptr<Invocation>& inv,
+                                                           const std::shared_ptr<ServerlessComputeNode>& node,
+                                                           const std::shared_ptr<Container>& container) {
+        if (container) {
+            _num_possible_new_invocations_on_container.at(container) -= 1;
+            _num_in_flight_invocations_on_container.at(container) += 1;
+        } else {
+            // The selected plan's container terminations have already been credited.
+            _num_possible_new_containers_on_compute_node.at(node) -= 1;
+            _ram_available.at(node) -= inv->getFunction()->getRAMSpaceLimit();
+            _disk_available.at(node) -= inv->getFunction()->getDiskSpaceLimit();
+        }
+        _num_possible_new_invocations_on_compute_node.at(node) -= 1;
+
+        // Update the pending counts
+        auto& num_pending = _pending_invocation_counts.at(inv->getFunction());
+        if (num_pending == 0) {
+            throw std::runtime_error("Cannot select a dispatch for a function with zero pending invocations");
+        }
+        --num_pending;
+    }
+
+    /**
+     * @brief Plan for a layer load to RAM
+     * @param node The node at which to load
+     * @param layer The layer to load
+     */
+    void ServerlessSchedulingState::planLayerLoadToRAM(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                       const std::shared_ptr<ImageLayer>& layer) {
+        _image_layers_on_their_way_to_ram.at(node).insert(layer);
+        _ram_available.at(node) -= layer->getRAMFootprint();
+    }
+
+    /**
+     * @brief Plan for a layer copy to disk
+     * @param node The node at which to copy
+     * @param layer The layer to copy
+     */
+    void ServerlessSchedulingState::planLayerCopyToDisk(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                        const std::shared_ptr<ImageLayer>& layer) {
+        _image_layers_on_their_way_to_disk.at(node).insert(layer);
+        _disk_available.at(node) -= layer->getDiskFootprint();
+    }
+
+    /**
+     * @brief Plan for a container prewarm
+     * @param node The compute node at which to prewarm a container
+     */
+    void ServerlessSchedulingState::planContainerPrewarm(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                         const std::shared_ptr<Function>& function) {
+        _num_possible_new_containers_on_compute_node.at(node) -= 1;
+    }
+
 
     /**
      * @brief Are all layers of an image in RAM at a compute node?

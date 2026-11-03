@@ -24,13 +24,13 @@ namespace wrench {
         unsigned long picked_remaining_invocation_slots = 0;
 
         for (const auto& node: candidate_nodes) {
-            for (auto const& container : scheduling_state->_initialized_containers.at(node)) {
+            for (auto const& container : scheduling_state->getInitializedContainers(node)) {
                 // Container for the correct function?
                 if (container->getFunction() != invocation->getFunction()) {
                     continue;
                 }
                 // If the container is already fully planned, nevermind
-                auto remaining_invocation_slots = scheduling_state->_num_possible_new_invocations_on_container.at(container);
+                auto remaining_invocation_slots = scheduling_state->getNumPossibleNewInvocationsOnContainer(container);
                 if (remaining_invocation_slots == 0) {
                     continue;
                 }

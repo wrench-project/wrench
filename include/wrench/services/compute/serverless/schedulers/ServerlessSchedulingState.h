@@ -31,6 +31,57 @@ namespace wrench {
 
         ~ServerlessSchedulingState() = default;
 
+    	/**
+		* Accessor Functions
+		*/
+    	std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations();
+    	const std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts() const;
+    	unsigned long getNumInFlightInvocationsOnContainer(const std::shared_ptr<Container>& container) const;
+    	[[nodiscard]] const std::vector<std::shared_ptr<ServerlessComputeNode>>& getActivatedComputeNodes();
+    	[[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
+    	[[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
+    	const std::set<std::shared_ptr<Container>>& getInitializedContainers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<Container>>& getInitializingContainers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	unsigned long getNumPossibleNewInvocationsAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
+    	unsigned long getNumPossibleNewInvocationsOnContainer(const std::shared_ptr<Container>& container);
+    	unsigned long getNumPossibleNewContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getProtectedImageLayers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnDisk(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToDisk(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersInRAM(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToRAM(const std::shared_ptr<ServerlessComputeNode>& node);
+    	[[nodiscard]] sg_size_t getRAMSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const;
+    	[[nodiscard]] sg_size_t getDiskSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const;
+
+    	/**
+		 * Update this planning snapshot to account for already-selected operations.
+		 *
+		 * These methods do not select operations, append scheduling decisions,
+		 * execute simulated work, or modify runtime objects. The caller remains
+		 * responsible for adding the corresponding decisions to the returned batch.
+		 */
+    	void excludeNodeFromPlanning(const std::shared_ptr<ServerlessComputeNode>& node);
+    	void planInvocationFailures(const std::set<std::shared_ptr<Invocation>>& invocations);
+    	void protectImageLayers(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Image>& image);
+    	void planIdleContainerTermination(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Container>& container);
+    	void planLayerEvictionFromRAM(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
+    	void planLayerEvictionFromDisk(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
+    	void planInvocationDispatch(const std::shared_ptr<Invocation>& inv, const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Container>& container);
+    	void planLayerLoadToRAM(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
+    	void planLayerCopyToDisk(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
+    	void planContainerPrewarm(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Function>& function);
+
+        /**
+         * Helper Functions
+         */
+        [[nodiscard]] bool areAllImageLayersInRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+    	[[nodiscard]] bool areAllImageLayersInRAMOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+    	[[nodiscard]] bool areAllImageLayersOnDiskOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+    	[[nodiscard]] bool areAllImageLayersOnDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+    	[[nodiscard]] bool areAllImageLayersOnDiskOrOnTheirWayToDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
+    	[[nodiscard]] std::set<std::shared_ptr<Container>> getIdleContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
+
+    private:
     	/** @brief The admitted invocations, i.e., whose image layers have not all yet been downloaded */
     	std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>> _admitted_invocations;
 
@@ -95,14 +146,7 @@ namespace wrench {
         /** @brief Map of layers that should not be evicted, due to previous scheduling decisions */
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _protected_layers;
 
-        // HELPER FUNCTIONS
-        [[nodiscard]] bool areAllImageLayersInRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool areAllImageLayersInRAMOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool areAllImageLayersOnDiskOrOnTheirWayToRAM(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool areAllImageLayersOnDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
-        [[nodiscard]] bool areAllImageLayersOnDiskOrOnTheirWayToDisk(const std::shared_ptr<Image> &image, const std::shared_ptr<ServerlessComputeNode> &node) const;
 
-    	[[nodiscard]] std::set<std::shared_ptr<Container>> getIdleContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode> &node) const;
     };
 
         /***********************/

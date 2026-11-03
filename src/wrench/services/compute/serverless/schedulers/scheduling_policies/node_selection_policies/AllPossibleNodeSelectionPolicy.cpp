@@ -16,7 +16,7 @@ namespace wrench {
 
                 /* Just filter out all compute nodes that have no available slots */
                 std::set<std::shared_ptr<ServerlessComputeNode>> not_fully_busy_compute_nodes;
-                for (auto const& node : scheduling_state->_activated_compute_nodes) {
+                for (auto const& node : scheduling_state->getActivatedComputeNodes()) {
                         if (node->isAtPerNodeInvocationLimit()) {
                                 continue;
                         }
