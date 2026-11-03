@@ -35,8 +35,8 @@ namespace wrench {
 		* Accessor Functions
 		*/
     	std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations();
-    	const std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts();
-    	unsigned long getNumInFlightInvocationsOnContainer(const std::shared_ptr<Container>& container);
+    	const std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts() const;
+    	unsigned long getNumInFlightInvocationsOnContainer(const std::shared_ptr<Container>& container) const;
     	[[nodiscard]] const std::vector<std::shared_ptr<ServerlessComputeNode>>& getActivatedComputeNodes();
     	[[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
     	[[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;

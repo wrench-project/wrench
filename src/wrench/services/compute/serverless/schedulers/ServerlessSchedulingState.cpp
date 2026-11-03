@@ -91,7 +91,7 @@ namespace wrench {
      * @brief Get the pending invocation counts
      * @return The map of pending invocations
      */
-    const std::map<std::shared_ptr<Function>, unsigned long>& ServerlessSchedulingState::getPendingInvocationCounts() {
+    const std::map<std::shared_ptr<Function>, unsigned long>& ServerlessSchedulingState::getPendingInvocationCounts() const {
         return _pending_invocation_counts;
     }
 
@@ -101,7 +101,7 @@ namespace wrench {
      * @return A number of invocations
      */
     unsigned long ServerlessSchedulingState::getNumInFlightInvocationsOnContainer(
-        const std::shared_ptr<Container>& container) {
+        const std::shared_ptr<Container>& container) const {
         return _num_in_flight_invocations_on_container.at(container);
     }
 
