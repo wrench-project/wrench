@@ -57,7 +57,7 @@ namespace wrench {
                         if (container->getFunction() != function) {
                             continue;
                         }
-                        if (scheduling_state->getNumInFlighInvocationsOnContainer(container) == container->
+                        if (scheduling_state->getNumInFlightInvocationsOnContainer(container) == container->
                             getMaxNumInflightInvocations()) {
                             continue;
                             }
@@ -94,7 +94,7 @@ namespace wrench {
                 }
                 bool all_containers_idle = true;
                 for (auto const &container : scheduling_state->getInitializedContainers(node)) {
-                    if (scheduling_state->getNumInFlighInvocationsOnContainer(container) != 0) {
+                    if (scheduling_state->getNumInFlightInvocationsOnContainer(container) != 0) {
                         all_containers_idle = false;
                         break;
                     }

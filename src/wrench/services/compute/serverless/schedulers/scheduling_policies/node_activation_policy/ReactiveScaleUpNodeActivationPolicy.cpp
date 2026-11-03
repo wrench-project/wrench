@@ -61,7 +61,7 @@ namespace wrench {
                     if (container->getFunction() != function) {
                         continue;
                     }
-                    if (scheduling_state->getNumInFlighInvocationsOnContainer(container) == container->
+                    if (scheduling_state->getNumInFlightInvocationsOnContainer(container) == container->
                         getMaxNumInflightInvocations()) {
                         continue;
                     }

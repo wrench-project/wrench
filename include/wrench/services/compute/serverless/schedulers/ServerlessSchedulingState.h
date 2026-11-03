@@ -35,25 +35,23 @@ namespace wrench {
 		* Accessor Functions
 		*/
     	std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations();
-    	std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts();
-    	unsigned long getNumInFlighInvocationsOnContainer(const std::shared_ptr<Container>& container);
-    	[[nodiscard]] std::vector<std::shared_ptr<ServerlessComputeNode>>& getActivatedComputeNodes();
+    	const std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts();
+    	unsigned long getNumInFlightInvocationsOnContainer(const std::shared_ptr<Container>& container);
+    	[[nodiscard]] const std::vector<std::shared_ptr<ServerlessComputeNode>>& getActivatedComputeNodes();
     	[[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
     	[[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
-    	std::set<std::shared_ptr<Container>>& getInitializedContainers(const std::shared_ptr<ServerlessComputeNode>& node);
-    	std::set<std::shared_ptr<Container>>& getInitializingContainers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<Container>>& getInitializedContainers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<Container>>& getInitializingContainers(const std::shared_ptr<ServerlessComputeNode>& node);
     	unsigned long getNumPossibleNewInvocationsAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
     	unsigned long getNumPossibleNewInvocationsOnContainer(const std::shared_ptr<Container>& container);
     	unsigned long getNumPossibleNewContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
-    	std::set<std::shared_ptr<ImageLayer>>& getProtectedImageLayers(const std::shared_ptr<ServerlessComputeNode>& node);
-    	std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnDisk(const std::shared_ptr<ServerlessComputeNode>& node);
-    	std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToDisk(const std::shared_ptr<ServerlessComputeNode>& node);
-    	std::set<std::shared_ptr<ImageLayer>>& getImageLayersInRAM(const std::shared_ptr<ServerlessComputeNode>& node);
-    	std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToRAM(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getProtectedImageLayers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnDisk(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToDisk(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersInRAM(const std::shared_ptr<ServerlessComputeNode>& node);
+    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToRAM(const std::shared_ptr<ServerlessComputeNode>& node);
     	[[nodiscard]] sg_size_t getRAMSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const;
     	[[nodiscard]] sg_size_t getDiskSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const;
-
-
 
     	/**
 		 * Update this planning snapshot to account for already-selected operations.

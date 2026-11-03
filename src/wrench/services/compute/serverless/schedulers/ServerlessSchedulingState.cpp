@@ -91,7 +91,7 @@ namespace wrench {
      * @brief Get the pending invocation counts
      * @return The map of pending invocations
      */
-    std::map<std::shared_ptr<Function>, unsigned long>& ServerlessSchedulingState::getPendingInvocationCounts() {
+    const std::map<std::shared_ptr<Function>, unsigned long>& ServerlessSchedulingState::getPendingInvocationCounts() {
         return _pending_invocation_counts;
     }
 
@@ -100,7 +100,7 @@ namespace wrench {
      * @param container A container
      * @return A number of invocations
      */
-    unsigned long ServerlessSchedulingState::getNumInFlighInvocationsOnContainer(
+    unsigned long ServerlessSchedulingState::getNumInFlightInvocationsOnContainer(
         const std::shared_ptr<Container>& container) {
         return _num_in_flight_invocations_on_container.at(container);
     }
@@ -109,7 +109,7 @@ namespace wrench {
      * @brief Get the activated compute nodes
      * @return A list of compute nodes
      */
-    std::vector<std::shared_ptr<ServerlessComputeNode>>& ServerlessSchedulingState::getActivatedComputeNodes() {
+    const std::vector<std::shared_ptr<ServerlessComputeNode>>& ServerlessSchedulingState::getActivatedComputeNodes() {
         return _activated_compute_nodes;
     }
 
@@ -134,7 +134,7 @@ namespace wrench {
      * @param node A compute node
      * @return A set of containers
      */
-    std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializedContainers(
+    const std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializedContainers(
         const std::shared_ptr<ServerlessComputeNode>& node) {
         return _initialized_containers.at(node);
     }
@@ -144,7 +144,7 @@ namespace wrench {
     * @param node A compute node
     * @return A set of containers
     */
-    std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializingContainers(
+    const std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializingContainers(
         const std::shared_ptr<ServerlessComputeNode>& node) {
         return _initializing_containers.at(node);
     }
@@ -185,7 +185,7 @@ namespace wrench {
      * @param node A compute node
      * @return A set of image layers
      */
-    std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getProtectedImageLayers(
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getProtectedImageLayers(
         const std::shared_ptr<ServerlessComputeNode>& node) {
         return _protected_layers.at(node);
     }
@@ -195,7 +195,7 @@ namespace wrench {
      * @param node A compute node
      * @return A set of image layers
      */
-    std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnDisk(
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnDisk(
         const std::shared_ptr<ServerlessComputeNode>& node) {
         return _image_layers_on_disk.at(node);
     }
@@ -205,7 +205,7 @@ namespace wrench {
      * @param node A compute node
      * @return A set of image layers
      */
-    std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToDisk(
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToDisk(
         const std::shared_ptr<ServerlessComputeNode>& node) {
         return _image_layers_on_their_way_to_disk.at(node);
     }
@@ -215,7 +215,7 @@ namespace wrench {
      * @param node A compute node
      * @return A set of image layers
      */
-    std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersInRAM(
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersInRAM(
         const std::shared_ptr<ServerlessComputeNode>& node) {
         return _image_layers_in_ram.at(node);
     }
@@ -225,7 +225,7 @@ namespace wrench {
      * @param node A compute node
      * @return A set of image layers
      */
-    std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToRAM(
+    const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToRAM(
         const std::shared_ptr<ServerlessComputeNode>& node) {
         return _image_layers_on_their_way_to_ram.at(node);
     }
