@@ -1,4 +1,3 @@
-
 #include <stdexcept>
 
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_failing_policies/QueueSizeLimitFailingPolicy.h"
@@ -27,8 +26,9 @@ namespace wrench {
     std::set<std::shared_ptr<Invocation>>
     QueueSizeLimitFailingPolicy::failSchedulableInvocations(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
-        std::size_t num_to_fail = (_queue_limit < scheduling_state->_schedulable_invocations.size()
-                                       ? scheduling_state->_schedulable_invocations.size() - _queue_limit
+        auto& schedulable_invocations = scheduling_state->getSchedulableInvocations();
+        std::size_t num_to_fail = (_queue_limit < schedulable_invocations.size()
+                                       ? schedulable_invocations.size() - _queue_limit
                                        : 0);
 
         if (num_to_fail == 0) {
@@ -37,8 +37,8 @@ namespace wrench {
 
         std::set<std::shared_ptr<Invocation>> to_fail;
         auto iterator_offset = static_cast<std::vector<std::shared_ptr<Invocation>>::difference_type>(num_to_fail);
-        for (auto it = scheduling_state->_schedulable_invocations.end() - iterator_offset;
-             it != scheduling_state->_schedulable_invocations.end(); ++it) {
+        for (auto it = schedulable_invocations.end() - iterator_offset;
+             it != schedulable_invocations.end(); ++it) {
             to_fail.insert(*it);
         }
         return to_fail;

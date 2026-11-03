@@ -11,6 +11,6 @@ namespace wrench {
     std::pair<unsigned long, std::set<std::shared_ptr<ServerlessComputeNode>>> ActivateAllNodePolicy::makeNodeScalingPlan(
         const std::shared_ptr<ServerlessSchedulingState>& scheduling_state) {
         std::set<std::shared_ptr<ServerlessComputeNode>> none = {};
-        return {scheduling_state->_num_deactivated_compute_nodes, none};
+        return {scheduling_state->getNumDeactivatedComputeNodes(), none};
     }
 }
