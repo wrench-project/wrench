@@ -43,8 +43,8 @@ namespace wrench {
     	const std::set<std::shared_ptr<Container>>& getInitializedContainers(const std::shared_ptr<ServerlessComputeNode>& node);
     	const std::set<std::shared_ptr<Container>>& getInitializingContainers(const std::shared_ptr<ServerlessComputeNode>& node);
     	unsigned long getNumPossibleNewInvocationsAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
-    	unsigned long getNumPossibleNewInvocationsOnContainer(const std::shared_ptr<Container>& container);
-    	unsigned long getNumPossibleNewContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
+    	unsigned long getNumPossibleNewInvocationsOnContainer(const std::shared_ptr<Container>& container) const;
+    	unsigned long getNumPossibleNewContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
     	const std::set<std::shared_ptr<ImageLayer>>& getProtectedImageLayers(const std::shared_ptr<ServerlessComputeNode>& node);
     	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnDisk(const std::shared_ptr<ServerlessComputeNode>& node);
     	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToDisk(const std::shared_ptr<ServerlessComputeNode>& node);

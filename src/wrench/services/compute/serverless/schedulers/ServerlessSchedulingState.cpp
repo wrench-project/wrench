@@ -166,7 +166,7 @@ namespace wrench {
      * @return A number of possible new invocations
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsOnContainer(
-        const std::shared_ptr<Container>& container) {
+        const std::shared_ptr<Container>& container) const {
         return _num_possible_new_invocations_on_container.at(container);
     }
 
@@ -176,7 +176,7 @@ namespace wrench {
      * @return A number of possible new containers
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewContainersAtComputeNode(
-        const std::shared_ptr<ServerlessComputeNode>& node) {
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
         return _num_possible_new_containers_on_compute_node.at(node);
     }
 
