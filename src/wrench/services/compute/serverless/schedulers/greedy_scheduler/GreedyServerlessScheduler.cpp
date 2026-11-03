@@ -322,38 +322,38 @@ namespace wrench {
     }
 
 
-    void GreedyServerlessScheduler::excludeNodeFromPlanning(
-        const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-        const std::shared_ptr<ServerlessComputeNode>& node) {
-
-        auto& active_nodes = scheduling_state->_activated_compute_nodes;
-        const auto node_it =
-            std::find(active_nodes.begin(), active_nodes.end(), node);
-        if (node_it == active_nodes.end()) {
-            return;
-        }
-        active_nodes.erase(node_it);
-        scheduling_state->_num_deactivated_compute_nodes += 1;
-
-        scheduling_state->_disk_available.erase(node);
-        scheduling_state->_ram_available.erase(node);
-        scheduling_state->_image_layers_on_disk.erase(node);
-        scheduling_state->_image_layers_on_their_way_to_disk.erase(node);
-        scheduling_state->_image_layers_in_ram.erase(node);
-        scheduling_state->_image_layers_on_their_way_to_ram.erase(node);
-        scheduling_state->_protected_layers.erase(node);
-
-        scheduling_state->_initializing_containers.erase(node);
-        for (const auto& container :
-             scheduling_state->_initialized_containers.at(node)) {
-            scheduling_state->_num_possible_new_invocations_on_container.erase(container);
-            scheduling_state->_num_in_flight_invocations_on_container.erase(container);
-        }
-        scheduling_state->_initialized_containers.erase(node);
-
-        scheduling_state->_num_possible_new_invocations_on_compute_node.erase(node);
-        scheduling_state->_num_possible_new_containers_on_compute_node.erase(node);
-    }
+    // void GreedyServerlessScheduler::excludeNodeFromPlanning(
+    //     const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
+    //     const std::shared_ptr<ServerlessComputeNode>& node) {
+    //
+    //     auto& active_nodes = scheduling_state->_activated_compute_nodes;
+    //     const auto node_it =
+    //         std::find(active_nodes.begin(), active_nodes.end(), node);
+    //     if (node_it == active_nodes.end()) {
+    //         return;
+    //     }
+    //     active_nodes.erase(node_it);
+    //     scheduling_state->_num_deactivated_compute_nodes += 1;
+    //
+    //     scheduling_state->_disk_available.erase(node);
+    //     scheduling_state->_ram_available.erase(node);
+    //     scheduling_state->_image_layers_on_disk.erase(node);
+    //     scheduling_state->_image_layers_on_their_way_to_disk.erase(node);
+    //     scheduling_state->_image_layers_in_ram.erase(node);
+    //     scheduling_state->_image_layers_on_their_way_to_ram.erase(node);
+    //     scheduling_state->_protected_layers.erase(node);
+    //
+    //     scheduling_state->_initializing_containers.erase(node);
+    //     for (const auto& container :
+    //          scheduling_state->_initialized_containers.at(node)) {
+    //         scheduling_state->_num_possible_new_invocations_on_container.erase(container);
+    //         scheduling_state->_num_in_flight_invocations_on_container.erase(container);
+    //     }
+    //     scheduling_state->_initialized_containers.erase(node);
+    //
+    //     scheduling_state->_num_possible_new_invocations_on_compute_node.erase(node);
+    //     scheduling_state->_num_possible_new_containers_on_compute_node.erase(node);
+    // }
 
 
     /**
@@ -384,51 +384,30 @@ namespace wrench {
         const ServerlessStateOfTheSystem* state) {
         auto decisions = std::make_shared<ServerlessSchedulingDecisions>();
 
-        // Create a scheduling state
+        /** Create a scheduling state **/
         auto scheduling_state = std::make_shared<ServerlessSchedulingState>(state);
 
-        // Invoke the invocation failing policy
+        /** Invoke the invocation failing policy **/
         auto to_fail = _invocation_failing_policy->failSchedulableInvocations(scheduling_state);
-
-        // Encode the "to fail" decisions
         for (auto const& inv : to_fail) {
             decisions->invocation_fails.push_back({inv});
         }
+        scheduling_state->planInvocationFails(to_fail);
 
-        // Filter out the "to fail" invocations from the list of schedulable invocations
-        if (!to_fail.empty()) {
-            auto& pending = scheduling_state->_schedulable_invocations;
-
-            pending.erase(
-                std::remove_if(
-                    pending.begin(),
-                    pending.end(),
-                    [&to_fail](const auto& invocation) {
-                        return to_fail.count(invocation) != 0;
-                    }),
-                pending.end());
-        }
-        // Adjust the pending counts
-        for (auto const &inv : to_fail) {
-            scheduling_state->_pending_invocation_counts.at(inv->getFunction())--;
-        }
-
-
-        // Invoke the node activation policy
-        auto [num_nodes_to_activate, nodes_to_deactivate] = _node_scaling_policy->makeNodeScalingPlan(scheduling_state);
+        /** Invoke the node activation policy **/
+        auto [num_nodes_to_activate, nodes_to_deactivate] =
+            _node_scaling_policy->makeNodeScalingPlan(scheduling_state);
         // Implement node activations
         if (num_nodes_to_activate) {
             decisions->compute_node_activations.push_back({num_nodes_to_activate});
         }
-
         // Implement node de-activations and update the bookkeeping
         for (auto const& node : nodes_to_deactivate) {
             decisions->compute_node_deactivations.push_back({node});
-            excludeNodeFromPlanning(scheduling_state, node);
+            scheduling_state->excludeNodeFromPlanning(node);
         }
 
-
-        // Sort the schedulable invocations in place
+        /** Sort the schedulable invocations in place **/
         _invocation_ordering_policy->sortSchedulableInvocations(scheduling_state);
 
         // Go through the invocations and pick target compute node
@@ -442,8 +421,7 @@ namespace wrench {
             }
 
             // Make the layers of this invocation protected to avoid eviction by subsequence scheduling decisions
-            const auto& layers = inv->getFunction()->getImage()->getLayers();
-            scheduling_state->_protected_layers.at(target_node).insert(layers.begin(), layers.end());
+            scheduling_state->makeLayersProtected(target_node, inv->getFunction()->getImage());
 
             // If no node-level decisions, move on (it was just a reservation)
             if (!node_decisions) {
@@ -456,85 +434,39 @@ namespace wrench {
 
             // Idle container terminations
             for (const auto& [container] : node_decisions->idle_container_terminations) {
+                scheduling_state->planIdleContainerTermination(target_node, container);
                 decisions->idle_container_terminations.push_back({container});
-                scheduling_state->_ram_available.at(target_node) += container->getFunction()->getRAMSpaceLimit();
-                scheduling_state->_disk_available.at(target_node) += container->getFunction()->getDiskSpaceLimit();
-                scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) += 1;
-                scheduling_state->_initialized_containers.at(target_node).erase(container);
-                scheduling_state->_num_possible_new_invocations_on_container.erase(container);
-                scheduling_state->_num_in_flight_invocations_on_container.erase(container);
             }
 
             // Layer evictions from RAM
             for (const auto& [layer, _] : node_decisions->layer_evictions_from_ram) {
-                if (scheduling_state->_protected_layers.at(target_node).count(layer)) {
-                    throw std::runtime_error(
-                        "Eviction plan attempts to evict a protected RAM layer");
-                }
-                auto& resident_layers = scheduling_state->_image_layers_in_ram.at(target_node);
-
-                if (resident_layers.erase(layer) != 1) {
-                    throw std::runtime_error(
-                        "Eviction plan attempts to evict a nonresident "
-                        "or already-evicted RAM layer");
-                }
-                scheduling_state->_ram_available.at(target_node) += layer->getRAMFootprint();
-
+                scheduling_state->planLayerEvictionFromRAM(target_node, layer);
                 decisions->layer_evictions_from_ram.push_back({layer, target_node});
             }
 
             // Layer evictions from disk
             for (const auto& [layer, _] : node_decisions->layer_evictions_from_disk) {
-                if (scheduling_state->_protected_layers.at(target_node).count(layer)) {
-                    throw std::runtime_error(
-                        "Eviction plan attempts to evict a protected disk layer");
-                }
-                auto& resident_layers = scheduling_state->_image_layers_on_disk.at(target_node);
-
-                if (resident_layers.erase(layer) != 1) {
-                    throw std::runtime_error(
-                        "Eviction plan attempts to evict a nonresident "
-                        "or already-evicted disk layer");
-                }
-                scheduling_state->_disk_available.at(target_node) += layer->getDiskFootprint();
-
+                scheduling_state->planLayerEvictionFromDisk(target_node, layer);
                 decisions->layer_evictions_from_disk.push_back({layer, target_node});
             }
 
             // Invocations
             for (const auto& [_ignore1, _ignore2, container] : node_decisions->invocation_dispatches) {
                 decisions->invocation_dispatches.push_back({inv, target_node, container});
-                if (container) {
-                    scheduling_state->_num_possible_new_invocations_on_container.at(container) -= 1;
-                    scheduling_state->_num_in_flight_invocations_on_container.at(container) += 1;
-                } else {
-                    // The selected plan's container terminations have already been credited.
-                    scheduling_state->_num_possible_new_containers_on_compute_node.at(target_node) -= 1;
-                    scheduling_state->_ram_available.at(target_node) -= inv->getFunction()->getRAMSpaceLimit();
-                    scheduling_state->_disk_available.at(target_node) -= inv->getFunction()->getDiskSpaceLimit();
-                }
-                scheduling_state->_num_possible_new_invocations_on_compute_node.at(target_node) -= 1;
-
-                // Update the pending counts
-                auto& num_pending = scheduling_state->_pending_invocation_counts.at(inv->getFunction());
-                if (num_pending == 0) {
-                    throw std::runtime_error("Cannot select a dispatch for a function with zero pending invocations");
-                }
-                --num_pending;
+                scheduling_state->planNewInvocation(inv, target_node, container);
             }
 
             // Image layer loads
             for (const auto& [layer,_] : node_decisions->image_layer_loads_to_RAM) {
                 decisions->image_layer_loads_to_RAM.push_back({layer, target_node});
-                scheduling_state->_image_layers_on_their_way_to_ram.at(target_node).insert(layer);
-                scheduling_state->_ram_available.at(target_node) -= layer->getRAMFootprint();
+                scheduling_state->planLayerLoadToRAM(target_node, layer);
             }
 
             // Image layer copies
             for (const auto& [layer,_] : node_decisions->image_layer_copies_to_disk) {
                 decisions->image_layer_copies_to_disk.push_back({layer, target_node});
-                scheduling_state->_image_layers_on_their_way_to_disk.at(target_node).insert(layer);
-                scheduling_state->_disk_available.at(target_node) -= layer->getDiskFootprint();
+                scheduling_state->planLayerCopyToDisk(target_node, layer);
+
             }
         }
 
@@ -542,7 +474,7 @@ namespace wrench {
         auto to_prewarm = _container_prewarm_policy->prewarmContainers(scheduling_state);
         for (auto const& [function, node] : to_prewarm) {
             decisions->container_prewarms.push_back({function, node});
-            scheduling_state->_num_possible_new_containers_on_compute_node.at(node) -= 1;
+            scheduling_state->planContainerPrewarm(node);
         }
 
         // Set the minimum of the wake-up dates

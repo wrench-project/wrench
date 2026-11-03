@@ -234,8 +234,8 @@ namespace wrench {
 
 
     private:
-        void excludeNodeFromPlanning(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-            const std::shared_ptr<ServerlessComputeNode>& node);
+        // void excludeNodeFromPlanning(const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
+        //     const std::shared_ptr<ServerlessComputeNode>& node);
 
         /***********************/
         /** \endcond          **/
