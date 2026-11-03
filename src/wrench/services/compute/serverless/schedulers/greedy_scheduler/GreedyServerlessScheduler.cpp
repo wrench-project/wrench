@@ -322,40 +322,6 @@ namespace wrench {
     }
 
 
-    // void GreedyServerlessScheduler::excludeNodeFromPlanning(
-    //     const std::shared_ptr<ServerlessSchedulingState>& scheduling_state,
-    //     const std::shared_ptr<ServerlessComputeNode>& node) {
-    //
-    //     auto& active_nodes = scheduling_state->_activated_compute_nodes;
-    //     const auto node_it =
-    //         std::find(active_nodes.begin(), active_nodes.end(), node);
-    //     if (node_it == active_nodes.end()) {
-    //         return;
-    //     }
-    //     active_nodes.erase(node_it);
-    //     scheduling_state->_num_deactivated_compute_nodes += 1;
-    //
-    //     scheduling_state->_disk_available.erase(node);
-    //     scheduling_state->_ram_available.erase(node);
-    //     scheduling_state->_image_layers_on_disk.erase(node);
-    //     scheduling_state->_image_layers_on_their_way_to_disk.erase(node);
-    //     scheduling_state->_image_layers_in_ram.erase(node);
-    //     scheduling_state->_image_layers_on_their_way_to_ram.erase(node);
-    //     scheduling_state->_protected_layers.erase(node);
-    //
-    //     scheduling_state->_initializing_containers.erase(node);
-    //     for (const auto& container :
-    //          scheduling_state->_initialized_containers.at(node)) {
-    //         scheduling_state->_num_possible_new_invocations_on_container.erase(container);
-    //         scheduling_state->_num_in_flight_invocations_on_container.erase(container);
-    //     }
-    //     scheduling_state->_initialized_containers.erase(node);
-    //
-    //     scheduling_state->_num_possible_new_invocations_on_compute_node.erase(node);
-    //     scheduling_state->_num_possible_new_containers_on_compute_node.erase(node);
-    // }
-
-
     /**
      * @brief Build one batch of scheduling decisions using a mutable planning
      *        snapshot without modifying the supplied invocation vector.
@@ -392,7 +358,7 @@ namespace wrench {
         for (auto const& inv : to_fail) {
             decisions->invocation_fails.push_back({inv});
         }
-        scheduling_state->planInvocationFails(to_fail);
+        scheduling_state->planInvocationFailures(to_fail);
 
         /** Invoke the node activation policy **/
         auto [num_nodes_to_activate, nodes_to_deactivate] =
@@ -421,7 +387,7 @@ namespace wrench {
             }
 
             // Make the layers of this invocation protected to avoid eviction by subsequence scheduling decisions
-            scheduling_state->makeLayersProtected(target_node, inv->getFunction()->getImage());
+            scheduling_state->protectImageLayers(target_node, inv->getFunction()->getImage());
 
             // If no node-level decisions, move on (it was just a reservation)
             if (!node_decisions) {
@@ -453,7 +419,7 @@ namespace wrench {
             // Invocations
             for (const auto& [_ignore1, _ignore2, container] : node_decisions->invocation_dispatches) {
                 decisions->invocation_dispatches.push_back({inv, target_node, container});
-                scheduling_state->planNewInvocation(inv, target_node, container);
+                scheduling_state->planInvocationDispatch(inv, target_node, container);
             }
 
             // Image layer loads
@@ -474,7 +440,7 @@ namespace wrench {
         auto to_prewarm = _container_prewarm_policy->prewarmContainers(scheduling_state);
         for (auto const& [function, node] : to_prewarm) {
             decisions->container_prewarms.push_back({function, node});
-            scheduling_state->planContainerPrewarm(node);
+            scheduling_state->planContainerPrewarm(node, function);
         }
 
         // Set the minimum of the wake-up dates

@@ -117,10 +117,8 @@ namespace wrench {
      * @brief Plan to fail some invocations
      * @param invocations A set of invocations to fail
      */
-    void ServerlessSchedulingState::planInvocationFails(const std::set<std::shared_ptr<Invocation>>& invocations) {
-
+    void ServerlessSchedulingState::planInvocationFailures(const std::set<std::shared_ptr<Invocation>>& invocations) {
         if (invocations.empty()) {
-            return;
             return;
         }
 
@@ -136,7 +134,7 @@ namespace wrench {
             pending.end());
 
         // Adjust the pending counts
-        for (auto const &inv : invocations) {
+        for (auto const& inv : invocations) {
             _pending_invocation_counts.at(inv->getFunction())--;
         }
     }
@@ -146,8 +144,8 @@ namespace wrench {
      * @param node The compute node
      * @param image The image
      */
-    void ServerlessSchedulingState::makeLayersProtected(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                        const std::shared_ptr<Image>& image) {
+    void ServerlessSchedulingState::protectImageLayers(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                       const std::shared_ptr<Image>& image) {
         const auto& layers = image->getLayers();
         _protected_layers.at(node).insert(layers.begin(), layers.end());
     }
@@ -156,7 +154,8 @@ namespace wrench {
      * @brief Plan for the termination of an idle container
      * @param container the container
      */
-    void ServerlessSchedulingState::planIdleContainerTermination(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Container>& container) {
+    void ServerlessSchedulingState::planIdleContainerTermination(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                                 const std::shared_ptr<Container>& container) {
         _ram_available.at(node) += container->getFunction()->getRAMSpaceLimit();
         _disk_available.at(node) += container->getFunction()->getDiskSpaceLimit();
         _num_possible_new_containers_on_compute_node.at(node) += 1;
@@ -194,7 +193,7 @@ namespace wrench {
      * @param layer The layer that will be evicted
      */
     void ServerlessSchedulingState::planLayerEvictionFromDisk(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                             const std::shared_ptr<ImageLayer>& layer) {
+                                                              const std::shared_ptr<ImageLayer>& layer) {
         if (_protected_layers.at(node).count(layer)) {
             throw std::runtime_error(
                 "Eviction plan attempts to evict a protected disk layer");
@@ -216,9 +215,9 @@ namespace wrench {
      * @param node The node on which to place it
      * @param container The container to use (if non-nullptr)
      */
-    void ServerlessSchedulingState::planNewInvocation(const std::shared_ptr<Invocation>& inv,
-                                                      const std::shared_ptr<ServerlessComputeNode>& node,
-                                                      const std::shared_ptr<Container>& container) {
+    void ServerlessSchedulingState::planInvocationDispatch(const std::shared_ptr<Invocation>& inv,
+                                                           const std::shared_ptr<ServerlessComputeNode>& node,
+                                                           const std::shared_ptr<Container>& container) {
         if (container) {
             _num_possible_new_invocations_on_container.at(container) -= 1;
             _num_in_flight_invocations_on_container.at(container) += 1;
@@ -255,8 +254,8 @@ namespace wrench {
      * @param layer The layer to copy
      */
     void ServerlessSchedulingState::planLayerCopyToDisk(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                       const std::shared_ptr<ImageLayer>& layer) {
-       _image_layers_on_their_way_to_disk.at(node).insert(layer);
+                                                        const std::shared_ptr<ImageLayer>& layer) {
+        _image_layers_on_their_way_to_disk.at(node).insert(layer);
         _disk_available.at(node) -= layer->getDiskFootprint();
     }
 
@@ -264,7 +263,8 @@ namespace wrench {
      * @brief Plan for a container prewarm
      * @param node The compute node at which to prewarm a container
      */
-    void ServerlessSchedulingState::planContainerPrewarm(const std::shared_ptr<ServerlessComputeNode>& node) {
+    void ServerlessSchedulingState::planContainerPrewarm(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                         const std::shared_ptr<Function>& function) {
         _num_possible_new_containers_on_compute_node.at(node) -= 1;
     }
 
