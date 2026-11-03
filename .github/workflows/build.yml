@@ -51,7 +51,7 @@ jobs:
             batsched: off
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 #      - name: Configure Docker
 #        run: |
 #          sudo apt-get update
