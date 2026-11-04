@@ -20,8 +20,12 @@ namespace wrench {
         _activated_compute_nodes = state->getActivatedComputeNodes();
         _num_deactivated_compute_nodes = state->getNumDeactivatedComputeNodes();
         _num_being_activated_compute_nodes = state->getNumBeingActivatedComputeNodes();
-        _ram_available = state->getAvailableRAMSpace();
-        _disk_available = state->getAvailableDiskSpace();
+        for (auto const &[node, space] : state->getAvailableRAMSpace()) {
+            _node_states[node]._ram_available = space;
+        }
+        for (auto const &[node, space] : state->getAvailableDiskSpace()) {
+            _node_states[node]._disk_available = space;
+        }
 
         // Initialize the pending counts to the outstanding counts
         for (auto const& [function, count] : state->getOutstandingInvocationCounts()) {
@@ -30,7 +34,7 @@ namespace wrench {
 
         // Initialize and build useful maps
         for (const auto& node : _activated_compute_nodes) {
-            _num_possible_new_containers_on_compute_node[node] = node->getMaxNumContainers() - node->
+            _node_states[node]._num_possible_new_containers = node->getMaxNumContainers() - node->
                 getTotalNumContainers();
             auto num_total_ongoing_invocations = 0UL;
 
@@ -49,32 +53,32 @@ namespace wrench {
                 num_total_ongoing_invocations += num_in_flight_invocations;
                 _pending_invocation_counts[function] -= num_in_flight_invocations;
             }
-            _num_possible_new_invocations_on_compute_node[node] = node->getMaxNumInvocations() -
+            _node_states[node]._num_possible_new_invocations = node->getMaxNumInvocations() -
                 num_total_ongoing_invocations;
 
-            _image_layers_on_disk[node] = state->getImageLayersOnDiskAtNode(node);
-            _image_layers_on_their_way_to_disk[node] = state->getImageLayersBeingCopiedToNode(node);
+            _node_states[node]._image_layers_on_disk = state->getImageLayersOnDiskAtNode(node);
+            _node_states[node]._image_layers_on_their_way_to_disk = state->getImageLayersBeingCopiedToNode(node);
 
-            _image_layers_in_ram[node] = state->getImageLayersInRAMAtNode(node);
-            _image_layers_on_their_way_to_ram[node] = state->getImageLayersBeingLoadedAtNode(node);
+            _node_states[node]._image_layers_in_ram = state->getImageLayersInRAMAtNode(node);
+            _node_states[node]._image_layers_on_their_way_to_ram = state->getImageLayersBeingLoadedAtNode(node);
 
             // Make all being-loaded/copied layers protected
-            _protected_layers[node] = {};
-            auto& protected_layers = _protected_layers.at(node);
-            const auto& layers_being_copied = _image_layers_on_their_way_to_disk.at(node);
+            _node_states[node]._protected_layers = {};
+            auto& protected_layers = _node_states[node]._protected_layers;
+            const auto& layers_being_copied = _node_states[node]._image_layers_on_their_way_to_disk;
             protected_layers.insert(layers_being_copied.begin(), layers_being_copied.end());
 
-            const auto& layers_being_loaded = _image_layers_on_their_way_to_ram.at(node);
+            const auto& layers_being_loaded = _node_states[node]._image_layers_on_their_way_to_ram;
             protected_layers.insert(layers_being_loaded.begin(), layers_being_loaded.end());
 
-            _initializing_containers[node] = {};
+            _node_states[node]._initializing_containers = {};
             for (auto const& container : node->getInitializingContainers()) {
-                _initializing_containers.at(node).insert(container);
+                _node_states[node]._initializing_containers.insert(container);
             }
 
-            _initialized_containers[node] = {};
+            _node_states[node]._initialized_containers = {};
             for (auto const& container : node->getInitializedContainers()) {
-                _initialized_containers.at(node).insert(container);
+                _node_states[node]._initialized_containers.insert(container);
             }
         }
     }
@@ -136,7 +140,7 @@ namespace wrench {
      */
     const std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializedContainers(
         const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _initialized_containers.at(node);
+        return _node_states.at(node)._initialized_containers;
     }
 
     /**
@@ -146,7 +150,7 @@ namespace wrench {
     */
     const std::set<std::shared_ptr<Container>>& ServerlessSchedulingState::getInitializingContainers(
         const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _initializing_containers.at(node);
+        return _node_states.at(node)._initializing_containers;
     }
 
 
@@ -156,8 +160,8 @@ namespace wrench {
      * @return A number of possible new invocations
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsAtComputeNode(
-        const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _num_possible_new_invocations_on_compute_node.at(node);
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return _node_states.at(node)._num_possible_new_invocations;
     }
 
     /**
@@ -166,7 +170,7 @@ namespace wrench {
      * @return A number of possible new invocations
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsOnContainer(
-        const std::shared_ptr<Container>& container) {
+        const std::shared_ptr<Container>& container) const {
         return _num_possible_new_invocations_on_container.at(container);
     }
 
@@ -176,8 +180,8 @@ namespace wrench {
      * @return A number of possible new containers
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewContainersAtComputeNode(
-        const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _num_possible_new_containers_on_compute_node.at(node);
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return _node_states.at(node)._num_possible_new_containers;
     }
 
     /**
@@ -187,7 +191,7 @@ namespace wrench {
      */
     const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getProtectedImageLayers(
         const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _protected_layers.at(node);
+        return _node_states.at(node)._protected_layers;
     }
 
     /**
@@ -197,7 +201,7 @@ namespace wrench {
      */
     const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnDisk(
         const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _image_layers_on_disk.at(node);
+        return _node_states.at(node)._image_layers_on_disk;
     }
 
     /**
@@ -207,7 +211,7 @@ namespace wrench {
      */
     const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToDisk(
         const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _image_layers_on_their_way_to_disk.at(node);
+        return _node_states.at(node)._image_layers_on_their_way_to_disk;
     }
 
     /**
@@ -217,7 +221,7 @@ namespace wrench {
      */
     const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersInRAM(
         const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _image_layers_in_ram.at(node);
+        return _node_states.at(node)._image_layers_in_ram;
     }
 
     /**
@@ -226,8 +230,8 @@ namespace wrench {
      * @return A set of image layers
      */
     const std::set<std::shared_ptr<ImageLayer>>& ServerlessSchedulingState::getImageLayersOnTheirWayToRAM(
-        const std::shared_ptr<ServerlessComputeNode>& node) {
-        return _image_layers_on_their_way_to_ram.at(node);
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
+        return _node_states.at(node)._image_layers_on_their_way_to_ram;
     }
 
     /**
@@ -236,7 +240,7 @@ namespace wrench {
      * @return A number of bytes
      */
     sg_size_t ServerlessSchedulingState::getRAMSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const {
-        return _ram_available.at(node);
+        return _node_states.at(node)._ram_available;
     }
 
     /**
@@ -245,7 +249,7 @@ namespace wrench {
      * @return A number of bytes
      */
     sg_size_t ServerlessSchedulingState::getDiskSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const {
-        return _disk_available.at(node);
+        return _node_states.at(node)._disk_available;
     }
 
 
@@ -264,24 +268,15 @@ namespace wrench {
         active_nodes.erase(node_it);
         _num_deactivated_compute_nodes += 1;
 
-        _disk_available.erase(node);
-        _ram_available.erase(node);
-        _image_layers_on_disk.erase(node);
-        _image_layers_on_their_way_to_disk.erase(node);
-        _image_layers_in_ram.erase(node);
-        _image_layers_on_their_way_to_ram.erase(node);
-        _protected_layers.erase(node);
-
-        _initializing_containers.erase(node);
+        // Remove node's container
         for (const auto& container :
-             _initialized_containers.at(node)) {
+             _node_states.at(node)._initialized_containers) {
             _num_possible_new_invocations_on_container.erase(container);
             _num_in_flight_invocations_on_container.erase(container);
         }
-        _initialized_containers.erase(node);
 
-        _num_possible_new_invocations_on_compute_node.erase(node);
-        _num_possible_new_containers_on_compute_node.erase(node);
+        // Remove all node-related bookkeeping
+        _node_states.erase(node);
     }
 
     /**
@@ -318,7 +313,7 @@ namespace wrench {
     void ServerlessSchedulingState::protectImageLayers(const std::shared_ptr<ServerlessComputeNode>& node,
                                                        const std::shared_ptr<Image>& image) {
         const auto& layers = image->getLayers();
-        _protected_layers.at(node).insert(layers.begin(), layers.end());
+        _node_states.at(node)._protected_layers.insert(layers.begin(), layers.end());
     }
 
     /**
@@ -327,10 +322,10 @@ namespace wrench {
      */
     void ServerlessSchedulingState::planIdleContainerTermination(const std::shared_ptr<ServerlessComputeNode>& node,
                                                                  const std::shared_ptr<Container>& container) {
-        _ram_available.at(node) += container->getFunction()->getRAMSpaceLimit();
-        _disk_available.at(node) += container->getFunction()->getDiskSpaceLimit();
-        _num_possible_new_containers_on_compute_node.at(node) += 1;
-        _initialized_containers.at(node).erase(container);
+        _node_states.at(node)._ram_available += container->getFunction()->getRAMSpaceLimit();
+        _node_states.at(node)._disk_available += container->getFunction()->getDiskSpaceLimit();
+        _node_states.at(node)._num_possible_new_containers += 1;
+        _node_states.at(node)._initialized_containers.erase(container);
         _num_possible_new_invocations_on_container.erase(container);
         _num_in_flight_invocations_on_container.erase(container);
     }
@@ -343,18 +338,18 @@ namespace wrench {
      */
     void ServerlessSchedulingState::planLayerEvictionFromRAM(const std::shared_ptr<ServerlessComputeNode>& node,
                                                              const std::shared_ptr<ImageLayer>& layer) {
-        if (_protected_layers.at(node).count(layer)) {
+        if (_node_states.at(node)._protected_layers.count(layer)) {
             throw std::runtime_error(
                 "Eviction plan attempts to evict a protected RAM layer");
         }
-        auto& resident_layers = _image_layers_in_ram.at(node);
+        auto& resident_layers = _node_states.at(node)._image_layers_in_ram;
 
         if (resident_layers.erase(layer) != 1) {
             throw std::runtime_error(
                 "Eviction plan attempts to evict a nonresident "
                 "or already-evicted RAM layer");
         }
-        _ram_available.at(node) += layer->getRAMFootprint();
+        _node_states.at(node)._ram_available += layer->getRAMFootprint();
     }
 
     /**
@@ -365,18 +360,18 @@ namespace wrench {
      */
     void ServerlessSchedulingState::planLayerEvictionFromDisk(const std::shared_ptr<ServerlessComputeNode>& node,
                                                               const std::shared_ptr<ImageLayer>& layer) {
-        if (_protected_layers.at(node).count(layer)) {
+        if (_node_states.at(node)._protected_layers.count(layer)) {
             throw std::runtime_error(
                 "Eviction plan attempts to evict a protected disk layer");
         }
-        auto& resident_layers = _image_layers_on_disk.at(node);
+        auto& resident_layers = _node_states.at(node)._image_layers_on_disk;
 
         if (resident_layers.erase(layer) != 1) {
             throw std::runtime_error(
                 "Eviction plan attempts to evict a nonresident "
                 "or already-evicted disk layer");
         }
-        _disk_available.at(node) += layer->getDiskFootprint();
+        _node_states.at(node)._disk_available += layer->getDiskFootprint();
     }
 
 
@@ -394,11 +389,11 @@ namespace wrench {
             _num_in_flight_invocations_on_container.at(container) += 1;
         } else {
             // The selected plan's container terminations have already been credited.
-            _num_possible_new_containers_on_compute_node.at(node) -= 1;
-            _ram_available.at(node) -= inv->getFunction()->getRAMSpaceLimit();
-            _disk_available.at(node) -= inv->getFunction()->getDiskSpaceLimit();
+            _node_states.at(node)._num_possible_new_containers -= 1;
+            _node_states.at(node)._ram_available -= inv->getFunction()->getRAMSpaceLimit();
+            _node_states.at(node)._disk_available -= inv->getFunction()->getDiskSpaceLimit();
         }
-        _num_possible_new_invocations_on_compute_node.at(node) -= 1;
+        _node_states.at(node)._num_possible_new_invocations -= 1;
 
         // Update the pending counts
         auto& num_pending = _pending_invocation_counts.at(inv->getFunction());
@@ -415,8 +410,8 @@ namespace wrench {
      */
     void ServerlessSchedulingState::planLayerLoadToRAM(const std::shared_ptr<ServerlessComputeNode>& node,
                                                        const std::shared_ptr<ImageLayer>& layer) {
-        _image_layers_on_their_way_to_ram.at(node).insert(layer);
-        _ram_available.at(node) -= layer->getRAMFootprint();
+        _node_states.at(node)._image_layers_on_their_way_to_ram.insert(layer);
+        _node_states.at(node)._ram_available -= layer->getRAMFootprint();
     }
 
     /**
@@ -426,8 +421,8 @@ namespace wrench {
      */
     void ServerlessSchedulingState::planLayerCopyToDisk(const std::shared_ptr<ServerlessComputeNode>& node,
                                                         const std::shared_ptr<ImageLayer>& layer) {
-        _image_layers_on_their_way_to_disk.at(node).insert(layer);
-        _disk_available.at(node) -= layer->getDiskFootprint();
+        _node_states.at(node)._image_layers_on_their_way_to_disk.insert(layer);
+        _node_states.at(node)._disk_available -= layer->getDiskFootprint();
     }
 
     /**
@@ -436,7 +431,7 @@ namespace wrench {
      */
     void ServerlessSchedulingState::planContainerPrewarm(const std::shared_ptr<ServerlessComputeNode>& node,
                                                          const std::shared_ptr<Function>& function) {
-        _num_possible_new_containers_on_compute_node.at(node) -= 1;
+        _node_states.at(node)._num_possible_new_containers -= 1;
     }
 
 
@@ -449,7 +444,7 @@ namespace wrench {
     bool ServerlessSchedulingState::areAllImageLayersInRAM(const std::shared_ptr<Image>& image,
                                                            const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
-            if (_image_layers_in_ram.at(node).count(layer) == 0) {
+            if (_node_states.at(node)._image_layers_in_ram.count(layer) == 0) {
                 return false;
             }
         }
@@ -465,9 +460,9 @@ namespace wrench {
     bool ServerlessSchedulingState::areAllImageLayersInRAMOrOnTheirWayToRAM(
         const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
-            if (_image_layers_in_ram.at(node).count(layer))
+            if (_node_states.at(node)._image_layers_in_ram.count(layer))
                 continue;
-            if (_image_layers_on_their_way_to_ram.at(node).count(layer))
+            if (_node_states.at(node)._image_layers_on_their_way_to_ram.count(layer))
                 continue;
 
             return false;
@@ -485,8 +480,8 @@ namespace wrench {
     bool ServerlessSchedulingState::areAllImageLayersOnDiskOrOnTheirWayToRAM(
         const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
-            if ((_image_layers_on_disk.at(node).count(layer) == 0) and
-                (_image_layers_on_their_way_to_ram.at(node).count(layer) == 0)) {
+            if ((_node_states.at(node)._image_layers_on_disk.count(layer) == 0) and
+                (_node_states.at(node)._image_layers_on_their_way_to_ram.count(layer) == 0)) {
                 return false;
             }
         }
@@ -502,7 +497,7 @@ namespace wrench {
     bool ServerlessSchedulingState::areAllImageLayersOnDisk(const std::shared_ptr<Image>& image,
                                                             const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
-            if (_image_layers_on_disk.at(node).count(layer) == 0) {
+            if (_node_states.at(node)._image_layers_on_disk.count(layer) == 0) {
                 return false;
             }
         }
@@ -519,8 +514,8 @@ namespace wrench {
     bool ServerlessSchedulingState::areAllImageLayersOnDiskOrOnTheirWayToDisk(
         const std::shared_ptr<Image>& image, const std::shared_ptr<ServerlessComputeNode>& node) const {
         for (auto const& layer : image->getLayers()) {
-            if ((_image_layers_on_disk.at(node).count(layer) == 0) and
-                (_image_layers_on_their_way_to_disk.at(node).count(layer) == 0)) {
+            if ((_node_states.at(node)._image_layers_on_disk.count(layer) == 0) and
+                (_node_states.at(node)._image_layers_on_their_way_to_disk.count(layer) == 0)) {
                 return false;
             }
         }
@@ -535,7 +530,7 @@ namespace wrench {
     std::set<std::shared_ptr<Container>> ServerlessSchedulingState::getIdleContainersAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
         std::set<std::shared_ptr<Container>> idle_containers;
-        for (auto const& container : _initialized_containers.at(node)) {
+        for (auto const& container : _node_states.at(node)._initialized_containers) {
             if (_num_possible_new_invocations_on_container.at(container) == container->getMaxNumInflightInvocations()) {
                 idle_containers.insert(container);
             }
