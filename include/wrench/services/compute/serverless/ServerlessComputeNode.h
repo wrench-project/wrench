@@ -93,7 +93,7 @@ namespace wrench {
         unsigned long _max_num_invocations_per_container;
 
         void killAllContainers();
-        void beginContainerIdlePeriod(const std::shared_ptr<Container>& container,
+        void beginContainerIdlePeriodOrShutdown(const std::shared_ptr<Container>& container,
                                       bool increment_idle_sequence);
     };
 

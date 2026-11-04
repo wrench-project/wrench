@@ -1034,16 +1034,9 @@ namespace wrench {
         container->_state = Container::State::INITIALIZED;
         compute_node->_initialized_containers.insert(container);
 
-
-        // What about an alarm?
+        // Making the container idle/shutdown?
         if (container->_in_flight_invocations.empty()) {
-            double idle_timeout = this->getPropertyValueAsTimeInSecond(
-                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
-            if (idle_timeout <= 0) {
-                compute_node->shutdownContainer(container);
-            } else {
-                compute_node->beginContainerIdlePeriod(container, false);
-            }
+           compute_node->beginContainerIdlePeriodOrShutdown(container, false);
         }
     }
 
