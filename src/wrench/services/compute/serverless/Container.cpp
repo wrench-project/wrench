@@ -306,6 +306,13 @@ namespace wrench {
     }
 
     /**
+     * @brief Increment the container's idle sequence
+     */
+    void Container::incrementIdleSequence() {
+        _idle_sequence += 1;
+    }
+
+    /**
      * @brief Clear the private storage's content
      */
     void Container::clearPrivateStorage() const {

@@ -68,6 +68,7 @@ namespace wrench {
 
         void spawn();
         void shutdown();
+        void incrementIdleSequence();
 
         void freeDiskAndMemoryResources();
 
