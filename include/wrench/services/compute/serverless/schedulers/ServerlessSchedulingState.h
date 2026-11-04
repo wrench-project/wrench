@@ -131,40 +131,6 @@ namespace wrench {
 
     	std::map<std::shared_ptr<ServerlessComputeNode>, NodePlanningState> _node_states;
 
-    	// /** @brief Number of possible new invocations that could be started on compute node */
-    	// std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_invocations_on_compute_node;
-     //
-    	// /** @brief Number of possible new containers that could be started on compute node */
-    	// std::map<std::shared_ptr<ServerlessComputeNode>, unsigned long> _num_possible_new_containers_on_compute_node;
-     //
-    	// /** @brief Map of RAM availability */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _ram_available;
-     //
-     //    /** @brief Map of disk availability */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> _disk_available;
-     //
-	    // /** @brief Map of initializing containers */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _initializing_containers;
-     //
-     //    /** @brief Map of initialized containers */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<Container>>> _initialized_containers;
-     //
-	    // /** @brief Map of on-disk image layers */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_disk;
-     //
-	    // /** @brief Map of soon-to-be-on-disk image layers */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_their_way_to_disk;
-     //
-	    // /** @brief Map of in-RAM image layers */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_in_ram;
-     //
-	    // /** @brief Map of soon-to-be-in-RAM image layers */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_their_way_to_ram;
-     //
-     //    /** @brief Map of layers that should not be evicted, due to previous scheduling decisions */
-     //    std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _protected_layers;
-
-
     };
 
         /***********************/
