@@ -83,7 +83,7 @@ namespace wrench {
      * @return The current number of containers
      */
     unsigned long ServerlessComputeNode::getTotalNumContainers() const {
-        return  _initializing_containers.size() + _initialized_containers.size();
+        return _initializing_containers.size() + _initialized_containers.size();
     }
 
     /**
@@ -173,7 +173,6 @@ namespace wrench {
      * @brief Method to kill all containers (brutally)
      */
     void ServerlessComputeNode::killAllContainers() {
-
         // Initializing containers
         for (auto const& container : _initializing_containers) {
             container->shutdown();
@@ -182,6 +181,36 @@ namespace wrench {
         // Ready containers
         for (auto const& container : _initialized_containers) {
             container->shutdown();
+        }
+    }
+
+    void ServerlessComputeNode::beginContainerIdlePeriodOrShutdown(const std::shared_ptr<Container>& container,
+                                                         bool increment_idle_sequence) {
+        auto idle_timeout = _serverless_compute_service->getPropertyValueAsTimeInSecond(
+            ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
+
+        if (idle_timeout <= 0) {
+            this->shutdownContainer(container);
+            return;
+        }
+
+        // Start the expiration alarm
+        auto now = S4U_Simulation::getClock();
+        container->_idle_date = now;
+        container->_expiration_date = idle_timeout == DBL_MAX ? DBL_MAX : now + idle_timeout;
+        if (increment_idle_sequence) {
+            container->incrementIdleSequence();
+        }
+        if (idle_timeout != DBL_MAX) {
+            container->_expiration_alarm = Alarm::createAndStartAlarm(
+                _serverless_compute_service->getSimulation(),
+                container->_expiration_date,
+                _serverless_compute_service->_hostname,
+                _serverless_compute_service->getCommPort(),
+                new
+                ServerlessComputeServiceContainerIdleTimeoutMessage(
+                    container, container->getIdleSequence()),
+                "container_idle_timout");
         }
     }
 
@@ -237,7 +266,7 @@ namespace wrench {
         auto container = invocation->_container;
         const bool was_idle = container->isInitialized() && container->_in_flight_invocations.empty();
         if (was_idle) {
-            container->_idle_sequence += 1;
+            container->incrementIdleSequence();
             if (container->_expiration_alarm) {
                 container->_expiration_alarm->kill();
             }
@@ -265,30 +294,9 @@ namespace wrench {
         auto container = invocation->_container;
         container->_in_flight_invocations.erase(invocation);
 
-        // Start the idle timer?
+        // Making the container idle/shutdown?
         if (container->_in_flight_invocations.empty()) {
-            double idle_timeout = _serverless_compute_service->getPropertyValueAsTimeInSecond(
-                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
-            if (idle_timeout <= 0) {
-                this->shutdownContainer(container);
-            } else {
-                // Start the expiration alarm
-                auto now = S4U_Simulation::getClock();
-                container->_idle_date = now;
-                container->_expiration_date = idle_timeout == DBL_MAX ? DBL_MAX : now + idle_timeout;
-                container->_idle_sequence++;
-                if (idle_timeout != DBL_MAX) {
-                    container->_expiration_alarm = Alarm::createAndStartAlarm(
-                        _serverless_compute_service->getSimulation(),
-                        container->_expiration_date,
-                        _serverless_compute_service->_hostname,
-                        _serverless_compute_service->getCommPort(),
-                        new
-                        ServerlessComputeServiceContainerIdleTimeoutMessage(
-                            container, container->getIdleSequence()),
-                        "container_idle_timout");
-                }
-            }
+            beginContainerIdlePeriodOrShutdown(container, true);
         }
     }
 
@@ -336,7 +344,6 @@ namespace wrench {
     bool ServerlessComputeNode::couldInvocationRunRightNow(
         const std::shared_ptr<Invocation>& invocation,
         const std::shared_ptr<Container>& target_container) const {
-
         // Sanity checks
         if (invocation->isDispatched()) {
             throw std::runtime_error(

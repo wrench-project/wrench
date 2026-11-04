@@ -39,13 +39,8 @@ namespace wrench {
      */
     class ServerlessComputeNode {
     public:
-
         ServerlessComputeNode(std::string h, ServerlessComputeService* service);
 
-        std::shared_ptr<Container> spawnContainer(const std::shared_ptr<Function>& function);
-        void acknowledgeInvocationStart(const std::shared_ptr<Invocation>& invocation);
-        void acknowledgeInvocationCompletion(const std::shared_ptr<Invocation>& invocation);
-        void shutdownContainer(const std::shared_ptr<Container>& container);
 
         [[nodiscard]] unsigned long getMaxNumInvocations() const;
         [[nodiscard]] unsigned long getMaxNumContainers() const;
@@ -75,7 +70,7 @@ namespace wrench {
         [[nodiscard]] bool isAtPerNodeInvocationLimit() const;
         [[nodiscard]] bool areAllContainersAtInvocationLimit() const;
 
-	/** @brief The hostname of the compute node */
+        /** @brief The hostname of the compute node */
         const std::string hostname;
 
     private:
@@ -93,8 +88,13 @@ namespace wrench {
         unsigned long _max_num_invocations_per_compute_node;
         unsigned long _max_num_invocations_per_container;
 
-         void killAllContainers();
-
+        void killAllContainers();
+        std::shared_ptr<Container> spawnContainer(const std::shared_ptr<Function>& function);
+        void shutdownContainer(const std::shared_ptr<Container>& container);
+        void beginContainerIdlePeriodOrShutdown(const std::shared_ptr<Container>& container,
+                                      bool increment_idle_sequence);
+        void acknowledgeInvocationStart(const std::shared_ptr<Invocation>& invocation);
+        void acknowledgeInvocationCompletion(const std::shared_ptr<Invocation>& invocation);
     };
 
     /***********************/

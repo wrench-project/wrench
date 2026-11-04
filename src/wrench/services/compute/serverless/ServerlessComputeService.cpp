@@ -1003,7 +1003,7 @@ namespace wrench {
     /**
      * @brief Process a container initialization completion
      * @param container The container
-     * @param init_action The container inititalization action
+     * @param init_action The container initialization action
      */
     void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
                                                                             const std::shared_ptr<Action>& init_action) {
@@ -1034,30 +1034,9 @@ namespace wrench {
         container->_state = Container::State::INITIALIZED;
         compute_node->_initialized_containers.insert(container);
 
-
-        // What about an alarm?
+        // Making the container idle/shutdown?
         if (container->_in_flight_invocations.empty()) {
-            double idle_timeout = this->getPropertyValueAsTimeInSecond(
-                ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT);
-            if (idle_timeout <= 0) {
-                compute_node->shutdownContainer(container);
-            } else {
-                auto now = S4U_Simulation::getClock();
-                container->_idle_date = now;
-                container->_expiration_date = idle_timeout == DBL_MAX ? DBL_MAX : now + idle_timeout;;
-                if (container->_expiration_date < DBL_MAX) {
-                    // Start the timeout alarm
-                    container->_expiration_alarm = Alarm::createAndStartAlarm(
-                        this->simulation_,
-                        container->_expiration_date,
-                        _hostname,
-                        _commport,
-                        new
-                        ServerlessComputeServiceContainerIdleTimeoutMessage(
-                            container, container->getIdleSequence()),
-                        "container_idle_timout");
-                }
-            }
+           compute_node->beginContainerIdlePeriodOrShutdown(container, false);
         }
     }
 
@@ -1109,7 +1088,6 @@ namespace wrench {
      */
     void ServerlessComputeService::processContainerIdleTimeout(const std::shared_ptr<Container>& container,
                                                                const std::uint64_t idle_sequence) {
-        WRENCH_INFO("WE GOT A CONTAINER TIME OUT");
         // If this isn't a stale/no-longer-valid message, nevermind
         if (container->getIdleSequence() != idle_sequence) {
             return;
