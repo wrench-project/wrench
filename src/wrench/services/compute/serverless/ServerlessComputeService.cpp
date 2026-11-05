@@ -1803,6 +1803,7 @@ namespace wrench {
             if (not _state_of_the_system->isImageLayerOnDiskAtNode(compute_node, layer)) {
                 WRENCH_INFO("Ignoring image layer load to RAM [layer: %s, node: %s] because the layer is not on disk",
                            layer->getName().c_str(), compute_node->hostname.c_str());
+                continue;
             }
             initiateImageLayerLoadAtComputeNode(compute_node, layer);
         }
