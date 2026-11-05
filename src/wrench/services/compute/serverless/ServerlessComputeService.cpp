@@ -1206,6 +1206,11 @@ namespace wrench {
      */
     void ServerlessComputeService::evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const {
         for (const auto& [layer, node] : decisions) {
+            if (_state_of_the_system->isImageLayerBeingLoadedAtNode(node, layer)) {
+                WRENCH_INFO("Ignoring layer eviction from RAM [layer %s, node%s], because the layer is being loaded to RAM!",
+                    layer->getName().c_str(), node->hostname.c_str());
+                continue;
+            }
             if (node->isImageLayerUsedByAnyContainer(layer)) {
                 WRENCH_INFO("Ignoring layer eviction from RAM [layer %s, node%s], because the layer is being used by a container!",
                     layer->getName().c_str(), node->hostname.c_str());
@@ -1791,9 +1796,13 @@ namespace wrench {
             if (std::find(_state_of_the_system->_activated_compute_nodes.begin(),
                           _state_of_the_system->_activated_compute_nodes.end(), compute_node) ==
                 _state_of_the_system->_activated_compute_nodes.end()) {
-                WRENCH_INFO("Ignoring image layer load scheduling decision at non-activated compute node %s",
-                            compute_node->hostname.c_str());
+                WRENCH_INFO("Ignoring image layer load [layer: %s, node: %s] because the node is not activated",
+                            layer->getName().c_str(), compute_node->hostname.c_str());
                 continue;
+            }
+            if (not _state_of_the_system->isImageLayerOnDiskAtNode(compute_node, layer)) {
+                WRENCH_INFO("Ignoring image layer load to RAM [layer: %s, node: %s] because the layer is not on disk",
+                           layer->getName().c_str(), compute_node->hostname.c_str());
             }
             initiateImageLayerLoadAtComputeNode(compute_node, layer);
         }
@@ -1810,8 +1819,13 @@ namespace wrench {
             if (std::find(_state_of_the_system->_activated_compute_nodes.begin(),
                           _state_of_the_system->_activated_compute_nodes.end(), compute_node) ==
                 _state_of_the_system->_activated_compute_nodes.end()) {
-                WRENCH_INFO("Ignoring image layer copy scheduling decision to non-activated compute node %s",
-                            compute_node->hostname.c_str());
+                WRENCH_INFO("Ignoring image layer copy [layer: %s, node: %s] because the node is not activated",
+                            layer->getName().c_str(), compute_node->hostname.c_str());
+                continue;
+            }
+            if (!_state_of_the_system->_head_storage_service->hasFile(layer->getFile())) {
+                WRENCH_INFO("Ignoring image layer copy [layer: %s, node: %s] because the layer is not on disk at the head node",
+                           layer->getName().c_str(), compute_node->hostname.c_str());
                 continue;
             }
             initiateImageLayerCopyToComputeNode(compute_node, layer);
@@ -1829,7 +1843,7 @@ namespace wrench {
             if (std::find(_state_of_the_system->_activated_compute_nodes.begin(),
                           _state_of_the_system->_activated_compute_nodes.end(), compute_node) ==
                 _state_of_the_system->_activated_compute_nodes.end()) {
-                WRENCH_INFO("Ignoring container pre-warming scheduling decision at non-activated compute node %s",
+                WRENCH_INFO("Ignoring container pre-warming [node: %s] because the node is not activated",
                             compute_node->hostname.c_str());
                 continue;
             }

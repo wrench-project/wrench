@@ -341,9 +341,9 @@ namespace wrench {
      */
     bool ServerlessComputeNode::isImageLayerUsedByAnyContainer(const std::shared_ptr<ImageLayer>& layer) const {
         bool used_by_any_container = false;
-        for (auto const& container_list :
-                    {this->getInitializingContainers(), this->getInitializedContainers()}) {
-            for (const auto&container: container_list) {
+        for (const auto* containers :
+                    {&(this->getInitializingContainers()), &(this->getInitializedContainers())}) {
+            for (const auto&container: *containers) {
                 if (container->getFunction()->getImage()->getLayers().count(layer)) {
                     used_by_any_container = true;
                     break;
