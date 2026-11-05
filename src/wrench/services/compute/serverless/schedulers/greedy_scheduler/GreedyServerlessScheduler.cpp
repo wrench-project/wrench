@@ -577,6 +577,8 @@ namespace wrench {
             for (const auto& idle_container : to_evict) {
                 eviction_decisions->idle_container_terminations.push_back(
                     {idle_container});
+                needed_ram -= std::min(needed_ram, idle_container->getFunction()->getRAMSpaceLimit());
+                needed_disk -= std::min(needed_disk, idle_container->getFunction()->getDiskSpaceLimit());
             }
         }
 
@@ -638,6 +640,8 @@ namespace wrench {
             for (auto const& victim : to_evict) {
                 // Mark this layer for eviction
                 eviction_decisions->layer_evictions_from_ram.push_back({victim, node});
+                needed_ram -= std::min(needed_ram, victim->getRAMFootprint());
+                needed_disk -= std::min(needed_disk, victim->getDiskFootprint());
             }
         }
 
@@ -666,6 +670,7 @@ namespace wrench {
             for (auto const& victim : to_evict) {
                 // Mark this layer for eviction
                 eviction_decisions->layer_evictions_from_disk.push_back({victim, node});
+                needed_disk -= std::min(needed_disk, victim->getDiskFootprint());
 
                 // If the layer is also in RAM, and not marked from eviction from RAM, then we must evict it
                 // (can't have a layer in RAM and not on disk)
@@ -680,7 +685,7 @@ namespace wrench {
                     }
                     if (not marked_for_eviction_from_ram) {
                         eviction_decisions->layer_evictions_from_ram.push_back({victim, node});
-                        needed_ram = (victim_ram_space > needed_ram ? 0 : needed_ram - victim_ram_space);
+                        needed_ram -= std::min(needed_ram, victim_ram_space);
                     }
                 }
             }

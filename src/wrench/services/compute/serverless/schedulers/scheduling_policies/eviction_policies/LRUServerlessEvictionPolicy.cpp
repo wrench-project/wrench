@@ -101,8 +101,8 @@ namespace wrench {
      */
     std::set<std::shared_ptr<Container>> LRUServerlessEvictionPolicy::pickIdleContainersForEviction(
         const std::set<std::shared_ptr<Container>>& idle_containers,
-        sg_size_t& ram_space_to_free_up,
-        sg_size_t& disk_space_to_free_up,
+        sg_size_t ram_space_to_free_up,
+        sg_size_t disk_space_to_free_up,
         unsigned long min_num_to_evict) {
         return pickVictimsLRU(
             idle_containers,
@@ -136,8 +136,8 @@ namespace wrench {
     std::set<std::shared_ptr<ImageLayer>> LRUServerlessEvictionPolicy::pickImageLayersForRAMEviction(
         const std::shared_ptr<ServerlessComputeNode>& node,
         const std::set<std::shared_ptr<ImageLayer>>& layers,
-        sg_size_t& ram_space_to_free_up,
-        sg_size_t& disk_space_to_free_up,
+        sg_size_t ram_space_to_free_up,
+        sg_size_t disk_space_to_free_up,
         unsigned long min_num_to_evict) {
         sg_size_t ignored_disk_deficit = 0;
 
@@ -172,8 +172,8 @@ namespace wrench {
     std::set<std::shared_ptr<ImageLayer>> LRUServerlessEvictionPolicy::pickImageLayersForDiskEviction(
         const std::shared_ptr<ServerlessComputeNode>& node,
         const std::set<std::shared_ptr<ImageLayer>>& layers,
-        sg_size_t& ram_space_to_free_up,
-        sg_size_t& disk_space_to_free_up,
+        sg_size_t ram_space_to_free_up,
+        sg_size_t disk_space_to_free_up,
         unsigned long min_num_to_evict) {
         sg_size_t ignored_ram_deficit = 0;
 
