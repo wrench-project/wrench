@@ -56,6 +56,8 @@ namespace wrench {
 
         [[nodiscard]] bool isImageLayerInRAM(const std::shared_ptr<ImageLayer>& layer) const;
 
+        [[nodiscard]] bool isImageLayerUsedByAnyContainer(const std::shared_ptr<ImageLayer>& layer) const;
+
         [[nodiscard]] bool couldInvocationRunRightNow(
             const std::shared_ptr<Invocation>& invocation,
             const std::shared_ptr<Container>& target_container) const;

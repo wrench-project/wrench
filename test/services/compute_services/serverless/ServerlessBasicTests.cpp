@@ -281,6 +281,15 @@ private:
         auto layer_file = wrench::Simulation::addFile("image_file", 100 * GB);
         auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
         auto layer = wrench::FunctionManager::createImageLayer("layer", layer_location, layer_file->getSize());
+
+        //Coverage
+        {auto ignore = layer->getCreationId(); }
+        {auto ignore = layer->getFile(); }
+        {auto ignore = layer->getLocation(); }
+        {auto ignore = layer->getName(); }
+        {auto ignore = layer->getDiskFootprint(); }
+        {auto ignore = layer->getRAMFootprint(); }
+
         auto image = wrench::FunctionManager::createImage("image", {layer});
         wrench::StorageService::createFileAtLocation(layer_location);
         try {

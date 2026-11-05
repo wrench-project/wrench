@@ -334,6 +334,28 @@ namespace wrench {
         return (this->_memory->hasFile(layer->getRAMFile()));
     }
 
+    /**
+     * @brief Determine if an image layer is being used by any container (initializing or initialized)
+     * @param layer An image layer
+     * @return true if the image layer is used by a container, false otherwise
+     */
+    bool ServerlessComputeNode::isImageLayerUsedByAnyContainer(const std::shared_ptr<ImageLayer>& layer) const {
+        bool used_by_any_container = false;
+        for (const auto* containers :
+                    {&(this->getInitializingContainers()), &(this->getInitializedContainers())}) {
+            for (const auto&container: *containers) {
+                if (container->getFunction()->getImage()->getLayers().count(layer)) {
+                    used_by_any_container = true;
+                    break;
+                }
+            }
+            if (used_by_any_container) {
+                break;
+            }
+        }
+        return used_by_any_container;
+    }
+
 
     /**
      * @brief Helper method to ensure that an invocation can be dispatched
