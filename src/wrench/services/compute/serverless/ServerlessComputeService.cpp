@@ -448,26 +448,6 @@ namespace wrench {
 
         bool do_scheduling = true;
         do {
-
-#if 0
-            // At each activated compute node, if an image layer is in RAM but not on Disk, due to what we did in the previous
-            // scheduling decisions, remove it from RAM (to be realistic).
-            // This is a hack, but, as of now, there is no way to "tie" two files together. This
-            // should never happen unless the scheduler is buggy, but better safe than sorry
-            for (auto const& node : _state_of_the_system->_activated_compute_nodes) {
-                for (auto const& rf : _state_of_the_system->_functions) {
-                    auto image = rf->getImage();
-                    for (auto const& layer : image->getLayers()) {
-                        if (node->isImageLayerInRAM(layer) and (not node->isImageLayerOnDisk(layer))) {
-                            StorageService::removeFileAtLocation(
-                                FileLocation::LOCATION(node->_memory, layer->getRAMFile()));
-                            _state_of_the_system->_image_layers_in_ram.at(node).erase(layer);
-                        }
-                    }
-                }
-            }
-#endif
-
             // Admit invocations whose images have or are being downloaded
             admitInvocations();
 
@@ -498,7 +478,7 @@ namespace wrench {
                 initiateImageLayerLoads(decisions->image_layer_loads_to_RAM);
                 // Do the image copies if any
                 initiateImageLayerCopies(decisions->image_layer_copies_to_disk);
-                // Prewarm containers if any
+                // Pre-warm containers if any
                 prewarmContainers(decisions->container_prewarms);
 
                 // Setup scheduler wake-up, if any
@@ -1226,6 +1206,11 @@ namespace wrench {
      */
     void ServerlessComputeService::evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const {
         for (const auto& [layer, node] : decisions) {
+            if (node->isImageLayerUsedByAnyContainer(layer)) {
+                WRENCH_INFO("Ignoring layer eviction from RAM [layer %s, node%s], because the layer is being used by a container!",
+                    layer->getName().c_str(), node->hostname.c_str());
+                continue;
+            }
             StorageService::removeFileAtLocation(FileLocation::LOCATION(node->_memory, layer->getRAMFile()));
             _state_of_the_system->_image_layers_in_ram.at(node).erase(layer);
         }
