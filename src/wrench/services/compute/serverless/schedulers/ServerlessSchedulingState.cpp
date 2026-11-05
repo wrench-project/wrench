@@ -20,11 +20,9 @@ namespace wrench {
         _activated_compute_nodes = state->getActivatedComputeNodes();
         _num_deactivated_compute_nodes = state->getNumDeactivatedComputeNodes();
         _num_being_activated_compute_nodes = state->getNumBeingActivatedComputeNodes();
-        for (auto const &[node, space] : state->getAvailableRAMSpace()) {
-            _node_states[node]._ram_available = space;
-        }
-        for (auto const &[node, space] : state->getAvailableDiskSpace()) {
-            _node_states[node]._disk_available = space;
+        for (auto const &node : _activated_compute_nodes) {
+            _node_states[node]._ram_available = node->getFreeRAMSpace();
+            _node_states[node]._disk_available = node->getFreeDiskSpace();
         }
 
         // Initialize the pending counts to the outstanding counts
