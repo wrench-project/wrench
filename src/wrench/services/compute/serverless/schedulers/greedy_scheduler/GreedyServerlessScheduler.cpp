@@ -641,7 +641,6 @@ namespace wrench {
                 // Mark this layer for eviction
                 eviction_decisions->layer_evictions_from_ram.push_back({victim, node});
                 needed_ram -= std::min(needed_ram, victim->getRAMFootprint());
-                needed_disk -= std::min(needed_disk, victim->getDiskFootprint());
             }
         }
 
