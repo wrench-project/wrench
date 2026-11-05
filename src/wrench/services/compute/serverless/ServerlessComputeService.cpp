@@ -448,6 +448,8 @@ namespace wrench {
 
         bool do_scheduling = true;
         do {
+
+#if 0
             // At each activated compute node, if an image layer is in RAM but not on Disk, due to what we did in the previous
             // scheduling decisions, remove it from RAM (to be realistic).
             // This is a hack, but, as of now, there is no way to "tie" two files together. This
@@ -464,6 +466,7 @@ namespace wrench {
                     }
                 }
             }
+#endif
 
             // Admit invocations whose images have or are being downloaded
             admitInvocations();
@@ -1234,6 +1237,24 @@ namespace wrench {
      */
     void ServerlessComputeService::evictLayersFromDisk(const std::vector<EvictLayerFromDisk>& decisions) const {
         for (const auto& [layer, node] : decisions) {
+            // Ignore if the layer is currently being copied to node
+            if (_state_of_the_system->isImageLayerBeingCopiedToNode(node, layer)) {
+                WRENCH_INFO("Ignoring layer eviction from disk [layer %s, node%s], because the layer is being copied to disk!",
+                    layer->getName().c_str(), node->hostname.c_str());
+                continue;
+            }
+            // Ignore if the layer is currently being loaded to RAM
+            if (_state_of_the_system->isImageLayerBeingLoadedAtNode(node, layer)) {
+                WRENCH_INFO("Ignoring layer eviction from disk [layer %s, node%s], because the layer is being loaded to RAM!",
+                   layer->getName().c_str(), node->hostname.c_str());
+                continue;
+            }
+            // Ignore if the layer is currently in RAM
+            if (_state_of_the_system->isImageLayerInRAMAtNode(node, layer)) {
+                WRENCH_INFO("Ignoring layer eviction from disk [layer %s, node%s], because the layer is in RAM!",
+                  layer->getName().c_str(), node->hostname.c_str());
+                continue;
+            }
             StorageService::removeFileAtLocation(FileLocation::LOCATION(node->_disk, layer->getFile()));
             _state_of_the_system->_image_layers_on_disk.at(node).erase(layer);
         }
@@ -1303,7 +1324,6 @@ namespace wrench {
                     throw;
                 }
             }
-
 
             // Invoke the user's lambda function
             invocation->_function_start_date = S4U_Simulation::getClock();
