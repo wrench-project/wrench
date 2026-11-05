@@ -593,7 +593,7 @@ namespace wrench {
 
         // Layers used by initializing containers cannot be evicted
         for (auto& container : scheduling_state->getInitializingContainers(node)) {
-            auto layers = container->getFunction()->getImage()->getLayers();
+            const auto& layers = container->getFunction()->getImage()->getLayers();
             non_evictable_layers.insert(layers.begin(), layers.end());
         }
 
@@ -609,76 +609,9 @@ namespace wrench {
             if (is_container_to_be_evicted) {
                 continue;
             }
-            auto layers = container->getFunction()->getImage()->getLayers();
+            const auto& layers = container->getFunction()->getImage()->getLayers();
             non_evictable_layers.insert(layers.begin(), layers.end());
         }
-
-        // for (const auto& activate_layer_lists:
-        //     {scheduling_state->getImageLayersInRAM(node),
-        //         scheduling_state->getImageLayersOnDisk(node)}) {
-        //     for (auto const& candidate : activate_layer_lists) {
-        //         // Perhaps it's being used by an idle container that's not marked for eviction?
-        //         bool is_victim_layer_evictable = true;
-        //         for (auto& container : scheduling_state->getIdleContainersAtComputeNode(node)) {
-        //             bool is_container_to_be_evicted = false;
-        //             for (auto const& [container_to_be_evicted] : eviction_decisions->idle_container_terminations) {
-        //                 if (container_to_be_evicted == container) {
-        //                     is_container_to_be_evicted = true;
-        //                     break;
-        //                 }
-        //             }
-        //
-        //             // If the container is to be evicted, we're always fine
-        //             if (is_container_to_be_evicted) {
-        //                 continue;
-        //             }
-        //
-        //             // If the container uses the layer, then the layer cannot be evicted
-        //             if (container->getFunction()->getImage()->getLayers().count(candidate)) {
-        //                 is_victim_layer_evictable = false;
-        //                 break;
-        //             }
-        //         }
-        //         if (not is_victim_layer_evictable) {
-        //             non_evictable_layers.insert(candidate);
-        //             continue;
-        //         }
-        //
-        //         // Perhaps it's being used by an initializing container?
-        //         is_victim_layer_evictable = true;
-        //         for (auto& container : scheduling_state->getInitializingContainers(node)) {
-        //             // If the container uses the layer, then the layer cannot be evicted
-        //             if (container->getFunction()->getImage()->getLayers().count(candidate)) {
-        //                 is_victim_layer_evictable = false;
-        //                 break;
-        //             }
-        //         }
-        //         // Perhaps it's being used by an initialized container?
-        //         for (auto& container : scheduling_state->getInitializedContainers(node)) {
-        //             // If the container is to be evicted, we're always fine
-        //             bool is_container_to_be_evicted = false;
-        //             for (auto const& [container_to_be_evicted] : eviction_decisions->idle_container_terminations) {
-        //                 if (container_to_be_evicted == container) {
-        //                     is_container_to_be_evicted = true;
-        //                     break;
-        //                 }
-        //             }
-        //             if (is_container_to_be_evicted) {
-        //                 continue;
-        //             }
-        //             // If the container uses the layer, then the layer cannot be evicted
-        //             if (container->getFunction()->getImage()->getLayers().count(candidate)) {
-        //                 is_victim_layer_evictable = false;
-        //                 break;
-        //             }
-        //         }
-        //         if (not is_victim_layer_evictable) {
-        //             non_evictable_layers.insert(candidate);
-        //             continue;
-        //         }
-        //     }
-        // }
-
 
         /** Try to evict layers from RAM to create space **/
         {
@@ -712,9 +645,7 @@ namespace wrench {
         {
             // Build a list of candidate layers for eviction
             std::set<std::shared_ptr<ImageLayer>> candidate_victims;
-
             for (auto const& candidate : scheduling_state->getImageLayersOnDisk(node)) {
-
                 if (non_evictable_layers.count(candidate) > 0) {
                     continue;
                 }
@@ -724,7 +655,6 @@ namespace wrench {
                 if ((not needed_disk) or (not candidate_disk_space)) {
                     continue;
                 }
-
                 candidate_victims.insert(candidate);
             }
 
