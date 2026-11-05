@@ -322,6 +322,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode26isAtPerNodeInvocationLimitEv"><code class="docutils literal notranslate"><span class="pre">isAtPerNodeInvocationLimit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode17isImageLayerInRAMERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">isImageLayerInRAM()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode18isImageLayerOnDiskERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">isImageLayerOnDisk()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench21ServerlessComputeNode30isImageLayerUsedByAnyContainerERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">isImageLayerUsedByAnyContainer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench21ServerlessComputeNode8hostnameE"><code class="docutils literal notranslate"><span class="pre">hostname</span></code></a></li>
 </ul>
 </li>
@@ -718,6 +719,20 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the image is on disk </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6wrench21ServerlessComputeNode30isImageLayerUsedByAnyContainerERKNSt10shared_ptrI10ImageLayerEE">
+<span id="_CPPv3NK6wrench21ServerlessComputeNode30isImageLayerUsedByAnyContainerERKNSt10shared_ptrI10ImageLayerEE"></span><span id="_CPPv2NK6wrench21ServerlessComputeNode30isImageLayerUsedByAnyContainerERKNSt10shared_ptrI10ImageLayerEE"></span><span id="wrench::ServerlessComputeNode::isImageLayerUsedByAnyContainer__std::shared_ptr:ImageLayer:CRC"></span><span class="target" id="classwrench_1_1_serverless_compute_node_1ad70b51cf74c7b3b2d1876bd001e78063"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isImageLayerUsedByAnyContainer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">layer</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench21ServerlessComputeNode30isImageLayerUsedByAnyContainerERKNSt10shared_ptrI10ImageLayerEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Determine if an image layer is being used by any container (initializing or initialized). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>layer</strong> – An image layer </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if the image layer is used by a container, false otherwise </p>
 </dd>
 </dl>
 </dd></dl>
