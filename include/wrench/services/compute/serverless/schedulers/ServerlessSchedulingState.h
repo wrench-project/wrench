@@ -34,6 +34,7 @@ namespace wrench {
     	/**
 		* Accessor Functions
 		*/
+    	std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>& getAdmittedInvocations();
     	std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations();
     	[[nodiscard]] const std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts() const;
     	[[nodiscard]] unsigned long getNumInFlightInvocationsOnContainer(const std::shared_ptr<Container>& container) const;

@@ -80,6 +80,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the admitted invocations (images not yet downloaded to the head node)
+     * @return A (reference to) the map of admitted invocations (keyed by Image)
+     */
+    std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>& ServerlessSchedulingState::getAdmittedInvocations() {
+        return _admitted_invocations;
+    }
+
+    /**
      * @brief Get the schedulable invocations
      * @return A (reference to) the list of schedulable invocations
      */
