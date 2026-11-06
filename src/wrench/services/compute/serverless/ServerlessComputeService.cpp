@@ -2107,12 +2107,12 @@ namespace wrench {
             }
         }
         // Check that there is enough disk/RAM space to start the new container
-        if (_state_of_the_system->getAvailableDiskSpace().at(compute_node) < function->getDiskSpaceLimit()) {
+        if (compute_node->getFreeDiskSpace() < function->getDiskSpaceLimit()) {
             WRENCH_INFO("Couldn't pre-warm container for function %s at node %s due to lack of available disk space",
                         function->getName().c_str(), compute_node->hostname.c_str());
             return;
         }
-        if (_state_of_the_system->getAvailableRAMSpace().at(compute_node) < function->getRAMSpaceLimit()) {
+        if (compute_node->getFreeRAMSpace() < function->getRAMSpaceLimit()) {
             WRENCH_INFO("Couldn't pre-warm container for function %s at node %s due to lack of available RAM space",
                         function->getName().c_str(), compute_node->hostname.c_str());
             return;

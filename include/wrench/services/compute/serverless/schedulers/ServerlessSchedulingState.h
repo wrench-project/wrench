@@ -34,22 +34,23 @@ namespace wrench {
     	/**
 		* Accessor Functions
 		*/
-    	std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations();
-    	const std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts() const;
-    	unsigned long getNumInFlightInvocationsOnContainer(const std::shared_ptr<Container>& container) const;
+    	[[nodiscard]] const std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>& getAdmittedInvocations() const;
+    	[[nodiscard]] std::vector<std::shared_ptr<Invocation>>& getSchedulableInvocations();
+    	[[nodiscard]] const std::map<std::shared_ptr<Function>, unsigned long>& getPendingInvocationCounts() const;
+    	[[nodiscard]] unsigned long getNumInFlightInvocationsOnContainer(const std::shared_ptr<Container>& container) const;
     	[[nodiscard]] const std::vector<std::shared_ptr<ServerlessComputeNode>>& getActivatedComputeNodes();
     	[[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
     	[[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
-    	const std::set<std::shared_ptr<Container>>& getInitializedContainers(const std::shared_ptr<ServerlessComputeNode>& node);
-    	const std::set<std::shared_ptr<Container>>& getInitializingContainers(const std::shared_ptr<ServerlessComputeNode>& node);
-    	unsigned long getNumPossibleNewInvocationsAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
-    	unsigned long getNumPossibleNewInvocationsOnContainer(const std::shared_ptr<Container>& container) const;
-    	unsigned long getNumPossibleNewContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
-    	const std::set<std::shared_ptr<ImageLayer>>& getProtectedImageLayers(const std::shared_ptr<ServerlessComputeNode>& node);
-    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnDisk(const std::shared_ptr<ServerlessComputeNode>& node);
-    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToDisk(const std::shared_ptr<ServerlessComputeNode>& node);
-    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersInRAM(const std::shared_ptr<ServerlessComputeNode>& node);
-    	const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToRAM(const std::shared_ptr<ServerlessComputeNode>& node) const;
+    	[[nodiscard]] const std::set<std::shared_ptr<Container>>& getInitializedContainers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	[[nodiscard]] const std::set<std::shared_ptr<Container>>& getInitializingContainers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	[[nodiscard]] unsigned long getNumPossibleNewInvocationsAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
+    	[[nodiscard]] unsigned long getNumPossibleNewInvocationsOnContainer(const std::shared_ptr<Container>& container) const;
+    	[[nodiscard]] unsigned long getNumPossibleNewContainersAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node) const;
+    	[[nodiscard]] const std::set<std::shared_ptr<ImageLayer>>& getProtectedImageLayers(const std::shared_ptr<ServerlessComputeNode>& node);
+    	[[nodiscard]] const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnDisk(const std::shared_ptr<ServerlessComputeNode>& node);
+    	[[nodiscard]] const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToDisk(const std::shared_ptr<ServerlessComputeNode>& node);
+    	[[nodiscard]] const std::set<std::shared_ptr<ImageLayer>>& getImageLayersInRAM(const std::shared_ptr<ServerlessComputeNode>& node);
+    	[[nodiscard]] const std::set<std::shared_ptr<ImageLayer>>& getImageLayersOnTheirWayToRAM(const std::shared_ptr<ServerlessComputeNode>& node) const;
     	[[nodiscard]] sg_size_t getRAMSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const;
     	[[nodiscard]] sg_size_t getDiskSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const;
 
@@ -99,10 +100,6 @@ namespace wrench {
 
     	/** @brief The number of compute nodes in the process of being activated */
     	unsigned long _num_being_activated_compute_nodes;
-
-
-    	/** @brief Number of possible new invocations that could be started on a current container */
-    	std::map<std::shared_ptr<Container>, unsigned long> _num_possible_new_invocations_on_container;
 
     	/**
 		 * @brief Planned in-flight invocation counts for existing initialized

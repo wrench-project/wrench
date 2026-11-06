@@ -20,11 +20,9 @@ namespace wrench {
         _activated_compute_nodes = state->getActivatedComputeNodes();
         _num_deactivated_compute_nodes = state->getNumDeactivatedComputeNodes();
         _num_being_activated_compute_nodes = state->getNumBeingActivatedComputeNodes();
-        for (auto const &[node, space] : state->getAvailableRAMSpace()) {
-            _node_states[node]._ram_available = space;
-        }
-        for (auto const &[node, space] : state->getAvailableDiskSpace()) {
-            _node_states[node]._disk_available = space;
+        for (auto const &node : _activated_compute_nodes) {
+            _node_states[node]._ram_available = node->getFreeRAMSpace();
+            _node_states[node]._disk_available = node->getFreeDiskSpace();
         }
 
         // Initialize the pending counts to the outstanding counts
@@ -44,8 +42,6 @@ namespace wrench {
                 _num_in_flight_invocations_on_container[container] = num_in_flight_invocations;
                 _pending_invocation_counts[function] -= num_in_flight_invocations;
                 num_total_ongoing_invocations += num_in_flight_invocations;
-                _num_possible_new_invocations_on_container[container] =
-                    container->getMaxNumInflightInvocations() - num_in_flight_invocations;
             }
             for (const auto& container : node->getInitializingContainers()) {
                 auto function = container->getFunction();
@@ -81,6 +77,14 @@ namespace wrench {
                 _node_states[node]._initialized_containers.insert(container);
             }
         }
+    }
+
+    /**
+     * @brief Get the admitted invocations (images not yet downloaded to the head node)
+     * @return A (reference to) the map of admitted invocations (keyed by Image)
+     */
+    const std::map<std::shared_ptr<Image>, std::vector<std::shared_ptr<Invocation>>>& ServerlessSchedulingState::getAdmittedInvocations() const {
+        return _admitted_invocations;
     }
 
     /**
@@ -171,7 +175,7 @@ namespace wrench {
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsOnContainer(
         const std::shared_ptr<Container>& container) const {
-        return _num_possible_new_invocations_on_container.at(container);
+        return container->getMaxNumInflightInvocations() - _num_in_flight_invocations_on_container.at(container);
     }
 
     /**
@@ -271,7 +275,6 @@ namespace wrench {
         // Remove node's container
         for (const auto& container :
              _node_states.at(node)._initialized_containers) {
-            _num_possible_new_invocations_on_container.erase(container);
             _num_in_flight_invocations_on_container.erase(container);
         }
 
@@ -326,7 +329,6 @@ namespace wrench {
         _node_states.at(node)._disk_available += container->getFunction()->getDiskSpaceLimit();
         _node_states.at(node)._num_possible_new_containers += 1;
         _node_states.at(node)._initialized_containers.erase(container);
-        _num_possible_new_invocations_on_container.erase(container);
         _num_in_flight_invocations_on_container.erase(container);
     }
 
@@ -385,7 +387,6 @@ namespace wrench {
                                                            const std::shared_ptr<ServerlessComputeNode>& node,
                                                            const std::shared_ptr<Container>& container) {
         if (container) {
-            _num_possible_new_invocations_on_container.at(container) -= 1;
             _num_in_flight_invocations_on_container.at(container) += 1;
         } else {
             // The selected plan's container terminations have already been credited.
@@ -531,7 +532,7 @@ namespace wrench {
         const std::shared_ptr<ServerlessComputeNode>& node) const {
         std::set<std::shared_ptr<Container>> idle_containers;
         for (auto const& container : _node_states.at(node)._initialized_containers) {
-            if (_num_possible_new_invocations_on_container.at(container) == container->getMaxNumInflightInvocations()) {
+            if (_num_in_flight_invocations_on_container.at(container) == 0) {
                 idle_containers.insert(container);
             }
         }

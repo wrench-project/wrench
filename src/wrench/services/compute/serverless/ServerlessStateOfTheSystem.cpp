@@ -70,36 +70,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter for the map of available RAM for activated compute nodes. Note that RAM is managed in an LRU fashion, so it's
-     *        not because RAM is full that nothing can be done, perhaps.
-     *
-     * @return The RAM availability map
-     */
-    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t>
-    ServerlessStateOfTheSystem::getAvailableRAMSpace() const {
-        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
-        for (const auto& compute_node : _activated_compute_nodes) {
-            to_return[compute_node] = compute_node->getMemoryStorage()->getTotalFreeSpaceZeroTime();
-        }
-        return to_return;
-    }
-
-    /**
-     * @brief Getter for the map of available disk space for activated compute nodes. Note that Disk space is managed in an LRU fashion, so it's
-     *        not because a disk is full that nothing can be done, perhaps.
-     *
-     * @return The RAM availability map
-     */
-    std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t>
-    ServerlessStateOfTheSystem::getAvailableDiskSpace() const {
-        std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> to_return;
-        for (const auto& compute_node : _activated_compute_nodes) {
-            to_return[compute_node] = compute_node->getDiskStorage()->getTotalFreeSpaceZeroTime();
-        }
-        return to_return;
-    }
-
-    /**
      * @brief Get the current image layers being copied to a node
      *
      * @param node the compute node

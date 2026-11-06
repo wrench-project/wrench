@@ -36,9 +36,6 @@ namespace wrench {
         [[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
         [[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
 
-        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableRAMSpace() const;
-        [[nodiscard]] std::map<std::shared_ptr<ServerlessComputeNode>, sg_size_t> getAvailableDiskSpace() const;
-
         [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingCopiedToNode(
             const std::shared_ptr<ServerlessComputeNode>& node) const;
         [[nodiscard]] bool isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
