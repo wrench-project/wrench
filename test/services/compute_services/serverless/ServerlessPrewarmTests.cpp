@@ -119,7 +119,7 @@ protected:
 
             switch (called) {
             case 4:
-                decisions->image_layer_copies_to_disk.push_back({layer, compute_node});
+                decisions->image_layer_stagings_to_disk.push_back({layer, compute_node});
                 break;
             case 5:
                 decisions->image_layer_loads_to_RAM.push_back({layer, compute_node});

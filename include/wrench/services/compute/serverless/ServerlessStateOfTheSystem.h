@@ -36,11 +36,11 @@ namespace wrench {
         [[nodiscard]] unsigned long getNumDeactivatedComputeNodes() const;
         [[nodiscard]] unsigned long getNumBeingActivatedComputeNodes() const;
 
-        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingCopiedToNode(
+        [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersBeingStagedToNode(
             const std::shared_ptr<ServerlessComputeNode>& node) const;
         [[nodiscard]] bool isImageLayerOnDiskAtNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                     const std::shared_ptr<ImageLayer>& layer) const;
-        [[nodiscard]] bool isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
+        [[nodiscard]] bool isImageLayerBeingStagedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                          const std::shared_ptr<ImageLayer>& layer) const;
         [[nodiscard]] std::set<std::shared_ptr<ImageLayer>> getImageLayersOnDiskAtNode(
             const std::shared_ptr<ServerlessComputeNode>& node) const;
@@ -101,7 +101,7 @@ namespace wrench {
         _image_layers_being_loaded_in_ram;
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>> _image_layers_on_disk;
         std::map<std::shared_ptr<ServerlessComputeNode>, std::set<std::shared_ptr<ImageLayer>>>
-        _image_layers_being_copied_to_disk;
+        _image_layers_being_staged_to_disk;
 
         // The compute service this is for
         ServerlessComputeService* _serverless_compute_service;

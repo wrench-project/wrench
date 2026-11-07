@@ -69,15 +69,15 @@ namespace wrench {
     };
 
     /**
-     * @brief A structure to encode an image-layer-copy scheduling decision
+     * @brief A structure to encode an image-layer-staging (i.e., put it on the disk of a compute node) scheduling decision
      */
-    struct CopyImageLayer {
+    struct StageImageLayer {
         /**
-         * @brief The image layer to copy
+         * @brief The image layer to stage
          */
         std::shared_ptr<ImageLayer> layer;
         /**
-         * @brief The compute node to copy the image layer to
+         * @brief The compute node to stage the image layer to
          */
         std::shared_ptr<ServerlessComputeNode> compute_node;
     };
@@ -149,7 +149,7 @@ namespace wrench {
      *        - Which idle container to terminate
      *        - Which layer to evict from RAM
      *        - Which layer to evict from disk
-     *        - Which images should be copied from the head node to compute nodes' disks, initiated right now
+     *        - Which images should be staged compute nodes' disks, initiated right now
      *        - Which images should be loaded into compute node's RAMs, initiated right now
      *        - Which invocations should be dispatched right now
      */
@@ -167,8 +167,8 @@ namespace wrench {
         std::vector<EvictLayerFromRAM> layer_evictions_from_ram;
         /** @brief The list of layer from disk evictions */
         std::vector<EvictLayerFromDisk> layer_evictions_from_disk;
-        /** @brief The list of image layer copies to storage at compute nodes */
-        std::vector<CopyImageLayer> image_layer_copies_to_disk;
+        /** @brief The list of image layer staging to storage at compute nodes */
+        std::vector<StageImageLayer> image_layer_stagings_to_disk;
         /** @brief The list of image layer loads in RAM at compute nodes */
         std::vector<LoadImageLayer> image_layer_loads_to_RAM;
         /** @brief The list of function invocations at compute nodes */
@@ -201,7 +201,7 @@ namespace wrench {
          *   - which idle containers to terminate
          *   - which layers to evict from RAM
          *   - which layers to evict from disk
-         *   - which layers to copy to compute nodes
+         *   - which layers to stage at compute nodes
          *   - which layers to load into memory at compute nodes
          *   - which invocations to dispatch at compute nodes
          *   - which containers to prewarm at compute nodes

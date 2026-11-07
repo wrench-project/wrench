@@ -69,7 +69,7 @@ namespace wrench {
     	void planLayerEvictionFromDisk(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
     	void planInvocationDispatch(const std::shared_ptr<Invocation>& inv, const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Container>& container);
     	void planLayerLoadToRAM(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
-    	void planLayerCopyToDisk(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
+    	void planLayerStagingToDisk(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<ImageLayer>& layer);
     	void planContainerPrewarm(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Function>& function);
 
         /**

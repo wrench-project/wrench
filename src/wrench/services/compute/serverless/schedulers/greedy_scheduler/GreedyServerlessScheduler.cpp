@@ -179,7 +179,7 @@ namespace wrench {
      *
      * A pending invocation need not receive an operation in this round. In
      * particular, choosing to wait for an existing transfer protects its layers
-     * but does not reserve invocation capacity or bind it to that node. Copies
+     * but does not reserve invocation capacity or bind it to that node. Stagings
      * and loads do not become completed residency changes during planning.
      *
      * The returned operations are intentions for the service to apply, not
@@ -273,9 +273,9 @@ namespace wrench {
             }
 
             // Image layer copies
-            for (const auto& [layer,_] : node_decisions->image_layer_copies_to_disk) {
-                decisions->image_layer_copies_to_disk.push_back({layer, target_node});
-                scheduling_state->planLayerCopyToDisk(target_node, layer);
+            for (const auto& [layer,_] : node_decisions->image_layer_stagings_to_disk) {
+                decisions->image_layer_stagings_to_disk.push_back({layer, target_node});
+                scheduling_state->planLayerStagingToDisk(target_node, layer);
 
             }
         }
@@ -471,7 +471,7 @@ namespace wrench {
         }
 
         // Pass 6: Can we just trigger ALL layer copies (with some desirable eviction actions)
-        std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>> copy_plan;
+        std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>> staging_plan;
         for (auto const& node : candidate_nodes) {
             if (scheduling_state->areAllImageLayersOnDisk(image, node)) continue;
 
@@ -481,9 +481,9 @@ namespace wrench {
                 if (scheduling_state->getImageLayersOnDisk(node).count(layer)) continue;
                 if (scheduling_state->getImageLayersOnTheirWayToDisk(node).count(layer)) continue;
                 disk_needed += layer->getDiskFootprint();
-                decisions->image_layer_copies_to_disk.push_back({layer, node}); // tentatively
+                decisions->image_layer_stagings_to_disk.push_back({layer, node}); // tentatively
             }
-            if (decisions->image_layer_copies_to_disk.empty()) {
+            if (decisions->image_layer_stagings_to_disk.empty()) {
                 throw std::runtime_error("Pass #6: This should not have happened");
             }
             std::shared_ptr<ServerlessSchedulingDecisions> eviction_plan = makeEvictionPlan(node,
@@ -498,13 +498,13 @@ namespace wrench {
             decisions->idle_container_terminations = eviction_plan->idle_container_terminations;
             decisions->layer_evictions_from_ram = eviction_plan->layer_evictions_from_ram;
             decisions->layer_evictions_from_disk = eviction_plan->layer_evictions_from_disk;
-            copy_plan.emplace(node, decisions);
+            staging_plan.emplace(node, decisions);
         }
         // Second, pick the node with the best plan
-        if (not copy_plan.empty()) {
-            picked_node = _plan_selection_policy->pickBestLayerCopyPlan(copy_plan);
+        if (not staging_plan.empty()) {
+            picked_node = _plan_selection_policy->pickBestLayerStagingPlan(staging_plan);
             if (picked_node) {
-                return {picked_node, copy_plan.at(picked_node)};
+                return {picked_node, staging_plan.at(picked_node)};
             }
         }
 

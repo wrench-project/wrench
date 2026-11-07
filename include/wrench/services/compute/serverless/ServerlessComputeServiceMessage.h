@@ -177,19 +177,19 @@ namespace wrench {
     };
 
     /**
-     * @brief a message sent to a ServerlessComputeService to notify it that a copy towards a compute node has completed
+     * @brief a message sent to a ServerlessComputeService to notify it that a layer staging at a compute node has completed
      */
-    class ServerlessComputeServiceNodeCopyCompleteMessage : public ServerlessComputeServiceMessage {
+    class ServerlessComputeServiceLayerStagingCompleteMessage : public ServerlessComputeServiceMessage {
     public:
-        ServerlessComputeServiceNodeCopyCompleteMessage(std::shared_ptr<CustomAction> action,
+        ServerlessComputeServiceLayerStagingCompleteMessage(std::shared_ptr<CustomAction> action,
                                                         std::shared_ptr<ImageLayer> layer,
                                                         std::shared_ptr<ServerlessComputeNode> compute_node,
                                                         sg_size_t payload);
-        /** @brief The action that did the copy */
+        /** @brief The action that did the staging */
         std::shared_ptr<CustomAction> _action;
-        /** @brief The image layer that was copied */
+        /** @brief The image layer that was staged */
         std::shared_ptr<ImageLayer> _layer;
-        /** @brief The compute node on which the image was copied to */
+        /** @brief The compute node on which the image was staged */
         std::shared_ptr<ServerlessComputeNode> _compute_node;
     };
 
@@ -202,7 +202,7 @@ namespace wrench {
                                                         std::shared_ptr<ImageLayer> layer,
                                                         std::shared_ptr<ServerlessComputeNode> compute_node,
                                                         sg_size_t payload);
-        /** @brief The action that did the copy */
+        /** @brief The action that did the loading */
         std::shared_ptr<CustomAction> _action;
         /** @brief The image layer that was loaded */
         std::shared_ptr<ImageLayer> _layer;

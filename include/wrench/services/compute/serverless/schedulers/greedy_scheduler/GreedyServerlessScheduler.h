@@ -74,12 +74,12 @@ namespace wrench {
      * 4. Construct alternatives that initiate the remaining RAM loads on nodes
      *    where every required layer is already on disk.
      * 5. Select the first node where some required disk residency is still
-     *    missing, but every missing layer is already being copied.
-     * 6. Construct alternatives that initiate the remaining disk copies.
+     *    missing, but every missing layer is already being staged.
+     * 6. Construct alternatives that initiate the remaining stagings.
      *
      * The first pass that selects a node determines the outcome for this
      * invocation. The plan-selection policy compares alternatives within the
-     * cold-dispatch, RAM-load, and disk-copy passes; it does not compare plans
+     * cold-dispatch, RAM-load, and disk-staging passes; it does not compare plans
      * across readiness levels or override the reusable-container decision.
      *
      * @par Working state and capacity accounting
@@ -123,7 +123,7 @@ namespace wrench {
      *
      * Layers needed by the invocation, earlier chosen plans, ongoing transfers,
      * or containers retained by the tentative plan are excluded as appropriate.
-     * Evicting a disk layer also requires removal of its RAM copy when present.
+     * Evicting a disk layer also requires removal of its in-RAM copy when present.
      * Reclamation is feasible only if it satisfies the required byte deficits
      * and frees enough container positions.
      *
@@ -160,7 +160,7 @@ namespace wrench {
      * applies decision categories in its own order and performs its runtime
      * checks. The batch is not an atomic transaction. Dependencies on operation
      * completion are handled through later scheduling rounds, not by assuming
-     * that a requested copy, load, initialization, or activation is complete.
+     * that a requested staging, load, initialization, or activation is complete.
      *
      * @see ServerlessScheduler
      * @see ServerlessSchedulingState

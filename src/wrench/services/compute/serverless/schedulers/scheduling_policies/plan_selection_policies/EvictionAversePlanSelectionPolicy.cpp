@@ -22,7 +22,7 @@ namespace wrench {
                 plan->layer_evictions_from_disk.size(),
                 plan->layer_evictions_from_ram.size(),
                 plan->idle_container_terminations.size(),
-                plan->image_layer_copies_to_disk.size(),
+                plan->image_layer_stagings_to_disk.size(),
                 plan->image_layer_loads_to_RAM.size());
         };
 
@@ -70,11 +70,11 @@ namespace wrench {
     }
 
     /**
-    * @brief Select the node that has the best layer-copy plan
+    * @brief Select the node that has the best layer-staging plan
     * @param plans a map of plans
     * @return a compute node
     */
-    std::shared_ptr<ServerlessComputeNode> EvictionAversePlanSelectionPolicy::pickBestLayerCopyPlan(
+    std::shared_ptr<ServerlessComputeNode> EvictionAversePlanSelectionPolicy::pickBestLayerStagingPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);

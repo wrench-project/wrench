@@ -31,7 +31,7 @@ namespace wrench {
         std::shared_ptr<ServerlessComputeNode> pickBestLayerLoadPlan(
             const std::map<std::shared_ptr<ServerlessComputeNode>,
                            std::shared_ptr<ServerlessSchedulingDecisions>>& plans) override;
-        std::shared_ptr<ServerlessComputeNode> pickBestLayerCopyPlan(
+        std::shared_ptr<ServerlessComputeNode> pickBestLayerStagingPlan(
             const std::map<std::shared_ptr<ServerlessComputeNode>,
                            std::shared_ptr<ServerlessSchedulingDecisions>>& plans) override;
 
