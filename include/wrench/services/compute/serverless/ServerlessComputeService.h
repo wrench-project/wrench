@@ -254,6 +254,8 @@ namespace wrench {
         std::shared_ptr<Alarm> _scheduler_wakeup_alarm;
         std::set<std::shared_ptr<Alarm>> _node_activation_alarms;
 
+        bool _cache_layers_on_head_node;
+
 
 
         /***********************/

@@ -105,6 +105,10 @@ namespace wrench {
         // Set default and specified properties
         this->setProperties(this->default_property_values, property_list);
 
+        // Parse the CACHE_IMAGES_ON_HEAD_NODE property
+        _cache_layers_on_head_node = this->getPropertyValueAsBoolean(
+            ServerlessComputeServiceProperty::CACHE_IMAGES_ON_HEAD_NODE);
+
         // Deal with the 0-value defaults
         if (this->getPropertyValueAsUnsignedLong(
                 ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE)
