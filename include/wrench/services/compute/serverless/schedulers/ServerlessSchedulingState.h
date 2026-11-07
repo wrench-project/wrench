@@ -55,11 +55,13 @@ namespace wrench {
     	[[nodiscard]] sg_size_t getDiskSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const;
 
     	/**
-		 * Update this planning snapshot to account for already-selected operations.
+		 * Update this planning snapshot after operations or waiting choices have
+		 * been selected.
 		 *
 		 * These methods do not select operations, append scheduling decisions,
-		 * execute simulated work, or modify runtime objects. The caller remains
-		 * responsible for adding the corresponding decisions to the returned batch.
+		 * execute simulated work, or modify runtime objects. The caller appends
+		 * any required runtime operations separately. Capacity claims and layer
+		 * protection may account for a waiting choice that emits no operation.
 		 */
     	void reserveInvocationSlot(const std::shared_ptr<ServerlessComputeNode>& node);
     	void excludeNodeFromPlanning(const std::shared_ptr<ServerlessComputeNode>& node);

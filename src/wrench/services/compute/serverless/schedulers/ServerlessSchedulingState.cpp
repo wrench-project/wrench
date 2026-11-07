@@ -161,9 +161,13 @@ namespace wrench {
 
 
     /**
-     * @brief Get the number of possible new invocations at a compute node
+     * @brief Get the node capacity remaining for invocation selections in this round.
+     *
+     * Starts with the node's invocation limit minus its observed in-flight
+     * invocations. Selected dispatches, image preparations, and waits for image
+     * preparation each consume one unit during planning.
      * @param node A compute node
-     * @return A number of possible new invocations
+     * @return A remaining invocation capacity in this planning snapshot
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
@@ -173,7 +177,7 @@ namespace wrench {
     /**
      * @brief Get the number of possible new invocations on a container
      * @param container A container
-     * @return A number of possible new invocations
+     * @returnA remaining invocation capacity in this planning snapshot
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsOnContainer(
         const std::shared_ptr<Container>& container) const {
@@ -183,7 +187,7 @@ namespace wrench {
     /**
      * @brief Get the number of possible new containers at a compute node
      * @param node A compute node
-     * @return A number of possible new containers
+     * @return A remaining container capacity in this planning snapshot
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewContainersAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
@@ -262,9 +266,17 @@ namespace wrench {
 
 
     /**
-     * @brief Declare intent to use a slot at a node
-     * @param node A compute node
-     */
+    * @brief Claim one unit of a node's invocation capacity in this planning round.
+    *
+    * Updates only the planning snapshot. Does not assign an invocation to the
+    * node, reserve a container or its private resources, change pending
+    * invocation counts, or append a scheduling decision.
+    *
+    * Each invocation selecting a node must consume exactly one unit of node
+    * capacity. Do not make a separate claim if dispatch accounting already
+    * includes it.
+    * @param node A compute node
+    */
     void ServerlessSchedulingState::reserveInvocationSlot(const std::shared_ptr<ServerlessComputeNode>& node) {
 
         auto& available =

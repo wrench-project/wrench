@@ -60,7 +60,7 @@ namespace wrench {
      * @par Placement precedence
      * For an invocation, the node-selection policy supplies an eligibility set,
      * not a ranking. The scheduler retains selected, already-activated nodes with
-     * remaining node-wide invocation capacity, preserving their traversal order.
+     * remaining node-wide invocation capacity (in the planning state), preserving their traversal order.
      * It then tries these passes in order:
      *
      * 1. Ask the reusable-container policy for an initialized, compatible
@@ -93,25 +93,29 @@ namespace wrench {
      * invocations per existing initialized container. These counts are separate
      * from RAM/disk availability and physical CPU capacity.
      *
-     * A selected dispatch consumes one unit of node invocation capacity. Reuse
-     * also consumes one unit of the existing container's invocation capacity.
-     * Cold dispatch instead consumes a container position and its private RAM
-     * and disk allocations. A selected idle-container termination returns its
-     * private resources and container position and removes the container from
-     * the working collection. Selected transfers reserve their destination
-     * space and mark their layers as in progress, not resident.
-     *
-     * Alternative plans are evaluated before committing their changes to the
-     * working state. Only the chosen alternative's changes constrain subsequent
-     * placement. This bookkeeping is local to the round: it is not a persistent
-     * service-side reservation or invocation-to-node binding.
-     *
-     * In particular, selecting a node to wait for image preparation does not
-     * consume invocation capacity or reserve a future container position. It
-     * protects the invocation's required layers on that node for the remainder
-     * of this round but emits no operation. Starting a transfer likewise does
-     * not reserve all resources needed for a later container. Future rounds
-     * reassess feasibility from the observed system state.
+    * Selecting a node for an invocation consumes one unit of node invocation
+    * capacity in the working state, whether the invocation is dispatched,
+    * starts image preparation, or waits for preparation already in progress.
+    * This is one unit per selected invocation, regardless of how many image
+    * layers its plan transfers.
+    *
+    * A dispatch into an existing container also consumes one unit of that
+    * container's invocation capacity. Cold dispatch instead consumes a
+    * container position and its private RAM and disk allocations. Selected
+    * transfers reserve their destination space and mark their layers as in
+    * progress. Idle-container termination returns its private resources and
+    * container position and removes it from the working collection.
+    *
+    * Only chosen alternatives update the working state. Waiting for image
+    * preparation protects the invocation's required layers and emits no new
+    * operation. Preparation and waiting leave the invocation pending and do
+    * not reserve a future container or its private resources.
+    *
+    * Slot claims last only for the current scheduling round and create no
+    * persistent assignment of an invocation to a node. Each later round
+    * rebuilds the working state and reassesses placement from observed
+    * runtime state. Within a round, an earlier preparation or waiting choice
+    * may defer a later ready invocation that would use the same node.
      *
      * @par Reclamation
      * Reclamation considers idle containers first, then RAM layers, then disk

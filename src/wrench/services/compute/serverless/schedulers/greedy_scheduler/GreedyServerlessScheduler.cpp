@@ -177,10 +177,12 @@ namespace wrench {
      * Finally evaluates prewarming against that working state and combines
      * the installed policies' requested wakeup dates.
      *
-     * A pending invocation need not receive an operation in this round. In
-     * particular, choosing to wait for an existing transfer protects its layers
-     * but does not reserve invocation capacity or bind it to that node. Staging
-     * and load operations do not become completed residency changes during planning.
+    * A pending invocation need not receive an operation in this round.
+     * Selecting a node to wait for image preparation still claims one node
+     * invocation slot and protects its required layers in the working state.
+     * The invocation remains pending and is reconsidered in later rounds.
+     * Staging and load plans record work in progress; completion is observed
+     * through later service events.
      *
      * The returned operations are intentions for the service to apply, not
      * executed actions or an atomic reservation. See the class documentation
@@ -233,15 +235,13 @@ namespace wrench {
             // Make the layers of this invocation protected to avoid eviction by subsequence scheduling decisions
             scheduling_state->protectImageLayers(target_node, inv->getFunction()->getImage());
 
-            // Even non-dispatch node-level decisions must reserve a "slot" on the target node,
-            // otherwise multiple invocations could aim for the same slot. If the decisions
-            // actually include an explicit dispatch, then no such speculative accounting
-            // is necessary (the accounting will be done in the code below)
+            // Preparation and waiting claim one node slot for this round.
+            // Dispatch plans account for their slot in planInvocationDispatch().
             if (!node_decisions || node_decisions->invocation_dispatches.empty()) {
                 scheduling_state->reserveInvocationSlot(target_node);
             }
 
-            // If no node-level decisions, move on (it was just a reservation)
+            // Waiting for existing preparation needs no additional operations.
             if (!node_decisions) {
                 continue;
             }
@@ -328,15 +328,15 @@ namespace wrench {
      *        invocation, using the current working state.
      *
      * Candidate alternatives are evaluated without committing their resource
-     * changes. The caller applies the chosen plan to the working state and
-     * protects the invocation's required layers on a selected node.
+     * changes. The caller accounts for the selected invocation's node slot,
+     * protects its required layers, and applies any returned plan to the
+     * working state.
      *
      * @param scheduling_state Current mutable planning snapshot.
      * @param inv Invocation being considered.
-     * @return {nullptr, nullptr} if no node is selected; {node, nullptr} to wait
+    * @return {nullptr, nullptr} if no node is selected; {node, nullptr} to wait
      *         for image preparation already in progress; or {node, decisions}
-     *         for a selected dispatch/preparation plan. Selecting a waiting node
-     *         does not reserve invocation capacity or a future container position.
+     *         for a selected dispatch or image-preparation plan.
      */
     std::pair<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>
     GreedyServerlessScheduler::pickComputeNode(
@@ -416,7 +416,7 @@ namespace wrench {
 
         /* At this point, we cannot start a container right now, even with evictions, but we can look at loading layers in RAM */
 
-        // Pass #3: Are all layers on their way to RAM, then optimistically reserve a slot that should be used in the next round */
+        // Pass #3: Wait where all missing RAM layers are already being loaded.
         for (auto const& node : candidate_nodes) {
             const bool waiting_for_ram =
                 not scheduling_state->areAllImageLayersInRAM(image, node) &&
@@ -465,7 +465,7 @@ namespace wrench {
 
         /* At this point, we cannot trigger a layer load, so perhaps look at disk copies */
 
-        // Pass #5: Are all layers on their way to disk, then reserve a slot that should be used in the next round */
+        // Pass #5: Wait where all missing disk layers are already being staged.
         for (auto const& node : candidate_nodes) {
             const bool waiting_for_disk =
                 not scheduling_state->areAllImageLayersOnDisk(image, node) &&
