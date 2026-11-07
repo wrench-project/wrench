@@ -480,7 +480,7 @@ namespace wrench {
                 dispatchInvocations(decisions->invocation_dispatches);
                 // Do the image loads if any
                 initiateImageLayerLoads(decisions->image_layer_loads_to_RAM);
-                // Do the image copies if any
+                // Do the image staging operations if any
                 initiateImageLayerStagings(decisions->image_layer_stagings_to_disk);
                 // Pre-warm containers if any
                 prewarmContainers(decisions->container_prewarms);
@@ -1814,7 +1814,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Helper method to initiate image stagings
+    * @brief Helper method to initiate image staging operations
     * @param decisions scheduling decisions
     */
     void ServerlessComputeService::initiateImageLayerStagings(

@@ -75,7 +75,7 @@ namespace wrench {
      *    where every required layer is already on disk.
      * 5. Select the first node where some required disk residency is still
      *    missing, but every missing layer is already being staged.
-     * 6. Construct alternatives that initiate the remaining stagings.
+     * 6. Construct alternatives that initiate the remaining staging operations.
      *
      * The first pass that selects a node determines the outcome for this
      * invocation. The plan-selection policy compares alternatives within the

@@ -179,8 +179,8 @@ namespace wrench {
      *
      * A pending invocation need not receive an operation in this round. In
      * particular, choosing to wait for an existing transfer protects its layers
-     * but does not reserve invocation capacity or bind it to that node. Stagings
-     * and loads do not become completed residency changes during planning.
+     * but does not reserve invocation capacity or bind it to that node. Staging
+     * and load operations do not become completed residency changes during planning.
      *
      * The returned operations are intentions for the service to apply, not
      * executed actions or an atomic reservation. See the class documentation

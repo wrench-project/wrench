@@ -23,7 +23,7 @@ namespace wrench {
      *          - The least number of in-RAM layer evictions
      *          - The least number of on-disk layer evictions
      *          - The least number of to-RAM layer loads
-     *          - The least number of to-disk layer stagings
+     *          - The least number of to-disk layer staging operations
      */
     class EvictionAversePlanSelectionPolicy : public ServerlessPlanSelectionPolicy {
     public:
