@@ -23,8 +23,9 @@ A serverless compute service consists of:
 - A head node with disk storage
 - A set of homogeneous compute nodes, each with its own local disk storage
 
-Once a function is registered at the compute service, and once it's image is downloaded
-to the head node's storage, then the function can be invoked.  A function invocation 
+Once a function is registered at the compute service, and once its image is downloaded
+to the head node's storage (caching images on the head node's storage is the default behavior,
+but one can configure to perform no such caching if desired), then the function can be invoked.  A function invocation 
 on a core of a compute node consists in:
 
 - Copying the function's image from the head node's storage to the compute node's storage, if not already present there
