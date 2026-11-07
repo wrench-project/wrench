@@ -844,7 +844,7 @@ namespace wrench {
         auto invocation = std::make_shared<Invocation>(function, input, notify_commport);
         invocation->_submit_date = Simulation::getCurrentSimulatedDate();
 
-        if (this->isInvocationSchedulable(invocation)) {
+        if (not _cache_layers_on_head_node or this->isInvocationSchedulable(invocation)) {
             _state_of_the_system->_schedulable_invocations.push_back(invocation);
         } else if (this->canInvocationBeAdmitted(invocation)) {
             _state_of_the_system->_admitted_invocations[function->getImage()].push_back(invocation);
@@ -1566,6 +1566,7 @@ namespace wrench {
             const auto image = invocation->_function->getImage();
             WRENCH_INFO("Admitting invocation %llu...", invocation->getId());
 
+            // See if admission can happen
             if (this->canInvocationBeAdmitted(invocation)) {
                 _state_of_the_system->_new_invocations.pop();
                 _state_of_the_system->_admitted_invocations[image].push_back(invocation);
