@@ -50,7 +50,7 @@ protected:
 
         <!-- The host on which the WMS will run -->
         <host id="UserHost" speed="10Gf" core="1">
-            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+            <disk id="hard_drive" read_bw="100TBps" write_bw="100TBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
@@ -66,14 +66,14 @@ protected:
        </host>
         <host id="ServerlessComputeNode1" speed="1f" core="1">
             <prop id="ram" value="64GB" />
-            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+            <disk id="hard_drive" read_bw="100TBps" write_bw="100TBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
         </host>
         <host id="ServerlessComputeNode2" speed="1f" core="1">
             <prop id="ram" value="64GB" />
-            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+            <disk id="hard_drive" read_bw="100TBps" write_bw="100TBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
@@ -85,8 +85,8 @@ protected:
 
         <!-- Network routes -->
         <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="wide_area"/></route>
-        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
-        <route src="UserHost" dst="ServerlessComputeNode2"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
+        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/> </route>
+        <route src="UserHost" dst="ServerlessComputeNode2"> <link_ctn id="wide_area"/> </route>
         <route src="ServerlessHeadNode" dst="ServerlessComputeNode1">  <link_ctn id="local_area"/></route>
         <route src="ServerlessHeadNode" dst="ServerlessComputeNode2">  <link_ctn id="local_area"/></route>
 
@@ -190,7 +190,6 @@ private:
 
         /** NON-CACHING SERVICE **/
         {
-            auto time_origin = wrench::Simulation::getCurrentSimulatedDate();
             auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
                                                                            this->compute_service_non_caching, 3600, 2000 * MB,
                                                                            8000 * MB, 10 * MB, 1 * MB);
@@ -198,6 +197,7 @@ private:
             auto input = std::make_shared<MyFunctionInput>(1, 2);
 
             // Place 4 invocations and wait for them
+            auto time_origin = wrench::Simulation::getCurrentSimulatedDate();
             std::cerr << "USING THE NON-CACHING SERVICE\n";
             std::vector<std::shared_ptr<wrench::Invocation>> invocations;
             for (int i=0; i < 2; i++) {
@@ -220,10 +220,10 @@ TEST_F(ServerlessNoCachingTest, BasicTest) {
 }
 
 void ServerlessNoCachingTest::do_BasicTest_test() {
-    int argc = 1;
+    int argc = 2;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    // argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
