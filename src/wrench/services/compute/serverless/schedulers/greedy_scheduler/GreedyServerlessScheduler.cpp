@@ -233,6 +233,14 @@ namespace wrench {
             // Make the layers of this invocation protected to avoid eviction by subsequence scheduling decisions
             scheduling_state->protectImageLayers(target_node, inv->getFunction()->getImage());
 
+            // Even non-dispatch node-level decisions must reserve a "slot" on the target node,
+            // otherwise multiple invocations could aim for the same slot. If the decisions
+            // actually include an explicit dispatch, then no such speculative accounting
+            // is necessary (the accounting will be done in the code below)
+            if (!node_decisions || node_decisions->invocation_dispatches.empty()) {
+                scheduling_state->reserveInvocationSlot(target_node);
+            }
+
             // If no node-level decisions, move on (it was just a reservation)
             if (!node_decisions) {
                 continue;

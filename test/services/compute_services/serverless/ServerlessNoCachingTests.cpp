@@ -8,22 +8,16 @@
  */
 
 #include <cmath>
+#include <utility>
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
-#include "../../../include/UniqueTmpPathPrefix.h"
 #include "wrench/failure_causes/OperationTimeout.h"
-#include "wrench/failure_causes/FunctionNotFound.h"
-#include "wrench/services/compute/serverless/schedulers/ServerlessScheduler.h"
 #include "wrench/services/compute/serverless/schedulers/greedy_scheduler/GreedyServerlessScheduler.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/LRUServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/eviction_policies/FewestServerlessEvictionPolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/FCFSInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/invocation_ordering_policies/RandomInvocationOrderingPolicy.h"
 #include "wrench/services/compute/serverless/schedulers/scheduling_policies/node_activation_policies/ActivateAllNodePolicy.h"
-#include "wrench/services/compute/serverless/schedulers/scheduling_policies/plan_selection_policies/EvictionAversePlanSelectionPolicy.h"
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000000ULL)
@@ -122,7 +116,7 @@ public:
 
 class MyFunctionOutput : public wrench::FunctionOutput {
 public:
-    explicit MyFunctionOutput(const std::string& msg) : msg_(msg) {
+    explicit MyFunctionOutput(std::string  msg) : msg_(std::move(msg)) {
     }
 
     std::string msg_;
@@ -226,10 +220,10 @@ TEST_F(ServerlessNoCachingTest, BasicTest) {
 }
 
 void ServerlessNoCachingTest::do_BasicTest_test() {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);

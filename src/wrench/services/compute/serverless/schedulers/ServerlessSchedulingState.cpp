@@ -262,6 +262,22 @@ namespace wrench {
 
 
     /**
+     * @brief Declare intent to use a slot at a node
+     * @param node A compute node
+     */
+    void ServerlessSchedulingState::reserveInvocationSlot(const std::shared_ptr<ServerlessComputeNode>& node) {
+
+        auto& available =
+            _node_states.at(node)._num_possible_new_invocations;
+
+        if (available == 0) {
+            throw std::runtime_error(
+                "Cannot reserve an invocation slot on a full node");
+        }
+        --available;
+    }
+
+    /**
      * @brief Exclude a compute node from all future planning
      * @param node 
      */

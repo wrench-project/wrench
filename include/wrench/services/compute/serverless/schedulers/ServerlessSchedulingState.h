@@ -61,6 +61,7 @@ namespace wrench {
 		 * execute simulated work, or modify runtime objects. The caller remains
 		 * responsible for adding the corresponding decisions to the returned batch.
 		 */
+    	void reserveInvocationSlot(const std::shared_ptr<ServerlessComputeNode>& node);
     	void excludeNodeFromPlanning(const std::shared_ptr<ServerlessComputeNode>& node);
     	void planInvocationFailures(const std::set<std::shared_ptr<Invocation>>& invocations);
     	void protectImageLayers(const std::shared_ptr<ServerlessComputeNode>& node, const std::shared_ptr<Image>& image);
