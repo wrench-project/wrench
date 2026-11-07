@@ -109,6 +109,10 @@ namespace wrench {
         _cache_layers_on_head_node = this->getPropertyValueAsBoolean(
             ServerlessComputeServiceProperty::CACHE_IMAGES_ON_HEAD_NODE);
 
+        // Parse the SIMULATE_REMOTE_IMAGE_DOWNLOADS property
+        _simulate_remote_image_downloads = this->getPropertyValueAsBoolean(
+                    ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS);
+
         // Deal with the 0-value defaults
         if (this->getPropertyValueAsUnsignedLong(
                 ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE)
@@ -993,7 +997,8 @@ namespace wrench {
      * @param init_action The container initialization action
      */
     void ServerlessComputeService::processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
-                                                                            const std::shared_ptr<Action>& init_action) {
+                                                                            const std::shared_ptr<Action>&
+                                                                            init_action) {
         auto compute_node = container->getComputeNode();
 
         if (compute_node->_initializing_containers.count(container) == 0) {
@@ -1023,7 +1028,7 @@ namespace wrench {
 
         // Making the container idle/shutdown?
         if (container->_in_flight_invocations.empty()) {
-           compute_node->beginContainerIdlePeriodOrShutdown(container, false);
+            compute_node->beginContainerIdlePeriodOrShutdown(container, false);
         }
     }
 
@@ -1034,8 +1039,8 @@ namespace wrench {
      * @param action The staging action
      */
     void ServerlessComputeService::processLayerStagingCompletion(const std::shared_ptr<ImageLayer>& layer,
-                                                             const std::shared_ptr<ServerlessComputeNode>& node,
-                                                             const std::shared_ptr<Action>& action) {
+                                                                 const std::shared_ptr<ServerlessComputeNode>& node,
+                                                                 const std::shared_ptr<Action>& action) {
         _state_of_the_system->_image_layers_being_staged_to_disk.at(node).erase(layer);
         if (action->getState() != Action::State::COMPLETED) {
             WRENCH_INFO("An image layer staging has failed for image layer [%s] (%s)",
@@ -1054,8 +1059,8 @@ namespace wrench {
      * @param action The loading action
      */
     void ServerlessComputeService::processLayerLoadingCompletion(const std::shared_ptr<ImageLayer>& layer,
-                                                             const std::shared_ptr<ServerlessComputeNode>& node,
-                                                             const std::shared_ptr<Action>& action) {
+                                                                 const std::shared_ptr<ServerlessComputeNode>& node,
+                                                                 const std::shared_ptr<Action>& action) {
         _state_of_the_system->_image_layers_being_loaded_in_ram.at(node).erase(layer);
         if (action->getState() != Action::State::COMPLETED) {
             WRENCH_INFO("A memory load has failed for image layer [%s] (%s)",
@@ -1197,7 +1202,8 @@ namespace wrench {
         // Terminate the containers
         for (const auto& [container] : decisions) {
             auto node = container->getComputeNode();
-            if (node->getInitializedContainers().count(container) == 0 ||  not container->_in_flight_invocations.empty()) {
+            if (node->getInitializedContainers().count(container) == 0 || not container->_in_flight_invocations.
+                empty()) {
                 continue; // Already removed, initializing, or currently occupied.
             }
             node->shutdownContainer(container);
@@ -1211,12 +1217,14 @@ namespace wrench {
     void ServerlessComputeService::evictLayersFromRAM(const std::vector<EvictLayerFromRAM>& decisions) const {
         for (const auto& [layer, node] : decisions) {
             if (_state_of_the_system->isImageLayerBeingLoadedAtNode(node, layer)) {
-                WRENCH_INFO("Ignoring layer eviction from RAM [layer %s, node%s], because the layer is being loaded to RAM!",
+                WRENCH_INFO(
+                    "Ignoring layer eviction from RAM [layer %s, node%s], because the layer is being loaded to RAM!",
                     layer->getName().c_str(), node->hostname.c_str());
                 continue;
             }
             if (node->isImageLayerUsedByAnyContainer(layer)) {
-                WRENCH_INFO("Ignoring layer eviction from RAM [layer %s, node%s], because the layer is being used by a container!",
+                WRENCH_INFO(
+                    "Ignoring layer eviction from RAM [layer %s, node%s], because the layer is being used by a container!",
                     layer->getName().c_str(), node->hostname.c_str());
                 continue;
             }
@@ -1233,20 +1241,22 @@ namespace wrench {
         for (const auto& [layer, node] : decisions) {
             // Ignore if the layer is currently being staged to node
             if (_state_of_the_system->isImageLayerBeingStagedToNode(node, layer)) {
-                WRENCH_INFO("Ignoring layer eviction from disk [layer %s, node%s], because the layer is being staged to disk!",
+                WRENCH_INFO(
+                    "Ignoring layer eviction from disk [layer %s, node%s], because the layer is being staged to disk!",
                     layer->getName().c_str(), node->hostname.c_str());
                 continue;
             }
             // Ignore if the layer is currently being loaded to RAM
             if (_state_of_the_system->isImageLayerBeingLoadedAtNode(node, layer)) {
-                WRENCH_INFO("Ignoring layer eviction from disk [layer %s, node%s], because the layer is being loaded to RAM!",
-                   layer->getName().c_str(), node->hostname.c_str());
+                WRENCH_INFO(
+                    "Ignoring layer eviction from disk [layer %s, node%s], because the layer is being loaded to RAM!",
+                    layer->getName().c_str(), node->hostname.c_str());
                 continue;
             }
             // Ignore if the layer is currently in RAM
             if (_state_of_the_system->isImageLayerInRAMAtNode(node, layer)) {
                 WRENCH_INFO("Ignoring layer eviction from disk [layer %s, node%s], because the layer is in RAM!",
-                  layer->getName().c_str(), node->hostname.c_str());
+                            layer->getName().c_str(), node->hostname.c_str());
                 continue;
             }
             StorageService::removeFileAtLocation(FileLocation::LOCATION(node->_disk, layer->getFile()));
@@ -1614,18 +1624,17 @@ namespace wrench {
             const auto src_location = layer->getLocation();
             const auto dst_location = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
                                                              src_location->getFile());
-            if (this->getPropertyValueAsBoolean(ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS)) {
+            if (_simulate_remote_image_downloads) {
                 StorageService::copyFile(src_location, dst_location);
             } else {
                 StorageService::createFileAtLocation(dst_location);
             }
         };
-        const std::function lambda_terminate = lambda_noop;
 
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
                 "download_image_layer_" + layer->getName(),
-                0, 0, lambda_execute, lambda_terminate));
+                0, 0, lambda_execute, lambda_noop));
 
         // Spin up an ActionExecutor service, and have it send us back a custom message
         auto custom_message = new ServerlessComputeServiceDownloadCompleteMessage(
@@ -1807,7 +1816,7 @@ namespace wrench {
             }
             if (not _state_of_the_system->isImageLayerOnDiskAtNode(compute_node, layer)) {
                 WRENCH_INFO("Ignoring image layer load to RAM [layer: %s, node: %s] because the layer is not on disk",
-                           layer->getName().c_str(), compute_node->hostname.c_str());
+                            layer->getName().c_str(), compute_node->hostname.c_str());
                 continue;
             }
             initiateImageLayerLoadAtComputeNode(compute_node, layer);
@@ -1829,9 +1838,11 @@ namespace wrench {
                             layer->getName().c_str(), compute_node->hostname.c_str());
                 continue;
             }
-            if (!_state_of_the_system->_head_storage_service->hasFile(layer->getFile())) {
-                WRENCH_INFO("Ignoring image layer staging [layer: %s, node: %s] because the layer is not on disk at the head node",
-                           layer->getName().c_str(), compute_node->hostname.c_str());
+            if (_cache_layers_on_head_node and not _state_of_the_system->_head_storage_service->hasFile(
+                layer->getFile())) {
+                WRENCH_INFO(
+                    "Ignoring image layer staging [layer: %s, node: %s] because the layer is not on disk at the head node",
+                    layer->getName().c_str(), compute_node->hostname.c_str());
                 continue;
             }
             initiateImageLayerStagingToComputeNode(compute_node, layer);
@@ -1912,24 +1923,32 @@ namespace wrench {
             return;
         }
 
-        const std::function lambda_terminate = lambda_noop;
-
         const std::function lambda_execute = [compute_node, layer, this](
             const std::shared_ptr<ActionExecutor>& action_executor) {
+            std::shared_ptr<FileLocation> src_location;
+            if (this->_cache_layers_on_head_node) {
+                // Copy the image file from the head host to the current compute node's storage service
+                src_location = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
+                                                      layer->getFile());
+            } else {
+                src_location = layer->getLocation();
+            }
 
-            // Copy the image file from the head host to the current compute node's storage service
-            auto head_host_image_path = FileLocation::LOCATION(_state_of_the_system->_head_storage_service,
-                                                               layer->getFile());
-            auto local_image_path = FileLocation::LOCATION(compute_node->_disk, layer->getFile());
-            StorageService::copyFile(head_host_image_path, local_image_path);
-            // WRENCH_INFO("Done with the lambda execute!!");
+            auto dst_location =
+                FileLocation::LOCATION(compute_node->_disk, layer->getFile());
+
+            if (_cache_layers_on_head_node || _simulate_remote_image_downloads) {
+                StorageService::copyFile(src_location, dst_location);
+            } else {
+                StorageService::createFileAtLocation(dst_location);
+            }
         };
 
         // Create the action and run it in an action executor
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
                 "stage_image_layer_" + layer->getName() + "_to_" + compute_node->hostname,
-                0, 0, lambda_execute, lambda_terminate));
+                0, 0, lambda_execute, lambda_noop));
 
         auto custom_message = new ServerlessComputeServiceLayerStagingCompleteMessage(
             action,
@@ -1955,7 +1974,7 @@ namespace wrench {
             action_executor->start(action_executor, true, false);
         } catch (const std::exception&) {
             throw std::runtime_error(
-                "ServerlessComputeService::initiateImageStagingToComputeNode(): Action executor could not be started - internal error");
+                "ServerlessComputeService::initiateImageLayerStagingToComputeNode(): Action executor could not be started - internal error");
         }
 
         _state_of_the_system->_image_layers_being_staged_to_disk.at(compute_node).insert(layer);
@@ -1990,8 +2009,6 @@ namespace wrench {
         }
 
         // Initiate an asynchronous action that simply read the image file from disk
-        const std::function lambda_terminate = lambda_noop;
-
         const std::function lambda_execute = [compute_node, layer](
             const std::shared_ptr<ActionExecutor>& action_executor) {
             // WRENCH_INFO("In the image load lambda execute!!");
@@ -2038,7 +2055,7 @@ namespace wrench {
         auto action = std::shared_ptr<CustomAction>(
             new CustomAction(
                 "load_image_layer_" + layer->getName() + "_at_" + compute_node->hostname,
-                0, 0, lambda_execute, lambda_terminate));
+                0, 0, lambda_execute, lambda_noop));
 
         auto custom_message = new ServerlessComputeServiceNodeLoadCompleteMessage(
             action,

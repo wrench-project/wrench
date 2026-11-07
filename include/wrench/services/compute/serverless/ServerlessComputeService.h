@@ -255,6 +255,7 @@ namespace wrench {
         std::set<std::shared_ptr<Alarm>> _node_activation_alarms;
 
         bool _cache_layers_on_head_node;
+        bool _simulate_remote_image_downloads;
 
 
 
