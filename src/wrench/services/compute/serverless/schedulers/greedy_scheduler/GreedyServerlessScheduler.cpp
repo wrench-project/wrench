@@ -472,9 +472,6 @@ namespace wrench {
                 scheduling_state->areAllImageLayersOnDiskOrOnTheirWayToDisk(image, node);
             if (not waiting_for_disk) continue;
 
-            // Claim one slot for this scheduling round while disk preparation
-            // is underway. Otherwise, arbitrarily many pending invocations can
-            // wait on this node, delaying preparation on additional nodes.
             return {node, nullptr};
         }
 

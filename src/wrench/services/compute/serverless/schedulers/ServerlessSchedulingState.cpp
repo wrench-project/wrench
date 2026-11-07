@@ -177,7 +177,7 @@ namespace wrench {
     /**
      * @brief Get the number of possible new invocations on a container
      * @param container A container
-     * @returnA remaining invocation capacity in this planning snapshot
+     * @return A remaining invocation capacity in this planning snapshot
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsOnContainer(
         const std::shared_ptr<Container>& container) const {
