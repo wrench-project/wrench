@@ -59,7 +59,7 @@ protected:
         <!-- The host on which the Serverless compute service will run -->
         <host id="ServerlessHeadNode" speed="10Gf" core="1">
             <prop id="ram" value="16GB" />
-            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+            <disk id="hard_drive" read_bw="100GBps" write_bw="100GBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
@@ -169,6 +169,7 @@ private:
         auto image1 = wrench::FunctionManager::createImage("my_image", {layer1});
 
         /** CACHING SERVICE **/
+        std::vector<double> caching_function_start_dates;
         {
             auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
                                                                            this->compute_service_caching, 3600, 2000 * MB,
@@ -177,18 +178,18 @@ private:
             auto input = std::make_shared<MyFunctionInput>(1, 2);
 
             // Place 4 invocations and wait for them
-            std::cerr << "USING THE CACHING SERVICE\n";
             std::vector<std::shared_ptr<wrench::Invocation>> invocations;
             for (int i=0; i < 2; i++) {
                 invocations.push_back(function_manager->invokeFunction(registered_function1, this->compute_service_caching, input));
             }
             function_manager->wait_all(invocations);
             for (auto &invocation : invocations) {
-                std::cerr << "CACHING: " << invocation->getFunctionStartDate() << " " << invocation->getFunctionEndDate() << std::endl;
+                caching_function_start_dates.push_back(invocation->getFunctionStartDate());
             }
         }
 
         /** NON-CACHING SERVICE **/
+        std::vector<double> non_caching_function_start_dates;
         {
             auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image1,
                                                                            this->compute_service_non_caching, 3600, 2000 * MB,
@@ -198,14 +199,22 @@ private:
 
             // Place 4 invocations and wait for them
             auto time_origin = wrench::Simulation::getCurrentSimulatedDate();
-            std::cerr << "USING THE NON-CACHING SERVICE\n";
             std::vector<std::shared_ptr<wrench::Invocation>> invocations;
             for (int i=0; i < 2; i++) {
                 invocations.push_back(function_manager->invokeFunction(registered_function1, this->compute_service_non_caching, input));
             }
             function_manager->wait_all(invocations);
             for (auto &invocation : invocations) {
-                std::cerr << "NON CACHING: " << invocation->getFunctionStartDate() - time_origin << " " << invocation->getFunctionEndDate() - time_origin << std::endl;
+                non_caching_function_start_dates.push_back(invocation->getFunctionStartDate() - time_origin);
+            }
+        }
+
+        // Check coherence
+        for (int i=0; i < caching_function_start_dates.size(); i++) {
+            if (std::abs(2 * caching_function_start_dates.at(i) - non_caching_function_start_dates.at(i)) > 0.1) {
+                throw std::runtime_error("Unexpected function start dates: caching=" +
+                    std::to_string(caching_function_start_dates.at(i)) +
+                    " non-caching=" + std::to_string(non_caching_function_start_dates.at(i)) + ")");
             }
         }
 
@@ -220,10 +229,10 @@ TEST_F(ServerlessNoCachingTest, BasicTest) {
 }
 
 void ServerlessNoCachingTest::do_BasicTest_test() {
-    int argc = 2;
+    int argc = 1;
     auto argv = (char**)calloc(argc, sizeof(char*));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    // argv[1] = strdup("--wrench-full-log");
 
     auto simulation = wrench::Simulation::createSimulation();
     simulation->init(&argc, argv);
