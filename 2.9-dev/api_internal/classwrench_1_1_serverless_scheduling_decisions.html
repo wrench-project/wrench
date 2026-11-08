@@ -313,9 +313,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_answer_message.html">wrench::ServerlessComputeServiceFunctionRegisterAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_request_message.html">wrench::ServerlessComputeServiceFunctionRegisterRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_invocation_execution_complete_message.html">wrench::ServerlessComputeServiceInvocationExecutionCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_layer_staging_complete_message.html">wrench::ServerlessComputeServiceLayerStagingCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message.html">wrench::ServerlessComputeServiceMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_nodes_activated_message.html">wrench::ServerlessComputeServiceNodesActivatedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
@@ -336,8 +336,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions26compute_node_deactivationsE"><code class="docutils literal notranslate"><span class="pre">compute_node_deactivations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions18container_prewarmsE"><code class="docutils literal notranslate"><span class="pre">container_prewarms</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions27idle_container_terminationsE"><code class="docutils literal notranslate"><span class="pre">idle_container_terminations</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions26image_layer_copies_to_diskE"><code class="docutils literal notranslate"><span class="pre">image_layer_copies_to_disk</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions24image_layer_loads_to_RAME"><code class="docutils literal notranslate"><span class="pre">image_layer_loads_to_RAM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions28image_layer_stagings_to_diskE"><code class="docutils literal notranslate"><span class="pre">image_layer_stagings_to_disk</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions21invocation_dispatchesE"><code class="docutils literal notranslate"><span class="pre">invocation_dispatches</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions16invocation_failsE"><code class="docutils literal notranslate"><span class="pre">invocation_fails</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions25layer_evictions_from_diskE"><code class="docutils literal notranslate"><span class="pre">layer_evictions_from_disk</span></code></a></li>
@@ -500,7 +500,7 @@
 <li><p>Which idle container to terminate</p></li>
 <li><p>Which layer to evict from RAM</p></li>
 <li><p>Which layer to evict from disk</p></li>
-<li><p>Which images should be copied from the head node to compute nodes’ disks, initiated right now</p></li>
+<li><p>Which images should be staged compute nodes’ disks, initiated right now</p></li>
 <li><p>Which images should be loaded into compute node’s RAMs, initiated right now</p></li>
 <li><p>Which invocations should be dispatched right now </p></li>
 </ul>
@@ -541,15 +541,15 @@
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessSchedulingDecisions26image_layer_copies_to_diskE">
-<span id="_CPPv3N6wrench29ServerlessSchedulingDecisions26image_layer_copies_to_diskE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisions26image_layer_copies_to_diskE"></span><span id="wrench::ServerlessSchedulingDecisions::image_layer_copies_to_disk__std::vector:CopyImageLayer:"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions_1a10ec467ec5ec31eb33170448cde2e50a"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">CopyImageLayer</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">image_layer_copies_to_disk</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions26image_layer_copies_to_diskE" title="Link to this definition"></a><br /></dt>
-<dd><p>The list of image layer copies to storage at compute nodes. </p>
-</dd></dl>
-
-<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessSchedulingDecisions24image_layer_loads_to_RAME">
 <span id="_CPPv3N6wrench29ServerlessSchedulingDecisions24image_layer_loads_to_RAME"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisions24image_layer_loads_to_RAME"></span><span id="wrench::ServerlessSchedulingDecisions::image_layer_loads_to_RAM__std::vector:LoadImageLayer:"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions_1ab72f31f34e92e248710c9504e1ede798"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">LoadImageLayer</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">image_layer_loads_to_RAM</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions24image_layer_loads_to_RAME" title="Link to this definition"></a><br /></dt>
 <dd><p>The list of image layer loads in RAM at compute nodes. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench29ServerlessSchedulingDecisions28image_layer_stagings_to_diskE">
+<span id="_CPPv3N6wrench29ServerlessSchedulingDecisions28image_layer_stagings_to_diskE"></span><span id="_CPPv2N6wrench29ServerlessSchedulingDecisions28image_layer_stagings_to_diskE"></span><span id="wrench::ServerlessSchedulingDecisions::image_layer_stagings_to_disk__std::vector:StageImageLayer:"></span><span class="target" id="classwrench_1_1_serverless_scheduling_decisions_1ad57815a536866569c1cfeb24465bf115"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">StageImageLayer</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">image_layer_stagings_to_disk</span></span></span><a class="headerlink" href="#_CPPv4N6wrench29ServerlessSchedulingDecisions28image_layer_stagings_to_diskE" title="Link to this definition"></a><br /></dt>
+<dd><p>The list of image layer staging to storage at compute nodes. </p>
 </dd></dl>
 
 <dl class="cpp var">

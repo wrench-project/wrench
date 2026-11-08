@@ -329,26 +329,27 @@
 <li><p>Construct cold-dispatch alternatives on nodes where every required image layer is resident on disk and in RAM. Reclamation may be needed for private RAM, private disk space, or a container position.</p></li>
 <li><p>Select the first node where some required RAM residency is still missing, but every missing layer is already being loaded.</p></li>
 <li><p>Construct alternatives that initiate the remaining RAM loads on nodes where every required layer is already on disk.</p></li>
-<li><p>Select the first node where some required disk residency is still missing, but every missing layer is already being copied.</p></li>
-<li><p>Construct alternatives that initiate the remaining disk copies.</p></li>
+<li><p>Select the first node where some required disk residency is still missing, but every missing layer is already being staged.</p></li>
+<li><p>Construct alternatives that initiate the remaining staging operations.</p></li>
 </ol>
 <dl class="simple">
-<dt><strong>Placement precedence</strong></dt><dd><p>For an invocation, the node-selection policy supplies an eligibility set, not a ranking. The scheduler retains selected, already-activated nodes with remaining node-wide invocation capacity, preserving their traversal order. It then tries these passes in order:</p>
+<dt><strong>Placement precedence</strong></dt><dd><p>For an invocation, the node-selection policy supplies an eligibility set, not a ranking. The scheduler retains selected, already-activated nodes with remaining node-wide invocation capacity (in the planning state), preserving their traversal order. It then tries these passes in order:</p>
 </dd>
 </dl>
 </p>
-<p>The first pass that selects a node determines the outcome for this invocation. The plan-selection policy compares alternatives within the cold-dispatch, RAM-load, and disk-copy passes; it does not compare plans across readiness levels or override the reusable-container decision.</p>
+<p>The first pass that selects a node determines the outcome for this invocation. The plan-selection policy compares alternatives within the cold-dispatch, RAM-load, and disk-staging passes; it does not compare plans across readiness levels or override the reusable-container decision.</p>
 <p>
 The working state distinguishes three count constraints: remaining invocations per node, remaining container positions per node, and remaining invocations per existing initialized container. These counts are separate from RAM/disk availability and physical CPU capacity.<dl class="simple">
 <dt><strong>Working state and capacity accounting</strong></dt><dd><p>The worklist is a copy of invocation references, not <a class="reference internal" href="../api_user/classwrench_1_1_invocation.html#classwrench_1_1_invocation"><span class="std std-ref">Invocation</span></a> objects. Filtering and ordering it do not change the service’s pending collection. Runtime containers and invocations remain shared objects; planning must not mutate them to simulate application of a returned decision.</p>
 </dd>
 </dl>
 </p>
-<p>A selected dispatch consumes one unit of node invocation capacity. Reuse also consumes one unit of the existing container’s invocation capacity. Cold dispatch instead consumes a container position and its private RAM and disk allocations. A selected idle-container termination returns its private resources and container position and removes the container from the working collection. Selected transfers reserve their destination space and mark their layers as in progress, not resident.</p>
-<p>Alternative plans are evaluated before committing their changes to the working state. Only the chosen alternative’s changes constrain subsequent placement. This bookkeeping is local to the round: it is not a persistent service-side reservation or invocation-to-node binding.</p>
-<p>In particular, selecting a node to wait for image preparation does not consume invocation capacity or reserve a future container position. It protects the invocation’s required layers on that node for the remainder of this round but emits no operation. Starting a transfer likewise does not reserve all resources needed for a later container. Future rounds reassess feasibility from the observed system state.</p>
+<p>Selecting a node for an invocation consumes one unit of node invocation capacity in the working state, whether the invocation is dispatched, starts image preparation, or waits for preparation already in progress. This is one unit per selected invocation, regardless of how many image layers its plan transfers.</p>
+<p>A dispatch into an existing container also consumes one unit of that container’s invocation capacity. Cold dispatch instead consumes a container position and its private RAM and disk allocations. Selected transfers reserve their destination space and mark their layers as in progress. Idle-container termination returns its private resources and container position and removes it from the working collection.</p>
+<p>Only chosen alternatives update the working state. Waiting for image preparation protects the invocation’s required layers and emits no new operation. Preparation and waiting leave the invocation pending and do not reserve a future container or its private resources.</p>
+<p>Slot claims last only for the current scheduling round and create no persistent assignment of an invocation to a node. Each later round rebuilds the working state and reassesses placement from observed runtime state. Within a round, an earlier preparation or waiting choice may defer a later ready invocation that would use the same node.</p>
 <p>
-Layers needed by the invocation, earlier chosen plans, ongoing transfers, or containers retained by the tentative plan are excluded as appropriate. Evicting a disk layer also requires removal of its RAM copy when present. Reclamation is feasible only if it satisfies the required byte deficits and frees enough container positions.<dl class="simple">
+Layers needed by the invocation, earlier chosen plans, ongoing transfers, or containers retained by the tentative plan are excluded as appropriate. Evicting a disk layer also requires removal of its in-RAM copy when present. Reclamation is feasible only if it satisfies the required byte deficits and frees enough container positions.<dl class="simple">
 <dt><strong>Reclamation</strong></dt><dd><p>Reclamation considers idle containers first, then RAM layers, then disk layers. The eviction policy selects victims from eligible candidates. Required resources are compared with currently available resources to obtain deficits; needing one new container does not necessarily require terminating an existing container. Only container termination can free a container position; layer eviction addresses byte deficits.</p>
 </dd>
 </dl>
@@ -360,7 +361,7 @@ The scheduler appends the proposals and accounts for their container positions; 
 </dl>
 </p>
 <p>
-The result describes operations for <a class="reference internal" href="../api_user/classwrench_1_1_serverless_compute_service.html#classwrench_1_1_serverless_compute_service"><span class="std std-ref">ServerlessComputeService</span></a> to apply. schedule() neither executes them nor waits for completion. The service applies decision categories in its own order and performs its runtime checks. The batch is not an atomic transaction. Dependencies on operation completion are handled through later scheduling rounds, not by assuming that a requested copy, load, initialization, or activation is complete.<dl class="simple">
+The result describes operations for <a class="reference internal" href="../api_user/classwrench_1_1_serverless_compute_service.html#classwrench_1_1_serverless_compute_service"><span class="std std-ref">ServerlessComputeService</span></a> to apply. schedule() neither executes them nor waits for completion. The service applies decision categories in its own order and performs its runtime checks. The batch is not an atomic transaction. Dependencies on operation completion are handled through later scheduling rounds, not by assuming that a requested staging, load, initialization, or activation is complete.<dl class="simple">
 <dt><strong>Wakeups and execution</strong></dt><dd><p>After policy evaluation, the scheduler takes the minimum reported wakeup date. DBL_MAX means no request; if all policies return it, the output’s optional wakeup date remains unset. Other dates must be finite absolute simulated dates strictly later than the current time. Deadlines are validated (i.e., an exception is thrown if stale), when taking the minimum.</p>
 </dd>
 </dl>

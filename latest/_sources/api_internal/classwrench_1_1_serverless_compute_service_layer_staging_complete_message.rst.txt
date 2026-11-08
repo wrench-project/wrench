@@ -1,0 +1,8 @@
+.. _ServerlessComputeServiceLayerStagingCompleteMessage:
+wrench::ServerlessComputeServiceLayerStagingCompleteMessage
+***********************************************************
+
+.. doxygenclass:: wrench::ServerlessComputeServiceLayerStagingCompleteMessage
+   :project: internal
+   :members:
+

@@ -313,9 +313,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_answer_message.html">wrench::ServerlessComputeServiceFunctionRegisterAnswerMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_function_register_request_message.html">wrench::ServerlessComputeServiceFunctionRegisterRequestMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_invocation_execution_complete_message.html">wrench::ServerlessComputeServiceInvocationExecutionCompleteMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_layer_staging_complete_message.html">wrench::ServerlessComputeServiceLayerStagingCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message.html">wrench::ServerlessComputeServiceMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_message_payload.html">wrench::ServerlessComputeServiceMessagePayload</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_copy_complete_message.html">wrench::ServerlessComputeServiceNodeCopyCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_node_load_complete_message.html">wrench::ServerlessComputeServiceNodeLoadCompleteMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_nodes_activated_message.html">wrench::ServerlessComputeServiceNodesActivatedMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classwrench_1_1_serverless_compute_service_property.html">wrench::ServerlessComputeServiceProperty</a></li>
@@ -364,11 +364,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState28planIdleContainerTerminationERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">planIdleContainerTermination()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState22planInvocationDispatchERKNSt10shared_ptrI10InvocationEERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI9ContainerEE"><code class="docutils literal notranslate"><span class="pre">planInvocationDispatch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState22planInvocationFailuresERKNSt3setINSt10shared_ptrI10InvocationEEEE"><code class="docutils literal notranslate"><span class="pre">planInvocationFailures()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState19planLayerCopyToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">planLayerCopyToDisk()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState25planLayerEvictionFromDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">planLayerEvictionFromDisk()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState24planLayerEvictionFromRAMERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">planLayerEvictionFromRAM()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState18planLayerLoadToRAMERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">planLayerLoadToRAM()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState22planLayerStagingToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"><code class="docutils literal notranslate"><span class="pre">planLayerStagingToDisk()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState18protectImageLayersERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI5ImageEE"><code class="docutils literal notranslate"><span class="pre">protectImageLayers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25ServerlessSchedulingState21reserveInvocationSlotERKNSt10shared_ptrI21ServerlessComputeNodeEE"><code class="docutils literal notranslate"><span class="pre">reserveInvocationSlot()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -621,8 +622,6 @@
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench25ServerlessSchedulingState23excludeNodeFromPlanningERKNSt10shared_ptrI21ServerlessComputeNodeEE">
 <span id="_CPPv3N6wrench25ServerlessSchedulingState23excludeNodeFromPlanningERKNSt10shared_ptrI21ServerlessComputeNodeEE"></span><span id="_CPPv2N6wrench25ServerlessSchedulingState23excludeNodeFromPlanningERKNSt10shared_ptrI21ServerlessComputeNodeEE"></span><span id="wrench::ServerlessSchedulingState::excludeNodeFromPlanning__std::shared_ptr:ServerlessComputeNode:CR"></span><span class="target" id="classwrench_1_1_serverless_scheduling_state_1a58866ef8fcd587af338173e1def19156"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">excludeNodeFromPlanning</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench25ServerlessSchedulingState23excludeNodeFromPlanningERKNSt10shared_ptrI21ServerlessComputeNodeEE" title="Link to this definition"></a><br /></dt>
 <dd><p>Exclude a compute node from all future planning. </p>
-<p>Update this planning snapshot to account for already-selected operations.</p>
-<p>These methods do not select operations, append scheduling decisions, execute simulated work, or modify runtime objects. The caller remains responsible for adding the corresponding decisions to the returned batch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>node</strong> – </p>
@@ -810,7 +809,7 @@
 <dd class="field-odd"><p><strong>node</strong> – A compute node </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A number of possible new containers </p>
+<dd class="field-even"><p>A remaining container capacity in this planning snapshot </p>
 </dd>
 </dl>
 </dd></dl>
@@ -818,13 +817,14 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK6wrench25ServerlessSchedulingState41getNumPossibleNewInvocationsAtComputeNodeERKNSt10shared_ptrI21ServerlessComputeNodeEE">
 <span id="_CPPv3NK6wrench25ServerlessSchedulingState41getNumPossibleNewInvocationsAtComputeNodeERKNSt10shared_ptrI21ServerlessComputeNodeEE"></span><span id="_CPPv2NK6wrench25ServerlessSchedulingState41getNumPossibleNewInvocationsAtComputeNodeERKNSt10shared_ptrI21ServerlessComputeNodeEE"></span><span id="wrench::ServerlessSchedulingState::getNumPossibleNewInvocationsAtComputeNode__std::shared_ptr:ServerlessComputeNode:CRC"></span><span class="target" id="classwrench_1_1_serverless_scheduling_state_1ae7b46eaa631b2c834303ad92aac83522"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getNumPossibleNewInvocationsAtComputeNode</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">node</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6wrench25ServerlessSchedulingState41getNumPossibleNewInvocationsAtComputeNodeERKNSt10shared_ptrI21ServerlessComputeNodeEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Get the number of possible new invocations at a compute node. </p>
+<dd><p>Get the node capacity remaining for invocation selections in this round. </p>
+<p>Starts with the node’s invocation limit minus its observed in-flight invocations. Selected dispatches, image preparations, and waits for image preparation each consume one unit during planning. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>node</strong> – A compute node </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A number of possible new invocations </p>
+<dd class="field-even"><p>A remaining invocation capacity in this planning snapshot </p>
 </dd>
 </dl>
 </dd></dl>
@@ -838,7 +838,7 @@
 <dd class="field-odd"><p><strong>container</strong> – A container </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A number of possible new invocations </p>
+<dd class="field-even"><p>A remaining invocation capacity in this planning snapshot </p>
 </dd>
 </dl>
 </dd></dl>
@@ -942,20 +942,6 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6wrench25ServerlessSchedulingState19planLayerCopyToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE">
-<span id="_CPPv3N6wrench25ServerlessSchedulingState19planLayerCopyToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"></span><span id="_CPPv2N6wrench25ServerlessSchedulingState19planLayerCopyToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"></span><span id="wrench::ServerlessSchedulingState::planLayerCopyToDisk__std::shared_ptr:ServerlessComputeNode:CR.std::shared_ptr:ImageLayer:CR"></span><span class="target" id="classwrench_1_1_serverless_scheduling_state_1a9dbcdf19bddb19d43e447300a9947986"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">planLayerCopyToDisk</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">node</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">layer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench25ServerlessSchedulingState19planLayerCopyToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Plan for a layer copy to disk. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> – The node at which to copy </p></li>
-<li><p><strong>layer</strong> – The layer to copy </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench25ServerlessSchedulingState25planLayerEvictionFromDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE">
 <span id="_CPPv3N6wrench25ServerlessSchedulingState25planLayerEvictionFromDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"></span><span id="_CPPv2N6wrench25ServerlessSchedulingState25planLayerEvictionFromDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"></span><span id="wrench::ServerlessSchedulingState::planLayerEvictionFromDisk__std::shared_ptr:ServerlessComputeNode:CR.std::shared_ptr:ImageLayer:CR"></span><span class="target" id="classwrench_1_1_serverless_scheduling_state_1a6b55f6a3b59874888144b4440e6b985f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">planLayerEvictionFromDisk</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">node</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">layer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench25ServerlessSchedulingState25planLayerEvictionFromDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE" title="Link to this definition"></a><br /></dt>
 <dd><p>Plan a layer eviction from Disk. </p>
@@ -998,6 +984,20 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench25ServerlessSchedulingState22planLayerStagingToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE">
+<span id="_CPPv3N6wrench25ServerlessSchedulingState22planLayerStagingToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"></span><span id="_CPPv2N6wrench25ServerlessSchedulingState22planLayerStagingToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE"></span><span id="wrench::ServerlessSchedulingState::planLayerStagingToDisk__std::shared_ptr:ServerlessComputeNode:CR.std::shared_ptr:ImageLayer:CR"></span><span class="target" id="classwrench_1_1_serverless_scheduling_state_1a97fec154030e72f3b5a1c9148b8b22df"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">planLayerStagingToDisk</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">node</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image_layer.html#_CPPv4N6wrench10ImageLayerE" title="wrench::ImageLayer"><span class="n"><span class="pre">ImageLayer</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">layer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench25ServerlessSchedulingState22planLayerStagingToDiskERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI10ImageLayerEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Plan for a layer staging to disk. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – The node at which to stage </p></li>
+<li><p><strong>layer</strong> – The layer to stage </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6wrench25ServerlessSchedulingState18protectImageLayersERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI5ImageEE">
 <span id="_CPPv3N6wrench25ServerlessSchedulingState18protectImageLayersERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI5ImageEE"></span><span id="_CPPv2N6wrench25ServerlessSchedulingState18protectImageLayersERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI5ImageEE"></span><span id="wrench::ServerlessSchedulingState::protectImageLayers__std::shared_ptr:ServerlessComputeNode:CR.std::shared_ptr:Image:CR"></span><span class="target" id="classwrench_1_1_serverless_scheduling_state_1a9e3f8327a4a65a724ff1ebfae96bf9eb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">protectImageLayers</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">node</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../api_developer/classwrench_1_1_image.html#_CPPv4N6wrench5ImageE" title="wrench::Image"><span class="n"><span class="pre">Image</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench25ServerlessSchedulingState18protectImageLayersERKNSt10shared_ptrI21ServerlessComputeNodeEERKNSt10shared_ptrI5ImageEE" title="Link to this definition"></a><br /></dt>
 <dd><p>Make all of an image’s layer protected at a compute node. </p>
@@ -1007,6 +1007,21 @@
 <li><p><strong>node</strong> – The compute node </p></li>
 <li><p><strong>image</strong> – The image </p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench25ServerlessSchedulingState21reserveInvocationSlotERKNSt10shared_ptrI21ServerlessComputeNodeEE">
+<span id="_CPPv3N6wrench25ServerlessSchedulingState21reserveInvocationSlotERKNSt10shared_ptrI21ServerlessComputeNodeEE"></span><span id="_CPPv2N6wrench25ServerlessSchedulingState21reserveInvocationSlotERKNSt10shared_ptrI21ServerlessComputeNodeEE"></span><span id="wrench::ServerlessSchedulingState::reserveInvocationSlot__std::shared_ptr:ServerlessComputeNode:CR"></span><span class="target" id="classwrench_1_1_serverless_scheduling_state_1a47099c24787ba1204d3ab4f01c2d8f4c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reserveInvocationSlot</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="classwrench_1_1_serverless_compute_node.html#_CPPv4N6wrench21ServerlessComputeNodeE" title="wrench::ServerlessComputeNode"><span class="n"><span class="pre">ServerlessComputeNode</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6wrench25ServerlessSchedulingState21reserveInvocationSlotERKNSt10shared_ptrI21ServerlessComputeNodeEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Claim one unit of a node’s invocation capacity in this planning round. </p>
+<p>Update this planning snapshot after operations or waiting choices have been selected.</p>
+<p>These methods do not select operations, append scheduling decisions, execute simulated work, or modify runtime objects. The caller appends any required runtime operations separately. Capacity claims and layer protection may account for a waiting choice that emits no operation.</p>
+<p>Updates only the planning snapshot. Does not assign an invocation to the node, reserve a container or its private resources, change pending invocation counts, or append a scheduling decision.</p>
+<p>Each invocation selecting a node must consume exactly one unit of node capacity. Do not make a separate claim if dispatch accounting already includes it. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – A compute node </p>
 </dd>
 </dl>
 </dd></dl>
