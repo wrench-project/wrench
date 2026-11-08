@@ -41,7 +41,7 @@ namespace wrench {
             _image_layers_in_ram[compute_node] = {};
             _image_layers_being_loaded_in_ram[compute_node] = {};
             _image_layers_on_disk[compute_node] = {};
-            _image_layers_being_copied_to_disk[compute_node] = {};
+            _image_layers_being_staged_to_disk[compute_node] = {};
         }
     }
 
@@ -70,14 +70,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the current image layers being copied to a node
+     * @brief Get the current image layers being staged to a node
      *
      * @param node the compute node
      * @return a set of image files
      */
-    std::set<std::shared_ptr<ImageLayer>> ServerlessStateOfTheSystem::getImageLayersBeingCopiedToNode(
+    std::set<std::shared_ptr<ImageLayer>> ServerlessStateOfTheSystem::getImageLayersBeingStagedToNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
-        return _image_layers_being_copied_to_disk.at(node);
+        return _image_layers_being_staged_to_disk.at(node);
     }
 
     /**
@@ -92,16 +92,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Determine whether an image layer is currently being copied to a node
+     * @brief Determine whether an image layer is currently being staged to a node
      *
      * @param node the compute node
      * @param layer an image layer
      *
      * @return true or false
      */
-    bool ServerlessStateOfTheSystem::isImageLayerBeingCopiedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
+    bool ServerlessStateOfTheSystem::isImageLayerBeingStagedToNode(const std::shared_ptr<ServerlessComputeNode>& node,
                                                                    const std::shared_ptr<ImageLayer>& layer) const {
-        return _image_layers_being_copied_to_disk.at(node).count(layer) != 0;
+        return _image_layers_being_staged_to_disk.at(node).count(layer) != 0;
     }
 
     /**

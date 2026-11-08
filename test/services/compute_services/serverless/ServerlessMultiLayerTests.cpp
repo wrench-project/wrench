@@ -124,7 +124,7 @@ protected:
 
         <!-- Network routes -->
         <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="wide_area"/></route>
-        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
+        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/></route>
         <route src="ServerlessHeadNode" dst="ServerlessComputeNode1">  <link_ctn id="local_area"/></route>
 
     </zone>

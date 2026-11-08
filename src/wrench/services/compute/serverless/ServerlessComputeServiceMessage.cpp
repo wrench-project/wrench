@@ -176,12 +176,12 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param action The action that did the copy
-     * @param layer The image layer that was copied
-     * @param compute_node The compute node to which the image layer was copied
+     * @param action The action that did the staging
+     * @param layer The image layer that was staged
+     * @param compute_node The compute node to which the image layer was staged
      * @param payload The message size in bytes
      */
-    ServerlessComputeServiceNodeCopyCompleteMessage::ServerlessComputeServiceNodeCopyCompleteMessage(
+    ServerlessComputeServiceLayerStagingCompleteMessage::ServerlessComputeServiceLayerStagingCompleteMessage(
         std::shared_ptr<CustomAction> action, std::shared_ptr<ImageLayer> layer,
         std::shared_ptr<ServerlessComputeNode> compute_node,
         const sg_size_t payload) : ServerlessComputeServiceMessage(payload), _action(std::move(action)),

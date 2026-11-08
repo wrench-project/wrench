@@ -69,11 +69,11 @@ namespace wrench {
     }
 
     /**
-    * @brief Select the node that has the best layer-copy plan
+    * @brief Select the node that has the best layer-staging plan
     * @param plans a map of plans
     * @return a compute node
     */
-    std::shared_ptr<ServerlessComputeNode> RandomPlanSelectionPolicy::pickBestLayerCopyPlan(
+    std::shared_ptr<ServerlessComputeNode> RandomPlanSelectionPolicy::pickBestLayerStagingPlan(
         const std::map<std::shared_ptr<ServerlessComputeNode>, std::shared_ptr<ServerlessSchedulingDecisions>>&
         plans) {
         return pickBestPlan(plans);

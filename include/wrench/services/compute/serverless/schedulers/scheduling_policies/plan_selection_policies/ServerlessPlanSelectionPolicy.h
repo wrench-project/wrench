@@ -46,11 +46,11 @@ namespace wrench {
                            std::shared_ptr<ServerlessSchedulingDecisions>>& plans) = 0;
 
         /**
-        * @brief Select the node that has the best layer-copy plan
+        * @brief Select the node that has the best layer-staging plan
         * @param plans a map of plans
         * @return a compute node
         */
-        virtual std::shared_ptr<ServerlessComputeNode> pickBestLayerCopyPlan(
+        virtual std::shared_ptr<ServerlessComputeNode> pickBestLayerStagingPlan(
             const std::map<std::shared_ptr<ServerlessComputeNode>,
                            std::shared_ptr<ServerlessSchedulingDecisions>>& plans) = 0;
 

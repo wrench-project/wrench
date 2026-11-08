@@ -82,7 +82,7 @@ protected:
 
         <!-- Network routes -->
         <route src="UserHost" dst="ServerlessHeadNode"> <link_ctn id="wide_area"/></route>
-        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/> <link_ctn id="wide_area"/></route>
+        <route src="UserHost" dst="ServerlessComputeNode1"> <link_ctn id="wide_area"/></route>
         <route src="ServerlessHeadNode" dst="ServerlessComputeNode1">  <link_ctn id="local_area"/></route>
 
     </zone>
@@ -119,7 +119,7 @@ protected:
 
             switch (called) {
             case 4:
-                decisions->image_layer_copies_to_disk.push_back({layer, compute_node});
+                decisions->image_layer_stagings_to_disk.push_back({layer, compute_node});
                 break;
             case 5:
                 decisions->image_layer_loads_to_RAM.push_back({layer, compute_node});

@@ -38,8 +38,9 @@ namespace wrench {
             {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0s"},
+            {ServerlessComputeServiceProperty::CACHE_IMAGES_ON_HEAD_NODE, "true"},
+            {ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "true"},
             {ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "0"},
-            {ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "true"}
         };
 
         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
@@ -195,10 +196,10 @@ namespace wrench {
         void processContainerInitializationCompletion(const std::shared_ptr<Container>& container,
                                                       const std::shared_ptr<Action>& init_action);
 
-        void processNodeCopyCompletion(const std::shared_ptr<ImageLayer>& layer,
+        void processLayerStagingCompletion(const std::shared_ptr<ImageLayer>& layer,
             const std::shared_ptr<ServerlessComputeNode>& node,
             const std::shared_ptr<Action>& action);
-        void processNodeLoadCompletion(const std::shared_ptr<ImageLayer>& layer,
+        void processLayerLoadingCompletion(const std::shared_ptr<ImageLayer>& layer,
             const std::shared_ptr<ServerlessComputeNode>& node,
             const std::shared_ptr<Action>& action);
 
@@ -212,7 +213,7 @@ namespace wrench {
         void evictLayersFromDisk(const std::vector<EvictLayerFromDisk>& decisions) const;
         void dispatchInvocations(const std::vector<DispatchInvocation>& decisions);
         void initiateImageLayerLoads(const std::vector<LoadImageLayer>& decisions);
-        void initiateImageLayerCopies(const std::vector<CopyImageLayer>& decisions);
+        void initiateImageLayerStagings(const std::vector<StageImageLayer>& decisions);
         void prewarmContainers(const std::vector<PrewarmContainer>& decisions);
 
         bool isInvocationSchedulable(const std::shared_ptr<Invocation>& invocation) const;
@@ -228,7 +229,7 @@ namespace wrench {
         void startServicesAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node);
 
         void initiateImageLayerDownloadFromRemote(const std::shared_ptr<ImageLayer>& layer);
-        void initiateImageLayerCopyToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
+        void initiateImageLayerStagingToComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
                                                  const std::shared_ptr<ImageLayer>& layer);
         void initiateImageLayerLoadAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& compute_node,
                                                  const std::shared_ptr<ImageLayer>& layer);
@@ -252,6 +253,9 @@ namespace wrench {
         std::optional<double> _next_scheduler_wakeup_date;
         std::shared_ptr<Alarm> _scheduler_wakeup_alarm;
         std::set<std::shared_ptr<Alarm>> _node_activation_alarms;
+
+        bool _cache_layers_on_head_node;
+        bool _simulate_remote_image_downloads;
 
 
 

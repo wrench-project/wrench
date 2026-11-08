@@ -23,7 +23,7 @@ namespace wrench {
      *          - The least number of in-RAM layer evictions
      *          - The least number of on-disk layer evictions
      *          - The least number of to-RAM layer loads
-     *          - The least number of to-disk layer copies
+     *          - The least number of to-disk layer staging operations
      */
     class EvictionAversePlanSelectionPolicy : public ServerlessPlanSelectionPolicy {
     public:
@@ -35,7 +35,7 @@ namespace wrench {
         std::shared_ptr<ServerlessComputeNode> pickBestLayerLoadPlan(
             const std::map<std::shared_ptr<ServerlessComputeNode>,
                            std::shared_ptr<ServerlessSchedulingDecisions>>& plans) override;
-        std::shared_ptr<ServerlessComputeNode> pickBestLayerCopyPlan(
+        std::shared_ptr<ServerlessComputeNode> pickBestLayerStagingPlan(
             const std::map<std::shared_ptr<ServerlessComputeNode>,
                            std::shared_ptr<ServerlessSchedulingDecisions>>& plans) override;
 

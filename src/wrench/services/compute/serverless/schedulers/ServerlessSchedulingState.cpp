@@ -20,7 +20,7 @@ namespace wrench {
         _activated_compute_nodes = state->getActivatedComputeNodes();
         _num_deactivated_compute_nodes = state->getNumDeactivatedComputeNodes();
         _num_being_activated_compute_nodes = state->getNumBeingActivatedComputeNodes();
-        for (auto const &node : _activated_compute_nodes) {
+        for (auto const& node : _activated_compute_nodes) {
             _node_states[node]._ram_available = node->getFreeRAMSpace();
             _node_states[node]._disk_available = node->getFreeDiskSpace();
         }
@@ -53,16 +53,16 @@ namespace wrench {
                 num_total_ongoing_invocations;
 
             _node_states[node]._image_layers_on_disk = state->getImageLayersOnDiskAtNode(node);
-            _node_states[node]._image_layers_on_their_way_to_disk = state->getImageLayersBeingCopiedToNode(node);
+            _node_states[node]._image_layers_on_their_way_to_disk = state->getImageLayersBeingStagedToNode(node);
 
             _node_states[node]._image_layers_in_ram = state->getImageLayersInRAMAtNode(node);
             _node_states[node]._image_layers_on_their_way_to_ram = state->getImageLayersBeingLoadedAtNode(node);
 
-            // Make all being-loaded/copied layers protected
+            // Make all being-loaded/staged layers protected
             _node_states[node]._protected_layers = {};
             auto& protected_layers = _node_states[node]._protected_layers;
-            const auto& layers_being_copied = _node_states[node]._image_layers_on_their_way_to_disk;
-            protected_layers.insert(layers_being_copied.begin(), layers_being_copied.end());
+            const auto& layers_being_staged = _node_states[node]._image_layers_on_their_way_to_disk;
+            protected_layers.insert(layers_being_staged.begin(), layers_being_staged.end());
 
             const auto& layers_being_loaded = _node_states[node]._image_layers_on_their_way_to_ram;
             protected_layers.insert(layers_being_loaded.begin(), layers_being_loaded.end());
@@ -99,7 +99,8 @@ namespace wrench {
      * @brief Get the pending invocation counts
      * @return The map of pending invocations
      */
-    const std::map<std::shared_ptr<Function>, unsigned long>& ServerlessSchedulingState::getPendingInvocationCounts() const {
+    const std::map<std::shared_ptr<Function>, unsigned long>&
+    ServerlessSchedulingState::getPendingInvocationCounts() const {
         return _pending_invocation_counts;
     }
 
@@ -159,9 +160,13 @@ namespace wrench {
 
 
     /**
-     * @brief Get the number of possible new invocations at a compute node
+     * @brief Get the node capacity remaining for invocation selections in this round.
+     *
+     * Starts with the node's invocation limit minus its observed in-flight
+     * invocations. Selected dispatches, image preparations, and waits for image
+     * preparation each consume one unit during planning.
      * @param node A compute node
-     * @return A number of possible new invocations
+     * @return A remaining invocation capacity in this planning snapshot
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
@@ -171,7 +176,7 @@ namespace wrench {
     /**
      * @brief Get the number of possible new invocations on a container
      * @param container A container
-     * @return A number of possible new invocations
+     * @return A remaining invocation capacity in this planning snapshot
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewInvocationsOnContainer(
         const std::shared_ptr<Container>& container) const {
@@ -181,7 +186,7 @@ namespace wrench {
     /**
      * @brief Get the number of possible new containers at a compute node
      * @param node A compute node
-     * @return A number of possible new containers
+     * @return A remaining container capacity in this planning snapshot
      */
     unsigned long ServerlessSchedulingState::getNumPossibleNewContainersAtComputeNode(
         const std::shared_ptr<ServerlessComputeNode>& node) const {
@@ -243,7 +248,8 @@ namespace wrench {
      * @param node A compute node
      * @return A number of bytes
      */
-    sg_size_t ServerlessSchedulingState::getRAMSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const {
+    sg_size_t ServerlessSchedulingState::getRAMSpaceAvailable(
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
         return _node_states.at(node)._ram_available;
     }
 
@@ -252,11 +258,35 @@ namespace wrench {
      * @param node A compute node
      * @return A number of bytes
      */
-    sg_size_t ServerlessSchedulingState::getDiskSpaceAvailable(const std::shared_ptr<ServerlessComputeNode>& node) const {
+    sg_size_t ServerlessSchedulingState::getDiskSpaceAvailable(
+        const std::shared_ptr<ServerlessComputeNode>& node) const {
         return _node_states.at(node)._disk_available;
     }
 
 
+    /**
+    * @brief Claim one unit of a node's invocation capacity in this planning round.
+    *
+    * Updates only the planning snapshot. Does not assign an invocation to the
+    * node, reserve a container or its private resources, change pending
+    * invocation counts, or append a scheduling decision.
+    *
+    * Each invocation selecting a node must consume exactly one unit of node
+    * capacity. Do not make a separate claim if dispatch accounting already
+    * includes it.
+    * @param node A compute node
+    */
+    void ServerlessSchedulingState::reserveInvocationSlot(const std::shared_ptr<ServerlessComputeNode>& node) {
+
+        auto& available =
+            _node_states.at(node)._num_possible_new_invocations;
+
+        if (available == 0) {
+            throw std::runtime_error(
+                "Cannot reserve an invocation slot on a full node");
+        }
+        --available;
+    }
 
     /**
      * @brief Exclude a compute node from all future planning
@@ -416,12 +446,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Plan for a layer copy to disk
-     * @param node The node at which to copy
-     * @param layer The layer to copy
+     * @brief Plan for a layer staging to disk
+     * @param node The node at which to stage
+     * @param layer The layer to stage
      */
-    void ServerlessSchedulingState::planLayerCopyToDisk(const std::shared_ptr<ServerlessComputeNode>& node,
-                                                        const std::shared_ptr<ImageLayer>& layer) {
+    void ServerlessSchedulingState::planLayerStagingToDisk(const std::shared_ptr<ServerlessComputeNode>& node,
+                                                           const std::shared_ptr<ImageLayer>& layer) {
         _node_states.at(node)._image_layers_on_their_way_to_disk.insert(layer);
         _node_states.at(node)._disk_available -= layer->getDiskFootprint();
     }

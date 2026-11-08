@@ -73,9 +73,11 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(CONTAINER_IDLE_TIMEOUT);
 
-        /** @brief The buffer size used by all internal storage services.
+        /** @brief Whether remote images (i.e., layers) should be first downloaded to the head node's storage, and cached
+         *  there for fast copies to compute nodes, or whether compute nodes should download remote images themselves.
+         *  ("true" (default) or "false")
          **/
-        DECLARE_PROPERTY_NAME(STORAGE_SERVICES_BUFFER_SIZE);
+        DECLARE_PROPERTY_NAME(CACHE_IMAGES_ON_HEAD_NODE);
 
         /** @brief Whether the download of remote images should be simulated or not (if not, then zero time is assumed).
          *  Setting this to false can create strange re-ordering of initial requests at time zero (because so much happens
@@ -84,6 +86,9 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(SIMULATE_REMOTE_IMAGE_DOWNLOADS);
 
+        /** @brief The buffer size used by all internal storage services.
+         **/
+        DECLARE_PROPERTY_NAME(STORAGE_SERVICES_BUFFER_SIZE);
     };
 
 }// namespace wrench

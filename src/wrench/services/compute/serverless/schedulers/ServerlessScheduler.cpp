@@ -15,7 +15,7 @@ namespace wrench {
             idle_container_terminations.empty() and
             layer_evictions_from_ram.empty() and
             layer_evictions_from_disk.empty() and
-            image_layer_copies_to_disk.empty() and
+            image_layer_stagings_to_disk.empty() and
             image_layer_loads_to_RAM.empty() and
             invocation_dispatches.empty() and
             container_prewarms.empty() and
@@ -46,8 +46,8 @@ namespace wrench {
             std::cerr << "  Layer eviction from disk: for layer " << layer->getName() << " at " << node->hostname <<
                 std::endl;
         }
-        for (const auto& [layer, node] : image_layer_copies_to_disk) {
-            std::cerr << "  Image layer copy: " << layer->getName() << " at " << node->hostname << std::endl;
+        for (const auto& [layer, node] : image_layer_stagings_to_disk) {
+            std::cerr << "  Image layer staging: " << layer->getName() << " at " << node->hostname << std::endl;
         }
         for (const auto& [layer, node] : image_layer_loads_to_RAM) {
             std::cerr << "  Image layer load: " << layer->getName() << " at " << node->hostname << std::endl;
