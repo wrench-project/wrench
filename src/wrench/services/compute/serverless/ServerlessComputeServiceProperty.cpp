@@ -21,6 +21,7 @@ namespace wrench {
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, INVOCATION_PROCESSING_OVERHEAD);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, CONTAINER_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, CONTAINER_IDLE_TIMEOUT);
+    SET_PROPERTY_NAME(ServerlessComputeServiceProperty, FUNCTION_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, CACHE_IMAGES_ON_HEAD_NODE);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, SIMULATE_REMOTE_IMAGE_DOWNLOADS);
     SET_PROPERTY_NAME(ServerlessComputeServiceProperty, STORAGE_SERVICES_BUFFER_SIZE);
