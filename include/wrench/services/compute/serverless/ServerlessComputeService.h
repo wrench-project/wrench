@@ -38,6 +38,7 @@ namespace wrench {
             {ServerlessComputeServiceProperty::INVOCATION_PROCESSING_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::CONTAINER_STARTUP_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::CONTAINER_IDLE_TIMEOUT, "0s"},
+            {ServerlessComputeServiceProperty::FUNCTION_STARTUP_OVERHEAD, "0s"},
             {ServerlessComputeServiceProperty::CACHE_IMAGES_ON_HEAD_NODE, "true"},
             {ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS, "true"},
             {ServerlessComputeServiceProperty::STORAGE_SERVICES_BUFFER_SIZE, "0"},
@@ -256,6 +257,7 @@ namespace wrench {
 
         bool _cache_layers_on_head_node;
         bool _simulate_remote_image_downloads;
+        double _function_startup_overhead;
 
 
 

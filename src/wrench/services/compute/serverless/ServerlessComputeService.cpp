@@ -113,6 +113,9 @@ namespace wrench {
         _simulate_remote_image_downloads = this->getPropertyValueAsBoolean(
                     ServerlessComputeServiceProperty::SIMULATE_REMOTE_IMAGE_DOWNLOADS);
 
+        // Parse the FUNCTION_STARTUP_OVERHEAD property
+        _function_startup_overhead = this->getPropertyValueAsDouble(ServerlessComputeServiceProperty::FUNCTION_STARTUP_OVERHEAD);
+
         // Deal with the 0-value defaults
         if (this->getPropertyValueAsUnsignedLong(
                 ServerlessComputeServiceProperty::MAX_NUM_CONCURRENT_INVOCATIONS_PER_NODE)
@@ -1314,6 +1317,9 @@ namespace wrench {
             const std::shared_ptr<ActionExecutor>& action_executor) {
             auto container = invocation->_container;
             auto private_storage_service = container->getPrivateStorageService();
+
+            // Function startup overhead
+            S4U_Simulation::sleep(_function_startup_overhead);
 
             if (not container->_initialized) {
                 // Invoke the user's initialization function

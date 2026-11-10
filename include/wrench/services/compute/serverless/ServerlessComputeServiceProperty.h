@@ -73,6 +73,11 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(CONTAINER_IDLE_TIMEOUT);
 
+       /** @brief The overhead to spawn a function execution on a container (default value: "0s", default unit: seconds):
+          *         Examples: "5s", "5000ms", etc.
+          **/
+       DECLARE_PROPERTY_NAME(FUNCTION_STARTUP_OVERHEAD);
+
         /** @brief Whether remote images (i.e., layers) should be first downloaded to the head node's storage, and cached
          *  there for fast copies to compute nodes, or whether compute nodes should download remote images themselves.
          *  ("true" (default) or "false")
