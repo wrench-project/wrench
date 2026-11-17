@@ -424,11 +424,24 @@ void ServerlessBasicTest::do_SanityTest_test() {
     }
 
     {
+        auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
         std::vector<std::string> compute_nodes = {"ServerlessComputeNode1", "ServerlessComputeNode2"};
         auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
             "ServerlessHeadNode", "/", compute_nodes,
-            std::make_shared<wrench::GreedyServerlessScheduler>(), {}, {}));
+            scheduler, {}, {}));
 
+        // Coverage
+        {
+            auto p1 = scheduler->getEvictionPolicy();
+            auto p2 = scheduler->getContainerPrewarmPolicy();
+            auto p3 = scheduler->getInvocationFailingPolicy();
+            auto p4 = scheduler->getInvocationOrderingPolicy();
+            auto p5 = scheduler->getNodeScalingPolicy();
+            auto p6 = scheduler->getNodeSelectionPolicy();
+            auto p7 = scheduler->getPlanSelectionPolicy();
+            auto p8 = scheduler->getReusableContainerSelectionPolicy();
+
+        }
         std::string user_host = "UserHost";
         auto wms = simulation->add(
             new ServerlessBasicTestSanityController(this, user_host, serverless_provider, storage_service));
