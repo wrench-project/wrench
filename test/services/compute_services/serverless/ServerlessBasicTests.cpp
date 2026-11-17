@@ -50,6 +50,7 @@ public:
     void do_FunctionTimeoutTest_test();
     void do_FunctionErrorTest_test();
     void do_TooManyOutstandingTest_test();
+    void do_ServiceTerminationTest_test();
 
 protected:
     ~ServerlessBasicTest() override {
@@ -210,6 +211,16 @@ private:
     int main() override {
         wrench::Simulation::sleep(1); // so that the service has started its sub-services
 
+        // Coverage
+        {
+            auto job_manager = this->createJobManager();
+            auto cjob = job_manager->createCompoundJob("cjob");
+            cjob->addSleepAction("sleep", 10);
+            try {
+                job_manager->submitJob(cjob, compute_service);
+                throw std::runtime_error("Should not be able to submit a compound job to a serverless compute service");
+            } catch (std::invalid_argument& ignore) {}
+        }
         // Retrieve resource information (no simulation)
         auto num_hosts = compute_service->getNumHosts();
         auto cores = compute_service->getPerHostNumCores();
@@ -1217,6 +1228,97 @@ void ServerlessBasicTest::do_TooManyOutstandingTest_test() {
     std::string user_host = "UserHost";
     auto wms = simulation->add(
         new ServerlessBasicTestTooManyOutstandingController(this, user_host, serverless_provider, storage_service));
+
+    simulation->launch();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  SERVICE TERMINATION TEST                                       **/
+/**********************************************************************/
+
+class ServerlessBasicTestServiceTerminationController : public wrench::ExecutionController {
+public:
+    ServerlessBasicTestServiceTerminationController(ServerlessBasicTest* test,
+                                                    const std::string& hostname,
+                                                    const std::shared_ptr<wrench::ServerlessComputeService>
+                                                    & compute_service,
+                                                    const std::shared_ptr<wrench::StorageService>& storage_service) :
+        wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+        this->compute_service = compute_service;
+        this->storage_service = storage_service;
+    }
+
+private:
+    ServerlessBasicTest* test;
+    std::shared_ptr<wrench::ServerlessComputeService> compute_service;
+    std::shared_ptr<wrench::StorageService> storage_service;
+
+    int main() override {
+        // Register a function
+        auto function_manager = this->createFunctionManager();
+        std::function lambda = [](const std::shared_ptr<wrench::FunctionInput>& input,
+                                  const std::shared_ptr<wrench::StorageService>& service) -> std::shared_ptr<
+            wrench::FunctionOutput> {
+            auto real_input = std::dynamic_pointer_cast<MyFunctionInput>(input);
+            wrench::Simulation::sleep(100);
+            return std::make_shared<MyFunctionOutput>("DONE");
+        };
+
+        auto layer_file = wrench::Simulation::addFile("layer_file", 100 * MB);
+        auto layer_location = wrench::FileLocation::LOCATION(this->storage_service, layer_file);
+        wrench::StorageService::createFileAtLocation(layer_location);
+        auto layer = wrench::FunctionManager::createImageLayer("my_layer", layer_location, layer_file->getSize());
+        auto image = wrench::FunctionManager::createImage("my_image", {layer});
+
+        // Registering a function
+        auto input = std::make_shared<MyFunctionInput>(1, 2);
+        auto registered_function1 = function_manager->registerFunction("Function 1", noop_init, lambda, image,
+                                                                       this->compute_service, 500, 2000 * MB,
+                                                                       8000 * MB, 10 * MB, 1 * MB);
+
+        // Place an invocation and then terminate the service
+            auto invocation = function_manager->invokeFunction(registered_function1, this->compute_service, input);
+
+        wrench::Simulation::sleep(10);
+
+        compute_service->stop();
+
+        return 0;
+    }
+};
+
+TEST_F(ServerlessBasicTest, DISABLED_ServiceTermination) {
+        DO_TEST_WITH_FORK(do_ServiceTerminationTest_test);
+}
+
+void ServerlessBasicTest::do_ServiceTerminationTest_test() {
+    int argc = 1;
+    auto argv = (char**)calloc(argc, sizeof(char*));
+    argv[0] = strdup("unit_test");
+    // argv[1] = strdup("--wrench-full-log");
+
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(this->platform_file_path);
+
+    auto storage_service = simulation->add(wrench::SimpleStorageService::createSimpleStorageService(
+        "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50MB"}}, {}));
+
+    std::vector<std::string> compute_nodes = {"ServerlessComputeNode1"};
+    auto scheduler = std::make_shared<wrench::GreedyServerlessScheduler>();
+    auto serverless_provider = simulation->add(new wrench::ServerlessComputeService(
+        "ServerlessHeadNode", "/", compute_nodes, scheduler, {}, {}));
+
+    std::string user_host = "UserHost";
+    auto wms = simulation->add(
+        new ServerlessBasicTestServiceTerminationController(this, user_host, serverless_provider, storage_service));
 
     simulation->launch();
 

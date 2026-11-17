@@ -169,15 +169,9 @@ namespace wrench {
             auto num_cores_available = S4U_Simulation::getHostNumCores(hostname);
             double speed = S4U_Simulation::getHostFlopRate(hostname);
             sg_size_t ram_available = S4U_Simulation::getHostMemoryCapacity(hostname);
-            sg_size_t disk_capacity;
+            sg_size_t disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
             // sg_size_t disk_read_bandwidth;
             // sg_size_t disk_write_bandwidth;
-            try {
-                disk_capacity = S4U_Simulation::getDiskCapacity(hostname, "/");
-            } catch (std::invalid_argument&) {
-                throw std::invalid_argument(
-                    "Compute nodes for a serverless compute service must have a '/' mountpoint");
-            }
 
             // Compute speed
             if (std::abs(speed - _compute_node_core_speed) > DBL_EPSILON) {
@@ -1184,7 +1178,7 @@ namespace wrench {
                 }
             }
 
-            // Notify the submitted
+            // Notify the submitter
             if (send_notification_message) {
                 inv->_notify_commport->dputMessage(
                     new ServerlessComputeServiceFunctionInvocationCompleteMessage(
@@ -1477,10 +1471,6 @@ namespace wrench {
      * @brief Start disk/ram storage services at a node.
      */
     void ServerlessComputeService::startServicesAtComputeNode(const std::shared_ptr<ServerlessComputeNode>& node) {
-        if (not S4U_Simulation::hostHasMountPoint(node->hostname, "/")) {
-            throw std::invalid_argument("ServerlessComputeService::startComputeNodeServices(): "
-                "each compute node in a serverless compute service should have a \"/\" mountpoint");
-        }
 
         // Start a compute service, to implement compute-node storage
         {
