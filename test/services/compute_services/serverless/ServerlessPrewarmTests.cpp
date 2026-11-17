@@ -150,6 +150,9 @@ protected:
                 break;
             }
 
+            // Some coverage
+            decisions->log();
+
             return decisions;
         }
     };

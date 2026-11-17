@@ -195,6 +195,8 @@ namespace wrench {
          void setPolicy(std::shared_ptr<ServerlessInvocationFailingPolicy> policy);
          void setPolicy(std::shared_ptr<ServerlessReusableContainerSelectionPolicy> policy);
 
+         void setDecisionLogging(bool log_decisions);
+
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
@@ -218,6 +220,8 @@ namespace wrench {
             unsigned long num_needed_containers,
             const std::set<std::shared_ptr<ImageLayer>>& invocation_layers_to_protect) const;
 
+        /** @brief Whether to log scheduling decisions **/
+        bool _log_decisions;
 
         /** @brief The node activation policy **/
         std::shared_ptr<ServerlessNodeScalingPolicy> _node_scaling_policy;

@@ -707,6 +707,7 @@ TEST_F(ServerlessBasicTest, FunctionInvocation) {
                                 scheduler->setPolicy(selection_policy);
                                 scheduler->setPolicy(container_prewarm_policy);
                                 scheduler->setPolicy(invocation_failing_policy);
+                                scheduler->setDecisionLogging(true);
                                 schedulers.push_back(scheduler);
                             }
                         }

@@ -179,8 +179,7 @@ namespace wrench {
         /** @brief The (optional) next scheduler wake-up time */
         std::optional<double> scheduler_wakeup_date;
 
-
-        void print();
+        void log();
     };
 
     /**
