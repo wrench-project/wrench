@@ -167,6 +167,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Set whether the scheduler should log al its scheduling decisions
+     * @param log_decisions true if logging is enabled, false otherwise
+     */
+    void GreedyServerlessScheduler::setDecisionLogging(bool log_decisions) {
+        _log_decisions = log_decisions;
+    }
+
+    /**
      * @brief Build one batch of scheduling decisions using a mutable planning
      *        snapshot without modifying the supplied invocation vector.
      *
@@ -318,6 +326,10 @@ namespace wrench {
 
         if (earliest_wake_update != DBL_MAX) {
             decisions->scheduler_wakeup_date = earliest_wake_update;
+        }
+
+        if (_log_decisions) {
+            decisions->log();
         }
 
         return decisions;

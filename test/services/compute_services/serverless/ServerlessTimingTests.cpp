@@ -278,6 +278,7 @@ TEST_F(ServerlessTimingTest, ImageReuse) {
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
 
@@ -290,6 +291,7 @@ TEST_F(ServerlessTimingTest, ImageReuse) {
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
 
@@ -302,6 +304,7 @@ TEST_F(ServerlessTimingTest, ImageReuse) {
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
 
@@ -314,6 +317,7 @@ TEST_F(ServerlessTimingTest, ImageReuse) {
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
 
@@ -447,6 +451,7 @@ TEST_F(ServerlessTimingTest, CorePressure) {
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -458,6 +463,7 @@ TEST_F(ServerlessTimingTest, CorePressure) {
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverPrewarmContainerPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::NeverFailInvocationsPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
 
@@ -584,6 +590,7 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -593,6 +600,7 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToImages) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -719,6 +727,7 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToInvocations) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -728,6 +737,7 @@ TEST_F(ServerlessTimingTest, RAMPressureDueToInvocations) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -851,6 +861,7 @@ TEST_F(ServerlessTimingTest, DiskPressureDueToImages) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -860,6 +871,7 @@ TEST_F(ServerlessTimingTest, DiskPressureDueToImages) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -983,6 +995,7 @@ TEST_F(ServerlessTimingTest, DiskPressureDueToInvocations) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -992,6 +1005,7 @@ TEST_F(ServerlessTimingTest, DiskPressureDueToInvocations) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1126,6 +1140,7 @@ TEST_F(ServerlessTimingTest, HotStart) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -1135,6 +1150,7 @@ TEST_F(ServerlessTimingTest, HotStart) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1306,6 +1322,7 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -1315,6 +1332,7 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromDisk) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1473,6 +1491,7 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromRAM) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -1482,6 +1501,7 @@ TEST_F(ServerlessTimingTest, SimpleImageEvictionFromRAM) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1640,6 +1660,7 @@ TEST_F(ServerlessTimingTest, TwoIdleContainers) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -1649,6 +1670,7 @@ TEST_F(ServerlessTimingTest, TwoIdleContainers) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1787,6 +1809,7 @@ TEST_F(ServerlessTimingTest, OneIdleContainerTwoInvocations) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -1796,6 +1819,7 @@ TEST_F(ServerlessTimingTest, OneIdleContainerTwoInvocations) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -1971,6 +1995,7 @@ TEST_F(ServerlessTimingTest, IdleContainerEviction) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -1980,6 +2005,7 @@ TEST_F(ServerlessTimingTest, IdleContainerEviction) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
@@ -2115,6 +2141,7 @@ TEST_F(ServerlessTimingTest, ImageDownloadSimulation) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::FewestServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     {
@@ -2124,6 +2151,7 @@ TEST_F(ServerlessTimingTest, ImageDownloadSimulation) {
         scheduler->setPolicy(std::make_shared<wrench::AllPossibleNodeSelectionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::LRUServerlessEvictionPolicy>());
         scheduler->setPolicy(std::make_shared<wrench::EvictionAversePlanSelectionPolicy>());
+        scheduler->setDecisionLogging(true);
         schedulers.push_back(scheduler);
     }
     for (auto& scheduler : schedulers) {
