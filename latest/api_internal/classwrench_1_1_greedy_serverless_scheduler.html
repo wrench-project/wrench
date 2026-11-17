@@ -235,6 +235,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler22getPlanSelectionPolicyEv"><code class="docutils literal notranslate"><span class="pre">getPlanSelectionPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK6wrench25GreedyServerlessScheduler35getReusableContainerSelectionPolicyEv"><code class="docutils literal notranslate"><span class="pre">getReusableContainerSelectionPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler8scheduleEPK26ServerlessStateOfTheSystem"><code class="docutils literal notranslate"><span class="pre">schedule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler18setDecisionLoggingEb"><code class="docutils literal notranslate"><span class="pre">setDecisionLogging()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI32ServerlessContainerPrewarmPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI24ServerlessEvictionPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv4N6wrench25GreedyServerlessScheduler9setPolicyENSt10shared_ptrI33ServerlessInvocationFailingPolicyEE"><code class="docutils literal notranslate"><span class="pre">setPolicy()</span></code></a></li>
@@ -698,6 +699,17 @@ The result describes operations for <a class="reference internal" href="../api_u
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A new <a class="reference internal" href="classwrench_1_1_serverless_scheduling_decisions.html#classwrench_1_1_serverless_scheduling_decisions"><span class="std std-ref">ServerlessSchedulingDecisions</span></a> object. Its operation lists may all be empty, independently of whether a future wakeup is requested. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6wrench25GreedyServerlessScheduler18setDecisionLoggingEb">
+<span id="_CPPv3N6wrench25GreedyServerlessScheduler18setDecisionLoggingEb"></span><span id="_CPPv2N6wrench25GreedyServerlessScheduler18setDecisionLoggingEb"></span><span id="wrench::GreedyServerlessScheduler::setDecisionLogging__b"></span><span class="target" id="classwrench_1_1_greedy_serverless_scheduler_1a5d411e041d9f0d9ffaab7f3c3706b452"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setDecisionLogging</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_decisions</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Set whether the scheduler should log al its scheduling decisions. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>log_decisions</strong> – true if logging is enabled, false otherwise </p>
 </dd>
 </dl>
 </dd></dl>
