@@ -1194,9 +1194,11 @@ private:
             throw std::runtime_error("Unexpected event: " + event->toString());
         }
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
-        if (not std::dynamic_pointer_cast<wrench::NotAllowed>(real_event->failure_cause)) {
+        auto real_failure_cause = std::dynamic_pointer_cast<wrench::NotAllowed>(real_event->failure_cause);
+        if (not real_failure_cause) {
             throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString());
         }
+        auto ignore = real_failure_cause->getService(); // coverage
 
         return 0;
     }
