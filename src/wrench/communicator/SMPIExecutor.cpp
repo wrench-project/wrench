@@ -39,12 +39,12 @@ namespace wrench {
             }
             const auto buffer_size = ranks * bytes_per_peer;
             void* send_buffer = SMPI_SHARED_MALLOC(buffer_size);
-            // void* receive_buffer = SMPI_SHARED_MALLOC(buffer_size);
-            void *receive_buffer = send_buffer; // This should be fine given SMPI's semantics
+            void* receive_buffer = SMPI_SHARED_MALLOC(buffer_size);
+            // void *receive_buffer = send_buffer; // This should be fine given SMPI's semantics
 
             MPI_Alltoall(send_buffer, data_size, MPI_CHAR, receive_buffer, data_size, MPI_CHAR, MPI_COMM_WORLD);
             SMPI_SHARED_FREE(send_buffer);
-            // SMPI_SHARED_FREE(receive_buffer);
+            SMPI_SHARED_FREE(receive_buffer);
             MPI_Finalize();
         }
 
