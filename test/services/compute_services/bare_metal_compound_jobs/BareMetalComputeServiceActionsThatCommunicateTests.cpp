@@ -295,9 +295,15 @@ private:
     }
 };
 
+#if defined(__linux__)
 TEST_F(BareMetalComputeServiceActionsThatCommunicateTest, MPICollectives) {
     DO_TEST_WITH_FORK(do_MPICollectives_test);
 }
+#else
+TEST_F(BareMetalComputeServiceActionsThatCommunicateTest, DISABLED_MPICollectives) {
+    DO_TEST_WITH_FORK(do_MPICollectives_test);
+}
+#endif
 
 void BareMetalComputeServiceActionsThatCommunicateTest::do_MPICollectives_test() {
     // Create and initialize a simulation

@@ -129,7 +129,8 @@ private:
             auto data_manager = controller->createDataMovementManager();
 
             int num_comm_bytes = 1000000;
-            void *data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
+            void *snd_data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
+            void *rcv_data = SMPI_SHARED_MALLOC(num_comm_bytes * num_procs);
 
             // Do a bulk-synchronous loop of 10 iterations
             for (unsigned long iter = 0; iter < 10; iter++) {
@@ -144,9 +145,10 @@ private:
                 wrench::Simulation::compute(flops);
 
                 // Participate in an all-to-all communication
-                MPI_Alltoall(data, num_comm_bytes, MPI_CHAR, data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
+                MPI_Alltoall(snd_data, num_comm_bytes, MPI_CHAR, rcv_data, num_comm_bytes, MPI_CHAR, MPI_COMM_WORLD);
             }
-            SMPI_SHARED_FREE(data);
+            SMPI_SHARED_FREE(snd_data);
+            SMPI_SHARED_FREE(rcv_data);
             MPI_Barrier(MPI_COMM_WORLD);
             WRENCH_INFO("Action with rank %d completed!", my_rank);
 
@@ -178,9 +180,15 @@ private:
     }
 };
 
+#if defined(__linux__)
 TEST_F(BatchComputeServiceMPIActionTest, MPIAction) {
     DO_TEST_WITH_FORK(do_MPIAction_test);
 }
+#else
+TEST_F(BatchComputeServiceMPIActionTest, DISABLED_MPIAction) {
+    DO_TEST_WITH_FORK(do_MPIAction_test);
+}
+#endif
 
 void BatchComputeServiceMPIActionTest::do_MPIAction_test() {
     // Create and initialize a simulation
