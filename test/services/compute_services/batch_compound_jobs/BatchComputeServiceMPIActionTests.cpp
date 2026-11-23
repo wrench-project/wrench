@@ -180,9 +180,15 @@ private:
     }
 };
 
+#if defined(__linux__)
 TEST_F(BatchComputeServiceMPIActionTest, MPIAction) {
     DO_TEST_WITH_FORK(do_MPIAction_test);
 }
+#else
+TEST_F(BatchComputeServiceMPIActionTest, DISABLED_MPIAction) {
+    DO_TEST_WITH_FORK(do_MPIAction_test);
+}
+#endif
 
 void BatchComputeServiceMPIActionTest::do_MPIAction_test() {
     // Create and initialize a simulation
